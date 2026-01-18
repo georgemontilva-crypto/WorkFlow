@@ -226,4 +226,4 @@
 - [x] Traducir contenido a inglés en LandingLanguageContext
 - [x] Posicionar sección después de pricing y antes de badges de cumplimiento
 - [x] Verificar diseño minimalista y legibilidad en ambos idiomas
-- [ ] Guardar checkpoint y hacer push
+- [x] Guardar checkpoint y hacer push
