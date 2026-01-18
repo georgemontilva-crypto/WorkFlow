@@ -33,7 +33,7 @@ export interface Invoice {
   dueDate: string;
   amount: number;
   paidAmount?: number; // Monto pagado (para pagos parciales)
-  status: 'pending' | 'paid' | 'overdue' | 'cancelled';
+  status: 'pending' | 'paid' | 'overdue' | 'cancelled' | 'archived';
   items: InvoiceItem[];
   notes?: string;
   createdAt: string;

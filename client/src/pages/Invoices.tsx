@@ -56,7 +56,8 @@ import { useState } from 'react';
 
 export default function Invoices() {
   const { t } = useLanguage();
-  const invoices = useLiveQuery(() => db.invoices.orderBy('createdAt').reverse().toArray());
+  const invoices = useLiveQuery(() => db.invoices.where('status').notEqual('archived').sortBy('createdAt').then(arr => arr.reverse()));
+  const archivedInvoices = useLiveQuery(() => db.invoices.where('status').equals('archived').sortBy('createdAt').then(arr => arr.reverse()));
   const clients = useLiveQuery(() => db.clients.toArray());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
@@ -208,6 +209,27 @@ export default function Invoices() {
 
     setShowStatusDialog(false);
     setSelectedInvoice(null);
+  };
+
+  const handleArchive = async (invoice: Invoice) => {
+    if (invoice.status !== 'paid') {
+      toast.error('Solo se pueden archivar facturas pagadas');
+      return;
+    }
+    
+    await db.invoices.update(invoice.id!, { 
+      status: 'archived', 
+      updatedAt: new Date().toISOString() 
+    });
+    toast.success('Factura archivada exitosamente');
+  };
+
+  const handleUnarchive = async (invoice: Invoice) => {
+    await db.invoices.update(invoice.id!, { 
+      status: 'paid', 
+      updatedAt: new Date().toISOString() 
+    });
+    toast.success('Factura restaurada');
   };
 
   const handlePartialPayment = (invoice: Invoice) => {
@@ -669,6 +691,15 @@ export default function Invoices() {
                               <AlertCircle className="w-4 h-4 mr-2 text-destructive" />
                               Marcar como Vencida
                             </DropdownMenuItem>
+                            {invoice.status === 'paid' && (
+                              <DropdownMenuItem 
+                                onClick={() => handleArchive(invoice)}
+                                className="text-green-400 hover:bg-accent cursor-pointer"
+                              >
+                                <CheckCircle2 className="w-4 h-4 mr-2" />
+                                Archivar Factura
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuSeparator className="bg-border" />
                             <DropdownMenuItem 
                               onClick={() => handleStatusChange(invoice, 'cancelled')}

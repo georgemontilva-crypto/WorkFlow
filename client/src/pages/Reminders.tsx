@@ -149,7 +149,7 @@ export default function Reminders() {
     return (
       <Card className={`bg-card border-border hover:bg-accent/5 transition-all ${config.cardBorder}`}>
         <CardContent className="p-4">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4">
             {/* Left: Icon and Info */}
             <div className="flex items-start gap-3 flex-1 min-w-0">
               <div className={`p-2 rounded-lg bg-accent/20 ${config.iconColor} flex-shrink-0`}>
@@ -189,7 +189,7 @@ export default function Reminders() {
             </div>
 
             {/* Right: Amount and Actions */}
-            <div className="flex flex-col items-end gap-2 flex-shrink-0">
+            <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 flex-shrink-0 w-full sm:w-auto">
               <div className="flex items-center gap-1 text-foreground">
                 <DollarSign className="w-4 h-4 text-muted-foreground" />
                 <span className="font-bold font-mono text-lg">
@@ -200,7 +200,7 @@ export default function Reminders() {
                 size="sm"
                 variant="outline"
                 onClick={() => handleViewItem(item)}
-                className="border-border text-foreground hover:bg-accent"
+                className="border-border text-foreground hover:bg-accent whitespace-nowrap"
               >
                 <Eye className="w-3 h-3 mr-1" />
                 Ver
