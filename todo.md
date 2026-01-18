@@ -238,4 +238,4 @@
 ## Actualizar Precio a $199 USD
 - [x] Cambiar precio en LandingLanguageContext.tsx (español e inglés)
 - [x] Verificar que el precio se muestre correctamente en la landing page
-- [ ] Guardar checkpoint y hacer push
+- [x] Guardar checkpoint y hacer push
