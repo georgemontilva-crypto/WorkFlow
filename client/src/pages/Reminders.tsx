@@ -13,9 +13,11 @@ import { Bell, BellOff, Calendar, DollarSign, User, AlertCircle, CheckCircle2 } 
 import { format, parseISO, differenceInDays, isPast } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useState } from 'react';
 
 export default function Reminders() {
+  const { t } = useLanguage();
   const clients = useLiveQuery(() => db.clients.where('status').equals('active').toArray());
   const invoices = useLiveQuery(() => db.invoices.where('status').equals('pending').toArray());
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());

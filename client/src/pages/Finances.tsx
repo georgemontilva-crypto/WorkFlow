@@ -27,11 +27,13 @@ import { db, type Transaction } from '@/lib/db';
 import { Plus, TrendingUp, TrendingDown } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, parseISO, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export default function Finances() {
+  const { t } = useLanguage();
   const transactions = useLiveQuery(() => db.transactions.orderBy('date').reverse().toArray());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState<Partial<Transaction>>({

@@ -12,9 +12,11 @@ import { Users, FileText, TrendingUp, TrendingDown, Plus, AlertCircle, Bell, Tar
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useLocation } from 'wouter';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Home() {
   const [, setLocation] = useLocation();
+  const { t } = useLanguage();
   const clients = useLiveQuery(() => db.clients.toArray());
   const invoices = useLiveQuery(() => db.invoices.toArray());
   const transactions = useLiveQuery(() => 
@@ -72,9 +74,9 @@ export default function Home() {
         {/* Header with Action Buttons */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{t.dashboard.title}</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
-              Resumen de tu gestión financiera y clientes
+              {t.dashboard.subtitle}
             </p>
           </div>
           
@@ -85,8 +87,8 @@ export default function Home() {
               className="bg-primary text-primary-foreground hover:opacity-90 flex-1 sm:flex-none"
             >
               <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Agregar Cliente</span>
-              <span className="sm:hidden">Cliente</span>
+              <span className="hidden sm:inline">{t.clients.newClient}</span>
+              <span className="sm:hidden">{t.clients.title}</span>
             </Button>
             <Button
               onClick={() => setLocation('/invoices')}
@@ -94,8 +96,8 @@ export default function Home() {
               className="border-border text-foreground hover:bg-accent flex-1 sm:flex-none"
             >
               <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Nueva Factura</span>
-              <span className="sm:hidden">Factura</span>
+              <span className="hidden sm:inline">{t.invoices.newInvoice}</span>
+              <span className="sm:hidden">{t.invoices.title}</span>
             </Button>
           </div>
         </div>
@@ -107,8 +109,8 @@ export default function Home() {
               <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-foreground" strokeWidth={1.5} />
             </div>
             <div>
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">Control Total</h2>
-              <p className="text-sm sm:text-base text-muted-foreground">Gestiona tu negocio con precisión</p>
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">{t.dashboard.totalControl}</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">{t.dashboard.totalControlSubtitle}</p>
             </div>
           </div>
         </div>
@@ -119,8 +121,8 @@ export default function Home() {
             <CardHeader className="pb-2 sm:pb-3">
               <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
                 <Users className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
-                <span className="hidden sm:inline">Clientes Activos</span>
-                <span className="sm:hidden">Clientes</span>
+                <span className="hidden sm:inline">{t.dashboard.activeClients}</span>
+                <span className="sm:hidden">{t.clients.title}</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -132,8 +134,8 @@ export default function Home() {
             <CardHeader className="pb-2 sm:pb-3">
               <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
                 <FileText className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
-                <span className="hidden sm:inline">Facturas Pendientes</span>
-                <span className="sm:hidden">Facturas</span>
+                <span className="hidden sm:inline">{t.dashboard.pendingInvoices}</span>
+                <span className="sm:hidden">{t.invoices.title}</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -145,8 +147,8 @@ export default function Home() {
             <CardHeader className="pb-2 sm:pb-3">
               <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
                 <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
-                <span className="hidden sm:inline">Ingresos del Mes</span>
-                <span className="sm:hidden">Ingresos</span>
+                <span className="hidden sm:inline">{t.dashboard.monthlyIncome}</span>
+                <span className="sm:hidden">{t.finances.income}</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -160,8 +162,8 @@ export default function Home() {
             <CardHeader className="pb-2 sm:pb-3">
               <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
                 <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
-                <span className="hidden sm:inline">Gastos del Mes</span>
-                <span className="sm:hidden">Gastos</span>
+                <span className="hidden sm:inline">{t.dashboard.monthlyExpenses}</span>
+                <span className="sm:hidden">{t.finances.expense}</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -208,13 +210,13 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="text-foreground flex items-center gap-2 text-base sm:text-lg">
                 <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
-                Próximos Pagos
+                {t.dashboard.upcomingPayments}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {upcomingPayments.length === 0 ? (
                 <p className="text-sm sm:text-base text-muted-foreground text-center py-4 sm:py-8">
-                  No hay pagos próximos según tus recordatorios configurados
+                  {t.dashboard.noUpcomingPayments}
                 </p>
               ) : (
                 <div className="space-y-2 sm:space-y-3 max-h-48 sm:max-h-64 overflow-y-auto">
@@ -244,14 +246,14 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="text-foreground flex items-center gap-2 text-base sm:text-lg">
                 <Target className="w-4 h-4 sm:w-5 sm:h-5" />
-                Metas de Ahorro
+                {t.dashboard.savingsGoals}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {!savingsGoals || savingsGoals.length === 0 ? (
                 <div className="text-center py-4 sm:py-8">
                   <p className="text-sm sm:text-base text-muted-foreground mb-3">
-                    No tienes metas de ahorro creadas
+                    {t.dashboard.noSavingsGoals}
                   </p>
                   <Button
                     onClick={() => setLocation('/savings')}
@@ -260,7 +262,7 @@ export default function Home() {
                     className="border-border text-foreground hover:bg-accent"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Crear Meta
+                    {t.goals.newGoal}
                   </Button>
                 </div>
               ) : (
@@ -304,7 +306,7 @@ export default function Home() {
                       size="sm"
                       className="w-full text-muted-foreground hover:text-foreground hover:bg-accent mt-2"
                     >
-                      Ver todas las metas →
+                      {t.dashboard.viewAll} →
                     </Button>
                   )}
                 </div>

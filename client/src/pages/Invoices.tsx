@@ -50,10 +50,12 @@ import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, 
 import { format, parseISO, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useLanguage } from '@/contexts/LanguageContext';
 import jsPDF from 'jspdf';
 import { useState } from 'react';
 
 export default function Invoices() {
+  const { t } = useLanguage();
   const invoices = useLiveQuery(() => db.invoices.orderBy('createdAt').reverse().toArray());
   const clients = useLiveQuery(() => db.clients.toArray());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -847,7 +849,7 @@ export default function Invoices() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Buscar por nombre, empresa o email..."
+                placeholder={t.clientSelector.searchPlaceholder}
                 value={clientSearch}
                 onChange={(e) => setClientSearch(e.target.value)}
                 className="pl-10 bg-background border-border text-foreground h-11"

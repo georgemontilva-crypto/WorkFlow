@@ -30,9 +30,11 @@ import { Target, Plus, TrendingUp, MoreVertical, Pencil, Trash2, CheckCircle2 } 
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useState } from 'react';
 
 export default function Savings() {
+  const { t } = useLanguage();
   const savingsGoals = useLiveQuery(() => db.savingsGoals.orderBy('createdAt').reverse().toArray());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);

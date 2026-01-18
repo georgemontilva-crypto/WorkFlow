@@ -37,9 +37,11 @@ import { Users, Plus, Search, MoreVertical, Pencil, Trash2, Mail, Phone, Calenda
 import { format, parseISO, differenceInDays, addMonths, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useState } from 'react';
 
 export default function Clients() {
+  const { t } = useLanguage();
   const clients = useLiveQuery(() => db.clients.orderBy('createdAt').reverse().toArray());
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -175,9 +177,9 @@ export default function Clients() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Clientes</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{t.clients.title}</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
-              Gestiona tu base de datos de clientes y recordatorios de pago
+              {t.clients.subtitle}
             </p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
@@ -201,13 +203,13 @@ export default function Clients() {
             <DialogTrigger asChild>
               <Button className="bg-primary text-primary-foreground hover:opacity-90">
                 <Plus className="w-4 h-4 mr-2" />
-                Nuevo Cliente
+                {t.clients.newClient}
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-popover border-border max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
               <DialogHeader className="pb-4">
                 <DialogTitle className="text-foreground text-xl sm:text-2xl">
-                  {editingClient ? 'Editar Cliente' : 'Agregar Nuevo Cliente'}
+                  {editingClient ? t.clients.editClient : t.clients.addClient}
                 </DialogTitle>
                 <DialogDescription className="text-muted-foreground text-sm">
                   {editingClient ? 'Actualiza la información del cliente' : 'Completa los datos del nuevo cliente y su ciclo de facturación'}
@@ -400,7 +402,7 @@ export default function Clients() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar clientes..."
+              placeholder={t.clients.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 bg-card border-border text-foreground h-11"
