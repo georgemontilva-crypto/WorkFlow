@@ -12,6 +12,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Landing from "./pages/Landing";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Clients from "./pages/Clients";
 import Invoices from "./pages/Invoices";
@@ -24,6 +26,8 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
+      <Route path="/signup" component={Signup} />
+      <Route path="/login" component={Login} />
       <Route path="/dashboard" component={Home} />
       <Route path="/clients" component={Clients} />
       <Route path="/invoices" component={Invoices} />

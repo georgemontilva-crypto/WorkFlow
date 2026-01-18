@@ -7,12 +7,13 @@
 import { Button } from '@/components/ui/button';
 import { Check, TrendingUp, FileText, Users, Target, Bell, Shield, Menu, X } from 'lucide-react';
 import { useState } from 'react';
-import { getLoginUrl } from '@/const';
+import { useLocation } from 'wouter';
 import { LandingLanguageProvider, useLandingLanguage } from '@/contexts/LandingLanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 
 function LandingContent() {
   const { t } = useLandingLanguage();
+  const [, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const features = [
@@ -69,7 +70,7 @@ function LandingContent() {
               {t.nav.security}
             </a>
             <LanguageSelector />
-            <Button onClick={() => window.location.href = getLoginUrl()} className="bg-primary text-primary-foreground hover:opacity-90">
+            <Button onClick={() => setLocation('/signup')} className="bg-primary text-primary-foreground hover:opacity-90">
               {t.nav.startTrial}
             </Button>
           </nav>
@@ -114,7 +115,7 @@ function LandingContent() {
                 <Button 
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    window.location.href = getLoginUrl();
+                    setLocation('/signup');
                   }} 
                   className="bg-primary text-primary-foreground hover:opacity-90 flex-1"
                 >
@@ -140,7 +141,7 @@ function LandingContent() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button 
               size="lg" 
-              onClick={() => window.location.href = getLoginUrl()}
+              onClick={() => setLocation('/signup')}
               className="bg-primary text-primary-foreground hover:opacity-90 text-lg px-8 py-6"
             >
               {t.hero.cta1}
@@ -226,7 +227,7 @@ function LandingContent() {
 
             <Button 
               size="lg" 
-              onClick={() => window.location.href = getLoginUrl()}
+              onClick={() => setLocation('/signup')}
               className="w-full bg-primary text-primary-foreground hover:opacity-90 text-lg py-6"
             >
               {t.pricing.cta}

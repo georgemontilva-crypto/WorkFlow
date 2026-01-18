@@ -179,3 +179,40 @@
 - [x] Agregar animación smooth para apertura/cierre del menú
 - [x] Verificar funcionamiento en móvil
 - [x] Guardar checkpoint y hacer push
+
+
+## Sistema de Autenticación Propio (Email/Contraseña)
+- [x] Actualizar esquema de users para incluir email, password_hash, email_verified
+- [x] Instalar dependencias: bcryptjs para hash de contraseñas
+- [x] Crear endpoints de registro (signup) y login en routers.ts
+- [x] Implementar generación y verificación de JWT tokens
+- [x] Actualizar context.ts para usar JWT en lugar de Manus OAuth
+- [x] Crear página de registro (/signup) con diseño minimalista
+- [x] Crear página de login (/login) con diseño minimalista
+- [x] Actualizar Landing para redirigir a /signup en lugar de Manus OAuth
+- [x] Agregar rutas de signup y login a App.tsx
+- [x] Agregar todas las funciones faltantes de db.ts (clients, invoices, transactions, savings goals)
+- [x] Probar registro con validación de usuarios duplicados
+- [ ] Actualizar DashboardLayout para usar autenticación propia
+- [ ] Actualizar sistema de trial para inicializar en registro
+- [ ] Probar flujo completo: registro → login → dashboard → trial
+- [ ] Guardar checkpoint y hacer push
+
+
+## Seguridad de Grado Militar
+- [x] Instalar dependencias de seguridad (crypto para AES-256, express-rate-limit, helmet)
+- [x] Implementar encriptación AES-256-GCM para datos sensibles en base de datos
+- [x] Crear helpers de encriptación/desencriptación con rotación de claves
+- [ ] Encriptar campos sensibles: email, nombre, datos financieros
+- [x] Aumentar bcrypt salt rounds a 12 para mayor seguridad
+- [ ] Implementar rate limiting en endpoints de autenticación (5 intentos/15min)
+- [ ] Agregar helmet para headers de seguridad (HSTS, CSP, X-Frame-Options)
+- [ ] Implementar validación estricta de inputs con zod
+- [ ] Crear sistema de auditoría con logs de operaciones sensibles
+- [ ] Agregar tabla de audit_logs en base de datos
+- [ ] Implementar CORS restrictivo solo para dominios autorizados
+- [ ] Agregar protección CSRF para formularios
+- [ ] Configurar JWT con expiración corta (1 hora) y refresh tokens
+- [ ] Implementar 2FA opcional con TOTP (Google Authenticator)
+- [ ] Documentar medidas de seguridad implementadas
+- [ ] Guardar checkpoint y hacer push

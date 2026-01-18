@@ -11,11 +11,16 @@ export const users = mysqlTable("users", {
    * Use this for relations between tables.
    */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
-  openId: varchar("openId", { length: 64 }).notNull().unique(),
-  name: text("name"),
-  email: varchar("email", { length: 320 }),
-  loginMethod: varchar("loginMethod", { length: 64 }),
+  /** User's full name */
+  name: text("name").notNull(),
+  /** User's email address - unique identifier for login */
+  email: varchar("email", { length: 320 }).notNull().unique(),
+  /** Hashed password using bcrypt */
+  passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
+  /** Whether email has been verified */
+  emailVerified: int("emailVerified").notNull().default(0), // 0 = false, 1 = true
+  /** Login method: 'email' for our own auth system */
+  loginMethod: varchar("loginMethod", { length: 64 }).notNull().default("email"),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
   /** Trial period end date - 7 days from registration */
   trialEndsAt: timestamp("trialEndsAt"),

@@ -22,6 +22,13 @@
       "when": 1768772198695,
       "tag": "0002_secret_inhumans",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1768774002462,
+      "tag": "0003_serious_frightful_four",
+      "breakpoints": true
     }
   ]
 }

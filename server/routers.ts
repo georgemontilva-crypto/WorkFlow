@@ -10,13 +10,98 @@ export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    
+    signup: publicProcedure
+      .input(z.object({
+        name: z.string().min(2, "Name must be at least 2 characters"),
+        email: z.string().email("Invalid email address"),
+        password: z.string().min(8, "Password must be at least 8 characters"),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const { createUser } = await import("./db");
+          const { generateToken } = await import("./_core/auth");
+          
+          // Create user
+          const user = await createUser({
+            name: input.name,
+            email: input.email,
+            password: input.password,
+          });
+
+          // Generate JWT token
+          const token = await generateToken(user);
+
+          // Set cookie
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          ctx.res.cookie('auth_token', token, {
+            ...cookieOptions,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          });
+
+          return {
+            success: true,
+            user: {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role,
+            },
+          };
+        } catch (error: any) {
+          throw new Error(error.message || "Failed to create account");
+        }
+      }),
+
+    login: publicProcedure
+      .input(z.object({
+        email: z.string().email("Invalid email address"),
+        password: z.string().min(1, "Password is required"),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const { verifyUserCredentials } = await import("./db");
+          const { generateToken } = await import("./_core/auth");
+
+          // Verify credentials
+          const user = await verifyUserCredentials(input.email, input.password);
+
+          if (!user) {
+            throw new Error("Invalid email or password");
+          }
+
+          // Generate JWT token
+          const token = await generateToken(user);
+
+          // Set cookie
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          ctx.res.cookie('auth_token', token, {
+            ...cookieOptions,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          });
+
+          return {
+            success: true,
+            user: {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role,
+            },
+          };
+        } catch (error: any) {
+          throw new Error(error.message || "Login failed");
+        }
+      }),
+    
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      ctx.res.clearCookie('auth_token', { ...cookieOptions, maxAge: -1 });
       return {
         success: true,
       } as const;
     }),
+    
     accessStatus: protectedProcedure.query(async ({ ctx }) => {
       const { getUserAccessStatus } = await import("./access");
       return getUserAccessStatus(ctx.user);
