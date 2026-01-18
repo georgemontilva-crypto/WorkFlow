@@ -52,7 +52,7 @@ function LandingContent() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/hiwork-logo-final.png" alt="HiWork" className="h-8 w-auto" />
+            <img src="/hiwork-icon-new.png" alt="HiWork" className="h-10 w-10" />
           </div>
           <nav className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -243,7 +243,7 @@ function LandingContent() {
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
-              <img src="/hiwork-logo-final.png" alt="HiWork" className="h-8 w-auto mb-4" />
+              <img src="/hiwork-icon-new.png" alt="HiWork" className="h-12 w-12 mb-4" />
               <p className="text-sm text-muted-foreground">
                 {t.footer.description}
               </p>

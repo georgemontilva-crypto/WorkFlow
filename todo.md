@@ -155,3 +155,11 @@
 - [x] Traducir AccessBlocker component
 - [ ] Crear páginas legales en ambos idiomas (Terms, Privacy)
 - [x] Persistir preferencia de idioma en localStorage
+
+
+## Actualizar Logo Landing Page
+- [x] Copiar nuevo logo (logocop-02.png) al directorio público
+- [x] Actualizar header de Landing para usar solo el icono (sin texto)
+- [x] Actualizar footer de Landing para usar solo el icono (sin texto)
+- [x] Verificar que el logo se vea correctamente
+- [x] Guardar checkpoint
