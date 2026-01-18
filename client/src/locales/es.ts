@@ -266,6 +266,8 @@ export const es = {
     recurringPayments: 'Pagos Recurrentes de Clientes',
     days: 'días',
     unknownClient: 'Cliente Desconocido',
+    overdueAlert: '¡Facturas Vencidas!',
+    urgentAlert: '¡Facturas Próximas a Vencer!',
   },
 
   // Settings

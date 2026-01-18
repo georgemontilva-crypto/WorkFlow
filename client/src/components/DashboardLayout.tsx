@@ -6,9 +6,14 @@
 import { Link, useLocation } from 'wouter';
 import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { ReminderAlert } from '@/components/ReminderAlert';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '@/lib/db';
+import { differenceInDays, parseISO } from 'date-fns';
+import { useEffect, useState } from 'react';
 
 
 
@@ -16,6 +21,82 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { t } = useLanguage();
+  
+  // Alert system state
+  const [showOverdueAlert, setShowOverdueAlert] = useState(false);
+  const [showUrgentAlert, setShowUrgentAlert] = useState(false);
+  
+  // Fetch clients and invoices for alerts
+  const clients = useLiveQuery(() => db.clients.where('status').equals('active').toArray());
+  const invoices = useLiveQuery(() => db.invoices.where('status').equals('pending').toArray());
+  
+  // Check for overdue and urgent reminders
+  useEffect(() => {
+    if (!clients || !invoices) return;
+    
+    // Check localStorage for dismissed alerts
+    const dismissedOverdue = localStorage.getItem('dismissedOverdueAlert');
+    const dismissedUrgent = localStorage.getItem('dismissedUrgentAlert');
+    
+    // Count overdue items
+    const overdueClients = clients.filter(c => {
+      const daysUntil = differenceInDays(parseISO(c.nextPaymentDate), new Date());
+      return daysUntil < 0;
+    });
+    const overdueInvoices = invoices.filter(i => {
+      const daysUntil = differenceInDays(parseISO(i.dueDate), new Date());
+      return daysUntil < 0;
+    });
+    const overdueCount = overdueClients.length + overdueInvoices.length;
+    
+    // Count urgent items (5 days or less)
+    const urgentClients = clients.filter(c => {
+      const daysUntil = differenceInDays(parseISO(c.nextPaymentDate), new Date());
+      return daysUntil >= 0 && daysUntil <= 5;
+    });
+    const urgentInvoices = invoices.filter(i => {
+      const daysUntil = differenceInDays(parseISO(i.dueDate), new Date());
+      return daysUntil >= 0 && daysUntil <= 5;
+    });
+    const urgentCount = urgentClients.length + urgentInvoices.length;
+    
+    // Show alerts if not dismissed and there are items
+    if (overdueCount > 0 && !dismissedOverdue) {
+      setTimeout(() => setShowOverdueAlert(true), 1000);
+    }
+    else if (urgentCount > 0 && !dismissedUrgent) {
+      setTimeout(() => setShowUrgentAlert(true), 1000);
+    }
+  }, [clients, invoices]);
+  
+  const handleDismissOverdue = () => {
+    localStorage.setItem('dismissedOverdueAlert', 'true');
+    setShowOverdueAlert(false);
+  };
+  
+  const handleDismissUrgent = () => {
+    localStorage.setItem('dismissedUrgentAlert', 'true');
+    setShowUrgentAlert(false);
+  };
+  
+  const handleViewReminders = () => {
+    window.location.href = '/reminders';
+  };
+  
+  // Calculate counts for alerts
+  const overdueCount = clients && invoices ? 
+    clients.filter(c => differenceInDays(parseISO(c.nextPaymentDate), new Date()) < 0).length +
+    invoices.filter(i => differenceInDays(parseISO(i.dueDate), new Date()) < 0).length : 0;
+  
+  const urgentCount = clients && invoices ?
+    clients.filter(c => {
+      const d = differenceInDays(parseISO(c.nextPaymentDate), new Date());
+      return d >= 0 && d <= 5;
+    }).length +
+    invoices.filter(i => {
+      const d = differenceInDays(parseISO(i.dueDate), new Date());
+      return d >= 0 && d <= 5;
+    }).length : 0;
 
   const navigation = [
     { name: t.nav.dashboard, href: '/', icon: LayoutDashboard },
@@ -103,6 +184,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {children}
         </div>
       </main>
+      
+      {/* Alert Popups */}
+      {showOverdueAlert && overdueCount > 0 && (
+        <ReminderAlert
+          type="overdue"
+          count={overdueCount}
+          onView={handleViewReminders}
+          onDismiss={handleDismissOverdue}
+        />
+      )}
+      {showUrgentAlert && urgentCount > 0 && !showOverdueAlert && (
+        <ReminderAlert
+          type="urgent"
+          count={urgentCount}
+          onView={handleViewReminders}
+          onDismiss={handleDismissUrgent}
+        />
+      )}
     </div>
   );
 }

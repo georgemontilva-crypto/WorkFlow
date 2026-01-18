@@ -1,306 +1,316 @@
 /**
- * Reminders Page - Recordatorios de Pago
- * Design Philosophy: Apple Minimalism - Clean, efficient, focused
+ * Reminders Page - Sistema de Alertas y Recordatorios
+ * Design Philosophy: Apple Minimalism - Clean timeline with visual priority
  */
 
 import DashboardLayout from '@/components/DashboardLayout';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import { Bell, BellOff, Calendar, DollarSign, User, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { format, parseISO, differenceInDays, isPast } from 'date-fns';
+import { AlertCircle, Clock, CheckCircle2, Eye, Building2, Calendar, DollarSign } from 'lucide-react';
+import { format, parseISO, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useState } from 'react';
+import { useLocation } from 'wouter';
+
+type ReminderItem = {
+  id: number;
+  type: 'client' | 'invoice';
+  clientName: string;
+  company?: string;
+  amount: number;
+  dueDate: string;
+  daysUntil: number;
+  status: 'overdue' | 'urgent' | 'upcoming';
+  invoiceNumber?: string;
+};
 
 export default function Reminders() {
   const { t } = useLanguage();
+  const [, setLocation] = useLocation();
   const clients = useLiveQuery(() => db.clients.where('status').equals('active').toArray());
   const invoices = useLiveQuery(() => db.invoices.where('status').equals('pending').toArray());
-  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
 
-  const toggleCard = (clientId: number) => {
-    const newExpanded = new Set(expandedCards);
-    if (newExpanded.has(clientId)) {
-      newExpanded.delete(clientId);
+  // Procesar recordatorios de clientes
+  const clientReminders: ReminderItem[] = clients?.map(client => {
+    const daysUntil = differenceInDays(parseISO(client.nextPaymentDate), new Date());
+    let status: 'overdue' | 'urgent' | 'upcoming' = 'upcoming';
+    
+    if (daysUntil < 0) status = 'overdue';
+    else if (daysUntil <= 5) status = 'urgent';
+    
+    return {
+      id: client.id!,
+      type: 'client' as const,
+      clientName: client.name,
+      company: client.company,
+      amount: client.amount,
+      dueDate: client.nextPaymentDate,
+      daysUntil,
+      status
+    };
+  }) || [];
+
+  // Procesar recordatorios de facturas
+  const invoiceReminders: ReminderItem[] = invoices?.map(invoice => {
+    const daysUntil = differenceInDays(parseISO(invoice.dueDate), new Date());
+    let status: 'overdue' | 'urgent' | 'upcoming' = 'upcoming';
+    
+    if (daysUntil < 0) status = 'overdue';
+    else if (daysUntil <= 5) status = 'urgent';
+    
+    const client = clients?.find(c => c.id === invoice.clientId);
+    
+    return {
+      id: invoice.id!,
+      type: 'invoice' as const,
+      clientName: client?.name || 'Cliente Desconocido',
+      company: client?.company,
+      amount: invoice.amount,
+      dueDate: invoice.dueDate,
+      daysUntil,
+      status,
+      invoiceNumber: invoice.invoiceNumber
+    };
+  }) || [];
+
+  // Combinar y ordenar todos los recordatorios
+  const allReminders = [...clientReminders, ...invoiceReminders]
+    .sort((a, b) => {
+      // Primero por status (overdue > urgent > upcoming)
+      const statusOrder = { overdue: 0, urgent: 1, upcoming: 2 };
+      if (statusOrder[a.status] !== statusOrder[b.status]) {
+        return statusOrder[a.status] - statusOrder[b.status];
+      }
+      // Luego por días hasta vencimiento (más cercano primero)
+      return a.daysUntil - b.daysUntil;
+    });
+
+  const overdueReminders = allReminders.filter(r => r.status === 'overdue');
+  const urgentReminders = allReminders.filter(r => r.status === 'urgent');
+  const upcomingReminders = allReminders.filter(r => r.status === 'upcoming');
+
+  const getStatusConfig = (status: 'overdue' | 'urgent' | 'upcoming') => {
+    switch (status) {
+      case 'overdue':
+        return {
+          label: t.reminders.overdue,
+          icon: AlertCircle,
+          badgeClass: 'bg-red-500/10 text-red-500 border-red-500/30',
+          cardBorder: 'border-l-4 border-l-red-500',
+          iconColor: 'text-red-500'
+        };
+      case 'urgent':
+        return {
+          label: t.reminders.urgent,
+          icon: Clock,
+          badgeClass: 'bg-orange-500/10 text-orange-500 border-orange-500/30',
+          cardBorder: 'border-l-4 border-l-orange-500',
+          iconColor: 'text-orange-500'
+        };
+      case 'upcoming':
+        return {
+          label: t.reminders.upcoming,
+          icon: CheckCircle2,
+          badgeClass: 'bg-green-500/10 text-green-500 border-green-500/30',
+          cardBorder: 'border-l-4 border-l-green-500',
+          iconColor: 'text-green-500'
+        };
+    }
+  };
+
+  const getDaysText = (daysUntil: number) => {
+    if (daysUntil < 0) {
+      return `${Math.abs(daysUntil)} ${t.common.days} ${t.reminders.overdueAgo}`;
+    } else if (daysUntil === 0) {
+      return 'Vence hoy';
+    } else if (daysUntil === 1) {
+      return 'Vence mañana';
     } else {
-      newExpanded.add(clientId);
+      return `Vence en ${daysUntil} ${t.common.days}`;
     }
-    setExpandedCards(newExpanded);
   };
 
-  // Obtener recordatorios de clientes
-  const clientReminders = clients?.map(client => {
-    const daysUntilPayment = differenceInDays(parseISO(client.nextPaymentDate), new Date());
-    const isOverdue = daysUntilPayment < 0;
-    const isUrgent = daysUntilPayment <= client.reminderDays && daysUntilPayment >= 0;
-    
-    return {
-      ...client,
-      daysUntilPayment,
-      isOverdue,
-      isUrgent,
-      priority: isOverdue ? 3 : (isUrgent ? 2 : 1)
-    };
-  }).sort((a, b) => b.priority - a.priority) || [];
-
-  // Obtener recordatorios de facturas pendientes
-  const invoiceReminders = invoices?.map(invoice => {
-    const daysUntilDue = differenceInDays(parseISO(invoice.dueDate), new Date());
-    const isOverdue = daysUntilDue < 0;
-    const isUrgent = daysUntilDue <= 7 && daysUntilDue >= 0;
-    
-    return {
-      ...invoice,
-      daysUntilDue,
-      isOverdue,
-      isUrgent,
-      priority: isOverdue ? 3 : (isUrgent ? 2 : 1)
-    };
-  }).sort((a, b) => b.priority - a.priority) || [];
-
-  const getPriorityBadge = (isOverdue: boolean, isUrgent: boolean) => {
-    if (isOverdue) {
-      return {
-        label: 'Vencido',
-        className: 'bg-red-500/10 text-red-400 border-red-500/20',
-        icon: AlertCircle
-      };
+  const handleViewItem = (item: ReminderItem) => {
+    if (item.type === 'invoice') {
+      setLocation('/invoices');
+    } else {
+      setLocation('/clients');
     }
-    if (isUrgent) {
-      return {
-        label: 'Urgente',
-        className: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-        icon: Bell
-      };
-    }
-    return {
-      label: 'Próximo',
-      className: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-      icon: Calendar
-    };
   };
 
-  const markAsNotified = async (clientId: number) => {
-    toast.success('Cliente notificado');
+  const ReminderCard = ({ item }: { item: ReminderItem }) => {
+    const config = getStatusConfig(item.status);
+    const StatusIcon = config.icon;
+
+    return (
+      <Card className={`bg-card border-border hover:bg-accent/5 transition-all ${config.cardBorder}`}>
+        <CardContent className="p-4">
+          <div className="flex items-start justify-between gap-4">
+            {/* Left: Icon and Info */}
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <div className={`p-2 rounded-lg bg-accent/20 ${config.iconColor} flex-shrink-0`}>
+                <StatusIcon className="w-5 h-5" />
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                {/* Client Name and Company */}
+                <div className="mb-2">
+                  <h3 className="font-semibold text-foreground truncate">{item.clientName}</h3>
+                  {item.company && (
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5">
+                      <Building2 className="w-3 h-3" />
+                      <span className="truncate">{item.company}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Invoice Number (if applicable) */}
+                {item.invoiceNumber && (
+                  <p className="text-xs text-muted-foreground mb-2">
+                    {t.invoices.invoice}: {item.invoiceNumber}
+                  </p>
+                )}
+
+                {/* Date and Days */}
+                <div className="flex flex-wrap items-center gap-3 text-sm">
+                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                    <Calendar className="w-4 h-4" />
+                    <span>{format(parseISO(item.dueDate), 'dd MMM yyyy', { locale: es })}</span>
+                  </div>
+                  <Badge variant="outline" className={config.badgeClass}>
+                    {getDaysText(item.daysUntil)}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Amount and Actions */}
+            <div className="flex flex-col items-end gap-2 flex-shrink-0">
+              <div className="flex items-center gap-1 text-foreground">
+                <DollarSign className="w-4 h-4 text-muted-foreground" />
+                <span className="font-bold font-mono text-lg">
+                  ${item.amount.toLocaleString('es-ES')}
+                </span>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => handleViewItem(item)}
+                className="border-border text-foreground hover:bg-accent"
+              >
+                <Eye className="w-3 h-3 mr-1" />
+                Ver
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
   };
+
+  const EmptyState = ({ message }: { message: string }) => (
+    <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mb-4">
+        <CheckCircle2 className="w-8 h-8 text-muted-foreground" />
+      </div>
+      <p className="text-muted-foreground">{message}</p>
+    </div>
+  );
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">Recordatorios</h1>
-          <p className="text-sm md:text-base text-muted-foreground mt-1">
-            Gestiona alertas de pagos próximos y vencidos
+      <div className="p-4 sm:p-6 lg:p-8">
+        {/* Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+            {t.reminders.title}
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground">
+            {t.reminders.subtitle}
           </p>
         </div>
 
-        {/* Estadísticas */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="bg-card border-border">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">Vencidos</p>
-                <AlertCircle className="w-4 h-4 text-red-400" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-red-400">
-                {clientReminders.filter(c => c.isOverdue).length + invoiceReminders.filter(i => i.isOverdue).length}
-              </p>
-            </CardContent>
-          </Card>
+        {/* Tabs */}
+        <Tabs defaultValue="all" className="space-y-6">
+          <TabsList className="bg-muted/50 border border-border">
+            <TabsTrigger value="all" className="data-[state=active]:bg-background">
+              Todas
+              <Badge variant="secondary" className="ml-2 bg-accent text-accent-foreground">
+                {allReminders.length}
+              </Badge>
+            </TabsTrigger>
+            <TabsTrigger value="overdue" className="data-[state=active]:bg-background">
+              {t.reminders.overdue}
+              {overdueReminders.length > 0 && (
+                <Badge className="ml-2 bg-red-500/10 text-red-500 border-red-500/30">
+                  {overdueReminders.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="urgent" className="data-[state=active]:bg-background">
+              {t.reminders.urgent}
+              {urgentReminders.length > 0 && (
+                <Badge className="ml-2 bg-orange-500/10 text-orange-500 border-orange-500/30">
+                  {urgentReminders.length}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="upcoming" className="data-[state=active]:bg-background">
+              {t.reminders.upcoming}
+              <Badge variant="secondary" className="ml-2 bg-accent text-accent-foreground">
+                {upcomingReminders.length}
+              </Badge>
+            </TabsTrigger>
+          </TabsList>
 
-          <Card className="bg-card border-border">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">Urgentes</p>
-                <Bell className="w-4 h-4 text-orange-400" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-orange-400">
-                {clientReminders.filter(c => c.isUrgent).length + invoiceReminders.filter(i => i.isUrgent).length}
-              </p>
-            </CardContent>
-          </Card>
+          {/* All Reminders */}
+          <TabsContent value="all" className="space-y-3">
+            {allReminders.length === 0 ? (
+              <EmptyState message={t.reminders.noReminders} />
+            ) : (
+              allReminders.map(item => (
+                <ReminderCard key={`${item.type}-${item.id}`} item={item} />
+              ))
+            )}
+          </TabsContent>
 
-          <Card className="bg-card border-border">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">Total Activos</p>
-                <Calendar className="w-4 h-4 text-blue-400" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-foreground">
-                {clientReminders.length + invoiceReminders.length}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+          {/* Overdue Reminders */}
+          <TabsContent value="overdue" className="space-y-3">
+            {overdueReminders.length === 0 ? (
+              <EmptyState message="No hay recordatorios vencidos" />
+            ) : (
+              overdueReminders.map(item => (
+                <ReminderCard key={`${item.type}-${item.id}`} item={item} />
+              ))
+            )}
+          </TabsContent>
 
-        {/* Recordatorios de Clientes */}
-        <div>
-          <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <User className="w-5 h-5" />
-            Pagos Recurrentes de Clientes
-          </h2>
-          
-          {clientReminders.length === 0 ? (
-            <Card className="bg-card border-border">
-              <CardContent className="py-12 text-center">
-                <BellOff className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                <p className="text-muted-foreground">No hay recordatorios de clientes activos</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {clientReminders.map((client) => {
-                const priorityInfo = getPriorityBadge(client.isOverdue, client.isUrgent);
-                const PriorityIcon = priorityInfo.icon;
-                const isExpanded = expandedCards.has(client.id!);
+          {/* Urgent Reminders */}
+          <TabsContent value="urgent" className="space-y-3">
+            {urgentReminders.length === 0 ? (
+              <EmptyState message="No hay recordatorios urgentes" />
+            ) : (
+              urgentReminders.map(item => (
+                <ReminderCard key={`${item.type}-${item.id}`} item={item} />
+              ))
+            )}
+          </TabsContent>
 
-                return (
-                  <Card key={client.id} className="bg-card border-border hover:border-accent transition-colors">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-foreground truncate">{client.name}</h3>
-                            <Badge className={`${priorityInfo.className} border px-2 py-0.5 flex items-center gap-1 text-xs shrink-0`}>
-                              <PriorityIcon className="w-3 h-3" />
-                              {priorityInfo.label}
-                            </Badge>
-                          </div>
-                          {client.company && (
-                            <p className="text-sm text-muted-foreground truncate">{client.company}</p>
-                          )}
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleCard(client.id!)}
-                          className="text-muted-foreground hover:text-foreground shrink-0"
-                        >
-                          {isExpanded ? 'Ocultar' : 'Ver más'}
-                        </Button>
-                      </div>
-                    </CardHeader>
-
-                    {isExpanded && (
-                      <CardContent className="space-y-3 pt-0 border-t border-border mt-3">
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Próximo Pago</p>
-                            <p className="text-sm font-medium text-foreground">
-                              {format(parseISO(client.nextPaymentDate), 'dd MMM yyyy', { locale: es })}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {client.isOverdue 
-                                ? `Vencido hace ${Math.abs(client.daysUntilPayment)} días` 
-                                : `En ${client.daysUntilPayment} días`}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Monto</p>
-                            <p className="text-lg font-bold font-mono text-foreground">
-                              ${client.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">Contacto</p>
-                          <p className="text-sm text-foreground">{client.email}</p>
-                          {client.phone && <p className="text-sm text-muted-foreground">{client.phone}</p>}
-                        </div>
-
-                        <div className="pt-2 border-t border-border">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => markAsNotified(client.id!)}
-                            className="w-full border-border text-foreground hover:bg-accent"
-                          >
-                            <CheckCircle2 className="w-4 h-4 mr-2" />
-                            Marcar como Notificado
-                          </Button>
-                        </div>
-                      </CardContent>
-                    )}
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Recordatorios de Facturas */}
-        <div>
-          <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <DollarSign className="w-5 h-5" />
-            Facturas Pendientes
-          </h2>
-          
-          {invoiceReminders.length === 0 ? (
-            <Card className="bg-card border-border">
-              <CardContent className="py-12 text-center">
-                <BellOff className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-                <p className="text-muted-foreground">No hay facturas pendientes</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {invoiceReminders.map((invoice) => {
-                const priorityInfo = getPriorityBadge(invoice.isOverdue, invoice.isUrgent);
-                const PriorityIcon = priorityInfo.icon;
-                const client = clients?.find(c => c.id === invoice.clientId);
-
-                return (
-                  <Card key={invoice.id} className="bg-card border-border hover:border-accent transition-colors">
-                    <CardContent className="py-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h3 className="font-semibold text-foreground text-sm">{invoice.invoiceNumber}</h3>
-                            <Badge className={`${priorityInfo.className} border px-2 py-0.5 flex items-center gap-1 text-xs`}>
-                              <PriorityIcon className="w-3 h-3" />
-                              {priorityInfo.label}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-2">{client?.name || 'Cliente Desconocido'}</p>
-                          <div className="grid grid-cols-2 gap-3">
-                            <div>
-                              <p className="text-xs text-muted-foreground">Vencimiento</p>
-                              <p className="text-sm font-medium text-foreground">
-                                {format(parseISO(invoice.dueDate), 'dd MMM yyyy', { locale: es })}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {invoice.isOverdue 
-                                  ? `Vencido hace ${Math.abs(invoice.daysUntilDue)} días` 
-                                  : `En ${invoice.daysUntilDue} días`}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-muted-foreground">Monto</p>
-                              <p className="text-lg font-bold font-mono text-foreground">
-                                ${invoice.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-        </div>
+          {/* Upcoming Reminders */}
+          <TabsContent value="upcoming" className="space-y-3">
+            {upcomingReminders.length === 0 ? (
+              <EmptyState message="No hay recordatorios próximos" />
+            ) : (
+              upcomingReminders.map(item => (
+                <ReminderCard key={`${item.type}-${item.id}`} item={item} />
+              ))
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </DashboardLayout>
   );

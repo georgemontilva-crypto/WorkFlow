@@ -266,6 +266,8 @@ export const en = {
     recurringPayments: 'Recurring Client Payments',
     days: 'days',
     unknownClient: 'Unknown Client',
+    overdueAlert: 'Overdue Invoices!',
+    urgentAlert: 'Invoices Due Soon!',
   },
 
   // Settings
