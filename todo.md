@@ -90,3 +90,10 @@
 - [x] Modify toggleCard function to close other cards when one is expanded
 - [x] Change expandedCards from Set to single ID state
 - [x] Test accordion behavior works correctly
+
+
+## Fix Invoice Card Expansion Bug
+- [x] Diagnose why all cards appear expanded when clicking one
+- [x] Review toggleCard function and expandedCardId state logic
+- [x] Fix the conditional rendering of expanded content
+- [x] Test that only clicked card expands and others remain collapsed

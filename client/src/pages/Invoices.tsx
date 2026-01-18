@@ -711,7 +711,7 @@ export default function Invoices() {
               const isExpanded = expandedCardId === invoice.id;
               
               return (
-                <Card key={invoice.id} className="bg-card border-border hover:border-accent/50 transition-all">
+                <Card key={invoice.id} className="bg-card border-border hover:border-accent/50 transition-all h-fit">
                   <CardContent className="p-4">
                     {/* Collapsed View - Only Invoice Number and Client */}
                     {!isExpanded ? (
