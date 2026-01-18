@@ -103,20 +103,20 @@ export default function Home() {
         </div>
 
         {/* Hero Section */}
-        <div className="mb-6 lg:mb-8 rounded-xl h-32 sm:h-40 lg:h-48 bg-gradient-to-br from-card via-accent/20 to-card border border-border flex items-center justify-center px-4">
+        <div className="mb-4 lg:mb-6 rounded-xl h-24 sm:h-32 lg:h-36 bg-gradient-to-br from-card via-accent/20 to-card border border-border flex items-center justify-center px-4">
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-center sm:text-left">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-2xl bg-accent/30 flex items-center justify-center flex-shrink-0">
-              <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-foreground" strokeWidth={1.5} />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-2xl bg-accent/30 flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-foreground" strokeWidth={1.5} />
             </div>
             <div>
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">{t.dashboard.totalControl}</h2>
+              <h2 className="text-base sm:text-lg lg:text-xl font-bold text-foreground">{t.dashboard.totalControl}</h2>
               <p className="text-sm sm:text-base text-muted-foreground">{t.dashboard.totalControlSubtitle}</p>
             </div>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 lg:mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-4 mb-4 lg:mb-6">
           <Card className="bg-card border-border">
             <CardHeader className="pb-2 sm:pb-3">
               <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
@@ -175,7 +175,7 @@ export default function Home() {
         </div>
 
         {/* Alerts, Upcoming Payments and Savings Goals */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
           {/* Overdue Payments Alert */}
           {overduePayments.length > 0 && (
             <Card className="bg-destructive/10 border-destructive/30">
@@ -186,7 +186,7 @@ export default function Home() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 sm:space-y-3 max-h-48 sm:max-h-64 overflow-y-auto">
+                <div className="space-y-2 max-h-32 sm:max-h-40 overflow-y-auto">
                   {overduePayments.map((client) => (
                     <div key={client.id} className="flex items-center justify-between p-2 sm:p-3 bg-background/50 rounded-lg">
                       <div className="min-w-0 flex-1">
@@ -219,7 +219,7 @@ export default function Home() {
                   {t.dashboard.noUpcomingPayments}
                 </p>
               ) : (
-                <div className="space-y-2 sm:space-y-3 max-h-48 sm:max-h-64 overflow-y-auto">
+                <div className="space-y-2 max-h-32 sm:max-h-40 overflow-y-auto">
                   {upcomingPayments.map((client) => {
                     const daysUntil = differenceInDays(parseISO(client.nextPaymentDate), new Date());
                     return (
