@@ -55,8 +55,14 @@ export default function Savings() {
     const now = new Date().toISOString();
 
     if (editingGoal) {
+      // Recalcular estado basado en el nuevo objetivo
+      const newCurrentAmount = formData.currentAmount || 0;
+      const newTargetAmount = formData.targetAmount || 0;
+      const newStatus = newCurrentAmount >= newTargetAmount ? 'completed' : 'active';
+      
       await db.savingsGoals.update(editingGoal.id!, {
         ...formData as SavingsGoal,
+        status: newStatus,
         updatedAt: now,
       });
       toast.success('Meta actualizada exitosamente');

@@ -4,7 +4,7 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { LayoutDashboard, Users, FileText, TrendingUp, Target, Settings, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ const navigation = [
   { name: 'Facturas', href: '/invoices', icon: FileText },
   { name: 'Finanzas', href: '/finances', icon: TrendingUp },
   { name: 'Metas de Ahorro', href: '/savings', icon: Target },
+  { name: 'Recordatorios', href: '/reminders', icon: Bell },
   { name: 'Configuración', href: '/settings', icon: Settings },
 ];
 

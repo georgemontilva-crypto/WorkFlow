@@ -16,6 +16,7 @@ import Invoices from "./pages/Invoices";
 import Finances from "./pages/Finances";
 import Savings from "./pages/Savings";
 import Settings from "./pages/Settings";
+import Reminders from "./pages/Reminders";
 
 function Router() {
   return (
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/invoices" component={Invoices} />
       <Route path="/finances" component={Finances} />
       <Route path="/savings" component={Savings} />
+      <Route path="/reminders" component={Reminders} />
       <Route path="/settings" component={Settings} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

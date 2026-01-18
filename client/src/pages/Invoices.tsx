@@ -5,6 +5,7 @@
 
 import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -45,7 +46,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Invoice, type InvoiceItem } from '@/lib/db';
-import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign } from 'lucide-react';
 import { format, parseISO, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -58,6 +59,8 @@ export default function Invoices() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [showStatusDialog, setShowStatusDialog] = useState(false);
+  const [showPartialPaymentDialog, setShowPartialPaymentDialog] = useState(false);
+  const [partialPaymentAmount, setPartialPaymentAmount] = useState<number>(0);
   const [newStatus, setNewStatus] = useState<'pending' | 'paid' | 'overdue' | 'cancelled'>('pending');
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
   const [formData, setFormData] = useState<Partial<Invoice>>({
@@ -65,6 +68,7 @@ export default function Invoices() {
     issueDate: new Date().toISOString().split('T')[0],
     dueDate: addDays(new Date(), 30).toISOString().split('T')[0],
     status: 'pending',
+    paidAmount: 0,
     items: [],
     notes: '',
   });
@@ -191,6 +195,52 @@ export default function Invoices() {
 
     setShowStatusDialog(false);
     setSelectedInvoice(null);
+  };
+
+  const handlePartialPayment = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setPartialPaymentAmount(0);
+    setShowPartialPaymentDialog(true);
+  };
+
+  const confirmPartialPayment = async () => {
+    if (!selectedInvoice || partialPaymentAmount <= 0) {
+      toast.error('Ingresa un monto válido');
+      return;
+    }
+
+    const currentPaid = selectedInvoice.paidAmount || 0;
+    const newPaidAmount = currentPaid + partialPaymentAmount;
+
+    if (newPaidAmount > selectedInvoice.amount) {
+      toast.error('El monto total pagado no puede exceder el monto de la factura');
+      return;
+    }
+
+    // Actualizar factura con el pago parcial
+    const newStatus = newPaidAmount >= selectedInvoice.amount ? 'paid' : selectedInvoice.status;
+    await db.invoices.update(selectedInvoice.id!, {
+      paidAmount: newPaidAmount,
+      status: newStatus,
+      updatedAt: new Date().toISOString(),
+    });
+
+    // Agregar transacción de ingreso
+    const client = clients?.find(c => c.id === selectedInvoice.clientId);
+    await db.transactions.add({
+      type: 'income',
+      amount: partialPaymentAmount,
+      category: 'Pago Parcial de Factura',
+      description: `Abono a factura ${selectedInvoice.invoiceNumber} - ${client?.name || 'Cliente'}`,
+      date: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    toast.success(`Pago parcial de $${partialPaymentAmount.toFixed(2)} registrado exitosamente`);
+    setShowPartialPaymentDialog(false);
+    setSelectedInvoice(null);
+    setPartialPaymentAmount(0);
   };
 
   const generatePDF = async (invoiceId: number) => {
@@ -596,6 +646,13 @@ export default function Invoices() {
                               Marcar como Pagada
                             </DropdownMenuItem>
                             <DropdownMenuItem 
+                              onClick={() => handlePartialPayment(invoice)}
+                              className="text-foreground hover:bg-accent cursor-pointer"
+                            >
+                              <DollarSign className="w-4 h-4 mr-2 text-blue-400" />
+                              Registrar Pago Parcial
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
                               onClick={() => handleStatusChange(invoice, 'overdue')}
                               className="text-foreground hover:bg-accent cursor-pointer"
                             >
@@ -626,12 +683,35 @@ export default function Invoices() {
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-muted-foreground mb-1">Monto</p>
+                          <p className="text-xs text-muted-foreground mb-1">Monto Total</p>
                           <p className="text-lg font-bold font-mono text-foreground">
                             ${invoice.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                           </p>
                         </div>
                       </div>
+
+                      {/* Pagos Parciales */}
+                      {(invoice.paidAmount && invoice.paidAmount > 0) && (
+                        <div className="pt-2 border-t border-border">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Pagado</p>
+                              <p className="text-sm font-medium text-green-500">
+                                ${invoice.paidAmount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Restante</p>
+                              <p className="text-sm font-bold text-orange-400">
+                                ${(invoice.amount - invoice.paidAmount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="mt-2">
+                            <Progress value={(invoice.paidAmount / invoice.amount) * 100} className="h-2" />
+                          </div>
+                        </div>
+                      )}
 
                       <div className="pt-3 border-t border-border">
                         <p className="text-xs text-muted-foreground mb-2">Estado</p>
@@ -684,6 +764,58 @@ export default function Invoices() {
                 className="bg-primary text-primary-foreground hover:opacity-90"
               >
                 Sí, agregar a Finanzas
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Partial Payment Dialog */}
+        <AlertDialog open={showPartialPaymentDialog} onOpenChange={setShowPartialPaymentDialog}>
+          <AlertDialogContent className="bg-popover border-border">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-foreground flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-blue-400" />
+                Registrar Pago Parcial
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-muted-foreground">
+                Factura: {selectedInvoice?.invoiceNumber}<br />
+                Monto Total: ${selectedInvoice?.amount.toFixed(2)}<br />
+                {selectedInvoice?.paidAmount && selectedInvoice.paidAmount > 0 && (
+                  <>
+                    Pagado: ${selectedInvoice.paidAmount.toFixed(2)}<br />
+                    Restante: ${(selectedInvoice.amount - selectedInvoice.paidAmount).toFixed(2)}<br />
+                  </>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="py-4">
+              <Label htmlFor="partialAmount" className="text-foreground text-sm mb-2 block">
+                Monto del Abono *
+              </Label>
+              <Input
+                id="partialAmount"
+                type="number"
+                step="0.01"
+                min="0"
+                max={selectedInvoice ? selectedInvoice.amount - (selectedInvoice.paidAmount || 0) : 0}
+                value={partialPaymentAmount}
+                onChange={(e) => setPartialPaymentAmount(parseFloat(e.target.value) || 0)}
+                placeholder="0.00"
+                className="bg-background border-border text-foreground h-10"
+              />
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogCancel 
+                onClick={() => setShowPartialPaymentDialog(false)}
+                className="border-border text-foreground hover:bg-accent"
+              >
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={confirmPartialPayment}
+                className="bg-primary text-primary-foreground hover:opacity-90"
+              >
+                Registrar Pago
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
