@@ -46,7 +46,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Invoice, type InvoiceItem } from '@/lib/db';
-import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign } from 'lucide-react';
+import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User } from 'lucide-react';
 import { format, parseISO, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -63,6 +63,8 @@ export default function Invoices() {
   const [partialPaymentAmount, setPartialPaymentAmount] = useState<number>(0);
   const [newStatus, setNewStatus] = useState<'pending' | 'paid' | 'overdue' | 'cancelled'>('pending');
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
+  const [showClientSelector, setShowClientSelector] = useState(false);
+  const [clientSearch, setClientSearch] = useState('');
   const [formData, setFormData] = useState<Partial<Invoice>>({
     clientId: 0,
     issueDate: new Date().toISOString().split('T')[0],
@@ -83,6 +85,15 @@ export default function Invoices() {
     const client = clients?.find(c => c.id === clientId);
     return client?.name || 'Cliente Desconocido';
   };
+
+  const filteredClients = clients?.filter(client => {
+    const searchLower = clientSearch.toLowerCase();
+    return (
+      client.name.toLowerCase().includes(searchLower) ||
+      client.email.toLowerCase().includes(searchLower) ||
+      client.company?.toLowerCase().includes(searchLower)
+    );
+  }) || [];
 
   const addItem = () => {
     if (!currentItem.description || !currentItem.quantity || !currentItem.unitPrice) {
@@ -381,25 +392,18 @@ export default function Invoices() {
                     <Label htmlFor="clientId" className="text-foreground font-semibold">
                       Cliente <span className="text-destructive">*</span>
                     </Label>
-                    <Select
-                      value={formData.clientId?.toString()}
-                      onValueChange={(value) => setFormData({ ...formData, clientId: parseInt(value) })}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-11 justify-between bg-background border-border text-foreground hover:bg-accent"
+                      onClick={() => setShowClientSelector(true)}
                     >
-                      <SelectTrigger className="bg-background border-border text-foreground h-11">
-                        <SelectValue placeholder="Selecciona un cliente" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border-border">
-                        {clients?.map(client => (
-                          <SelectItem key={client.id} value={client.id!.toString()}>
-                            <div className="flex flex-col">
-                              <span className="font-medium">{client.name}</span>
-                              <span className="text-xs text-muted-foreground">{client.email}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <p className="text-xs text-muted-foreground">Selecciona el cliente para esta factura</p>
+                      <span className="truncate">
+                        {formData.clientId ? getClientName(formData.clientId) : 'Selecciona un cliente'}
+                      </span>
+                      <Search className="w-4 h-4 ml-2 flex-shrink-0" />
+                    </Button>
+                    <p className="text-xs text-muted-foreground">Haz clic para buscar y seleccionar un cliente</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="status" className="text-foreground font-semibold">Estado Inicial</Label>
@@ -824,6 +828,124 @@ export default function Invoices() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Client Selector Modal */}
+        <Dialog open={showClientSelector} onOpenChange={setShowClientSelector}>
+          <DialogContent className="bg-popover border-border max-w-3xl max-h-[85vh] overflow-hidden w-[95vw] sm:w-full flex flex-col">
+            <DialogHeader className="pb-4">
+              <DialogTitle className="text-foreground text-xl flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Seleccionar Cliente
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground text-sm">
+                Busca y selecciona un cliente para la factura
+              </DialogDescription>
+            </DialogHeader>
+            
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Buscar por nombre, empresa o email..."
+                value={clientSearch}
+                onChange={(e) => setClientSearch(e.target.value)}
+                className="pl-10 bg-background border-border text-foreground h-11"
+                autoFocus
+              />
+            </div>
+
+            {/* Clients List */}
+            <div className="flex-1 overflow-y-auto pr-2 space-y-2 min-h-0">
+              {!filteredClients || filteredClients.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mb-4">
+                    <User className="w-8 h-8 text-muted-foreground" strokeWidth={1} />
+                  </div>
+                  <p className="text-muted-foreground text-sm">
+                    {clientSearch ? 'No se encontraron clientes con ese criterio' : 'No hay clientes registrados'}
+                  </p>
+                  {!clientSearch && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Ve a la sección de Clientes para agregar uno
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-2">
+                  {filteredClients.map((client) => (
+                    <button
+                      key={client.id}
+                      type="button"
+                      onClick={() => {
+                        setFormData({ ...formData, clientId: client.id });
+                        setShowClientSelector(false);
+                        setClientSearch('');
+                        toast.success(`Cliente seleccionado: ${client.name}`);
+                      }}
+                      className="w-full text-left p-4 rounded-lg border border-border bg-card hover:bg-accent hover:border-accent-foreground/20 transition-all group"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-foreground text-base group-hover:text-accent-foreground truncate">
+                            {client.name}
+                          </h4>
+                          {client.company && (
+                            <p className="text-sm text-muted-foreground truncate mt-0.5">
+                              {client.company}
+                            </p>
+                          )}
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mt-2">
+                            <p className="text-xs text-muted-foreground truncate">
+                              {client.email}
+                            </p>
+                            {client.phone && (
+                              <>
+                                <span className="hidden sm:inline text-muted-foreground">•</span>
+                                <p className="text-xs text-muted-foreground">
+                                  {client.phone}
+                                </p>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-shrink-0 text-right">
+                          {client.amount && (
+                            <p className="text-sm font-bold font-mono text-foreground">
+                              ${client.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                            </p>
+                          )}
+                          {client.billingCycle && (
+                            <p className="text-xs text-muted-foreground mt-1 capitalize">
+                              {client.billingCycle === 'monthly' ? 'Mensual' : 
+                               client.billingCycle === 'quarterly' ? 'Trimestral' : 
+                               client.billingCycle === 'yearly' ? 'Anual' : 'Personalizado'}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="pt-4 border-t border-border flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setShowClientSelector(false);
+                  setClientSearch('');
+                }}
+                className="border-border text-foreground hover:bg-accent"
+              >
+                Cancelar
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );
