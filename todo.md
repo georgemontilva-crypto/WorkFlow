@@ -291,3 +291,31 @@
 - [x] Verificar que el sistema JWT funcione sin variables de Manus
 - [x] Probar localmente que el servidor arranque correctamente
 - [ ] Hacer push a GitHub y verificar deployment en Railway
+
+## Implementar Autenticación de Dos Factores (2FA) Opcional
+### Base de Datos
+- [ ] Agregar campos a tabla users: twofa_enabled (boolean), twofa_secret (string encrypted)
+- [ ] Ejecutar db:push para aplicar cambios
+
+### Backend
+- [ ] Instalar dependencia: otplib para generar/verificar códigos TOTP
+- [ ] Crear procedimientos tRPC para:
+  - [ ] Generar secret y QR code para activar 2FA
+  - [ ] Verificar código y activar 2FA
+  - [ ] Desactivar 2FA
+  - [ ] Verificar código 2FA durante login
+- [ ] Modificar flujo de login para requerir 2FA si está activado
+
+### Frontend
+- [ ] Crear página/modal de configuración de 2FA en perfil
+- [ ] Mostrar QR code para escanear con Google Authenticator/Authy
+- [ ] Input para verificar código antes de activar
+- [ ] Botón para desactivar 2FA (con confirmación)
+- [ ] Pantalla de verificación 2FA durante login
+- [ ] Mostrar estado de 2FA en perfil (activado/desactivado)
+
+### Testing
+- [ ] Probar activación de 2FA con Google Authenticator
+- [ ] Probar login con 2FA activado
+- [ ] Probar desactivación de 2FA
+- [ ] Guardar checkpoint y hacer push
