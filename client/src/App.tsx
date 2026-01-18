@@ -18,8 +18,8 @@ import Finances from "./pages/Finances";
 import Savings from "./pages/Savings";
 import Settings from "./pages/Settings";
 import Reminders from "./pages/Reminders";
-
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path="/" component={Home} />

@@ -31,8 +31,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db, type Client } from '@/lib/db';
+import { trpc } from '@/lib/trpc';
 import { Users, Plus, Search, MoreVertical, Pencil, Trash2, Mail, Phone, Calendar, DollarSign, Bell, Building2, ChevronDown, ChevronUp } from 'lucide-react';
 import { format, parseISO, differenceInDays, addMonths, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -40,20 +39,74 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState } from 'react';
 
+// Client type based on tRPC schema
+type Client = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  company?: string | null;
+  billingCycle: 'monthly' | 'quarterly' | 'yearly' | 'custom';
+  customCycleDays?: number | null;
+  amount: string;
+  nextPaymentDate: Date;
+  reminderDays: number;
+  status: 'active' | 'inactive' | 'overdue';
+  archived: number;
+  notes?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export default function Clients() {
   const { t } = useLanguage();
-  const clients = useLiveQuery(() => db.clients.orderBy('createdAt').reverse().toArray());
+  const utils = trpc.useUtils();
+  
+  // Fetch clients using tRPC
+  const { data: clients, isLoading } = trpc.clients.list.useQuery();
+  
+  // Mutations
+  const createClient = trpc.clients.create.useMutation({
+    onSuccess: () => {
+      utils.clients.list.invalidate();
+      toast.success('Cliente agregado exitosamente');
+    },
+    onError: () => {
+      toast.error('Error al agregar el cliente');
+    },
+  });
+  
+  const updateClient = trpc.clients.update.useMutation({
+    onSuccess: () => {
+      utils.clients.list.invalidate();
+      toast.success('Cliente actualizado exitosamente');
+    },
+    onError: () => {
+      toast.error('Error al actualizar el cliente');
+    },
+  });
+  
+  const deleteClient = trpc.clients.delete.useMutation({
+    onSuccess: () => {
+      utils.clients.list.invalidate();
+      toast.success('Cliente eliminado exitosamente');
+    },
+    onError: () => {
+      toast.error('Error al eliminar el cliente');
+    },
+  });
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
-  const [formData, setFormData] = useState<Partial<Client>>({
+  const [formData, setFormData] = useState<any>({
     name: '',
     email: '',
     phone: '',
     company: '',
     billingCycle: 'monthly',
-    amount: 0,
+    amount: '0',
     nextPaymentDate: '',
     reminderDays: 7,
     status: 'active',
@@ -83,21 +136,13 @@ export default function Clients() {
       return;
     }
 
-    const now = new Date().toISOString();
-
     if (editingClient) {
-      await db.clients.update(editingClient.id!, {
-        ...formData as Client,
-        updatedAt: now,
+      await updateClient.mutateAsync({
+        id: editingClient.id,
+        ...formData,
       });
-      toast.success('Cliente actualizado exitosamente');
     } else {
-      await db.clients.add({
-        ...formData as Client,
-        createdAt: now,
-        updatedAt: now,
-      });
-      toast.success('Cliente agregado exitosamente');
+      await createClient.mutateAsync(formData);
     }
 
     setIsDialogOpen(false);
@@ -108,7 +153,7 @@ export default function Clients() {
       phone: '',
       company: '',
       billingCycle: 'monthly',
-      amount: 0,
+      amount: '0',
       nextPaymentDate: '',
       reminderDays: 7,
       status: 'active',
@@ -122,44 +167,26 @@ export default function Clients() {
       name: client.name,
       email: client.email,
       phone: client.phone,
-      company: client.company,
+      company: client.company || '',
       billingCycle: client.billingCycle,
       customCycleDays: client.customCycleDays,
       amount: client.amount,
-      nextPaymentDate: client.nextPaymentDate.split('T')[0],
+      nextPaymentDate: format(new Date(client.nextPaymentDate), 'yyyy-MM-dd'),
       reminderDays: client.reminderDays,
       status: client.status,
-      notes: client.notes,
+      notes: client.notes || '',
     });
     setIsDialogOpen(true);
   };
 
   const handleDelete = async (clientId: number) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este cliente? Esta acción no se puede deshacer.')) {
-      try {
-        // Eliminar facturas asociadas
-        const invoices = await db.invoices.where('clientId').equals(clientId).toArray();
-        for (const invoice of invoices) {
-          await db.invoices.delete(invoice.id!);
-        }
-        
-        // Eliminar transacciones asociadas
-        const transactions = await db.transactions.where('clientId').equals(clientId).toArray();
-        for (const transaction of transactions) {
-          await db.transactions.delete(transaction.id!);
-        }
-        
-        // Eliminar cliente
-        await db.clients.delete(clientId);
-        toast.success('Cliente eliminado exitosamente');
-      } catch (error) {
-        toast.error('Error al eliminar el cliente');
-      }
+      await deleteClient.mutateAsync({ id: clientId });
     }
   };
 
-  const getPaymentStatus = (nextPaymentDate: string, reminderDays: number) => {
-    const daysUntil = differenceInDays(parseISO(nextPaymentDate), new Date());
+  const getPaymentStatus = (nextPaymentDate: Date, reminderDays: number) => {
+    const daysUntil = differenceInDays(new Date(nextPaymentDate), new Date());
     
     if (daysUntil < 0) {
       return { color: 'bg-destructive/10 text-destructive border-destructive/30', label: t.clients.overdue, icon: '🔴' };
@@ -170,6 +197,21 @@ export default function Clients() {
     }
     return { color: 'bg-muted text-muted-foreground border-border', label: `${daysUntil} ${t.common.days}`, icon: '🟢' };
   };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="p-4 sm:p-6 lg:p-8">
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Cargando clientes...</p>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -192,7 +234,7 @@ export default function Clients() {
                 phone: '',
                 company: '',
                 billingCycle: 'monthly',
-                amount: 0,
+                amount: '0',
                 nextPaymentDate: '',
                 reminderDays: 7,
                 status: 'active',
@@ -326,7 +368,7 @@ export default function Clients() {
                         type="number"
                         step="0.01"
                         value={formData.amount}
-                        onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
+                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                         className="bg-background border-border text-foreground font-mono h-11"
                         required
                       />
@@ -430,7 +472,7 @@ export default function Clients() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredClients.map((client) => {
               const paymentStatus = getPaymentStatus(client.nextPaymentDate, client.reminderDays);
-              const isExpanded = expandedCards.has(client.id!);
+              const isExpanded = expandedCards.has(client.id);
 
               return (
                 <Card key={client.id} className="bg-card border-border hover:border-accent transition-colors">
@@ -449,7 +491,7 @@ export default function Clients() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => toggleCard(client.id!)}
+                          onClick={() => toggleCard(client.id)}
                           className="text-muted-foreground hover:text-foreground h-8 w-8"
                         >
                           {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -470,7 +512,7 @@ export default function Clients() {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-border" />
                             <DropdownMenuItem 
-                              onClick={() => handleDelete(client.id!)}
+                              onClick={() => handleDelete(client.id)}
                               className="text-destructive hover:bg-destructive/10 cursor-pointer"
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
@@ -501,13 +543,13 @@ export default function Clients() {
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm text-muted-foreground">{t.clients.nextPayment}</span>
                           <span className="text-sm font-semibold text-foreground">
-                            {format(parseISO(client.nextPaymentDate), 'dd/MM/yyyy')}
+                            {format(new Date(client.nextPaymentDate), 'dd/MM/yyyy')}
                           </span>
                         </div>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm text-muted-foreground">{t.common.amount}</span>
                           <span className="text-lg font-bold font-mono text-foreground">
-                            ${client.amount.toLocaleString('es-ES')}
+                            ${parseFloat(client.amount).toLocaleString('es-ES')}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
