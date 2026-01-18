@@ -66,7 +66,7 @@ function LandingContent() {
             <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               {t.nav.pricing}
             </a>
-            <a href="#compliance" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a href="#security" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               {t.nav.security}
             </a>
             <LanguageSelector />
@@ -104,7 +104,7 @@ function LandingContent() {
                 {t.nav.pricing}
               </a>
               <a 
-                href="#compliance" 
+                href="#security" 
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
               >
@@ -333,45 +333,6 @@ function LandingContent() {
         </div>
       </section>
 
-      {/* Compliance Section */}
-      <section id="compliance" className="py-20 px-4 bg-card/30">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            {t.compliance.title}
-          </h2>
-          <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
-            {t.compliance.subtitle}
-          </p>
-          
-          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10">
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-2xl font-bold text-blue-500">GDPR</span>
-              <span className="text-xs text-muted-foreground">{t.compliance.gdpr}</span>
-            </div>
-            
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-xl font-bold text-blue-400">ISO 27001</span>
-              <span className="text-xs text-muted-foreground">{t.compliance.iso27001}</span>
-            </div>
-            
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-xl font-bold text-yellow-600">ISO 9001</span>
-              <span className="text-xs text-muted-foreground">{t.compliance.iso9001}</span>
-            </div>
-            
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-xl font-bold text-cyan-500">SOC 2</span>
-              <span className="text-xs text-muted-foreground">{t.compliance.soc2}</span>
-            </div>
-            
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-xl font-bold text-purple-500">HIPAA</span>
-              <span className="text-xs text-muted-foreground">{t.compliance.hipaa}</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="py-12 px-4 border-t border-border">
         <div className="container mx-auto max-w-6xl">
@@ -388,7 +349,7 @@ function LandingContent() {
               <ul className="space-y-2">
                 <li><a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t.nav.features}</a></li>
                 <li><a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t.nav.pricing}</a></li>
-                <li><a href="#compliance" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t.nav.security}</a></li>
+                <li><a href="#security" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t.nav.security}</a></li>
               </ul>
             </div>
             

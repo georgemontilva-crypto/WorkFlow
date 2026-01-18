@@ -227,3 +227,10 @@
 - [x] Posicionar sección después de pricing y antes de badges de cumplimiento
 - [x] Verificar diseño minimalista y legibilidad en ambos idiomas
 - [x] Guardar checkpoint y hacer push
+
+## Eliminar Sección de Compliance Badges
+- [x] Eliminar sección "Cumplimiento y Seguridad" de Landing.tsx
+- [x] Eliminar badges de GDPR, ISO 27001, ISO 9001, SOC 2, HIPAA
+- [x] Actualizar navegación de #compliance a #security
+- [x] Verificar que la landing page se vea correctamente sin la sección
+- [ ] Guardar checkpoint y hacer push
