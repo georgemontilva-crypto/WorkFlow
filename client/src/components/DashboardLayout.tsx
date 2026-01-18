@@ -48,9 +48,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             const isActive = location === item.href;
             return (
               <Link key={item.name} href={item.href}>
-                <a
+                <div
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150',
+                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 cursor-pointer',
                     isActive
                       ? 'bg-accent text-accent-foreground'
                       : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
@@ -58,7 +58,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 >
                   <item.icon className="w-5 h-5" strokeWidth={1.5} />
                   {item.name}
-                </a>
+                </div>
               </Link>
             );
           })}

@@ -6,11 +6,14 @@
 import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Settings as SettingsIcon, Database, Download, Trash2 } from 'lucide-react';
+import { Settings as SettingsIcon, Database, Download, Trash2, Upload } from 'lucide-react';
 import { db } from '@/lib/db';
 import { toast } from 'sonner';
+import { useRef } from 'react';
 
 export default function Settings() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const exportData = async () => {
     try {
       const clients = await db.clients.toArray();
@@ -37,6 +40,56 @@ export default function Settings() {
       toast.success('Datos exportados exitosamente');
     } catch (error) {
       toast.error('Error al exportar datos');
+    }
+  };
+
+  const importData = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      if (!data.clients || !data.invoices || !data.transactions || !data.savingsGoals) {
+        toast.error('Formato de archivo inválido');
+        return;
+      }
+
+      if (window.confirm('¿Estás seguro de que quieres importar estos datos? Esto agregará los datos al sistema existente.')) {
+        // Importar clientes
+        for (const client of data.clients) {
+          const { id, ...clientData } = client;
+          await db.clients.add(clientData);
+        }
+
+        // Importar facturas
+        for (const invoice of data.invoices) {
+          const { id, ...invoiceData } = invoice;
+          await db.invoices.add(invoiceData);
+        }
+
+        // Importar transacciones
+        for (const transaction of data.transactions) {
+          const { id, ...transactionData } = transaction;
+          await db.transactions.add(transactionData);
+        }
+
+        // Importar metas de ahorro
+        for (const goal of data.savingsGoals) {
+          const { id, ...goalData } = goal;
+          await db.savingsGoals.add(goalData);
+        }
+
+        toast.success('Datos importados exitosamente');
+      }
+    } catch (error) {
+      toast.error('Error al importar datos. Verifica el formato del archivo.');
+    }
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -79,7 +132,7 @@ export default function Settings() {
                 Todos tus datos se almacenan localmente en tu navegador usando IndexedDB. 
                 Esto permite que la aplicación funcione sin conexión a internet.
               </p>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 <Button
                   onClick={exportData}
                   variant="outline"
@@ -88,6 +141,21 @@ export default function Settings() {
                   <Download className="w-4 h-4 mr-2" />
                   Exportar Datos
                 </Button>
+                <Button
+                  onClick={() => fileInputRef.current?.click()}
+                  variant="outline"
+                  className="border-border text-foreground hover:bg-accent"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Importar Datos
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={importData}
+                  className="hidden"
+                />
                 <Button
                   onClick={clearAllData}
                   variant="outline"
@@ -120,6 +188,28 @@ export default function Settings() {
                 <span className="text-sm text-muted-foreground">Almacenamiento</span>
                 <span className="text-sm font-medium text-foreground">IndexedDB (Dexie.js)</span>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground">Formato de Importación</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-3">
+                Para importar datos, el archivo JSON debe tener la siguiente estructura:
+              </p>
+              <pre className="bg-background border border-border rounded-lg p-4 text-xs text-foreground overflow-x-auto">
+{`{
+  "clients": [...],
+  "invoices": [...],
+  "transactions": [...],
+  "savingsGoals": [...]
+}`}
+              </pre>
+              <p className="text-sm text-muted-foreground mt-3">
+                Puedes usar la función "Exportar Datos" para obtener un ejemplo del formato correcto.
+              </p>
             </CardContent>
           </Card>
         </div>

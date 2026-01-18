@@ -67,13 +67,17 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Hero Image */}
-        <div className="mb-8 rounded-xl overflow-hidden h-48 bg-card border border-border">
-          <img 
-            src="/images/hero-dashboard.png" 
-            alt="Dashboard" 
-            className="w-full h-full object-cover opacity-60"
-          />
+        {/* Hero Section */}
+        <div className="mb-8 rounded-xl h-48 bg-gradient-to-br from-card via-accent/20 to-card border border-border flex items-center justify-center">
+          <div className="flex items-center gap-4">
+            <div className="w-20 h-20 rounded-2xl bg-accent/30 flex items-center justify-center">
+              <TrendingUp className="w-10 h-10 text-foreground" strokeWidth={1.5} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-foreground">Control Total</h2>
+              <p className="text-muted-foreground">Gestiona tu negocio con precisión</p>
+            </div>
+          </div>
         </div>
 
         {/* Stats Cards */}

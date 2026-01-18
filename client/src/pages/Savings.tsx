@@ -172,11 +172,9 @@ export default function Savings() {
         {!savingsGoals || savingsGoals.length === 0 ? (
           <Card className="bg-card border-border">
             <CardContent className="flex flex-col items-center justify-center py-16">
-              <img 
-                src="/images/financial-growth.png" 
-                alt="No hay metas" 
-                className="w-64 h-64 object-contain opacity-50 mb-6"
-              />
+              <div className="w-32 h-32 rounded-full bg-accent/20 flex items-center justify-center mb-6">
+                <Target className="w-16 h-16 text-muted-foreground" strokeWidth={1} />
+              </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 No hay metas de ahorro aún
               </h3>
@@ -188,7 +186,7 @@ export default function Savings() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {savingsGoals.map((goal) => {
-              const progress = (goal.currentAmount / goal.targetAmount) * 100;
+              const progress = goal.targetAmount > 0 ? (goal.currentAmount / goal.targetAmount) * 100 : 0;
               const remaining = goal.targetAmount - goal.currentAmount;
 
               return (

@@ -308,11 +308,9 @@ export default function Finances() {
           <CardContent>
             {!transactions || transactions.length === 0 ? (
               <div className="text-center py-8">
-                <img 
-                  src="/images/financial-growth.png" 
-                  alt="No hay transacciones" 
-                  className="w-48 h-48 object-contain opacity-50 mx-auto mb-4"
-                />
+                <div className="w-32 h-32 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
+                  <TrendingUp className="w-16 h-16 text-muted-foreground" strokeWidth={1} />
+                </div>
                 <p className="text-muted-foreground">No hay transacciones registradas</p>
               </div>
             ) : (
