@@ -48,6 +48,8 @@ export default function Clients() {
     company: '',
     billingCycle: 'monthly',
     amount: 0,
+    nextPaymentDate: '',
+    reminderDays: 7,
     status: 'active',
     notes: '',
   });
@@ -60,40 +62,22 @@ export default function Clients() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.amount) {
+    if (!formData.name || !formData.email || !formData.amount || !formData.nextPaymentDate) {
       toast.error('Por favor completa los campos requeridos');
       return;
     }
 
     const now = new Date().toISOString();
-    let nextPaymentDate = new Date();
-
-    switch (formData.billingCycle) {
-      case 'monthly':
-        nextPaymentDate = addMonths(new Date(), 1);
-        break;
-      case 'quarterly':
-        nextPaymentDate = addMonths(new Date(), 3);
-        break;
-      case 'yearly':
-        nextPaymentDate = addMonths(new Date(), 12);
-        break;
-      case 'custom':
-        nextPaymentDate = addDays(new Date(), formData.customCycleDays || 30);
-        break;
-    }
 
     if (editingClient) {
       await db.clients.update(editingClient.id!, {
         ...formData as Client,
-        nextPaymentDate: nextPaymentDate.toISOString(),
         updatedAt: now,
       });
       toast.success('Cliente actualizado exitosamente');
     } else {
       await db.clients.add({
         ...formData as Client,
-        nextPaymentDate: nextPaymentDate.toISOString(),
         createdAt: now,
         updatedAt: now,
       });
@@ -109,6 +93,8 @@ export default function Clients() {
       company: '',
       billingCycle: 'monthly',
       amount: 0,
+      nextPaymentDate: '',
+      reminderDays: 7,
       status: 'active',
       notes: '',
     });
@@ -124,6 +110,8 @@ export default function Clients() {
       billingCycle: client.billingCycle,
       customCycleDays: client.customCycleDays,
       amount: client.amount,
+      nextPaymentDate: client.nextPaymentDate.split('T')[0],
+      reminderDays: client.reminderDays,
       status: client.status,
       notes: client.notes,
     });
@@ -153,12 +141,12 @@ export default function Clients() {
 
   return (
     <DashboardLayout>
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Clientes</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Clientes</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Gestiona tu base de datos de clientes y recordatorios de pago
             </p>
           </div>
@@ -184,7 +172,7 @@ export default function Clients() {
                 Nuevo Cliente
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-popover border-border max-w-2xl">
+            <DialogContent className="bg-popover border-border max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-foreground text-2xl">
                   {editingClient ? 'Editar Cliente' : 'Agregar Nuevo Cliente'}
@@ -243,9 +231,44 @@ export default function Clients() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
-                  <div className="space-y-2">
-                    <Label htmlFor="billingCycle" className="text-foreground font-semibold">Ciclo de Facturación</Label>
+                {/* Billing Section */}
+                <div className="pt-4 border-t-2 border-border space-y-4">
+                  <div>
+                    <h3 className="text-foreground font-semibold text-lg mb-1">Información de Facturación</h3>
+                    <p className="text-sm text-muted-foreground">Configura el ciclo de cobro y recordatorios</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="nextPaymentDate" className="text-foreground font-semibold">Fecha de Próximo Cobro <span className="text-destructive">*</span></Label>
+                      <Input
+                        id="nextPaymentDate"
+                        type="date"
+                        value={formData.nextPaymentDate}
+                        onChange={(e) => setFormData({ ...formData, nextPaymentDate: e.target.value })}
+                        className="bg-background border-border text-foreground h-11"
+                        required
+                      />
+                      <p className="text-xs text-muted-foreground">Fecha del próximo pago esperado</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="reminderDays" className="text-foreground font-semibold">Días de Anticipación</Label>
+                      <Input
+                        id="reminderDays"
+                        type="number"
+                        min="1"
+                        max="30"
+                        value={formData.reminderDays}
+                        onChange={(e) => setFormData({ ...formData, reminderDays: parseInt(e.target.value) || 7 })}
+                        className="bg-background border-border text-foreground h-11"
+                      />
+                      <p className="text-xs text-muted-foreground">Días antes para mostrar recordatorio</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="billingCycle" className="text-foreground font-semibold">Ciclo de Facturación</Label>
                     <Select
                       value={formData.billingCycle}
                       onValueChange={(value: any) => setFormData({ ...formData, billingCycle: value })}
@@ -260,9 +283,9 @@ export default function Clients() {
                         <SelectItem value="custom">Personalizado</SelectItem>
                       </SelectContent>
                     </Select>
-                    <p className="text-xs text-muted-foreground">Frecuencia de cobro recurrente</p>
-                  </div>
-                  <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground">Frecuencia de cobro recurrente</p>
+                    </div>
+                    <div className="space-y-2">
                     <Label htmlFor="amount" className="text-foreground font-semibold">Monto <span className="text-destructive">*</span></Label>
                     <Input
                       id="amount"
@@ -273,7 +296,8 @@ export default function Clients() {
                       className="bg-background border-border text-foreground font-mono h-11"
                       required
                     />
-                    <p className="text-xs text-muted-foreground">Monto a cobrar por ciclo</p>
+                      <p className="text-xs text-muted-foreground">Monto a cobrar por ciclo</p>
+                    </div>
                   </div>
                 </div>
 
@@ -352,6 +376,7 @@ export default function Clients() {
         </div>
 
         {/* Clients List */}
+        <div className="mt-6">
         {!filteredClients || filteredClients.length === 0 ? (
           <Card className="bg-card border-border">
             <CardContent className="flex flex-col items-center justify-center py-16">
@@ -367,7 +392,7 @@ export default function Clients() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredClients.map((client) => {
               const paymentStatus = getPaymentStatus(client.nextPaymentDate);
               
@@ -454,6 +479,7 @@ export default function Clients() {
             })}
           </div>
         )}
+        </div>
       </div>
     </DashboardLayout>
   );

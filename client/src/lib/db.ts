@@ -18,6 +18,7 @@ export interface Client {
   customCycleDays?: number;
   amount: number;
   nextPaymentDate: string;
+  reminderDays: number; // Días de anticipación para recordatorio
   status: 'active' | 'inactive' | 'overdue';
   notes?: string;
   createdAt: string;

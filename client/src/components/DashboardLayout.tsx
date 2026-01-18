@@ -1,25 +1,13 @@
 /**
- * DashboardLayout Component
- * Design Philosophy: Apple Minimalism - Negro, grises, blanco
- * 
- * Sidebar fijo con navegación minimalista
- * Espaciado generoso y tipografía clara
+ * DashboardLayout - Layout principal con sidebar
+ * Design Philosophy: Apple Minimalism - Responsive mobile-first
  */
 
 import { Link, useLocation } from 'wouter';
-import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
-  TrendingUp, 
-  Target,
-  Settings
-} from 'lucide-react';
+import { LayoutDashboard, Users, FileText, TrendingUp, Target, Settings, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -30,20 +18,44 @@ const navigation = [
   { name: 'Configuración', href: '/settings', icon: Settings },
 ];
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-background overflow-hidden">
+      {/* Mobile Menu Button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="fixed top-4 left-4 z-50 lg:hidden bg-card border border-border"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      >
+        {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+      </Button>
+
+      {/* Overlay for mobile */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-60 bg-card border-r border-border flex flex-col">
+      <aside
+        className={cn(
+          'fixed lg:static inset-y-0 left-0 z-40 w-64 bg-card border-r border-border flex flex-col transition-transform duration-300 ease-in-out',
+          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        )}
+      >
         {/* Logo */}
         <div className="h-16 flex items-center px-6 border-b border-border">
           <h1 className="text-xl font-bold text-foreground">WorkFlow</h1>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-6 space-y-1">
+        <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
           {navigation.map((item) => {
             const isActive = location === item.href;
             return (
@@ -55,6 +67,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       ? 'bg-accent text-accent-foreground'
                       : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
                   )}
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <item.icon className="w-5 h-5" strokeWidth={1.5} />
                   {item.name}
@@ -65,16 +78,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </nav>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-border">
-          <p className="text-xs text-muted-foreground">
+        <div className="p-4 border-t border-border">
+          <p className="text-xs text-muted-foreground text-center">
             Modo Offline Activo
           </p>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-auto">
-        {children}
+      <main className="flex-1 overflow-y-auto">
+        <div className="min-h-full">
+          {children}
+        </div>
       </main>
     </div>
   );
