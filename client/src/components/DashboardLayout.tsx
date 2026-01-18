@@ -149,7 +149,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         {/* Logo */}
         <div className="h-16 flex items-center gap-3 px-6 border-b border-border">
-          <img src="/hiwork-logo-final.png" alt="HiWork" className="h-8 w-auto" />
+          <img src="/hiwork-logo-final.png" alt="HiWork" className="h-10 w-auto object-contain" />
         </div>
 
         {/* Navigation */}

@@ -184,6 +184,95 @@ export async function hasActiveAccess(userId: number): Promise<boolean> {
   return false;
 }
 
+/**
+ * Update user's 2FA secret
+ */
+export async function updateUser2FASecret(userId: number, secret: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    await db.update(users)
+      .set({
+        twoFactorSecret: secret,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+  } catch (error) {
+    console.error("[Database] Failed to update 2FA secret:", error);
+    throw error;
+  }
+}
+
+/**
+ * Enable 2FA for user
+ */
+export async function enable2FA(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    await db.update(users)
+      .set({
+        twoFactorEnabled: 1,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+  } catch (error) {
+    console.error("[Database] Failed to enable 2FA:", error);
+    throw error;
+  }
+}
+
+/**
+ * Disable 2FA for user
+ */
+export async function disable2FA(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    await db.update(users)
+      .set({
+        twoFactorEnabled: 0,
+        twoFactorSecret: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+  } catch (error) {
+    console.error("[Database] Failed to disable 2FA:", error);
+    throw error;
+  }
+}
+
+/**
+ * Update user password
+ */
+export async function updateUserPassword(userId: number, passwordHash: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    await db.update(users)
+      .set({
+        passwordHash,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+  } catch (error) {
+    console.error("[Database] Failed to update password:", error);
+    throw error;
+  }
+}
+
 export { users, clients, invoices, transactions, savingsGoals };
 
 // ============================================

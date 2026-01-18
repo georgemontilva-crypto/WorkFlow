@@ -106,6 +106,80 @@ export const appRouter = router({
       const { getUserAccessStatus } = await import("./access");
       return getUserAccessStatus(ctx.user);
     }),
+
+    // 2FA endpoints
+    generate2FA: protectedProcedure.mutation(async ({ ctx }) => {
+      const { TOTP, generateSecret } = await import('otplib');
+      const QRCode = await import('qrcode');
+      
+      // Generate secret
+      const secret = generateSecret();
+      
+      // Generate QR code URL
+      const otpauth = `otpauth://totp/HiWork:${encodeURIComponent(ctx.user.email)}?secret=${secret}&issuer=HiWork`;
+      
+      const qrCode = await QRCode.toDataURL(otpauth);
+      
+      // Store secret temporarily (not enabled yet)
+      await db.updateUser2FASecret(ctx.user.id, secret);
+      
+      return { qrCode, secret };
+    }),
+
+    verify2FA: protectedProcedure
+      .input(z.object({ token: z.string().length(6) }))
+      .mutation(async ({ ctx, input }) => {
+        const { verify } = await import('otplib');
+        const user = await db.getUserById(ctx.user.id);
+        
+        if (!user || !user.twoFactorSecret) {
+          throw new Error('2FA not configured');
+        }
+        
+        const isValid = verify({ token: input.token, secret: user.twoFactorSecret });
+        
+        if (!isValid) {
+          throw new Error('Invalid 2FA code');
+        }
+        
+        // Enable 2FA
+        await db.enable2FA(ctx.user.id);
+        
+        return { success: true };
+      }),
+
+    disable2FA: protectedProcedure.mutation(async ({ ctx }) => {
+      await db.disable2FA(ctx.user.id);
+      return { success: true };
+    }),
+
+    changePassword: protectedProcedure
+      .input(z.object({
+        oldPassword: z.string().min(1),
+        newPassword: z.string().min(8),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const bcrypt = await import('bcryptjs');
+        const user = await db.getUserById(ctx.user.id);
+        
+        if (!user) {
+          throw new Error('User not found');
+        }
+        
+        // Verify old password
+        const isValid = await bcrypt.compare(input.oldPassword, user.passwordHash);
+        if (!isValid) {
+          throw new Error('Current password is incorrect');
+        }
+        
+        // Hash new password
+        const newHash = await bcrypt.hash(input.newPassword, 12);
+        
+        // Update password
+        await db.updateUserPassword(ctx.user.id, newHash);
+        
+        return { success: true };
+      }),
   }),
 
   /**

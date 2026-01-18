@@ -30,6 +30,10 @@ export const users = mysqlTable("users", {
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
   /** Stripe payment intent ID for lifetime purchase */
   stripePaymentId: varchar("stripePaymentId", { length: 255 }),
+  /** Two-factor authentication secret (base32 encoded) */
+  twoFactorSecret: varchar("twoFactorSecret", { length: 255 }),
+  /** Whether 2FA is enabled for this user */
+  twoFactorEnabled: int("twoFactorEnabled").notNull().default(0), // 0 = false, 1 = true
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

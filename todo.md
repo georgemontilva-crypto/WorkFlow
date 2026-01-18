@@ -292,30 +292,30 @@
 - [x] Probar localmente que el servidor arranque correctamente
 - [x] Guardar checkpoint con cambios
 
-## Implementar Autenticación de Dos Factores (2FA) Opcional
-### Base de Datos
-- [ ] Agregar campos a tabla users: twofa_enabled (boolean), twofa_secret (string encrypted)
-- [ ] Ejecutar db:push para aplicar cambios
+## Arreglar UI y Agregar Funciones de Seguridad
+### UI Fixes
+- [ ] Arreglar logos en DashboardLayout (tamaño y posición)
+- [ ] Reorganizar Settings en grid 2x2 (dos tarjetas arriba, dos abajo)
 
-### Backend
-- [ ] Instalar dependencia: otplib para generar/verificar códigos TOTP
-- [ ] Crear procedimientos tRPC para:
-  - [ ] Generar secret y QR code para activar 2FA
-  - [ ] Verificar código y activar 2FA
-  - [ ] Desactivar 2FA
-  - [ ] Verificar código 2FA durante login
-- [ ] Modificar flujo de login para requerir 2FA si está activado
+### Base de Datos y Dependencias
+- [ ] Agregar campos a users: twofa_enabled, twofa_secret
+- [ ] Instalar: otplib, qrcode, resend
+- [ ] Ejecutar db:push
 
-### Frontend
-- [ ] Crear página/modal de configuración de 2FA en perfil
-- [ ] Mostrar QR code para escanear con Google Authenticator/Authy
-- [ ] Input para verificar código antes de activar
-- [ ] Botón para desactivar 2FA (con confirmación)
-- [ ] Pantalla de verificación 2FA durante login
-- [ ] Mostrar estado de 2FA en perfil (activado/desactivado)
+### Backend - 2FA y Cambio de Contraseña
+- [ ] Configurar Resend API con key: re_3tw2pyS3_2ejmj3qnuWy3pnsAzSajh2oc
+- [ ] Crear procedimientos tRPC para 2FA (generar QR, activar, desactivar, verificar)
+- [ ] Crear procedimiento para cambiar contraseña
+- [ ] Modificar login para verificar 2FA si está activado
+
+### Frontend - Settings
+- [ ] Agregar tarjeta "Seguridad" con opciones:
+  - [ ] Activar/Desactivar 2FA (mostrar QR code)
+  - [ ] Cambiar contraseña
+- [ ] Modal para configurar 2FA con QR code
+- [ ] Modal para cambiar contraseña
 
 ### Testing
-- [ ] Probar activación de 2FA con Google Authenticator
-- [ ] Probar login con 2FA activado
-- [ ] Probar desactivación de 2FA
-- [ ] Guardar checkpoint y hacer push
+- [ ] Probar 2FA completo
+- [ ] Probar cambio de contraseña
+- [ ] Guardar checkpoint
