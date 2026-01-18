@@ -1,5 +1,5 @@
 /**
- * DashboardLayout - Layout principal con sidebar
+ * DashboardLayout - Layout principal con sidebar y header fijo
  * Design Philosophy: Apple Minimalism - Responsive mobile-first
  */
 
@@ -24,16 +24,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      {/* Mobile Menu Button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="fixed top-4 left-4 z-50 lg:hidden bg-card border border-border"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-      >
-        {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </Button>
-
       {/* Overlay for mobile */}
       {isMobileMenuOpen && (
         <div
@@ -85,9 +75,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="min-h-full">
+      {/* Main Content with Fixed Header */}
+      <main className="flex-1 overflow-hidden flex flex-col">
+        {/* Fixed Header */}
+        <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="lg:hidden"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </Button>
+          
+          <div className="flex-1" />
+          
+          <h1 className="text-lg sm:text-xl font-bold text-foreground">WorkFlow</h1>
+        </header>
+
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto">
           {children}
         </div>
       </main>

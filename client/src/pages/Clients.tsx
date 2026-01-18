@@ -1,6 +1,6 @@
 /**
- * Clients Page - Gestión de Clientes
- * Design Philosophy: Apple Minimalism
+ * Clients Page - Gestión de Clientes (CRM)
+ * Design Philosophy: Apple Minimalism - Collapsible cards for space efficiency
  */
 
 import DashboardLayout from '@/components/DashboardLayout';
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -28,19 +29,22 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Client } from '@/lib/db';
-import { Plus, Search, MoreVertical, Mail, Phone, Building, Users, Pencil, Trash2, Bell } from 'lucide-react';
-import { useState } from 'react';
+import { Users, Plus, Search, MoreVertical, Pencil, Trash2, Mail, Phone, Calendar, DollarSign, Bell, Building2, ChevronDown, ChevronUp } from 'lucide-react';
+import { format, parseISO, differenceInDays, addMonths, addDays } from 'date-fns';
+import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { format, addMonths, addDays, parseISO, differenceInDays } from 'date-fns';
+import { useState } from 'react';
 
 export default function Clients() {
   const clients = useLiveQuery(() => db.clients.orderBy('createdAt').reverse().toArray());
   const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
   const [formData, setFormData] = useState<Partial<Client>>({
     name: '',
     email: '',
@@ -58,6 +62,16 @@ export default function Clients() {
     client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     client.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const toggleCard = (clientId: number) => {
+    const newExpanded = new Set(expandedCards);
+    if (newExpanded.has(clientId)) {
+      newExpanded.delete(clientId);
+    } else {
+      newExpanded.add(clientId);
+    }
+    setExpandedCards(newExpanded);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,31 +133,47 @@ export default function Clients() {
   };
 
   const handleDelete = async (clientId: number) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este cliente?')) {
-      await db.clients.delete(clientId);
-      toast.success('Cliente eliminado exitosamente');
+    if (window.confirm('¿Estás seguro de que quieres eliminar este cliente? Esta acción no se puede deshacer.')) {
+      try {
+        // Eliminar facturas asociadas
+        const invoices = await db.invoices.where('clientId').equals(clientId).toArray();
+        for (const invoice of invoices) {
+          await db.invoices.delete(invoice.id!);
+        }
+        
+        // Eliminar transacciones asociadas
+        const transactions = await db.transactions.where('clientId').equals(clientId).toArray();
+        for (const transaction of transactions) {
+          await db.transactions.delete(transaction.id!);
+        }
+        
+        // Eliminar cliente
+        await db.clients.delete(clientId);
+        toast.success('Cliente eliminado exitosamente');
+      } catch (error) {
+        toast.error('Error al eliminar el cliente');
+      }
     }
   };
 
-  const getPaymentStatus = (nextPaymentDate: string) => {
+  const getPaymentStatus = (nextPaymentDate: string, reminderDays: number) => {
     const daysUntil = differenceInDays(parseISO(nextPaymentDate), new Date());
     
     if (daysUntil < 0) {
-      return { label: 'Vencido', color: 'text-destructive', bgColor: 'bg-destructive/20' };
+      return { color: 'bg-destructive/10 text-destructive border-destructive/30', label: 'Vencido', icon: '🔴' };
     } else if (daysUntil <= 3) {
-      return { label: `${daysUntil} días`, color: 'text-orange-400', bgColor: 'bg-orange-400/20' };
-    } else if (daysUntil <= 7) {
-      return { label: `${daysUntil} días`, color: 'text-yellow-400', bgColor: 'bg-yellow-400/20' };
-    } else {
-      return { label: `${daysUntil} días`, color: 'text-muted-foreground', bgColor: 'bg-muted' };
+      return { color: 'bg-orange-500/10 text-orange-500 border-orange-500/30', label: `${daysUntil} días`, icon: '🟠' };
+    } else if (daysUntil <= reminderDays) {
+      return { color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30', label: `${daysUntil} días`, icon: '🟡' };
     }
+    return { color: 'bg-muted text-muted-foreground border-border', label: `${daysUntil} días`, icon: '🟢' };
   };
 
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Clientes</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
@@ -161,6 +191,8 @@ export default function Clients() {
                 company: '',
                 billingCycle: 'monthly',
                 amount: 0,
+                nextPaymentDate: '',
+                reminderDays: 7,
                 status: 'active',
                 notes: '',
               });
@@ -269,33 +301,33 @@ export default function Clients() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="billingCycle" className="text-foreground font-semibold">Ciclo de Facturación</Label>
-                    <Select
-                      value={formData.billingCycle}
-                      onValueChange={(value: any) => setFormData({ ...formData, billingCycle: value })}
-                    >
-                      <SelectTrigger className="bg-background border-border text-foreground h-11">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border-border">
-                        <SelectItem value="monthly">Mensual</SelectItem>
-                        <SelectItem value="quarterly">Trimestral</SelectItem>
-                        <SelectItem value="yearly">Anual</SelectItem>
-                        <SelectItem value="custom">Personalizado</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <Select
+                        value={formData.billingCycle}
+                        onValueChange={(value: any) => setFormData({ ...formData, billingCycle: value })}
+                      >
+                        <SelectTrigger className="bg-background border-border text-foreground h-11">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border-border">
+                          <SelectItem value="monthly">Mensual</SelectItem>
+                          <SelectItem value="quarterly">Trimestral</SelectItem>
+                          <SelectItem value="yearly">Anual</SelectItem>
+                          <SelectItem value="custom">Personalizado</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <p className="text-xs text-muted-foreground">Frecuencia de cobro recurrente</p>
                     </div>
                     <div className="space-y-2">
-                    <Label htmlFor="amount" className="text-foreground font-semibold">Monto <span className="text-destructive">*</span></Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      step="0.01"
-                      value={formData.amount}
-                      onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
-                      className="bg-background border-border text-foreground font-mono h-11"
-                      required
-                    />
+                      <Label htmlFor="amount" className="text-foreground font-semibold">Monto <span className="text-destructive">*</span></Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        step="0.01"
+                        value={formData.amount}
+                        onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
+                        className="bg-background border-border text-foreground font-mono h-11"
+                        required
+                      />
                       <p className="text-xs text-muted-foreground">Monto a cobrar por ciclo</p>
                     </div>
                   </div>
@@ -307,6 +339,7 @@ export default function Clients() {
                     <Input
                       id="customCycleDays"
                       type="number"
+                      min="1"
                       value={formData.customCycleDays}
                       onChange={(e) => setFormData({ ...formData, customCycleDays: parseInt(e.target.value) })}
                       className="bg-background border-border text-foreground h-11"
@@ -319,18 +352,18 @@ export default function Clients() {
                   <Label htmlFor="status" className="text-foreground font-semibold">Estado</Label>
                   <Select
                     value={formData.status}
-                      onValueChange={(value: any) => setFormData({ ...formData, status: value })}
-                    >
-                      <SelectTrigger className="bg-background border-border text-foreground h-11">
+                    onValueChange={(value: any) => setFormData({ ...formData, status: value })}
+                  >
+                    <SelectTrigger className="bg-background border-border text-foreground h-11">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-popover border-border">
                       <SelectItem value="active">Activo</SelectItem>
-                        <SelectItem value="inactive">Inactivo</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-xs text-muted-foreground">Estado actual del cliente</p>
-                  </div>
+                      <SelectItem value="inactive">Inactivo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">Estado actual del cliente</p>
+                </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="notes" className="text-foreground font-semibold">Notas Adicionales</Label>
@@ -338,11 +371,11 @@ export default function Clients() {
                     id="notes"
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      className="bg-background border-border text-foreground h-11"
-                      placeholder="Información adicional sobre el cliente..."
-                    />
-                    <p className="text-xs text-muted-foreground">Notas privadas sobre el cliente (opcional)</p>
-                  </div>
+                    className="bg-background border-border text-foreground h-11"
+                    placeholder="Información adicional sobre el cliente..."
+                  />
+                  <p className="text-xs text-muted-foreground">Notas privadas sobre el cliente (opcional)</p>
+                </div>
 
                 <div className="flex justify-end gap-3 pt-6 border-t border-border">
                   <Button
@@ -354,7 +387,7 @@ export default function Clients() {
                     Cancelar
                   </Button>
                   <Button type="submit" className="bg-primary text-primary-foreground hover:opacity-90">
-                    {editingClient ? 'Actualizar' : 'Guardar'} Cliente
+                    {editingClient ? 'Actualizar' : 'Agregar'} Cliente
                   </Button>
                 </div>
               </form>
@@ -370,7 +403,7 @@ export default function Clients() {
               placeholder="Buscar clientes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-card border-border text-foreground"
+              className="pl-10 bg-card border-border text-foreground h-11"
             />
           </div>
         </div>
@@ -384,96 +417,112 @@ export default function Clients() {
                 <Users className="w-16 h-16 text-muted-foreground" strokeWidth={1} />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
-                No hay clientes aún
+                {searchQuery ? 'No se encontraron clientes' : 'No hay clientes aún'}
               </h3>
               <p className="text-muted-foreground mb-6">
-                Comienza agregando tu primer cliente
+                {searchQuery ? 'Intenta con otro término de búsqueda' : 'Comienza agregando tu primer cliente'}
               </p>
             </CardContent>
           </Card>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredClients.map((client) => {
-              const paymentStatus = getPaymentStatus(client.nextPaymentDate);
-              
+              const paymentStatus = getPaymentStatus(client.nextPaymentDate, client.reminderDays);
+              const isExpanded = expandedCards.has(client.id!);
+
               return (
                 <Card key={client.id} className="bg-card border-border hover:border-accent transition-colors">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-foreground">{client.name}</CardTitle>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-foreground text-lg truncate">{client.name}</CardTitle>
                         {client.company && (
-                          <p className="text-sm text-muted-foreground mt-1">{client.company}</p>
+                          <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1 truncate">
+                            <Building2 className="w-3 h-3 flex-shrink-0" />
+                            {client.company}
+                          </p>
                         )}
                       </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="bg-popover border-border">
-                          <DropdownMenuItem 
-                            onClick={() => handleEdit(client)}
-                            className="text-foreground hover:bg-accent cursor-pointer"
-                          >
-                            <Pencil className="w-4 h-4 mr-2" />
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleDelete(client.id!)}
-                            className="text-destructive hover:bg-destructive/10 cursor-pointer"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Eliminar
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => toggleCard(client.id!)}
+                          className="text-muted-foreground hover:text-foreground h-8 w-8"
+                        >
+                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-8 w-8">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="bg-popover border-border" align="end">
+                            <DropdownMenuItem 
+                              onClick={() => handleEdit(client)}
+                              className="text-foreground hover:bg-accent cursor-pointer"
+                            >
+                              <Pencil className="w-4 h-4 mr-2" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-border" />
+                            <DropdownMenuItem 
+                              onClick={() => handleDelete(client.id!)}
+                              className="text-destructive hover:bg-destructive/10 cursor-pointer"
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Eliminar
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Mail className="w-4 h-4" />
-                      <span>{client.email}</span>
-                    </div>
-                    {client.phone && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Phone className="w-4 h-4" />
-                        <span>{client.phone}</span>
+
+                  {isExpanded && (
+                    <CardContent className="space-y-3 pt-0">
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Mail className="w-4 h-4 flex-shrink-0" />
+                          <span className="truncate">{client.email}</span>
+                        </div>
+                        {client.phone && (
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Phone className="w-4 h-4 flex-shrink-0" />
+                            <span>{client.phone}</span>
+                          </div>
+                        )}
                       </div>
-                    )}
-                    <div className="pt-3 border-t border-border">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-muted-foreground">Próximo Pago</span>
-                        <span className="text-sm font-medium text-foreground">
-                          {format(parseISO(client.nextPaymentDate), 'dd/MM/yyyy')}
-                        </span>
+
+                      <div className="pt-3 border-t border-border">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-muted-foreground">Próximo Pago</span>
+                          <span className="text-sm font-semibold text-foreground">
+                            {format(parseISO(client.nextPaymentDate), 'dd/MM/yyyy')}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-muted-foreground">Monto</span>
+                          <span className="text-lg font-bold font-mono text-foreground">
+                            ${client.amount.toLocaleString('es-ES')}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Bell className="w-4 h-4 text-muted-foreground" />
+                          <Badge className={`${paymentStatus.color} border text-xs`}>
+                            {paymentStatus.icon} {paymentStatus.label}
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm text-muted-foreground">Monto</span>
-                        <span className="text-lg font-bold font-mono text-foreground">
-                          ${client.amount.toLocaleString('es-ES')}
-                        </span>
+
+                      <div className="pt-3 border-t border-border">
+                        <Badge variant={client.status === 'active' ? 'default' : 'secondary'} className="text-xs">
+                          {client.status === 'active' ? 'Activo' : 'Inactivo'}
+                        </Badge>
                       </div>
-                      
-                      {/* Payment Reminder Badge */}
-                      <div className="flex items-center gap-2">
-                        <Bell className={`w-4 h-4 ${paymentStatus.color}`} />
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${paymentStatus.bgColor} ${paymentStatus.color}`}>
-                          {paymentStatus.label}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="pt-2">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        client.status === 'active' 
-                          ? 'bg-accent text-accent-foreground' 
-                          : 'bg-muted text-muted-foreground'
-                      }`}>
-                        {client.status === 'active' ? 'Activo' : 'Inactivo'}
-                      </span>
-                    </div>
-                  </CardContent>
+                    </CardContent>
+                  )}
                 </Card>
               );
             })}
