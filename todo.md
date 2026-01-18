@@ -239,3 +239,47 @@
 - [x] Cambiar precio en LandingLanguageContext.tsx (español e inglés)
 - [x] Verificar que el precio se muestre correctamente en la landing page
 - [x] Guardar checkpoint y hacer push
+
+## Sistema Completo de Super Admin, Trial y Soporte
+
+### Base de Datos
+- [x] Agregar campos a tabla users: trial_ends_at, has_lifetime_access, role super_admin
+- [x] Crear tabla support_tickets (id, user_id, subject, status, priority, created_at, updated_at)
+- [x] Crear tabla support_messages (id, ticket_id, sender_id, message, is_admin_reply, created_at)
+- [x] Ejecutar db:push para aplicar cambios
+
+### Backend - Sistema de Roles y Trial
+- [x] Crear middleware superAdminProcedure para proteger rutas de super admin
+- [x] Crear procedimiento para verificar estado de trial del usuario (ya existía en access.ts)
+- [x] Crear procedimientos CRUD para tickets de soporte
+- [x] Crear procedimientos para mensajes de soporte
+- [x] Crear procedimiento para listar todos los usuarios (solo admin)
+- [x] Crear procedimiento para actualizar has_lifetime_access después de pago
+
+### Dashboard de Super Admin
+- [ ] Crear página /admin con protección de super admin
+- [ ] Implementar tabla de usuarios con filtros (trial, expirado, lifetime)
+- [ ] Mostrar estadísticas: total usuarios, con trial activo, con lifetime, tickets abiertos
+- [ ] Crear sección de gestión de tickets de soporte
+- [ ] Implementar vista de conversación de tickets con respuestas
+
+### Sistema de Soporte para Usuarios
+- [ ] Crear componente SupportButton flotante en dashboard
+- [ ] Crear modal/página para crear nuevo ticket
+- [ ] Crear página para ver historial de tickets del usuario
+- [ ] Implementar vista de conversación individual de ticket
+- [ ] Agregar notificaciones cuando admin responde
+
+### Bloqueo Post-Trial
+- [ ] Crear componente TrialExpiredOverlay
+- [ ] Implementar lógica de verificación de trial en rutas protegidas
+- [ ] Bloquear acceso a funcionalidades cuando trial expira
+- [ ] Mostrar solo botón de "Actualizar a Lifetime" cuando está bloqueado
+- [ ] Permitir acceso a soporte incluso con trial expirado
+
+### Testing y Finalización
+- [ ] Probar flujo completo de registro y trial
+- [ ] Probar creación de tickets y respuestas
+- [ ] Probar dashboard de super admin
+- [ ] Verificar bloqueo post-trial
+- [ ] Guardar checkpoint y hacer push

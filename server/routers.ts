@@ -1,7 +1,7 @@
 import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
-import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { publicProcedure, protectedProcedure, superAdminProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
 
@@ -323,6 +323,142 @@ export const appRouter = router({
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
         await db.deleteTransaction(input.id, ctx.user.id);
+        return { success: true };
+      }),
+  }),
+
+  /**
+   * Support router - Support tickets and messages
+   */
+  support: router({
+    // Create a new support ticket
+    createTicket: protectedProcedure
+      .input(z.object({
+        subject: z.string().min(5, "Subject must be at least 5 characters"),
+        message: z.string().min(10, "Message must be at least 10 characters"),
+        priority: z.enum(["low", "medium", "high", "urgent"]).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Create ticket
+        const ticket = await db.createSupportTicket({
+          userId: ctx.user.id,
+          subject: input.subject,
+          priority: input.priority,
+        });
+
+        const ticketId = ticket.id;
+
+        // Add first message
+        await db.createSupportMessage({
+          ticketId,
+          senderId: ctx.user.id,
+          message: input.message,
+          isAdminReply: false,
+        });
+
+        return { success: true, ticketId };
+      }),
+
+    // Get user's tickets
+    myTickets: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getSupportTicketsByUserId(ctx.user.id);
+    }),
+
+    // Get ticket details with messages
+    getTicket: protectedProcedure
+      .input(z.object({ ticketId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const ticket = await db.getSupportTicketById(input.ticketId);
+        if (!ticket) {
+          throw new Error("Ticket not found");
+        }
+
+        // Verify ownership (users can only see their own tickets)
+        if (ticket.userId !== ctx.user.id && ctx.user.role !== 'super_admin') {
+          throw new Error("Access denied");
+        }
+
+        const messages = await db.getSupportMessagesByTicketId(input.ticketId);
+        return { ticket, messages };
+      }),
+
+    // Add message to ticket
+    addMessage: protectedProcedure
+      .input(z.object({
+        ticketId: z.number(),
+        message: z.string().min(1, "Message cannot be empty"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const ticket = await db.getSupportTicketById(input.ticketId);
+        if (!ticket) {
+          throw new Error("Ticket not found");
+        }
+
+        // Verify ownership
+        if (ticket.userId !== ctx.user.id && ctx.user.role !== 'super_admin') {
+          throw new Error("Access denied");
+        }
+
+        const isAdminReply = ctx.user.role === 'super_admin';
+
+        await db.createSupportMessage({
+          ticketId: input.ticketId,
+          senderId: ctx.user.id,
+          message: input.message,
+          isAdminReply,
+        });
+
+        // If admin replied, update status to in_progress
+        if (isAdminReply && ticket.status === 'open') {
+          await db.updateSupportTicketStatus(input.ticketId, 'in_progress');
+        }
+
+        return { success: true };
+      }),
+  }),
+
+  /**
+   * Admin router - Super admin only operations
+   */
+  admin: router({
+    // Get all users
+    getAllUsers: superAdminProcedure.query(async () => {
+      return await db.getAllUsers();
+    }),
+
+    // Get all support tickets
+    getAllTickets: superAdminProcedure.query(async () => {
+      return await db.getAllSupportTickets();
+    }),
+
+    // Update ticket status
+    updateTicketStatus: superAdminProcedure
+      .input(z.object({
+        ticketId: z.number(),
+        status: z.enum(["open", "in_progress", "resolved", "closed"]),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateSupportTicketStatus(input.ticketId, input.status);
+        return { success: true };
+      }),
+
+    // Grant lifetime access to user
+    grantLifetimeAccess: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateUserLifetimeAccess(input.userId, true);
+        return { success: true };
+      }),
+
+    // Revoke lifetime access from user
+    revokeLifetimeAccess: superAdminProcedure
+      .input(z.object({
+        userId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateUserLifetimeAccess(input.userId, false);
         return { success: true };
       }),
   }),

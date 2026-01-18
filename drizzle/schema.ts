@@ -21,7 +21,7 @@ export const users = mysqlTable("users", {
   emailVerified: int("emailVerified").notNull().default(0), // 0 = false, 1 = true
   /** Login method: 'email' for our own auth system */
   loginMethod: varchar("loginMethod", { length: 64 }).notNull().default("email"),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: mysqlEnum("role", ["user", "admin", "super_admin"]).default("user").notNull(),
   /** Trial period end date - 7 days from registration */
   trialEndsAt: timestamp("trialEndsAt"),
   /** Whether user has purchased lifetime access */
@@ -132,3 +132,34 @@ export const savingsGoals = mysqlTable("savingsGoals", {
 
 export type SavingsGoal = typeof savingsGoals.$inferSelect;
 export type InsertSavingsGoal = typeof savingsGoals.$inferInsert;
+
+/**
+ * Support tickets table - stores support requests from users
+ */
+export const supportTickets = mysqlTable("supportTickets", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(), // User who created the ticket
+  subject: varchar("subject", { length: 255 }).notNull(),
+  status: mysqlEnum("status", ["open", "in_progress", "resolved", "closed"]).notNull().default("open"),
+  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).notNull().default("medium"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SupportTicket = typeof supportTickets.$inferSelect;
+export type InsertSupportTicket = typeof supportTickets.$inferInsert;
+
+/**
+ * Support messages table - stores messages within support tickets
+ */
+export const supportMessages = mysqlTable("supportMessages", {
+  id: int("id").autoincrement().primaryKey(),
+  ticketId: int("ticketId").notNull(), // Reference to support ticket
+  senderId: int("senderId").notNull(), // User ID of sender (can be user or admin)
+  message: text("message").notNull(),
+  isAdminReply: int("isAdminReply").notNull().default(0), // 0 = user message, 1 = admin reply
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type SupportMessage = typeof supportMessages.$inferSelect;
+export type InsertSupportMessage = typeof supportMessages.$inferInsert;

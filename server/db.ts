@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { ENV } from "./_core/env";
-import { users, clients, invoices, transactions, savingsGoals } from "../drizzle/schema";
+import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
@@ -544,4 +544,175 @@ export async function updateClient(id: number, userId: number, data: any) {
     .update(clients)
     .set(data)
     .where(eq(clients.id, id));
+}
+
+// ============================================
+// Support Tickets Functions
+// ============================================
+
+export async function createSupportTicket(data: {
+  userId: number;
+  subject: string;
+  priority?: "low" | "medium" | "high" | "urgent";
+}) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(supportTickets).values({
+    userId: data.userId,
+    subject: data.subject,
+    status: "open",
+    priority: data.priority || "medium",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  // Get the last inserted ticket
+  const tickets = await db
+    .select()
+    .from(supportTickets)
+    .where(eq(supportTickets.userId, data.userId))
+    .orderBy(supportTickets.id)
+    .limit(1);
+
+  return tickets[0];
+}
+
+export async function getSupportTicketsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return await db
+    .select()
+    .from(supportTickets)
+    .where(eq(supportTickets.userId, userId))
+    .orderBy(supportTickets.createdAt);
+}
+
+export async function getAllSupportTickets() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return await db
+    .select()
+    .from(supportTickets)
+    .orderBy(supportTickets.createdAt);
+}
+
+export async function getSupportTicketById(id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select()
+    .from(supportTickets)
+    .where(eq(supportTickets.id, id))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+export async function updateSupportTicketStatus(
+  id: number,
+  status: "open" | "in_progress" | "resolved" | "closed"
+) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(supportTickets)
+    .set({ status, updatedAt: new Date() })
+    .where(eq(supportTickets.id, id));
+}
+
+// ============================================
+// Support Messages Functions
+// ============================================
+
+export async function createSupportMessage(data: {
+  ticketId: number;
+  senderId: number;
+  message: string;
+  isAdminReply: boolean;
+}) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(supportMessages).values({
+    ticketId: data.ticketId,
+    senderId: data.senderId,
+    message: data.message,
+    isAdminReply: data.isAdminReply ? 1 : 0,
+    createdAt: new Date(),
+  });
+
+  // Update ticket's updatedAt timestamp
+  await db
+    .update(supportTickets)
+    .set({ updatedAt: new Date() })
+    .where(eq(supportTickets.id, data.ticketId));
+
+  return result;
+}
+
+export async function getSupportMessagesByTicketId(ticketId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return await db
+    .select()
+    .from(supportMessages)
+    .where(eq(supportMessages.ticketId, ticketId))
+    .orderBy(supportMessages.createdAt);
+}
+
+// ============================================
+// Admin Functions
+// ============================================
+
+export async function getAllUsers() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      trialEndsAt: users.trialEndsAt,
+      hasLifetimeAccess: users.hasLifetimeAccess,
+      createdAt: users.createdAt,
+      lastSignedIn: users.lastSignedIn,
+    })
+    .from(users)
+    .orderBy(users.createdAt);
+}
+
+export async function updateUserLifetimeAccess(userId: number, hasAccess: boolean) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(users)
+    .set({ hasLifetimeAccess: hasAccess ? 1 : 0, updatedAt: new Date() })
+    .where(eq(users.id, userId));
 }
