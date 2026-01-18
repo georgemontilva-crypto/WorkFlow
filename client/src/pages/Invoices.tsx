@@ -313,16 +313,16 @@ export default function Invoices() {
                 Nueva Factura
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-popover border-border max-w-4xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-foreground text-2xl">Crear Nueva Factura</DialogTitle>
-                <DialogDescription className="text-muted-foreground">
+            <DialogContent className="bg-popover border-border max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+              <DialogHeader className="pb-4">
+                <DialogTitle className="text-foreground text-xl sm:text-2xl">Crear Nueva Factura</DialogTitle>
+                <DialogDescription className="text-muted-foreground text-sm">
                   Completa los detalles de la factura y agrega los items correspondientes
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 {/* Client and Status */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="clientId" className="text-foreground font-semibold">
                       Cliente <span className="text-destructive">*</span>
@@ -368,7 +368,7 @@ export default function Invoices() {
                 </div>
 
                 {/* Dates */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="issueDate" className="text-foreground font-semibold">Fecha de Emisión</Label>
                     <Input
@@ -437,62 +437,62 @@ export default function Invoices() {
 
                   {/* Add New Item */}
                   <Card className="bg-background border-border">
-                    <CardHeader>
-                      <CardTitle className="text-base">Agregar Nuevo Item</CardTitle>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm sm:text-base">Agregar Nuevo Item</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-12 gap-3">
-                        <div className="col-span-5">
-                          <Label htmlFor="itemDescription" className="text-xs text-muted-foreground mb-1.5 block">
+                      <div className="space-y-3">
+                        <div className="space-y-2">
+                          <Label htmlFor="itemDescription" className="text-xs sm:text-sm text-foreground font-medium">
                             Descripción del Item
                           </Label>
                           <Input
                             id="itemDescription"
-                            placeholder="Ej: Diseño de sitio web"
+                            placeholder="Ej: Diseño"
                             value={currentItem.description}
                             onChange={(e) => setCurrentItem({ ...currentItem, description: e.target.value })}
-                            className="bg-background border-border text-foreground"
+                            className="bg-background border-border text-foreground h-10"
                           />
                         </div>
-                        <div className="col-span-2">
-                          <Label htmlFor="itemQuantity" className="text-xs text-muted-foreground mb-1.5 block">
-                            Cantidad
-                          </Label>
-                          <Input
-                            id="itemQuantity"
-                            type="number"
-                            min="1"
-                            placeholder="1"
-                            value={currentItem.quantity}
-                            onChange={(e) => setCurrentItem({ ...currentItem, quantity: parseInt(e.target.value) || 1 })}
-                            className="bg-background border-border text-foreground"
-                          />
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="space-y-2">
+                            <Label htmlFor="itemQuantity" className="text-xs sm:text-sm text-foreground font-medium">
+                              Cantidad
+                            </Label>
+                            <Input
+                              id="itemQuantity"
+                              type="number"
+                              min="1"
+                              placeholder="1"
+                              value={currentItem.quantity}
+                              onChange={(e) => setCurrentItem({ ...currentItem, quantity: parseInt(e.target.value) || 1 })}
+                              className="bg-background border-border text-foreground h-10"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="itemPrice" className="text-xs sm:text-sm text-foreground font-medium">
+                              Precio ($)
+                            </Label>
+                            <Input
+                              id="itemPrice"
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              placeholder="0.00"
+                              value={currentItem.unitPrice}
+                              onChange={(e) => setCurrentItem({ ...currentItem, unitPrice: parseFloat(e.target.value) || 0 })}
+                              className="bg-background border-border text-foreground font-mono h-10"
+                            />
+                          </div>
                         </div>
-                        <div className="col-span-3">
-                          <Label htmlFor="itemPrice" className="text-xs text-muted-foreground mb-1.5 block">
-                            Precio Unitario ($)
-                          </Label>
-                          <Input
-                            id="itemPrice"
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            placeholder="0.00"
-                            value={currentItem.unitPrice}
-                            onChange={(e) => setCurrentItem({ ...currentItem, unitPrice: parseFloat(e.target.value) || 0 })}
-                            className="bg-background border-border text-foreground font-mono"
-                          />
-                        </div>
-                        <div className="col-span-2 flex items-end">
-                          <Button
-                            type="button"
-                            onClick={addItem}
-                            className="w-full bg-accent text-accent-foreground hover:bg-accent/80"
-                          >
-                            <Plus className="w-4 h-4 mr-1" />
-                            Agregar
-                          </Button>
-                        </div>
+                        <Button
+                          type="button"
+                          onClick={addItem}
+                          className="w-full bg-accent text-accent-foreground hover:bg-accent/80 h-10"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Agregar
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>

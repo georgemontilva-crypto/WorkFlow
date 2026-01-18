@@ -204,24 +204,24 @@ export default function Clients() {
                 Nuevo Cliente
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-popover border-border max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-foreground text-2xl">
+            <DialogContent className="bg-popover border-border max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+              <DialogHeader className="pb-4">
+                <DialogTitle className="text-foreground text-xl sm:text-2xl">
                   {editingClient ? 'Editar Cliente' : 'Agregar Nuevo Cliente'}
                 </DialogTitle>
-                <DialogDescription className="text-muted-foreground">
+                <DialogDescription className="text-muted-foreground text-sm">
                   {editingClient ? 'Actualiza la información del cliente' : 'Completa los datos del nuevo cliente y su ciclo de facturación'}
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-foreground font-semibold">Nombre <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="name" className="text-foreground font-semibold text-sm">Nombre <span className="text-destructive">*</span></Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="bg-background border-border text-foreground h-11"
+                      className="bg-background border-border text-foreground h-10"
                       required
                     />
                     <p className="text-xs text-muted-foreground">Nombre completo o razón social</p>
@@ -240,7 +240,7 @@ export default function Clients() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="phone" className="text-foreground font-semibold">Teléfono</Label>
                     <Input
@@ -371,7 +371,7 @@ export default function Clients() {
                     id="notes"
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="bg-background border-border text-foreground h-11"
+                    className="bg-background border-border text-foreground h-10"
                     placeholder="Información adicional sobre el cliente..."
                   />
                   <p className="text-xs text-muted-foreground">Notas privadas sobre el cliente (opcional)</p>
