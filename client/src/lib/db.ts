@@ -20,6 +20,7 @@ export interface Client {
   nextPaymentDate: string;
   reminderDays: number; // Días de anticipación para recordatorio
   status: 'active' | 'inactive' | 'overdue';
+  archived?: boolean; // Indica si el recordatorio está archivado
   notes?: string;
   createdAt: string;
   updatedAt: string;
