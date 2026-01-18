@@ -885,44 +885,19 @@ export default function Invoices() {
                       }}
                       className="w-full text-left p-4 rounded-lg border border-border bg-card hover:bg-accent hover:border-accent-foreground/20 transition-all group"
                     >
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center justify-between gap-3">
                         <div className="flex-1 min-w-0">
                           <h4 className="font-semibold text-foreground text-base group-hover:text-accent-foreground truncate">
                             {client.name}
                           </h4>
-                          {client.company && (
-                            <p className="text-sm text-muted-foreground truncate mt-0.5">
+                        </div>
+                        {client.company && (
+                          <div className="flex-shrink-0">
+                            <p className="text-sm text-muted-foreground truncate">
                               {client.company}
                             </p>
-                          )}
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mt-2">
-                            <p className="text-xs text-muted-foreground truncate">
-                              {client.email}
-                            </p>
-                            {client.phone && (
-                              <>
-                                <span className="hidden sm:inline text-muted-foreground">•</span>
-                                <p className="text-xs text-muted-foreground">
-                                  {client.phone}
-                                </p>
-                              </>
-                            )}
                           </div>
-                        </div>
-                        <div className="flex-shrink-0 text-right">
-                          {client.amount && (
-                            <p className="text-sm font-bold font-mono text-foreground">
-                              ${client.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                            </p>
-                          )}
-                          {client.billingCycle && (
-                            <p className="text-xs text-muted-foreground mt-1 capitalize">
-                              {client.billingCycle === 'monthly' ? 'Mensual' : 
-                               client.billingCycle === 'quarterly' ? 'Trimestral' : 
-                               client.billingCycle === 'yearly' ? 'Anual' : 'Personalizado'}
-                            </p>
-                          )}
-                        </div>
+                        )}
                       </div>
                     </button>
                   ))}

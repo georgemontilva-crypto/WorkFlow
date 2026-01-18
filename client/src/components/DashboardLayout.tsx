@@ -8,20 +8,24 @@ import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, M
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Clientes', href: '/clients', icon: Users },
-  { name: 'Facturas', href: '/invoices', icon: FileText },
-  { name: 'Finanzas', href: '/finances', icon: TrendingUp },
-  { name: 'Metas de Ahorro', href: '/savings', icon: Target },
-  { name: 'Recordatorios', href: '/reminders', icon: Bell },
-  { name: 'Configuración', href: '/settings', icon: Settings },
-];
+
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { t } = useLanguage();
+
+  const navigation = [
+    { name: t.nav.dashboard, href: '/', icon: LayoutDashboard },
+    { name: t.nav.clients, href: '/clients', icon: Users },
+    { name: t.nav.invoices, href: '/invoices', icon: FileText },
+    { name: t.nav.finances, href: '/finances', icon: TrendingUp },
+    { name: t.nav.goals, href: '/savings', icon: Target },
+    { name: t.nav.reminders, href: '/reminders', icon: Bell },
+    { name: t.nav.settings, href: '/settings', icon: Settings },
+  ];
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -71,7 +75,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Footer */}
         <div className="p-4 border-t border-border">
           <p className="text-xs text-muted-foreground text-center">
-            Modo Offline Activo
+            {t.nav.offlineMode}
           </p>
         </div>
       </aside>
