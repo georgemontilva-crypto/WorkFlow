@@ -100,18 +100,18 @@ export default function Finances() {
 
   return (
     <DashboardLayout>
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-6 space-y-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Finanzas</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Finanzas</h1>
+            <p className="text-sm md:text-base text-muted-foreground mt-1">
               Control de ingresos y gastos
             </p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary text-primary-foreground hover:opacity-90">
+              <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:opacity-90">
                 <Plus className="w-4 h-4 mr-2" />
                 Nueva Transacción
               </Button>
@@ -318,30 +318,32 @@ export default function Finances() {
                 {transactions.slice(0, 10).map((transaction) => (
                   <div 
                     key={transaction.id} 
-                    className="flex items-center justify-between p-3 rounded-lg bg-accent/30 border border-border"
+                    className="p-3 sm:p-4 rounded-lg bg-accent/30 border border-border"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        transaction.type === 'income' ? 'bg-accent' : 'bg-muted'
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className={`w-10 h-10 flex-shrink-0 rounded-lg flex items-center justify-center ${
+                          transaction.type === 'income' ? 'bg-accent' : 'bg-muted'
+                        }`}>
+                          {transaction.type === 'income' ? (
+                            <TrendingUp className="w-5 h-5 text-accent-foreground" strokeWidth={1.5} />
+                          ) : (
+                            <TrendingDown className="w-5 h-5 text-muted-foreground" strokeWidth={1.5} />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground break-words">{transaction.description}</p>
+                          <p className="text-sm text-muted-foreground break-words">
+                            {transaction.category} • {format(parseISO(transaction.date), 'dd MMM yyyy', { locale: es })}
+                          </p>
+                        </div>
+                      </div>
+                      <p className={`text-lg sm:text-xl font-bold font-mono self-end sm:self-center ${
+                        transaction.type === 'income' ? 'text-foreground' : 'text-muted-foreground'
                       }`}>
-                        {transaction.type === 'income' ? (
-                          <TrendingUp className="w-5 h-5 text-accent-foreground" strokeWidth={1.5} />
-                        ) : (
-                          <TrendingDown className="w-5 h-5 text-muted-foreground" strokeWidth={1.5} />
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground">{transaction.description}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {transaction.category} • {format(parseISO(transaction.date), 'dd MMM yyyy', { locale: es })}
-                        </p>
-                      </div>
+                        {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                      </p>
                     </div>
-                    <p className={`text-lg font-bold font-mono ${
-                      transaction.type === 'income' ? 'text-foreground' : 'text-muted-foreground'
-                    }`}>
-                      {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                    </p>
                   </div>
                 ))}
               </div>
