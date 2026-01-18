@@ -283,3 +283,11 @@
 - [ ] Probar dashboard de super admin
 - [ ] Verificar bloqueo post-trial
 - [ ] Guardar checkpoint y hacer push
+
+## Eliminar Dependencias de Manus OAuth
+- [x] Modificar server/_core/env.ts para hacer variables de Manus opcionales
+- [x] Actualizar server/_core/index.ts para eliminar inicialización de OAuth
+- [x] Limpiar referencias a Manus en server/_core/sdk.ts
+- [x] Verificar que el sistema JWT funcione sin variables de Manus
+- [x] Probar localmente que el servidor arranque correctamente
+- [ ] Hacer push a GitHub y verificar deployment en Railway
