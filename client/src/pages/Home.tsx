@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import { Users, FileText, TrendingUp, TrendingDown, Plus, AlertCircle, Bell } from 'lucide-react';
+import { Users, FileText, TrendingUp, TrendingDown, Plus, AlertCircle, Bell, Target } from 'lucide-react';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useLocation } from 'wouter';
@@ -21,6 +21,13 @@ export default function Home() {
     db.transactions
       .orderBy('date')
       .reverse()
+      .toArray()
+  );
+  const savingsGoals = useLiveQuery(() => 
+    db.savingsGoals
+      .orderBy('createdAt')
+      .reverse()
+      .limit(3)
       .toArray()
   );
 
@@ -165,7 +172,7 @@ export default function Home() {
           </Card>
         </div>
 
-        {/* Alerts and Upcoming Payments */}
+        {/* Alerts, Upcoming Payments and Savings Goals */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Overdue Payments Alert */}
           {overduePayments.length > 0 && (
@@ -227,6 +234,79 @@ export default function Home() {
                       </div>
                     );
                   })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Savings Goals Summary */}
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2 text-base sm:text-lg">
+                <Target className="w-4 h-4 sm:w-5 sm:h-5" />
+                Metas de Ahorro
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {!savingsGoals || savingsGoals.length === 0 ? (
+                <div className="text-center py-4 sm:py-8">
+                  <p className="text-sm sm:text-base text-muted-foreground mb-3">
+                    No tienes metas de ahorro creadas
+                  </p>
+                  <Button
+                    onClick={() => setLocation('/savings')}
+                    variant="outline"
+                    size="sm"
+                    className="border-border text-foreground hover:bg-accent"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Crear Meta
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3 sm:space-y-4 max-h-48 sm:max-h-64 overflow-y-auto">
+                  {savingsGoals.map((goal) => {
+                    const progress = goal.targetAmount > 0 ? (goal.currentAmount / goal.targetAmount) * 100 : 0;
+                    const isCompleted = progress >= 100;
+                    return (
+                      <div key={goal.id} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium text-foreground text-sm sm:text-base truncate flex-1">
+                            {goal.name}
+                          </p>
+                          <p className="text-xs sm:text-sm text-muted-foreground ml-2">
+                            {Math.min(progress, 100).toFixed(0)}%
+                          </p>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              isCompleted ? 'bg-green-500' : 'bg-primary'
+                            }`}
+                            style={{ width: `${Math.min(progress, 100)}%` }}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between text-xs sm:text-sm">
+                          <span className="text-muted-foreground">
+                            ${goal.currentAmount.toLocaleString('es-ES')}
+                          </span>
+                          <span className="font-medium text-foreground">
+                            ${goal.targetAmount.toLocaleString('es-ES')}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {savingsGoals.length >= 3 && (
+                    <Button
+                      onClick={() => setLocation('/savings')}
+                      variant="ghost"
+                      size="sm"
+                      className="w-full text-muted-foreground hover:text-foreground hover:bg-accent mt-2"
+                    >
+                      Ver todas las metas →
+                    </Button>
+                  )}
                 </div>
               )}
             </CardContent>
