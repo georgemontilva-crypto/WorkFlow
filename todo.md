@@ -84,3 +84,9 @@
 - [x] Make grid responsive: 3 columns (desktop), 2 columns (tablet), 1 column (mobile)
 - [x] Ensure cards maintain proper spacing and alignment
 - [x] Test on different screen sizes
+
+
+## Implement Accordion Behavior for Invoice Cards
+- [x] Modify toggleCard function to close other cards when one is expanded
+- [x] Change expandedCards from Set to single ID state
+- [x] Test accordion behavior works correctly

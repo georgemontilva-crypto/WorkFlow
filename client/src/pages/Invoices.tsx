@@ -134,7 +134,7 @@ export default function Invoices() {
   const [showPartialPaymentDialog, setShowPartialPaymentDialog] = useState(false);
   const [partialPaymentAmount, setPartialPaymentAmount] = useState<number>(0);
   const [newStatus, setNewStatus] = useState<'pending' | 'paid' | 'overdue' | 'cancelled'>('pending');
-  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
+  const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
   const [showClientSelector, setShowClientSelector] = useState(false);
   const [showArchivedDialog, setShowArchivedDialog] = useState(false);
   const [clientSearch, setClientSearch] = useState('');
@@ -442,15 +442,8 @@ export default function Invoices() {
   const toggleCard = (invoiceId: number) => {
     if (!invoiceId) return; // Validar que el ID existe
     
-    setExpandedCards(prev => {
-      const newExpanded = new Set(prev);
-      if (newExpanded.has(invoiceId)) {
-        newExpanded.delete(invoiceId);
-      } else {
-        newExpanded.add(invoiceId);
-      }
-      return newExpanded;
-    });
+    // Si la tarjeta ya está expandida, la cerramos; si no, la abrimos (y cerramos cualquier otra)
+    setExpandedCardId(prev => prev === invoiceId ? null : invoiceId);
   };
 
   // Calculate statistics
@@ -715,7 +708,7 @@ export default function Invoices() {
             {invoices.map((invoice) => {
               const statusInfo = getStatusBadge(invoice.status);
               const StatusIcon = statusInfo.icon;
-              const isExpanded = expandedCards.has(invoice.id!);
+              const isExpanded = expandedCardId === invoice.id;
               
               return (
                 <Card key={invoice.id} className="bg-card border-border hover:border-accent/50 transition-all">
