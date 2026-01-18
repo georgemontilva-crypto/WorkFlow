@@ -46,7 +46,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Invoice, type InvoiceItem } from '@/lib/db';
-import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User } from 'lucide-react';
+import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User, FolderArchive, ArchiveRestore } from 'lucide-react';
 import { format, parseISO, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -67,6 +67,7 @@ export default function Invoices() {
   const [newStatus, setNewStatus] = useState<'pending' | 'paid' | 'overdue' | 'cancelled'>('pending');
   const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
   const [showClientSelector, setShowClientSelector] = useState(false);
+  const [showArchivedDialog, setShowArchivedDialog] = useState(false);
   const [clientSearch, setClientSearch] = useState('');
   const [formData, setFormData] = useState<Partial<Invoice>>({
     clientId: 0,
@@ -395,13 +396,22 @@ export default function Invoices() {
               {t.invoices.subtitle}
             </p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-primary text-primary-foreground hover:opacity-90">
-                <Plus className="w-4 h-4 mr-2" />
-                {t.invoices.newInvoice}
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowArchivedDialog(true)}
+              className="border-border text-foreground hover:bg-accent"
+            >
+              <FolderArchive className="w-4 h-4 mr-2" />
+              Ver Archivados
+            </Button>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-primary text-primary-foreground hover:opacity-90">
+                  <Plus className="w-4 h-4 mr-2" />
+                  {t.invoices.newInvoice}
+                </Button>
+              </DialogTrigger>
             <DialogContent className="bg-popover border-border max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
               <DialogHeader className="pb-4">
                 <DialogTitle className="text-foreground text-xl sm:text-2xl">{t.invoices.createInvoice}</DialogTitle>
@@ -951,6 +961,70 @@ export default function Invoices() {
               >
                 {t.common.cancel}
               </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+          </div>
+
+        {/* Archived Invoices Dialog */}
+        <Dialog open={showArchivedDialog} onOpenChange={setShowArchivedDialog}>
+          <DialogContent className="bg-popover border-border max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+            <DialogHeader>
+              <DialogTitle className="text-foreground text-xl sm:text-2xl">Facturas Archivadas</DialogTitle>
+              <DialogDescription className="text-muted-foreground text-sm">
+                Gestiona tus facturas archivadas y restáuralas cuando sea necesario
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              {archivedInvoices && archivedInvoices.length === 0 ? (
+                <div className="text-center py-12">
+                  <FolderArchive className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                  <p className="text-muted-foreground">No hay facturas archivadas</p>
+                </div>
+              ) : (
+                archivedInvoices?.map((invoice) => {
+                  const client = clients?.find(c => c.id === invoice.clientId);
+                  return (
+                    <Card key={invoice.id} className="bg-card border-border">
+                      <CardContent className="p-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <FileText className="w-4 h-4 text-muted-foreground" />
+                              <span className="font-mono text-sm text-muted-foreground">{invoice.invoiceNumber}</span>
+                            </div>
+                            <h3 className="font-semibold text-foreground mb-1">{client?.name || 'Cliente desconocido'}</h3>
+                            {client?.company && (
+                              <p className="text-sm text-muted-foreground">{client.company}</p>
+                            )}
+                            <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
+                              <span>Emitida: {format(parseISO(invoice.issueDate), 'dd/MM/yyyy')}</span>
+                              <span>Vencimiento: {format(parseISO(invoice.dueDate), 'dd/MM/yyyy')}</span>
+                            </div>
+                          </div>
+                          <div className="flex flex-col sm:items-end gap-2">
+                            <div className="text-2xl font-bold font-mono text-foreground">
+                              ${(invoice.items?.reduce((sum, item) => sum + item.total, 0) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={async () => {
+                                await db.invoices.update(invoice.id!, { status: 'pending' });
+                                toast.success('Factura restaurada correctamente');
+                              }}
+                              className="border-border text-foreground hover:bg-accent"
+                            >
+                              <ArchiveRestore className="w-3 h-3 mr-1" />
+                              Restaurar
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })
+              )}
             </div>
           </DialogContent>
         </Dialog>

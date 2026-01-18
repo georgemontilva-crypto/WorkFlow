@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
-import { AlertCircle, Clock, CheckCircle2, Eye, Building2, Calendar, DollarSign, FolderArchive, ArchiveRestore } from 'lucide-react';
+import { AlertCircle, Clock, CheckCircle2, Eye, Building2, Calendar, DollarSign } from 'lucide-react';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -32,10 +32,7 @@ export default function Reminders() {
   const { t } = useLanguage();
   const [, setLocation] = useLocation();
   const clients = useLiveQuery(() => 
-    db.clients.where('status').equals('active').filter(c => !c.archived).toArray()
-  );
-  const archivedClients = useLiveQuery(() => 
-    db.clients.where('status').equals('active').filter(c => c.archived === true).toArray()
+    db.clients.where('status').equals('active').toArray()
   );
   const invoices = useLiveQuery(() => db.invoices.where('status').equals('pending').toArray());
 
@@ -98,25 +95,7 @@ export default function Reminders() {
   const urgentReminders = allReminders.filter(r => r.status === 'urgent');
   const upcomingReminders = allReminders.filter(r => r.status === 'upcoming');
 
-  // Procesar recordatorios archivados
-  const archivedReminders: ReminderItem[] = archivedClients?.map(client => {
-    const daysUntil = differenceInDays(parseISO(client.nextPaymentDate), new Date());
-    let status: 'overdue' | 'urgent' | 'upcoming' = 'upcoming';
-    
-    if (daysUntil < 0) status = 'overdue';
-    else if (daysUntil <= 5) status = 'urgent';
-    
-    return {
-      id: client.id!,
-      type: 'client' as const,
-      clientName: client.name,
-      company: client.company,
-      amount: client.amount,
-      dueDate: client.nextPaymentDate,
-      daysUntil,
-      status
-    };
-  }) || [];
+
 
   const getStatusConfig = (status: 'overdue' | 'urgent' | 'upcoming') => {
     switch (status) {
@@ -167,17 +146,7 @@ export default function Reminders() {
     }
   };
 
-  const handleArchive = async (item: ReminderItem) => {
-    if (item.type === 'client') {
-      await db.clients.update(item.id, { archived: true });
-    }
-  };
 
-  const handleRestore = async (item: ReminderItem) => {
-    if (item.type === 'client') {
-      await db.clients.update(item.id, { archived: false });
-    }
-  };
 
   const ReminderCard = ({ item }: { item: ReminderItem }) => {
     const config = getStatusConfig(item.status);
@@ -243,14 +212,7 @@ export default function Reminders() {
                   <Eye className="w-3 h-3 mr-1" />
                   Ver
                 </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleArchive(item)}
-                  className="border-border text-muted-foreground hover:bg-accent hover:text-foreground whitespace-nowrap"
-                >
-                  <FolderArchive className="w-3 h-3" />
-                </Button>
+
               </div>
             </div>
           </div>
@@ -312,14 +274,7 @@ export default function Reminders() {
                 {upcomingReminders.length}
               </Badge>
             </TabsTrigger>
-            <TabsTrigger value="archived" className="data-[state=active]:bg-background">
-              Archivados
-              {archivedReminders.length > 0 && (
-                <Badge variant="secondary" className="ml-2 bg-accent text-accent-foreground">
-                  {archivedReminders.length}
-                </Badge>
-              )}
-            </TabsTrigger>
+
           </TabsList>
 
           {/* All Reminders */}
@@ -366,69 +321,7 @@ export default function Reminders() {
             )}
           </TabsContent>
 
-          {/* Archived Reminders */}
-          <TabsContent value="archived" className="space-y-3">
-            {archivedReminders.length === 0 ? (
-              <EmptyState message="No hay recordatorios archivados" />
-            ) : (
-              archivedReminders.map(item => {
-                const config = getStatusConfig(item.status);
-                const StatusIcon = config.icon;
-                return (
-                  <Card key={`archived-${item.type}-${item.id}`} className="bg-card border-border hover:bg-accent/5 transition-all border-l-4 border-l-muted">
-                    <CardContent className="p-4">
-                      <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4">
-                        <div className="flex items-start gap-3 flex-1 min-w-0">
-                          <div className="p-2 rounded-lg bg-accent/20 text-muted-foreground flex-shrink-0">
-                            <FolderArchive className="w-5 h-5" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="mb-2">
-                              <h3 className="font-semibold text-foreground truncate">{item.clientName}</h3>
-                              {item.company && (
-                                <div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5">
-                                  <Building2 className="w-3 h-3" />
-                                  <span className="truncate">{item.company}</span>
-                                </div>
-                              )}
-                            </div>
-                            {item.invoiceNumber && (
-                              <p className="text-xs text-muted-foreground mb-2">
-                                {t.invoices.invoice}: {item.invoiceNumber}
-                              </p>
-                            )}
-                            <div className="flex flex-wrap items-center gap-3 text-sm">
-                              <div className="flex items-center gap-1.5 text-muted-foreground">
-                                <Calendar className="w-4 h-4" />
-                                <span>{format(parseISO(item.dueDate), 'dd MMM yyyy', { locale: es })}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 flex-shrink-0 w-full sm:w-auto">
-                          <div className="flex items-center gap-1 text-foreground">
-                            <DollarSign className="w-4 h-4 text-muted-foreground" />
-                            <span className="font-bold font-mono text-lg">
-                              ${item.amount.toLocaleString('es-ES')}
-                            </span>
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleRestore(item)}
-                            className="border-border text-foreground hover:bg-accent whitespace-nowrap"
-                          >
-                            <ArchiveRestore className="w-3 h-3 mr-1" />
-                            Restaurar
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })
-            )}
-          </TabsContent>
+
         </Tabs>
       </div>
     </DashboardLayout>
