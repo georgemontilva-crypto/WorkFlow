@@ -61,7 +61,7 @@ const translations = {
       title: 'Simple and Fair Pricing',
       subtitle: 'One payment, lifetime access',
       badge: 'Launch Offer',
-      price: '$49',
+      price: '$199',
       currency: 'USD',
       period: 'One-time payment • Lifetime access',
       benefits: [
@@ -169,7 +169,7 @@ const translations = {
       title: 'Precio Simple y Justo',
       subtitle: 'Un solo pago, acceso de por vida',
       badge: 'Oferta de Lanzamiento',
-      price: '$49',
+      price: '$199',
       currency: 'USD',
       period: 'Pago único • Acceso lifetime',
       benefits: [

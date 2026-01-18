@@ -234,3 +234,8 @@
 - [x] Actualizar navegación de #compliance a #security
 - [x] Verificar que la landing page se vea correctamente sin la sección
 - [x] Guardar checkpoint y hacer push
+
+## Actualizar Precio a $199 USD
+- [x] Cambiar precio en LandingLanguageContext.tsx (español e inglés)
+- [x] Verificar que el precio se muestre correctamente en la landing page
+- [ ] Guardar checkpoint y hacer push
