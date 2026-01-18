@@ -61,3 +61,11 @@
 - [x] Create sample clients in the database
 - [x] Create sample invoices with different statuses
 - [x] Verify statistics cards display correctly with data
+
+
+## Fix Invoices UI/UX
+- [x] Diagnose why invoice cards are not displaying
+- [x] Redesign invoice cards layout for better visibility
+- [x] Improve overall page design and spacing
+- [x] Add loading states and empty states
+- [x] Test responsive design on different screen sizes

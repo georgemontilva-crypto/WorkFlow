@@ -699,54 +699,54 @@ export default function Invoices() {
           </Dialog>
         </div>
 
-        {/* Statistics Cards */}
+        {/* Statistics Cards - Compact Design */}
         {invoices && invoices.length > 0 && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 lg:mb-8">
-            <Card className="bg-card border-border">
-              <CardHeader className="pb-2 sm:pb-3">
-                <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
-                  <FileText className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
-                  Total Facturas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">{totalInvoices}</p>
+          <div className="grid grid-cols-4 gap-3 mb-4">
+            <Card className="bg-card/50 border-border/50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Total</p>
+                    <p className="text-2xl font-bold text-foreground">{totalInvoices}</p>
+                  </div>
+                  <FileText className="w-8 h-8 text-muted-foreground/50" strokeWidth={1.5} />
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-card border-border">
-              <CardHeader className="pb-2 sm:pb-3">
-                <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
-                  <Clock className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
-                  Pendientes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-yellow-400">{pendingInvoices}</p>
+            <Card className="bg-card/50 border-border/50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Pendientes</p>
+                    <p className="text-2xl font-bold text-yellow-400">{pendingInvoices}</p>
+                  </div>
+                  <Clock className="w-8 h-8 text-yellow-400/50" strokeWidth={1.5} />
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-card border-border">
-              <CardHeader className="pb-2 sm:pb-3">
-                <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
-                  <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
-                  Pagadas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-400">{paidInvoices}</p>
+            <Card className="bg-card/50 border-border/50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Pagadas</p>
+                    <p className="text-2xl font-bold text-green-400">{paidInvoices}</p>
+                  </div>
+                  <CheckCircle2 className="w-8 h-8 text-green-400/50" strokeWidth={1.5} />
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-card border-border">
-              <CardHeader className="pb-2 sm:pb-3">
-                <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
-                  <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
-                  Vencidas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-destructive">{overdueInvoices}</p>
+            <Card className="bg-card/50 border-border/50">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Vencidas</p>
+                    <p className="text-2xl font-bold text-destructive">{overdueInvoices}</p>
+                  </div>
+                  <AlertCircle className="w-8 h-8 text-destructive/50" strokeWidth={1.5} />
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -768,34 +768,64 @@ export default function Invoices() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <div className="space-y-3">
             {invoices.map((invoice) => {
               const statusInfo = getStatusBadge(invoice.status);
               const StatusIcon = statusInfo.icon;
               const isExpanded = expandedCards.has(invoice.id!);
               
               return (
-                <Card key={invoice.id} className="bg-card border-border hover:border-accent transition-colors">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-foreground text-lg truncate">
-                          {invoice.invoiceNumber}
-                        </CardTitle>
-                        <p className="text-sm text-muted-foreground truncate mt-1">
-                          {getClientName(invoice.clientId)}
-                        </p>
+                <Card key={invoice.id} className="bg-card border-border hover:border-accent/50 transition-all">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between gap-4">
+                      {/* Left: Invoice Info */}
+                      <div className="flex items-center gap-4 flex-1 min-w-0">
+                        <div className="flex-shrink-0">
+                          <Badge className={`${statusInfo.className} border px-2.5 py-1 flex items-center gap-1.5`}>
+                            <StatusIcon className="w-3.5 h-3.5" />
+                            {statusInfo.label}
+                          </Badge>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-foreground truncate">{invoice.invoiceNumber}</p>
+                          <p className="text-sm text-muted-foreground truncate">{getClientName(invoice.clientId)}</p>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => toggleCard(invoice.id!)}
-                          className="text-muted-foreground hover:text-foreground h-8 w-8"
-                        >
-                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                        </Button>
-                        <DropdownMenu>
+
+                      {/* Center: Dates */}
+                      <div className="hidden md:flex items-center gap-6">
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">Emisión</p>
+                          <p className="text-sm font-medium text-foreground">
+                            {format(new Date(invoice.issueDate), 'dd MMM', { locale: es })}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">Vencimiento</p>
+                          <p className="text-sm font-medium text-foreground">
+                            {format(new Date(invoice.dueDate), 'dd MMM', { locale: es })}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Right: Amount & Actions */}
+                      <div className="flex items-center gap-3 flex-shrink-0">
+                        <div className="text-right">
+                          <p className="text-xs text-muted-foreground">Monto</p>
+                          <p className="text-lg font-bold font-mono text-foreground">
+                            ${parseFloat(invoice.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => toggleCard(invoice.id!)}
+                            className="text-muted-foreground hover:text-foreground h-8 w-8"
+                          >
+                            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                          </Button>
+                          <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-8 w-8">
                               <MoreVertical className="w-4 h-4" />
@@ -849,11 +879,12 @@ export default function Invoices() {
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
+                        </div>
                       </div>
                     </div>
-                  </CardHeader>
 
-                  {isExpanded && (
+                    {/* Expanded Content */}
+                    {isExpanded && (
                     <CardContent className="space-y-3 pt-0">
                       <div className="grid grid-cols-2 gap-3">
                         <div>
@@ -913,7 +944,8 @@ export default function Invoices() {
                         </Button>
                       </div>
                     </CardContent>
-                  )}
+                    )}
+                  </CardContent>
                 </Card>
               );
             })}
