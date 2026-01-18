@@ -162,13 +162,13 @@ export default function Clients() {
     const daysUntil = differenceInDays(parseISO(nextPaymentDate), new Date());
     
     if (daysUntil < 0) {
-      return { color: 'bg-destructive/10 text-destructive border-destructive/30', label: 'Vencido', icon: '🔴' };
+      return { color: 'bg-destructive/10 text-destructive border-destructive/30', label: t.clients.overdue, icon: '🔴' };
     } else if (daysUntil <= 3) {
-      return { color: 'bg-orange-500/10 text-orange-500 border-orange-500/30', label: `${daysUntil} días`, icon: '🟠' };
+      return { color: 'bg-orange-500/10 text-orange-500 border-orange-500/30', label: `${daysUntil} ${t.common.days}`, icon: '🟠' };
     } else if (daysUntil <= reminderDays) {
-      return { color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30', label: `${daysUntil} días`, icon: '🟡' };
+      return { color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30', label: `${daysUntil} ${t.common.days}`, icon: '🟡' };
     }
-    return { color: 'bg-muted text-muted-foreground border-border', label: `${daysUntil} días`, icon: '🟢' };
+    return { color: 'bg-muted text-muted-foreground border-border', label: `${daysUntil} ${t.common.days}`, icon: '🟢' };
   };
 
   return (
@@ -320,7 +320,7 @@ export default function Clients() {
                       <p className="text-xs text-muted-foreground">Frecuencia de cobro recurrente</p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="amount" className="text-foreground font-semibold">Monto <span className="text-destructive">*</span></Label>
+                      <Label htmlFor="amount" className="text-foreground font-semibold">{t.clients.amount} <span className="text-destructive">*</span></Label>
                       <Input
                         id="amount"
                         type="number"
@@ -330,7 +330,7 @@ export default function Clients() {
                         className="bg-background border-border text-foreground font-mono h-11"
                         required
                       />
-                      <p className="text-xs text-muted-foreground">Monto a cobrar por ciclo</p>
+                      <p className="text-xs text-muted-foreground">{t.clients.billingAmount}</p>
                     </div>
                   </div>
                 </div>
@@ -346,7 +346,7 @@ export default function Clients() {
                       onChange={(e) => setFormData({ ...formData, customCycleDays: parseInt(e.target.value) })}
                       className="bg-background border-border text-foreground h-11"
                     />
-                    <p className="text-xs text-muted-foreground">Cada cuántos días se repite el ciclo</p>
+                    <p className="text-xs text-muted-foreground">{t.clients.reminderDays}</p>
                   </div>
                 )}
 
@@ -360,8 +360,8 @@ export default function Clients() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-popover border-border">
-                      <SelectItem value="active">Activo</SelectItem>
-                      <SelectItem value="inactive">Inactivo</SelectItem>
+                      <SelectItem value="active">{t.clients.active}</SelectItem>
+                      <SelectItem value="inactive">{t.clients.inactive}</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground">Estado actual del cliente</p>
@@ -374,7 +374,7 @@ export default function Clients() {
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     className="bg-background border-border text-foreground h-10"
-                    placeholder="Información adicional sobre el cliente..."
+                    placeholder={t.clients.notesPlaceholder}
                   />
                   <p className="text-xs text-muted-foreground">Notas privadas sobre el cliente (opcional)</p>
                 </div>
@@ -499,13 +499,13 @@ export default function Clients() {
 
                       <div className="pt-3 border-t border-border">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-muted-foreground">Próximo Pago</span>
+                          <span className="text-sm text-muted-foreground">{t.clients.nextPayment}</span>
                           <span className="text-sm font-semibold text-foreground">
                             {format(parseISO(client.nextPaymentDate), 'dd/MM/yyyy')}
                           </span>
                         </div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-muted-foreground">Monto</span>
+                          <span className="text-sm text-muted-foreground">{t.common.amount}</span>
                           <span className="text-lg font-bold font-mono text-foreground">
                             ${client.amount.toLocaleString('es-ES')}
                           </span>
@@ -520,7 +520,7 @@ export default function Clients() {
 
                       <div className="pt-3 border-t border-border">
                         <Badge variant={client.status === 'active' ? 'default' : 'secondary'} className="text-xs">
-                          {client.status === 'active' ? 'Activo' : 'Inactivo'}
+                          {client.status === 'active' ? t.clients.active : t.clients.inactive}
                         </Badge>
                       </div>
                     </CardContent>

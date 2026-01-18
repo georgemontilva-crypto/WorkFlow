@@ -368,23 +368,23 @@ export default function Invoices() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Facturas</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{t.invoices.title}</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
-              Crea, gestiona y genera facturas profesionales en PDF
+              {t.invoices.subtitle}
             </p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-primary text-primary-foreground hover:opacity-90">
                 <Plus className="w-4 h-4 mr-2" />
-                Nueva Factura
+                {t.invoices.newInvoice}
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-popover border-border max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
               <DialogHeader className="pb-4">
-                <DialogTitle className="text-foreground text-xl sm:text-2xl">Crear Nueva Factura</DialogTitle>
+                <DialogTitle className="text-foreground text-xl sm:text-2xl">{t.invoices.createInvoice}</DialogTitle>
                 <DialogDescription className="text-muted-foreground text-sm">
-                  Completa los detalles de la factura y agrega los items correspondientes
+                  {t.invoices.createInvoiceSubtitle}
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
@@ -472,7 +472,7 @@ export default function Invoices() {
                           <div className="flex-1">
                             <p className="font-medium text-foreground">{item.description}</p>
                             <p className="text-sm text-muted-foreground mt-1">
-                              Cantidad: {item.quantity} × ${item.unitPrice.toFixed(2)} = ${item.total.toFixed(2)}
+                              {t.invoices.quantity}: {item.quantity} × ${item.unitPrice.toFixed(2)} = ${item.total.toFixed(2)}
                             </p>
                           </div>
                           <Button
@@ -487,7 +487,7 @@ export default function Invoices() {
                         </div>
                       ))}
                       <div className="text-right pt-3 border-t border-border">
-                        <p className="text-sm text-muted-foreground mb-1">Total de la Factura</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t.invoices.totalInvoice}</p>
                         <p className="text-2xl font-bold font-mono text-foreground">
                           ${calculateTotal().toFixed(2)}
                         </p>
@@ -498,17 +498,17 @@ export default function Invoices() {
                   {/* Add New Item */}
                   <Card className="bg-background border-border">
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm sm:text-base">Agregar Nuevo Item</CardTitle>
+                      <CardTitle className="text-sm sm:text-base">{t.invoices.addNewItem}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
                         <div className="space-y-2">
                           <Label htmlFor="itemDescription" className="text-xs sm:text-sm text-foreground font-medium">
-                            Descripción del Item
+                            {t.invoices.itemDescription}
                           </Label>
                           <Input
                             id="itemDescription"
-                            placeholder="Ej: Diseño"
+                            placeholder={t.invoices.itemDescriptionPlaceholder}
                             value={currentItem.description}
                             onChange={(e) => setCurrentItem({ ...currentItem, description: e.target.value })}
                             className="bg-background border-border text-foreground h-10"
@@ -517,7 +517,7 @@ export default function Invoices() {
                         <div className="grid grid-cols-2 gap-3">
                           <div className="space-y-2">
                             <Label htmlFor="itemQuantity" className="text-xs sm:text-sm text-foreground font-medium">
-                              Cantidad
+                              {t.invoices.quantity}
                             </Label>
                             <Input
                               id="itemQuantity"
@@ -531,7 +531,7 @@ export default function Invoices() {
                           </div>
                           <div className="space-y-2">
                             <Label htmlFor="itemPrice" className="text-xs sm:text-sm text-foreground font-medium">
-                              Precio ($)
+                              {t.invoices.price}
                             </Label>
                             <Input
                               id="itemPrice"
@@ -551,7 +551,7 @@ export default function Invoices() {
                           className="w-full bg-accent text-accent-foreground hover:bg-accent/80 h-10"
                         >
                           <Plus className="w-4 h-4 mr-1" />
-                          Agregar
+                          {t.invoices.addItem}
                         </Button>
                       </div>
                     </CardContent>
@@ -566,7 +566,7 @@ export default function Invoices() {
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     className="bg-background border-border text-foreground min-h-[80px]"
-                    placeholder="Términos de pago, condiciones especiales, información adicional..."
+                    placeholder={t.invoices.notesPlaceholder}
                   />
                   <p className="text-xs text-muted-foreground">Información adicional que aparecerá en el PDF</p>
                 </div>
@@ -579,7 +579,7 @@ export default function Invoices() {
                     onClick={() => setIsDialogOpen(false)}
                     className="border-border text-foreground hover:bg-accent"
                   >
-                    Cancelar
+                    {t.common.cancel}
                   </Button>
                   <Button type="submit" className="bg-primary text-primary-foreground hover:opacity-90">
                     <FileText className="w-4 h-4 mr-2" />
@@ -599,10 +599,10 @@ export default function Invoices() {
                 <FileText className="w-16 h-16 text-muted-foreground" strokeWidth={1} />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
-                No hay facturas aún
+                {t.invoices.noInvoices}
               </h3>
               <p className="text-muted-foreground mb-6">
-                Comienza creando tu primera factura
+                {t.invoices.noInvoicesSubtitle}
               </p>
             </CardContent>
           </Card>
@@ -675,7 +675,7 @@ export default function Invoices() {
                               className="text-destructive hover:bg-destructive/10 cursor-pointer"
                             >
                               <XCircle className="w-4 h-4 mr-2" />
-                              Cancelar Factura
+                              {t.invoices.cancelInvoice}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -693,7 +693,7 @@ export default function Invoices() {
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-muted-foreground mb-1">Monto Total</p>
+                          <p className="text-xs text-muted-foreground mb-1">{t.invoices.totalAmount}</p>
                           <p className="text-lg font-bold font-mono text-foreground">
                             ${invoice.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                           </p>
@@ -788,8 +788,8 @@ export default function Invoices() {
                 Registrar Pago Parcial
               </AlertDialogTitle>
               <AlertDialogDescription className="text-muted-foreground">
-                Factura: {selectedInvoice?.invoiceNumber}<br />
-                Monto Total: ${selectedInvoice?.amount.toFixed(2)}<br />
+                {t.invoices.invoiceNumber} {selectedInvoice?.invoiceNumber}<br />
+                {t.invoices.totalAmount}: ${selectedInvoice?.amount.toFixed(2)}<br />
                 {selectedInvoice?.paidAmount && selectedInvoice.paidAmount > 0 && (
                   <>
                     Pagado: ${selectedInvoice.paidAmount.toFixed(2)}<br />
@@ -819,7 +819,7 @@ export default function Invoices() {
                 onClick={() => setShowPartialPaymentDialog(false)}
                 className="border-border text-foreground hover:bg-accent"
               >
-                Cancelar
+                {t.common.cancel}
               </AlertDialogCancel>
               <AlertDialogAction 
                 onClick={confirmPartialPayment}
@@ -918,7 +918,7 @@ export default function Invoices() {
                 }}
                 className="border-border text-foreground hover:bg-accent"
               >
-                Cancelar
+                {t.common.cancel}
               </Button>
             </div>
           </DialogContent>
