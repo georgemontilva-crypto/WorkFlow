@@ -171,3 +171,11 @@
 - [x] Mantener diseño minimalista y limpio
 - [x] Verificar en ambos idiomas (ES/EN)
 - [x] Guardar checkpoint
+
+
+## Menú Hamburguesa Responsive
+- [x] Implementar menú hamburguesa para móviles en Landing page
+- [x] Ocultar navegación desktop en pantallas < 768px
+- [x] Agregar animación smooth para apertura/cierre del menú
+- [x] Verificar funcionamiento en móvil
+- [x] Guardar checkpoint y hacer push

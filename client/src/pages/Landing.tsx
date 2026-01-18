@@ -5,13 +5,15 @@
  */
 
 import { Button } from '@/components/ui/button';
-import { Check, TrendingUp, FileText, Users, Target, Bell, Shield } from 'lucide-react';
+import { Check, TrendingUp, FileText, Users, Target, Bell, Shield, Menu, X } from 'lucide-react';
+import { useState } from 'react';
 import { getLoginUrl } from '@/const';
 import { LandingLanguageProvider, useLandingLanguage } from '@/contexts/LandingLanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 
 function LandingContent() {
   const { t } = useLandingLanguage();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const features = [
     {
@@ -54,6 +56,8 @@ function LandingContent() {
           <div className="flex items-center gap-3">
             <img src="/hiwork-icon-new.png" alt="HiWork" className="h-10 w-auto" />
           </div>
+          
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               {t.nav.features}
@@ -65,16 +69,61 @@ function LandingContent() {
               {t.nav.security}
             </a>
             <LanguageSelector />
-          </nav>
-          <div className="flex items-center gap-3">
-            <div className="md:hidden">
-              <LanguageSelector />
-            </div>
             <Button onClick={() => window.location.href = getLoginUrl()} className="bg-primary text-primary-foreground hover:opacity-90">
               {t.nav.startTrial}
             </Button>
-          </div>
+          </nav>
+          
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-foreground hover:bg-accent rounded-md transition-colors"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
+        
+        {/* Mobile Navigation Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-background border-t border-border">
+            <nav className="container mx-auto px-4 py-4 flex flex-col gap-4">
+              <a 
+                href="#features" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              >
+                {t.nav.features}
+              </a>
+              <a 
+                href="#pricing" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              >
+                {t.nav.pricing}
+              </a>
+              <a 
+                href="#compliance" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              >
+                {t.nav.security}
+              </a>
+              <div className="flex items-center gap-3 pt-2 border-t border-border">
+                <LanguageSelector />
+                <Button 
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    window.location.href = getLoginUrl();
+                  }} 
+                  className="bg-primary text-primary-foreground hover:opacity-90 flex-1"
+                >
+                  {t.nav.startTrial}
+                </Button>
+              </div>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
