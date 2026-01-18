@@ -199,39 +199,29 @@ function LandingContent() {
             {t.compliance.subtitle}
           </p>
           
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10">
             <div className="flex flex-col items-center gap-2">
-              <div className="w-20 h-20 rounded-full bg-blue-500/10 flex items-center justify-center">
-                <span className="text-2xl font-bold text-blue-500">GDPR</span>
-              </div>
+              <span className="text-2xl font-bold text-blue-500">GDPR</span>
               <span className="text-xs text-muted-foreground">{t.compliance.gdpr}</span>
             </div>
             
             <div className="flex flex-col items-center gap-2">
-              <div className="w-20 h-20 rounded-full bg-blue-400/10 flex items-center justify-center">
-                <span className="text-lg font-bold text-blue-400">ISO 27001</span>
-              </div>
+              <span className="text-xl font-bold text-blue-400">ISO 27001</span>
               <span className="text-xs text-muted-foreground">{t.compliance.iso27001}</span>
             </div>
             
             <div className="flex flex-col items-center gap-2">
-              <div className="w-20 h-20 rounded-full bg-yellow-500/10 flex items-center justify-center">
-                <span className="text-lg font-bold text-yellow-600">ISO 9001</span>
-              </div>
+              <span className="text-xl font-bold text-yellow-600">ISO 9001</span>
               <span className="text-xs text-muted-foreground">{t.compliance.iso9001}</span>
             </div>
             
             <div className="flex flex-col items-center gap-2">
-              <div className="w-20 h-20 rounded-full bg-cyan-500/10 flex items-center justify-center">
-                <span className="text-sm font-bold text-cyan-500">SOC 2</span>
-              </div>
+              <span className="text-xl font-bold text-cyan-500">SOC 2</span>
               <span className="text-xs text-muted-foreground">{t.compliance.soc2}</span>
             </div>
             
             <div className="flex flex-col items-center gap-2">
-              <div className="w-20 h-20 rounded-full bg-purple-500/10 flex items-center justify-center">
-                <span className="text-sm font-bold text-purple-500">HIPAA</span>
-              </div>
+              <span className="text-xl font-bold text-purple-500">HIPAA</span>
               <span className="text-xs text-muted-foreground">{t.compliance.hipaa}</span>
             </div>
           </div>

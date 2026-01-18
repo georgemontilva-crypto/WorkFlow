@@ -163,3 +163,11 @@
 - [x] Actualizar footer de Landing para usar solo el icono (sin texto)
 - [x] Verificar que el logo se vea correctamente
 - [x] Guardar checkpoint
+
+
+## Actualizar Sección Compliance
+- [x] Rediseñar badges de compliance sin íconos circulares
+- [x] Mostrar solo texto de badges (GDPR, ISO 27001, ISO 9001, SOC 2, HIPAA)
+- [x] Mantener diseño minimalista y limpio
+- [x] Verificar en ambos idiomas (ES/EN)
+- [x] Guardar checkpoint
