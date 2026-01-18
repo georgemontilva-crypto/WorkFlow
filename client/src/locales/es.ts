@@ -270,6 +270,23 @@ export const es = {
     urgentAlert: '¡Facturas Próximas a Vencer!',
   },
 
+  // Access Blocker
+  accessBlocker: {
+    lastDay: '¡Último día de prueba!',
+    daysRemaining: '{days} días restantes',
+    trialEnding: 'Tu período de prueba está por terminar. Obtén acceso lifetime ahora.',
+    getLifetime: 'Obtener Acceso Lifetime',
+    expired: 'Tu Prueba Ha Expirado',
+    expiredMessage: 'Para continuar usando HiWork, obtén acceso lifetime con un solo pago de $49 USD',
+    includes: 'Incluye:',
+    benefit1: 'Acceso ilimitado de por vida',
+    benefit2: 'Todas las actualizaciones futuras',
+    benefit3: 'Soporte técnico prioritario',
+    benefit4: 'Sin suscripciones mensuales',
+    ctaButton: 'Obtener Acceso Lifetime - $49 USD',
+    securePayment: 'Pago seguro procesado por Stripe',
+  },
+
   // Settings
   settings: {
     title: 'Configuración',

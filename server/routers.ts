@@ -17,6 +17,10 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    accessStatus: protectedProcedure.query(async ({ ctx }) => {
+      const { getUserAccessStatus } = await import("./access");
+      return getUserAccessStatus(ctx.user);
+    }),
   }),
 
   /**

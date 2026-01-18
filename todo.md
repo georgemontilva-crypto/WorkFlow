@@ -129,3 +129,29 @@
 - [x] Actualizar DashboardLayout para usar el logo cuadrado completo (icono + texto)
 - [x] Verificar que el logo se vea correctamente en sidebar y header
 - [x] Guardar checkpoint con los cambios
+
+
+## Sistema de Autenticación y Monetización
+- [x] Actualizar esquema de base de datos (user) para incluir campos: trial_ends_at, has_lifetime_access, stripe_customer_id, stripe_payment_id
+- [x] Crear landing page minimalista con información de HiWork
+- [x] Implementar lógica de prueba gratuita de 7 días
+- [x] Crear middleware para verificar acceso (trial activo o lifetime access)
+- [x] Implementar bloqueo de funcionalidades cuando expire el trial
+- [ ] Integrar Stripe para pagos (webdev_add_feature stripe)
+- [ ] Crear página de pricing con opción de pago único lifetime
+- [ ] Crear componente de "Upgrade to Lifetime" para usuarios con trial expirado
+- [ ] Crear página de Términos de Servicio
+- [ ] Crear página de Política de Privacidad
+- [ ] Añadir badges de cumplimiento (GDPR, ISO, AICPA SOC, HIPAA) en footer
+- [ ] Definir precio del lifetime access
+- [ ] Verificar flujo completo: registro → trial → expiración → pago → acceso lifetime
+
+
+## Soporte Multiidioma (Inglés/Español)
+- [x] Crear contexto de idioma global para Landing page
+- [x] Crear archivos de traducción (en.ts y es.ts) para Landing
+- [x] Agregar selector de idioma en header de Landing
+- [x] Traducir todo el contenido de Landing page
+- [x] Traducir AccessBlocker component
+- [ ] Crear páginas legales en ambos idiomas (Terms, Privacy)
+- [x] Persistir preferencia de idioma en localStorage

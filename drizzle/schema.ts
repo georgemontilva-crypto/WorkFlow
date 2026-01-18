@@ -17,6 +17,14 @@ export const users = mysqlTable("users", {
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
   role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  /** Trial period end date - 7 days from registration */
+  trialEndsAt: timestamp("trialEndsAt"),
+  /** Whether user has purchased lifetime access */
+  hasLifetimeAccess: int("hasLifetimeAccess").notNull().default(0), // 0 = false, 1 = true
+  /** Stripe customer ID for payment tracking */
+  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
+  /** Stripe payment intent ID for lifetime purchase */
+  stripePaymentId: varchar("stripePaymentId", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),

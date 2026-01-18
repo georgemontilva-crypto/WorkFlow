@@ -64,6 +64,16 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.lastSignedIn = new Date();
     }
 
+    // Initialize trial for new users (7 days from now)
+    const existingUser = await db.select().from(users).where(eq(users.openId, user.openId)).limit(1);
+    if (existingUser.length === 0) {
+      // New user - set trial end date
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + 7);
+      values.trialEndsAt = trialEnd;
+      values.hasLifetimeAccess = 0;
+    }
+
     if (Object.keys(updateSet).length === 0) {
       updateSet.lastSignedIn = new Date();
     }
@@ -232,4 +242,42 @@ export async function deleteSavingsGoal(id: number, userId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.delete(savingsGoals).where(and(eq(savingsGoals.id, id), eq(savingsGoals.userId, userId)));
+}
+
+
+/**
+ * User access management helpers
+ */
+export async function grantLifetimeAccess(userId: number, stripeCustomerId: string, stripePaymentId: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot grant lifetime access: database not available");
+    return false;
+  }
+
+  try {
+    await db.update(users)
+      .set({
+        hasLifetimeAccess: 1,
+        stripeCustomerId,
+        stripePaymentId,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+    return true;
+  } catch (error) {
+    console.error("[Database] Failed to grant lifetime access:", error);
+    return false;
+  }
+}
+
+export async function getUserById(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user: database not available");
+    return undefined;
+  }
+
+  const result = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
 }

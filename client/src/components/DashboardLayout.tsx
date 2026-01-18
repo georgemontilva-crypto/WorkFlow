@@ -10,10 +10,13 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ReminderAlert } from '@/components/ReminderAlert';
+import { AccessBlocker } from './AccessBlocker';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/db';
 import { differenceInDays, parseISO } from 'date-fns';
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/_core/hooks/useAuth';
+import { trpc } from '@/lib/trpc';
 
 
 
@@ -21,6 +24,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { t } = useLanguage();
+  
+  // Auth and access control
+  const { user, isAuthenticated } = useAuth();
+  const { data: accessStatus } = trpc.auth.accessStatus.useQuery(undefined, {
+    enabled: isAuthenticated,
+    refetchInterval: 60000, // Check every minute
+  });
   
   // Alert system state
   const [showOverdueAlert, setShowOverdueAlert] = useState(false);
@@ -99,7 +109,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }).length : 0;
 
   const navigation = [
-    { name: t.nav.dashboard, href: '/', icon: LayoutDashboard },
+    { name: t.nav.dashboard, href: '/dashboard', icon: LayoutDashboard },
     { name: t.nav.clients, href: '/clients', icon: Users },
     { name: t.nav.invoices, href: '/invoices', icon: FileText },
     { name: t.nav.finances, href: '/finances', icon: TrendingUp },
@@ -108,8 +118,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: t.nav.settings, href: '/settings', icon: Settings },
   ];
 
+  // Handle upgrade action
+  const handleUpgrade = () => {
+    window.location.href = '/#pricing';
+  };
+
   return (
     <div className="flex h-screen bg-background overflow-hidden">
+      {/* Access Blocker */}
+      {accessStatus && !accessStatus.hasLifetimeAccess && (
+        <AccessBlocker 
+          trialDaysRemaining={accessStatus.trialDaysRemaining}
+          onUpgrade={handleUpgrade}
+        />
+      )}
       {/* Overlay for mobile */}
       {isMobileMenuOpen && (
         <div
@@ -127,7 +149,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         {/* Logo */}
         <div className="h-16 flex items-center gap-3 px-6 border-b border-border">
-          <img src="/hiwork-logo-square.png" alt="HiWork" className="h-10 w-auto" />
+          <img src="/hiwork-logo-final.png" alt="HiWork" className="h-8 w-auto" />
         </div>
 
         {/* Navigation */}
@@ -176,7 +198,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           
           <div className="flex-1" />
           
-          <img src="/hiwork-logo-square.png" alt="HiWork" className="h-8 w-auto sm:h-9" />
+          <img src="/hiwork-logo-final.png" alt="HiWork" className="h-7 w-auto sm:h-8" />
         </header>
 
         {/* Scrollable Content */}
