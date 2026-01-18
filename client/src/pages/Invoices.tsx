@@ -44,8 +44,35 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db, type Invoice, type InvoiceItem } from '@/lib/db';
+import { trpc } from '@/lib/trpc';
+import type { InvoiceItem } from '../../../drizzle/schema';
+
+// Invoice type based on tRPC schema
+type Invoice = {
+  id: number;
+  clientId: number;
+  invoiceNumber: string;
+  issueDate: Date;
+  dueDate: Date;
+  amount: string;
+  paidAmount: string | null;
+  status: 'pending' | 'paid' | 'overdue' | 'cancelled' | 'archived';
+  items: InvoiceItem[];
+  notes?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+// Form data type with string dates for inputs
+type InvoiceFormData = {
+  clientId?: number;
+  issueDate?: string;
+  dueDate?: string;
+  status?: 'pending' | 'paid' | 'overdue' | 'cancelled';
+  paidAmount?: number | string;
+  items?: InvoiceItem[];
+  notes?: string;
+};
 import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User, FolderArchive, ArchiveRestore } from 'lucide-react';
 import { format, parseISO, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -56,9 +83,51 @@ import { useState } from 'react';
 
 export default function Invoices() {
   const { t } = useLanguage();
-  const invoices = useLiveQuery(() => db.invoices.where('status').notEqual('archived').sortBy('createdAt').then(arr => arr.reverse()));
-  const archivedInvoices = useLiveQuery(() => db.invoices.where('status').equals('archived').sortBy('createdAt').then(arr => arr.reverse()));
-  const clients = useLiveQuery(() => db.clients.toArray());
+  const utils = trpc.useUtils();
+  
+  // Fetch data using tRPC
+  const { data: allInvoices, isLoading: invoicesLoading } = trpc.invoices.list.useQuery();
+  const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery();
+  
+  // Filter invoices
+  const invoices = allInvoices?.filter(inv => inv.status !== 'archived');
+  const archivedInvoices = allInvoices?.filter(inv => inv.status === 'archived');
+  
+  // Mutations
+  const createInvoice = trpc.invoices.create.useMutation({
+    onSuccess: () => {
+      utils.invoices.list.invalidate();
+      toast.success('Factura creada exitosamente');
+    },
+    onError: () => {
+      toast.error('Error al crear la factura');
+    },
+  });
+  
+  const updateInvoice = trpc.invoices.update.useMutation({
+    onSuccess: () => {
+      utils.invoices.list.invalidate();
+    },
+    onError: () => {
+      toast.error('Error al actualizar la factura');
+    },
+  });
+  
+  const deleteInvoice = trpc.invoices.delete.useMutation({
+    onSuccess: () => {
+      utils.invoices.list.invalidate();
+      toast.success('Factura eliminada exitosamente');
+    },
+    onError: () => {
+      toast.error('Error al eliminar la factura');
+    },
+  });
+  
+  const createTransaction = trpc.transactions.create.useMutation({
+    onSuccess: () => {
+      utils.transactions.list.invalidate();
+    },
+  });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [showStatusDialog, setShowStatusDialog] = useState(false);
@@ -69,7 +138,7 @@ export default function Invoices() {
   const [showClientSelector, setShowClientSelector] = useState(false);
   const [showArchivedDialog, setShowArchivedDialog] = useState(false);
   const [clientSearch, setClientSearch] = useState('');
-  const [formData, setFormData] = useState<Partial<Invoice>>({
+  const [formData, setFormData] = useState<InvoiceFormData>({
     clientId: 0,
     issueDate: new Date().toISOString().split('T')[0],
     dueDate: addDays(new Date(), 30).toISOString().split('T')[0],
@@ -149,15 +218,17 @@ export default function Invoices() {
     const invoiceNumber = `INV-${Date.now()}`;
     const total = calculateTotal();
 
-    await db.invoices.add({
-      ...formData as Invoice,
+    await createInvoice.mutateAsync({
+      clientId: formData.clientId!,
       invoiceNumber,
-      amount: total,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      issueDate: formData.issueDate!,
+      dueDate: formData.dueDate!,
+      amount: total.toString(),
+      paidAmount: '0',
+      status: formData.status!,
+      items: formData.items!,
+      notes: formData.notes,
     });
-
-    toast.success('Factura creada exitosamente');
     setIsDialogOpen(false);
     setFormData({
       clientId: 0,
@@ -178,7 +249,7 @@ export default function Invoices() {
       setShowStatusDialog(true);
     } else {
       // Cambiar estado directamente
-      await db.invoices.update(invoice.id!, { status, updatedAt: new Date().toISOString() });
+      await updateInvoice.mutateAsync({ id: invoice.id, status });
       toast.success('Estado actualizado');
     }
   };
@@ -186,22 +257,20 @@ export default function Invoices() {
   const confirmStatusChange = async (addToFinances: boolean) => {
     if (!selectedInvoice) return;
 
-    await db.invoices.update(selectedInvoice.id!, { 
-      status: newStatus, 
-      updatedAt: new Date().toISOString() 
+    await updateInvoice.mutateAsync({ 
+      id: selectedInvoice.id, 
+      status: newStatus
     });
 
     if (addToFinances) {
       // Agregar ingreso a finanzas
       const client = clients?.find(c => c.id === selectedInvoice.clientId);
-      await db.transactions.add({
+      await createTransaction.mutateAsync({
         type: 'income',
         amount: selectedInvoice.amount,
         category: 'Pago de Factura',
         description: `Pago de factura ${selectedInvoice.invoiceNumber} - ${client?.name || 'Cliente'}`,
         date: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
       });
       toast.success('Factura marcada como pagada e ingreso agregado a Finanzas');
     } else {
@@ -218,17 +287,17 @@ export default function Invoices() {
       return;
     }
     
-    await db.invoices.update(invoice.id!, { 
-      status: 'archived', 
-      updatedAt: new Date().toISOString() 
+    await updateInvoice.mutateAsync({ 
+      id: invoice.id, 
+      status: 'archived'
     });
     toast.success('Factura archivada exitosamente');
   };
 
   const handleUnarchive = async (invoice: Invoice) => {
-    await db.invoices.update(invoice.id!, { 
-      status: 'paid', 
-      updatedAt: new Date().toISOString() 
+    await updateInvoice.mutateAsync({ 
+      id: invoice.id, 
+      status: 'paid'
     });
     toast.success('Factura restaurada');
   };
@@ -245,32 +314,31 @@ export default function Invoices() {
       return;
     }
 
-    const currentPaid = selectedInvoice.paidAmount || 0;
+    const currentPaid = parseFloat(selectedInvoice.paidAmount || '0') || 0;
     const newPaidAmount = currentPaid + partialPaymentAmount;
+    const invoiceAmount = parseFloat(selectedInvoice.amount);
 
-    if (newPaidAmount > selectedInvoice.amount) {
+    if (newPaidAmount > invoiceAmount) {
       toast.error('El monto total pagado no puede exceder el monto de la factura');
       return;
     }
 
     // Actualizar factura con el pago parcial
-    const newStatus = newPaidAmount >= selectedInvoice.amount ? 'paid' : selectedInvoice.status;
-    await db.invoices.update(selectedInvoice.id!, {
-      paidAmount: newPaidAmount,
+    const newStatus = newPaidAmount >= invoiceAmount ? 'paid' : selectedInvoice.status;
+    await updateInvoice.mutateAsync({
+      id: selectedInvoice.id,
+      paidAmount: newPaidAmount.toString() || '0',
       status: newStatus,
-      updatedAt: new Date().toISOString(),
     });
 
     // Agregar transacción de ingreso
     const client = clients?.find(c => c.id === selectedInvoice.clientId);
-    await db.transactions.add({
+    await createTransaction.mutateAsync({
       type: 'income',
-      amount: partialPaymentAmount,
+      amount: partialPaymentAmount.toString(),
       category: 'Pago Parcial de Factura',
       description: `Abono a factura ${selectedInvoice.invoiceNumber} - ${client?.name || 'Cliente'}`,
       date: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
     });
 
     toast.success(`Pago parcial de $${partialPaymentAmount.toFixed(2)} registrado exitosamente`);
@@ -280,10 +348,10 @@ export default function Invoices() {
   };
 
   const generatePDF = async (invoiceId: number) => {
-    const invoice = await db.invoices.get(invoiceId);
+    const invoice = allInvoices?.find(inv => inv.id === invoiceId);
     if (!invoice) return;
 
-    const client = await db.clients.get(invoice.clientId);
+    const client = clients?.find(c => c.id === invoice.clientId);
     if (!client) return;
 
     const doc = new jsPDF();
@@ -297,8 +365,8 @@ export default function Invoices() {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Factura #: ${invoice.invoiceNumber}`, 20, 40);
-    doc.text(`Fecha de Emisión: ${format(parseISO(invoice.issueDate), 'dd/MM/yyyy')}`, 20, 47);
-    doc.text(`Fecha de Vencimiento: ${format(parseISO(invoice.dueDate), 'dd/MM/yyyy')}`, 20, 54);
+    doc.text(`Fecha de Emisión: ${format(new Date(invoice.issueDate), 'dd/MM/yyyy')}`, 20, 47);
+    doc.text(`Fecha de Vencimiento: ${format(new Date(invoice.dueDate), 'dd/MM/yyyy')}`, 20, 54);
 
     // Client Info
     doc.setFontSize(12);
@@ -344,7 +412,7 @@ export default function Invoices() {
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.text('TOTAL:', 140, yPos);
-    doc.text(`$${invoice.amount.toFixed(2)}`, 190, yPos, { align: 'right' });
+    doc.text(`$${parseFloat(invoice.amount).toFixed(2)}`, 190, yPos, { align: 'right' });
 
     // Notes
     if (invoice.notes) {
@@ -730,36 +798,36 @@ export default function Invoices() {
                         <div>
                           <p className="text-xs text-muted-foreground mb-1">Vencimiento</p>
                           <p className="text-sm font-medium text-foreground">
-                            {format(parseISO(invoice.dueDate), 'dd MMM yyyy', { locale: es })}
+                            {format(new Date(invoice.dueDate), 'dd MMM yyyy', { locale: es })}
                           </p>
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground mb-1">{t.invoices.totalAmount}</p>
                           <p className="text-lg font-bold font-mono text-foreground">
-                            ${invoice.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                            ${parseFloat(invoice.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                           </p>
                         </div>
                       </div>
 
                       {/* Pagos Parciales */}
-                      {(invoice.paidAmount && invoice.paidAmount > 0) && (
+                      {(invoice.paidAmount && parseFloat(invoice.paidAmount) > 0) && (
                         <div className="pt-2 border-t border-border">
                           <div className="grid grid-cols-2 gap-3">
                             <div>
                               <p className="text-xs text-muted-foreground mb-1">Pagado</p>
                               <p className="text-sm font-medium text-green-500">
-                                ${invoice.paidAmount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                                ${parseFloat(invoice.paidAmount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                               </p>
                             </div>
                             <div>
                               <p className="text-xs text-muted-foreground mb-1">Restante</p>
                               <p className="text-sm font-bold text-orange-400">
-                                ${(invoice.amount - invoice.paidAmount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                                ${(parseFloat(invoice.amount) - parseFloat(invoice.paidAmount)).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                               </p>
                             </div>
                           </div>
                           <div className="mt-2">
-                            <Progress value={(invoice.paidAmount / invoice.amount) * 100} className="h-2" />
+                            <Progress value={(parseFloat(invoice.paidAmount) / parseFloat(invoice.amount)) * 100} className="h-2" />
                           </div>
                         </div>
                       )}
@@ -800,7 +868,7 @@ export default function Invoices() {
                 Factura Pagada
               </AlertDialogTitle>
               <AlertDialogDescription className="text-muted-foreground">
-                ¿Deseas agregar el monto de ${selectedInvoice?.amount.toFixed(2)} como ingreso en la sección de Finanzas?
+                ¿Deseas agregar el monto de ${parseFloat(selectedInvoice?.amount || '0').toFixed(2)} como ingreso en la sección de Finanzas?
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -830,11 +898,11 @@ export default function Invoices() {
               </AlertDialogTitle>
               <AlertDialogDescription className="text-muted-foreground">
                 {t.invoices.invoiceNumber} {selectedInvoice?.invoiceNumber}<br />
-                {t.invoices.totalAmount}: ${selectedInvoice?.amount.toFixed(2)}<br />
-                {selectedInvoice?.paidAmount && selectedInvoice.paidAmount > 0 && (
+                {t.invoices.totalAmount}: ${parseFloat(selectedInvoice?.amount || '0').toFixed(2)}<br />
+                {selectedInvoice?.paidAmount && parseFloat(selectedInvoice.paidAmount) > 0 && (
                   <>
-                    Pagado: ${selectedInvoice.paidAmount.toFixed(2)}<br />
-                    Restante: ${(selectedInvoice.amount - selectedInvoice.paidAmount).toFixed(2)}<br />
+                    Pagado: ${parseFloat(selectedInvoice.paidAmount).toFixed(2)}<br />
+                    Restante: ${(parseFloat(selectedInvoice.amount) - parseFloat(selectedInvoice.paidAmount)).toFixed(2)}<br />
                   </>
                 )}
               </AlertDialogDescription>
@@ -848,7 +916,7 @@ export default function Invoices() {
                 type="number"
                 step="0.01"
                 min="0"
-                max={selectedInvoice ? selectedInvoice.amount - (selectedInvoice.paidAmount || 0) : 0}
+                max={selectedInvoice ? parseFloat(selectedInvoice.amount) - parseFloat(selectedInvoice.paidAmount || '0') : 0}
                 value={partialPaymentAmount}
                 onChange={(e) => setPartialPaymentAmount(parseFloat(e.target.value) || 0)}
                 placeholder="0.00"
@@ -998,8 +1066,8 @@ export default function Invoices() {
                               <p className="text-sm text-muted-foreground">{client.company}</p>
                             )}
                             <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
-                              <span>Emitida: {format(parseISO(invoice.issueDate), 'dd/MM/yyyy')}</span>
-                              <span>Vencimiento: {format(parseISO(invoice.dueDate), 'dd/MM/yyyy')}</span>
+                              <span>Emitida: {format(new Date(invoice.issueDate), 'dd/MM/yyyy')}</span>
+                              <span>Vencimiento: {format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</span>
                             </div>
                           </div>
                           <div className="flex flex-col sm:items-end gap-2">
@@ -1010,7 +1078,7 @@ export default function Invoices() {
                               size="sm"
                               variant="outline"
                               onClick={async () => {
-                                await db.invoices.update(invoice.id!, { status: 'pending' });
+                                await updateInvoice.mutateAsync({ id: invoice.id, status: 'pending' });
                                 toast.success('Factura restaurada correctamente');
                               }}
                               className="border-border text-foreground hover:bg-accent"

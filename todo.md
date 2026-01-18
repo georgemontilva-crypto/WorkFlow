@@ -8,7 +8,7 @@
 
 ## Phase 2: Frontend Migration from Dexie to tRPC
 - [x] Migrate Clients.tsx to use tRPC
-- [ ] Migrate Invoices.tsx to use tRPC
+- [x] Migrate Invoices.tsx to use tRPC
 - [ ] Migrate Reminders.tsx to use tRPC
 - [ ] Migrate Home.tsx (Dashboard) to use tRPC
 - [ ] Migrate Finances.tsx to use tRPC
@@ -41,3 +41,11 @@
 - [ ] Save final checkpoint
 - [ ] Document deployment process
 - [ ] Provide user with access information
+
+
+## Visual Defects & Invoices Repair
+- [x] Identify visual defects in the application
+- [x] Check and repair Invoices section (reported as broken)
+- [x] Fix any styling issues caused by migration
+- [x] Verify all pages display correctly
+- [ ] Test responsive design on mobile and desktop
