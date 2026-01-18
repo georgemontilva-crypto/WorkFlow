@@ -18,6 +18,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -185,64 +186,71 @@ export default function Clients() {
             </DialogTrigger>
             <DialogContent className="bg-popover border-border max-w-2xl">
               <DialogHeader>
-                <DialogTitle className="text-foreground">
+                <DialogTitle className="text-foreground text-2xl">
                   {editingClient ? 'Editar Cliente' : 'Agregar Nuevo Cliente'}
                 </DialogTitle>
+                <DialogDescription className="text-muted-foreground">
+                  {editingClient ? 'Actualiza la información del cliente' : 'Completa los datos del nuevo cliente y su ciclo de facturación'}
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-foreground">Nombre *</Label>
+                    <Label htmlFor="name" className="text-foreground font-semibold">Nombre <span className="text-destructive">*</span></Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="bg-background border-border text-foreground"
+                      className="bg-background border-border text-foreground h-11"
                       required
                     />
+                    <p className="text-xs text-muted-foreground">Nombre completo o razón social</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-foreground">Email *</Label>
+                    <Label htmlFor="email" className="text-foreground font-semibold">Email <span className="text-destructive">*</span></Label>
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="bg-background border-border text-foreground"
+                      className="bg-background border-border text-foreground h-11"
                       required
                     />
+                    <p className="text-xs text-muted-foreground">Correo electrónico de contacto</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-foreground">Teléfono</Label>
+                    <Label htmlFor="phone" className="text-foreground font-semibold">Teléfono</Label>
                     <Input
                       id="phone"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="bg-background border-border text-foreground"
+                      className="bg-background border-border text-foreground h-11"
                     />
+                    <p className="text-xs text-muted-foreground">Número de teléfono (opcional)</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="company" className="text-foreground">Empresa</Label>
+                    <Label htmlFor="company" className="text-foreground font-semibold">Empresa</Label>
                     <Input
                       id="company"
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      className="bg-background border-border text-foreground"
+                      className="bg-background border-border text-foreground h-11"
                     />
+                    <p className="text-xs text-muted-foreground">Nombre de la empresa (opcional)</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
                   <div className="space-y-2">
-                    <Label htmlFor="billingCycle" className="text-foreground">Ciclo de Facturación</Label>
+                    <Label htmlFor="billingCycle" className="text-foreground font-semibold">Ciclo de Facturación</Label>
                     <Select
                       value={formData.billingCycle}
                       onValueChange={(value: any) => setFormData({ ...formData, billingCycle: value })}
                     >
-                      <SelectTrigger className="bg-background border-border text-foreground">
+                      <SelectTrigger className="bg-background border-border text-foreground h-11">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-popover border-border">
@@ -252,61 +260,67 @@ export default function Clients() {
                         <SelectItem value="custom">Personalizado</SelectItem>
                       </SelectContent>
                     </Select>
+                    <p className="text-xs text-muted-foreground">Frecuencia de cobro recurrente</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="amount" className="text-foreground">Monto *</Label>
+                    <Label htmlFor="amount" className="text-foreground font-semibold">Monto <span className="text-destructive">*</span></Label>
                     <Input
                       id="amount"
                       type="number"
                       step="0.01"
                       value={formData.amount}
                       onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
-                      className="bg-background border-border text-foreground font-mono"
+                      className="bg-background border-border text-foreground font-mono h-11"
                       required
                     />
+                    <p className="text-xs text-muted-foreground">Monto a cobrar por ciclo</p>
                   </div>
                 </div>
 
                 {formData.billingCycle === 'custom' && (
                   <div className="space-y-2">
-                    <Label htmlFor="customCycleDays" className="text-foreground">Días del Ciclo Personalizado</Label>
+                    <Label htmlFor="customCycleDays" className="text-foreground font-semibold">Días del Ciclo Personalizado</Label>
                     <Input
                       id="customCycleDays"
                       type="number"
                       value={formData.customCycleDays}
                       onChange={(e) => setFormData({ ...formData, customCycleDays: parseInt(e.target.value) })}
-                      className="bg-background border-border text-foreground"
+                      className="bg-background border-border text-foreground h-11"
                     />
+                    <p className="text-xs text-muted-foreground">Cada cuántos días se repite el ciclo</p>
                   </div>
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="status" className="text-foreground">Estado</Label>
+                  <Label htmlFor="status" className="text-foreground font-semibold">Estado</Label>
                   <Select
                     value={formData.status}
-                    onValueChange={(value: any) => setFormData({ ...formData, status: value })}
-                  >
-                    <SelectTrigger className="bg-background border-border text-foreground">
+                      onValueChange={(value: any) => setFormData({ ...formData, status: value })}
+                    >
+                      <SelectTrigger className="bg-background border-border text-foreground h-11">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-popover border-border">
                       <SelectItem value="active">Activo</SelectItem>
-                      <SelectItem value="inactive">Inactivo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                        <SelectItem value="inactive">Inactivo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">Estado actual del cliente</p>
+                  </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="notes" className="text-foreground">Notas</Label>
+                  <Label htmlFor="notes" className="text-foreground font-semibold">Notas Adicionales</Label>
                   <Input
                     id="notes"
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="bg-background border-border text-foreground"
-                  />
-                </div>
+                      className="bg-background border-border text-foreground h-11"
+                      placeholder="Información adicional sobre el cliente..."
+                    />
+                    <p className="text-xs text-muted-foreground">Notas privadas sobre el cliente (opcional)</p>
+                  </div>
 
-                <div className="flex justify-end gap-3 pt-4">
+                <div className="flex justify-end gap-3 pt-6 border-t border-border">
                   <Button
                     type="button"
                     variant="outline"

@@ -55,6 +55,7 @@ export interface Transaction {
   clientId?: number;
   invoiceId?: number;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface SavingsGoal {
