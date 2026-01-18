@@ -233,4 +233,4 @@
 - [x] Eliminar badges de GDPR, ISO 27001, ISO 9001, SOC 2, HIPAA
 - [x] Actualizar navegación de #compliance a #security
 - [x] Verificar que la landing page se vea correctamente sin la sección
-- [ ] Guardar checkpoint y hacer push
+- [x] Guardar checkpoint y hacer push
