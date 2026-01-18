@@ -465,7 +465,7 @@ export default function Invoices() {
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{t.invoices.title}</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
@@ -474,21 +474,18 @@ export default function Invoices() {
           </div>
           <div className="flex gap-2 sm:gap-3">
             <Button
-              variant="outline"
-              onClick={() => setShowArchivedDialog(true)}
-              className="border-border text-foreground hover:bg-accent"
+              onClick={() => setIsDialogOpen(true)}
+              className="bg-primary text-primary-foreground hover:opacity-90"
             >
-              <FolderArchive className="w-4 h-4 mr-2" />
-              Ver Archivados
+              <Plus className="w-4 h-4 mr-2" />
+              Nueva Factura
             </Button>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-primary text-primary-foreground hover:opacity-90">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t.invoices.newInvoice}
-                </Button>
-              </DialogTrigger>
-            <DialogContent className="bg-popover border-border max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+          </div>
+        </div>
+
+        {/* New Invoice Dialog */}
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="bg-popover border-border max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
               <DialogHeader className="pb-4">
                 <DialogTitle className="text-foreground text-xl sm:text-2xl">{t.invoices.createInvoice}</DialogTitle>
                 <DialogDescription className="text-muted-foreground text-sm">
@@ -697,60 +694,6 @@ export default function Invoices() {
               </form>
             </DialogContent>
           </Dialog>
-        </div>
-
-        {/* Statistics Cards - Compact Design */}
-        {invoices && invoices.length > 0 && (
-          <div className="grid grid-cols-4 gap-3 mb-4">
-            <Card className="bg-card/50 border-border/50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Total</p>
-                    <p className="text-2xl font-bold text-foreground">{totalInvoices}</p>
-                  </div>
-                  <FileText className="w-8 h-8 text-muted-foreground/50" strokeWidth={1.5} />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card/50 border-border/50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Pendientes</p>
-                    <p className="text-2xl font-bold text-yellow-400">{pendingInvoices}</p>
-                  </div>
-                  <Clock className="w-8 h-8 text-yellow-400/50" strokeWidth={1.5} />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card/50 border-border/50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Pagadas</p>
-                    <p className="text-2xl font-bold text-green-400">{paidInvoices}</p>
-                  </div>
-                  <CheckCircle2 className="w-8 h-8 text-green-400/50" strokeWidth={1.5} />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-card/50 border-border/50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-1">Vencidas</p>
-                    <p className="text-2xl font-bold text-destructive">{overdueInvoices}</p>
-                  </div>
-                  <AlertCircle className="w-8 h-8 text-destructive/50" strokeWidth={1.5} />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
 
         {/* Invoices List */}
         {!invoices || invoices.length === 0 ? (
@@ -777,53 +720,21 @@ export default function Invoices() {
               return (
                 <Card key={invoice.id} className="bg-card border-border hover:border-accent/50 transition-all">
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between gap-4">
-                      {/* Left: Invoice Info */}
-                      <div className="flex items-center gap-4 flex-1 min-w-0">
-                        <div className="flex-shrink-0">
-                          <Badge className={`${statusInfo.className} border px-2.5 py-1 flex items-center gap-1.5`}>
-                            <StatusIcon className="w-3.5 h-3.5" />
-                            {statusInfo.label}
-                          </Badge>
-                        </div>
+                    {/* Collapsed View - Only Invoice Number and Client */}
+                    {!isExpanded ? (
+                      <div className="flex items-center justify-between gap-4">
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-foreground truncate">{invoice.invoiceNumber}</p>
+                          <p className="font-semibold text-lg text-foreground truncate">{invoice.invoiceNumber}</p>
                           <p className="text-sm text-muted-foreground truncate">{getClientName(invoice.clientId)}</p>
                         </div>
-                      </div>
-
-                      {/* Center: Dates */}
-                      <div className="hidden md:flex items-center gap-6">
-                        <div className="text-center">
-                          <p className="text-xs text-muted-foreground">Emisión</p>
-                          <p className="text-sm font-medium text-foreground">
-                            {format(new Date(invoice.issueDate), 'dd MMM', { locale: es })}
-                          </p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-xs text-muted-foreground">Vencimiento</p>
-                          <p className="text-sm font-medium text-foreground">
-                            {format(new Date(invoice.dueDate), 'dd MMM', { locale: es })}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Right: Amount & Actions */}
-                      <div className="flex items-center gap-3 flex-shrink-0">
-                        <div className="text-right">
-                          <p className="text-xs text-muted-foreground">Monto</p>
-                          <p className="text-lg font-bold font-mono text-foreground">
-                            ${parseFloat(invoice.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           <Button
                             variant="ghost"
                             size="icon"
                             onClick={() => toggleCard(invoice.id!)}
                             className="text-muted-foreground hover:text-foreground h-8 w-8"
                           >
-                            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            <ChevronDown className="w-4 h-4" />
                           </Button>
                           <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -881,25 +792,96 @@ export default function Invoices() {
                         </DropdownMenu>
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      /* Expanded View - Full Details */
+                      <div className="space-y-4">
+                        {/* Header with Invoice Number, Client and Actions */}
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-lg text-foreground truncate">{invoice.invoiceNumber}</p>
+                            <p className="text-sm text-muted-foreground truncate">{getClientName(invoice.clientId)}</p>
+                          </div>
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => toggleCard(invoice.id!)}
+                              className="text-muted-foreground hover:text-foreground h-8 w-8"
+                            >
+                              <ChevronUp className="w-4 h-4" />
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-8 w-8">
+                                  <MoreVertical className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="bg-popover border-border w-56" align="end">
+                                <DropdownMenuItem 
+                                  onClick={() => handleStatusChange(invoice, 'pending')}
+                                  className="text-foreground hover:bg-accent cursor-pointer"
+                                >
+                                  <Clock className="w-4 h-4 mr-2 text-yellow-400" />
+                                  Marcar como Pendiente
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => handleStatusChange(invoice, 'paid')}
+                                  className="text-foreground hover:bg-accent cursor-pointer"
+                                >
+                                  <CheckCircle2 className="w-4 h-4 mr-2 text-green-400" />
+                                  Marcar como Pagada
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => handlePartialPayment(invoice)}
+                                  className="text-foreground hover:bg-accent cursor-pointer"
+                                >
+                                  <DollarSign className="w-4 h-4 mr-2 text-blue-400" />
+                                  Registrar Pago Parcial
+                                </DropdownMenuItem>
+                                <DropdownMenuItem 
+                                  onClick={() => handleStatusChange(invoice, 'overdue')}
+                                  className="text-foreground hover:bg-accent cursor-pointer"
+                                >
+                                  <AlertCircle className="w-4 h-4 mr-2 text-destructive" />
+                                  Marcar como Vencida
+                                </DropdownMenuItem>
+                                {invoice.status === 'paid' && (
+                                  <DropdownMenuItem 
+                                    onClick={() => handleArchive(invoice)}
+                                    className="text-green-400 hover:bg-accent cursor-pointer"
+                                  >
+                                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                                    Archivar Factura
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuSeparator className="bg-border" />
+                                <DropdownMenuItem 
+                                  onClick={() => handleStatusChange(invoice, 'cancelled')}
+                                  className="text-destructive hover:bg-destructive/10 cursor-pointer"
+                                >
+                                  <XCircle className="w-4 h-4 mr-2" />
+                                  {t.invoices.cancelInvoice}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
 
-                    {/* Expanded Content */}
-                    {isExpanded && (
-                    <CardContent className="space-y-3 pt-0">
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">Vencimiento</p>
-                          <p className="text-sm font-medium text-foreground">
-                            {format(new Date(invoice.dueDate), 'dd MMM yyyy', { locale: es })}
-                          </p>
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-2 gap-4 pt-3 border-t border-border">
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Vencimiento</p>
+                            <p className="text-sm font-medium text-foreground">
+                              {format(new Date(invoice.dueDate), 'dd MMM yyyy', { locale: es })}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Monto</p>
+                            <p className="text-lg font-bold font-mono text-foreground">
+                              ${parseFloat(invoice.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">{t.invoices.totalAmount}</p>
-                          <p className="text-lg font-bold font-mono text-foreground">
-                            ${parseFloat(invoice.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                          </p>
-                        </div>
-                      </div>
 
                       {/* Pagos Parciales */}
                       {(invoice.paidAmount && parseFloat(invoice.paidAmount) > 0) && (
@@ -943,7 +925,7 @@ export default function Invoices() {
                           Descargar PDF
                         </Button>
                       </div>
-                    </CardContent>
+                      </div>
                     )}
                   </CardContent>
                 </Card>
@@ -1125,7 +1107,6 @@ export default function Invoices() {
             </div>
           </DialogContent>
         </Dialog>
-          </div>
 
         {/* Archived Invoices Dialog */}
         <Dialog open={showArchivedDialog} onOpenChange={setShowArchivedDialog}>

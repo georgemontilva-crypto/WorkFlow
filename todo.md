@@ -69,3 +69,11 @@
 - [x] Improve overall page design and spacing
 - [x] Add loading states and empty states
 - [x] Test responsive design on different screen sizes
+
+
+## Redesign Invoices Layout (User Request)
+- [x] Remove statistics cards (Total, Pendientes, Pagadas, Vencidas)
+- [x] Remove "Ver Archivados" button
+- [x] Move header section (title + description + New Invoice button) to top
+- [x] Simplify closed invoice cards to show only invoice number and client name
+- [x] Keep expanded view with vencimiento, monto, and estado
