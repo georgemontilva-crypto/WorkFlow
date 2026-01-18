@@ -336,13 +336,17 @@ export default function Invoices() {
   };
 
   const toggleCard = (invoiceId: number) => {
-    const newExpanded = new Set(expandedCards);
-    if (newExpanded.has(invoiceId)) {
-      newExpanded.delete(invoiceId);
-    } else {
-      newExpanded.add(invoiceId);
-    }
-    setExpandedCards(newExpanded);
+    if (!invoiceId) return; // Validar que el ID existe
+    
+    setExpandedCards(prev => {
+      const newExpanded = new Set(prev);
+      if (newExpanded.has(invoiceId)) {
+        newExpanded.delete(invoiceId);
+      } else {
+        newExpanded.add(invoiceId);
+      }
+      return newExpanded;
+    });
   };
 
   return (

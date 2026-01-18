@@ -88,7 +88,7 @@ export default function Reminders() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 pb-8">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">Recordatorios</h1>
           <p className="text-sm md:text-base text-muted-foreground mt-1">
@@ -156,7 +156,7 @@ export default function Reminders() {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {clientReminders.map((client) => {
                 const priorityInfo = getPriorityBadge(client.isOverdue, client.isUrgent);
                 const PriorityIcon = priorityInfo.icon;
@@ -252,7 +252,7 @@ export default function Reminders() {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {invoiceReminders.map((invoice) => {
                 const priorityInfo = getPriorityBadge(invoice.isOverdue, invoice.isUrgent);
                 const PriorityIcon = priorityInfo.icon;
