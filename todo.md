@@ -77,3 +77,10 @@
 - [x] Move header section (title + description + New Invoice button) to top
 - [x] Simplify closed invoice cards to show only invoice number and client name
 - [x] Keep expanded view with vencimiento, monto, and estado
+
+
+## Optimize Invoices Grid Layout
+- [x] Change invoice cards layout to 3-column grid on desktop
+- [x] Make grid responsive: 3 columns (desktop), 2 columns (tablet), 1 column (mobile)
+- [x] Ensure cards maintain proper spacing and alignment
+- [x] Test on different screen sizes
