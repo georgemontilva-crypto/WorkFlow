@@ -126,8 +126,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         )}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-border">
-          <h1 className="text-xl font-bold text-foreground">WorkFlow</h1>
+        <div className="h-16 flex items-center gap-3 px-6 border-b border-border">
+          <img src="/hiwork-icon.png" alt="HiWork" className="h-8 w-8" />
+          <span className="text-xl font-bold text-foreground tracking-wide">HiWork</span>
         </div>
 
         {/* Navigation */}
@@ -176,7 +177,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           
           <div className="flex-1" />
           
-          <h1 className="text-lg sm:text-xl font-bold text-foreground">WorkFlow</h1>
+          <div className="flex items-center gap-2">
+            <img src="/hiwork-icon.png" alt="HiWork" className="h-6 w-6 sm:h-7 sm:w-7" />
+            <span className="text-lg sm:text-xl font-bold text-foreground tracking-wide">HiWork</span>
+          </div>
         </header>
 
         {/* Scrollable Content */}

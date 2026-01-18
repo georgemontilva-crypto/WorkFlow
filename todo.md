@@ -97,3 +97,23 @@
 - [x] Review toggleCard function and expandedCardId state logic
 - [x] Fix the conditional rendering of expanded content
 - [x] Test that only clicked card expands and others remain collapsed
+
+
+## Railway Deployment Setup
+- [x] Create PostgreSQL database in Railway
+- [x] Get database connection string (DATABASE_URL)
+- [x] Configure environment variables in Railway
+- [x] Run database migrations to create tables
+- [ ] Deploy application to Railway
+- [ ] Verify login/registro with Manus OAuth works in production
+- [ ] Test all features in production environment
+
+
+## Rebrand to HiWork
+- [x] Copy HiWork logos to project public folder
+- [x] Update package.json name to "hiwork"
+- [x] Update all "WorkFlow" references to "HiWork" in code
+- [x] Configure PWA manifest with HiWork name and icon
+- [x] Update favicon to HiWork logo
+- [x] Update DashboardLayout header with HiWork branding
+- [x] Test PWA installation with new icon

@@ -1,5 +1,5 @@
 /**
- * WorkFlow Database - Dexie.js Configuration
+ * HiWork Database - Dexie.js Configuration
  * Design Philosophy: Apple Minimalism - Clean, efficient, offline-first
  * 
  * Base de datos local para modo offline con IndexedDB
@@ -73,7 +73,7 @@ export interface SavingsGoal {
 }
 
 // Configuración de la base de datos
-const db = new Dexie('WorkFlowDB') as Dexie & {
+const db = new Dexie('HiWorkDB') as Dexie & {
   clients: EntityTable<Client, 'id'>;
   invoices: EntityTable<Invoice, 'id'>;
   transactions: EntityTable<Transaction, 'id'>;
