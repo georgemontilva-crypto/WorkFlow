@@ -216,3 +216,14 @@
 - [ ] Implementar 2FA opcional con TOTP (Google Authenticator)
 - [ ] Documentar medidas de seguridad implementadas
 - [ ] Guardar checkpoint y hacer push
+
+
+## Sección de Estándares de Seguridad en Landing
+- [x] Crear nueva sección "Seguridad de Grado Militar" en Landing page
+- [x] Agregar explicación detallada de medidas de seguridad implementadas
+- [x] Incluir información sobre: AES-256-GCM, bcrypt 12 rounds, JWT tokens, rate limiting, HTTPS
+- [x] Traducir contenido a español en LandingLanguageContext
+- [x] Traducir contenido a inglés en LandingLanguageContext
+- [x] Posicionar sección después de pricing y antes de badges de cumplimiento
+- [x] Verificar diseño minimalista y legibilidad en ambos idiomas
+- [ ] Guardar checkpoint y hacer push

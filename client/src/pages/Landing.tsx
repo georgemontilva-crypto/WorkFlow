@@ -239,6 +239,100 @@ function LandingContent() {
         </div>
       </section>
 
+      {/* Security Standards Section */}
+      <section id="security" className="py-20 px-4 bg-background">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              {t.security.title}
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              {t.security.subtitle}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* AES-256-GCM Encryption */}
+            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground mb-2">
+                {t.security.encryption.title}
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                {t.security.encryption.description}
+              </p>
+            </div>
+
+            {/* Bcrypt Password Hashing */}
+            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground mb-2">
+                {t.security.passwords.title}
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                {t.security.passwords.description}
+              </p>
+            </div>
+
+            {/* JWT Tokens */}
+            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground mb-2">
+                {t.security.sessions.title}
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                {t.security.sessions.description}
+              </p>
+            </div>
+
+            {/* HTTPS & TLS */}
+            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground mb-2">
+                {t.security.transport.title}
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                {t.security.transport.description}
+              </p>
+            </div>
+
+            {/* Rate Limiting */}
+            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground mb-2">
+                {t.security.protection.title}
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                {t.security.protection.description}
+              </p>
+            </div>
+
+            {/* Security Audits */}
+            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground mb-2">
+                {t.security.audits.title}
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                {t.security.audits.description}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Compliance Section */}
       <section id="compliance" className="py-20 px-4 bg-card/30">
         <div className="container mx-auto max-w-4xl text-center">

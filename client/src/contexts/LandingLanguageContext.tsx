@@ -84,6 +84,34 @@ const translations = {
       soc2: 'AICPA Standards',
       hipaa: 'Healthcare Privacy',
     },
+    security: {
+      title: 'Military-Grade Security',
+      subtitle: 'Your data is protected with the most advanced security technologies and international standards',
+      encryption: {
+        title: 'AES-256-GCM Encryption',
+        description: 'All sensitive data is encrypted using military-grade AES-256-GCM encryption, the same standard used by governments and financial institutions worldwide.',
+      },
+      passwords: {
+        title: 'Bcrypt Password Protection',
+        description: 'Passwords are protected with bcrypt using 12 salt rounds, making them virtually impossible to crack even with advanced computing power.',
+      },
+      sessions: {
+        title: 'Secure JWT Sessions',
+        description: 'Authentication sessions use industry-standard JWT tokens with short expiration times and automatic renewal for maximum security.',
+      },
+      transport: {
+        title: 'HTTPS & TLS 1.3',
+        description: 'All data transmission is encrypted end-to-end using HTTPS with TLS 1.3, ensuring your information is protected in transit.',
+      },
+      protection: {
+        title: 'Rate Limiting & DDoS Protection',
+        description: 'Advanced protection against brute force attacks and DDoS with intelligent rate limiting and automatic threat detection.',
+      },
+      audits: {
+        title: 'Security Audits & Monitoring',
+        description: 'Continuous monitoring and regular security audits ensure your data remains protected against emerging threats.',
+      },
+    },
     footer: {
       description: 'Simple and powerful financial management for freelancers and small businesses.',
       product: 'Product',
@@ -163,6 +191,34 @@ const translations = {
       iso9001: 'Gestión de Calidad',
       soc2: 'Estándares AICPA',
       hipaa: 'Privacidad Sanitaria',
+    },
+    security: {
+      title: 'Seguridad de Grado Militar',
+      subtitle: 'Tus datos están protegidos con las tecnologías de seguridad más avanzadas y estándares internacionales',
+      encryption: {
+        title: 'Encriptación AES-256-GCM',
+        description: 'Todos los datos sensibles están encriptados usando encriptación de grado militar AES-256-GCM, el mismo estándar utilizado por gobiernos e instituciones financieras en todo el mundo.',
+      },
+      passwords: {
+        title: 'Protección de Contraseñas Bcrypt',
+        description: 'Las contraseñas están protegidas con bcrypt usando 12 rondas de salt, haciéndolas virtualmente imposibles de descifrar incluso con poder computacional avanzado.',
+      },
+      sessions: {
+        title: 'Sesiones Seguras JWT',
+        description: 'Las sesiones de autenticación utilizan tokens JWT estándar de la industria con tiempos de expiración cortos y renovación automática para máxima seguridad.',
+      },
+      transport: {
+        title: 'HTTPS & TLS 1.3',
+        description: 'Toda la transmisión de datos está encriptada de extremo a extremo usando HTTPS con TLS 1.3, asegurando que tu información esté protegida en tránsito.',
+      },
+      protection: {
+        title: 'Rate Limiting & Protección DDoS',
+        description: 'Protección avanzada contra ataques de fuerza bruta y DDoS con rate limiting inteligente y detección automática de amenazas.',
+      },
+      audits: {
+        title: 'Auditorías de Seguridad & Monitoreo',
+        description: 'Monitoreo continuo y auditorías de seguridad regulares aseguran que tus datos permanezcan protegidos contra amenazas emergentes.',
+      },
     },
     footer: {
       description: 'Gestión financiera simple y poderosa para freelancers y pequeños negocios.',
