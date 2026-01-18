@@ -45,7 +45,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, type Invoice, type InvoiceItem } from '@/lib/db';
-import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle } from 'lucide-react';
+import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { format, parseISO, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -59,6 +59,7 @@ export default function Invoices() {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [newStatus, setNewStatus] = useState<'pending' | 'paid' | 'overdue' | 'cancelled'>('pending');
+  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
   const [formData, setFormData] = useState<Partial<Invoice>>({
     clientId: 0,
     issueDate: new Date().toISOString().split('T')[0],
@@ -284,14 +285,24 @@ export default function Invoices() {
     return variants[status] || variants.pending;
   };
 
+  const toggleCard = (invoiceId: number) => {
+    const newExpanded = new Set(expandedCards);
+    if (newExpanded.has(invoiceId)) {
+      newExpanded.delete(invoiceId);
+    } else {
+      newExpanded.add(invoiceId);
+    }
+    setExpandedCards(newExpanded);
+  };
+
   return (
     <DashboardLayout>
-      <div className="p-8">
+      <div className="p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Facturas</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Facturas</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Crea, gestiona y genera facturas profesionales en PDF
             </p>
           </div>
@@ -536,104 +547,113 @@ export default function Invoices() {
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {invoices.map((invoice) => {
               const statusInfo = getStatusBadge(invoice.status);
               const StatusIcon = statusInfo.icon;
+              const isExpanded = expandedCards.has(invoice.id!);
               
               return (
                 <Card key={invoice.id} className="bg-card border-border hover:border-accent transition-colors">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
-                          <FileText className="w-6 h-6 text-accent-foreground" strokeWidth={1.5} />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-foreground text-lg">
-                            {invoice.invoiceNumber}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            {getClientName(invoice.clientId)}
-                          </p>
-                        </div>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-foreground text-lg truncate">
+                          {invoice.invoiceNumber}
+                        </CardTitle>
+                        <p className="text-sm text-muted-foreground truncate mt-1">
+                          {getClientName(invoice.clientId)}
+                        </p>
                       </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => toggleCard(invoice.id!)}
+                          className="text-muted-foreground hover:text-foreground h-8 w-8"
+                        >
+                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-8 w-8">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="bg-popover border-border w-56" align="end">
+                            <DropdownMenuItem 
+                              onClick={() => handleStatusChange(invoice, 'pending')}
+                              className="text-foreground hover:bg-accent cursor-pointer"
+                            >
+                              <Clock className="w-4 h-4 mr-2 text-yellow-400" />
+                              Marcar como Pendiente
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleStatusChange(invoice, 'paid')}
+                              className="text-foreground hover:bg-accent cursor-pointer"
+                            >
+                              <CheckCircle2 className="w-4 h-4 mr-2 text-green-400" />
+                              Marcar como Pagada
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => handleStatusChange(invoice, 'overdue')}
+                              className="text-foreground hover:bg-accent cursor-pointer"
+                            >
+                              <AlertCircle className="w-4 h-4 mr-2 text-destructive" />
+                              Marcar como Vencida
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-border" />
+                            <DropdownMenuItem 
+                              onClick={() => handleStatusChange(invoice, 'cancelled')}
+                              className="text-destructive hover:bg-destructive/10 cursor-pointer"
+                            >
+                              <XCircle className="w-4 h-4 mr-2" />
+                              Cancelar Factura
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                  </CardHeader>
 
-                      <div className="flex items-center gap-6">
-                        <div className="text-right">
+                  {isExpanded && (
+                    <CardContent className="space-y-3 pt-0">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
                           <p className="text-xs text-muted-foreground mb-1">Vencimiento</p>
-                          <p className="font-medium text-foreground">
+                          <p className="text-sm font-medium text-foreground">
                             {format(parseISO(invoice.dueDate), 'dd MMM yyyy', { locale: es })}
                           </p>
                         </div>
-
-                        <div className="text-right">
+                        <div>
                           <p className="text-xs text-muted-foreground mb-1">Monto</p>
-                          <p className="text-xl font-bold font-mono text-foreground">
+                          <p className="text-lg font-bold font-mono text-foreground">
                             ${invoice.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                           </p>
                         </div>
-
-                        <div className="min-w-[120px]">
-                          <Badge className={`${statusInfo.className} border px-3 py-1.5 flex items-center gap-1.5`}>
-                            <StatusIcon className="w-3.5 h-3.5" />
-                            {statusInfo.label}
-                          </Badge>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => generatePDF(invoice.id!)}
-                            className="border-border text-foreground hover:bg-accent"
-                            title="Descargar PDF"
-                          >
-                            <Download className="w-4 h-4" />
-                          </Button>
-
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="outline" size="icon" className="border-border text-foreground hover:bg-accent">
-                                <MoreVertical className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-popover border-border w-48">
-                              <DropdownMenuItem 
-                                onClick={() => handleStatusChange(invoice, 'pending')}
-                                className="text-foreground hover:bg-accent cursor-pointer"
-                              >
-                                <Clock className="w-4 h-4 mr-2 text-yellow-400" />
-                                Marcar como Pendiente
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleStatusChange(invoice, 'paid')}
-                                className="text-foreground hover:bg-accent cursor-pointer"
-                              >
-                                <CheckCircle2 className="w-4 h-4 mr-2 text-green-400" />
-                                Marcar como Pagada
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleStatusChange(invoice, 'overdue')}
-                                className="text-foreground hover:bg-accent cursor-pointer"
-                              >
-                                <AlertCircle className="w-4 h-4 mr-2 text-destructive" />
-                                Marcar como Vencida
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator className="bg-border" />
-                              <DropdownMenuItem 
-                                onClick={() => handleStatusChange(invoice, 'cancelled')}
-                                className="text-destructive hover:bg-destructive/10 cursor-pointer"
-                              >
-                                <XCircle className="w-4 h-4 mr-2" />
-                                Cancelar Factura
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
                       </div>
-                    </div>
-                  </CardContent>
+
+                      <div className="pt-3 border-t border-border">
+                        <p className="text-xs text-muted-foreground mb-2">Estado</p>
+                        <Badge className={`${statusInfo.className} border px-3 py-1.5 flex items-center gap-1.5 w-fit`}>
+                          <StatusIcon className="w-3.5 h-3.5" />
+                          {statusInfo.label}
+                        </Badge>
+                      </div>
+
+                      <div className="pt-3 border-t border-border">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => generatePDF(invoice.id!)}
+                          className="w-full border-border text-foreground hover:bg-accent"
+                        >
+                          <Download className="w-4 h-4 mr-2" />
+                          Descargar PDF
+                        </Button>
+                      </div>
+                    </CardContent>
+                  )}
                 </Card>
               );
             })}
