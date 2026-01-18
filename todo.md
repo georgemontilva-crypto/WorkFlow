@@ -290,7 +290,7 @@
 - [x] Limpiar referencias a Manus en server/_core/sdk.ts
 - [x] Verificar que el sistema JWT funcione sin variables de Manus
 - [x] Probar localmente que el servidor arranque correctamente
-- [ ] Hacer push a GitHub y verificar deployment en Railway
+- [x] Guardar checkpoint con cambios
 
 ## Implementar Autenticación de Dos Factores (2FA) Opcional
 ### Base de Datos
