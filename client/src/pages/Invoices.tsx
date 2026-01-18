@@ -453,18 +453,26 @@ export default function Invoices() {
     });
   };
 
+  // Calculate statistics
+  const totalInvoices = invoices?.length || 0;
+  const pendingInvoices = invoices?.filter(inv => inv.status === 'pending').length || 0;
+  const paidInvoices = invoices?.filter(inv => inv.status === 'paid').length || 0;
+  const overdueInvoices = invoices?.filter(inv => inv.status === 'overdue').length || 0;
+  const totalAmount = invoices?.reduce((sum, inv) => sum + parseFloat(inv.amount), 0) || 0;
+  const paidAmount = invoices?.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + parseFloat(inv.amount), 0) || 0;
+
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{t.invoices.title}</h1>
             <p className="text-sm sm:text-base text-muted-foreground">
               {t.invoices.subtitle}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 sm:gap-3">
             <Button
               variant="outline"
               onClick={() => setShowArchivedDialog(true)}
@@ -690,6 +698,59 @@ export default function Invoices() {
             </DialogContent>
           </Dialog>
         </div>
+
+        {/* Statistics Cards */}
+        {invoices && invoices.length > 0 && (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 lg:mb-8">
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-2 sm:pb-3">
+                <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
+                  <FileText className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
+                  Total Facturas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">{totalInvoices}</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-2 sm:pb-3">
+                <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
+                  Pendientes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-yellow-400">{pendingInvoices}</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-2 sm:pb-3">
+                <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
+                  <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
+                  Pagadas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-green-400">{paidInvoices}</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card border-border">
+              <CardHeader className="pb-2 sm:pb-3">
+                <CardTitle className="text-xs sm:text-sm text-muted-foreground font-medium flex items-center gap-2">
+                  <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={1.5} />
+                  Vencidas
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-destructive">{overdueInvoices}</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Invoices List */}
         {!invoices || invoices.length === 0 ? (
