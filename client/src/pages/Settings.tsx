@@ -334,7 +334,7 @@ export default function Settings() {
               ) : show2FASetup ? (
                 <div className="space-y-4">
                   {qrCodeUrl && (
-                    <div className="flex justify-center p-4 bg-white rounded-lg">
+                    <div className="flex justify-center p-6 bg-card border border-border rounded-lg">
                       <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48" />
                     </div>
                   )}
