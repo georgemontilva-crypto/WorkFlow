@@ -892,9 +892,6 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
-});
-
-export type AppRouter = typeof appRouter;
 
   /**
    * Price Alerts router - Manage user price alerts
@@ -930,3 +927,5 @@ export type AppRouter = typeof appRouter;
       }),
   }),
 });
+
+export type AppRouter = typeof appRouter;
