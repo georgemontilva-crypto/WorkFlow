@@ -4,7 +4,7 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X, Sparkles, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { t } = useLanguage();
   
   // Auth and access control
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const { data: accessStatus } = trpc.auth.accessStatus.useQuery(undefined, {
     enabled: isAuthenticated,
     refetchInterval: 60000, // Check every minute
@@ -197,6 +197,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
         )}
+
+        {/* Logout Button */}
+        <div className="mx-3 mb-4">
+          <Button
+            onClick={logout}
+            variant="outline"
+            className="w-full justify-start text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            {t.nav?.logout || 'Cerrar Sesión'}
+          </Button>
+        </div>
 
         {/* Footer */}
         <div className="p-4 border-t border-border">
