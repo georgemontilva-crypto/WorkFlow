@@ -4,15 +4,17 @@
  */
 
 import { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Star, Search, BarChart3, Eye, Sparkles, ArrowLeft } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { TrendingUp, TrendingDown, Star, Search, BarChart3, Eye, Sparkles, ArrowLeft, ChevronDown } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
+import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
 
 interface MarketAsset {
   symbol: string;
@@ -22,7 +24,31 @@ interface MarketAsset {
   marketCap?: number;
   volume24h?: number;
   type: 'crypto' | 'stock' | 'forex' | 'commodity';
+  sparkline?: number[];
 }
+
+// Mock data for other markets
+const MOCK_STOCKS: MarketAsset[] = [
+  { symbol: 'AAPL', name: 'Apple Inc.', price: 185.92, change24h: 1.25, marketCap: 2890000000000, volume24h: 55000000, type: 'stock', sparkline: [180, 182, 181, 183, 184, 185, 186] },
+  { symbol: 'MSFT', name: 'Microsoft Corp.', price: 420.55, change24h: 0.85, marketCap: 3120000000000, volume24h: 22000000, type: 'stock', sparkline: [410, 412, 415, 414, 418, 419, 420] },
+  { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 175.30, change24h: -0.45, marketCap: 2150000000000, volume24h: 30000000, type: 'stock', sparkline: [178, 177, 176, 175, 176, 175, 175] },
+  { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 180.15, change24h: 2.10, marketCap: 1850000000000, volume24h: 40000000, type: 'stock', sparkline: [175, 176, 178, 179, 180, 181, 180] },
+  { symbol: 'TSLA', name: 'Tesla Inc.', price: 178.20, change24h: -1.50, marketCap: 560000000000, volume24h: 95000000, type: 'stock', sparkline: [185, 182, 180, 178, 179, 177, 178] },
+];
+
+const MOCK_FOREX: MarketAsset[] = [
+  { symbol: 'EUR/USD', name: 'Euro / US Dollar', price: 1.0850, change24h: 0.15, type: 'forex', sparkline: [1.082, 1.083, 1.084, 1.083, 1.084, 1.085, 1.085] },
+  { symbol: 'GBP/USD', name: 'British Pound / US Dollar', price: 1.2640, change24h: -0.20, type: 'forex', sparkline: [1.268, 1.267, 1.266, 1.265, 1.264, 1.263, 1.264] },
+  { symbol: 'USD/JPY', name: 'US Dollar / Japanese Yen', price: 151.20, change24h: 0.50, type: 'forex', sparkline: [150.5, 150.8, 151.0, 151.1, 151.2, 151.3, 151.2] },
+  { symbol: 'USD/CHF', name: 'US Dollar / Swiss Franc', price: 0.9050, change24h: 0.10, type: 'forex', sparkline: [0.902, 0.903, 0.904, 0.904, 0.905, 0.905, 0.905] },
+];
+
+const MOCK_COMMODITIES: MarketAsset[] = [
+  { symbol: 'XAU/USD', name: 'Gold', price: 2350.50, change24h: 1.10, type: 'commodity', sparkline: [2320, 2330, 2325, 2340, 2345, 2350, 2350] },
+  { symbol: 'XAG/USD', name: 'Silver', price: 28.40, change24h: 2.50, type: 'commodity', sparkline: [27.5, 27.8, 28.0, 28.1, 28.2, 28.3, 28.4] },
+  { symbol: 'WTI', name: 'Crude Oil WTI', price: 85.60, change24h: -0.80, type: 'commodity', sparkline: [87.0, 86.5, 86.0, 85.8, 85.5, 85.6, 85.6] },
+  { symbol: 'BRENT', name: 'Brent Crude Oil', price: 90.10, change24h: -0.70, type: 'commodity', sparkline: [91.5, 91.0, 90.5, 90.2, 90.0, 90.1, 90.1] },
+];
 
 export default function Markets() {
   const [, setLocation] = useLocation();
@@ -63,8 +89,9 @@ export default function Markets() {
   useEffect(() => {
     const fetchCryptoData = async () => {
       try {
+        // Added sparkline=true to get historical data
         const response = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false'
+          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=true'
         );
         const data = await response.json();
         
@@ -76,6 +103,7 @@ export default function Markets() {
           marketCap: coin.market_cap,
           volume24h: coin.total_volume,
           type: 'crypto' as const,
+          sparkline: coin.sparkline_in_7d?.price || [],
         }));
         
         setCryptoData(formatted);
@@ -100,7 +128,8 @@ export default function Markets() {
     return dashboardWidget?.symbol === symbol;
   };
 
-  const handleToggleFavorite = (asset: MarketAsset) => {
+  const handleToggleFavorite = (e: React.MouseEvent, asset: MarketAsset) => {
+    e.stopPropagation(); // Prevent accordion toggle
     if (isFavorite(asset.symbol)) {
       removeFavoriteMutation.mutate({ symbol: asset.symbol });
     } else {
@@ -125,103 +154,138 @@ export default function Markets() {
     return `$${value.toLocaleString()}`;
   };
 
-  const filteredCrypto = cryptoData.filter(asset =>
-    asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    asset.symbol.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filterAssets = (assets: MarketAsset[]) => {
+    return assets.filter(asset =>
+      asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      asset.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
 
-  // Sort: favorites first, then by market cap
-  const sortedCrypto = [...filteredCrypto].sort((a, b) => {
-    const aIsFav = isFavorite(a.symbol);
-    const bIsFav = isFavorite(b.symbol);
-    if (aIsFav && !bIsFav) return -1;
-    if (!aIsFav && bIsFav) return 1;
-    return (b.marketCap || 0) - (a.marketCap || 0);
-  });
+  const sortAssets = (assets: MarketAsset[]) => {
+    return [...assets].sort((a, b) => {
+      const aIsFav = isFavorite(a.symbol);
+      const bIsFav = isFavorite(b.symbol);
+      if (aIsFav && !bIsFav) return -1;
+      if (!aIsFav && bIsFav) return 1;
+      return (b.marketCap || 0) - (a.marketCap || 0);
+    });
+  };
 
   const favoriteCount = favorites?.length || 0;
 
-  const AssetCard = ({ asset }: { asset: MarketAsset }) => {
+  const MiniChart = ({ data, isPositive }: { data: number[], isPositive: boolean }) => {
+    if (!data || data.length === 0) return null;
+    
+    const chartData = data.map((val, i) => ({ i, val }));
+    const color = isPositive ? '#22c55e' : '#ef4444'; // green-500 : red-500
+
+    return (
+      <div className="h-8 w-20 sm:w-24">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData}>
+            <Line 
+              type="monotone" 
+              dataKey="val" 
+              stroke={color} 
+              strokeWidth={2} 
+              dot={false} 
+              isAnimationActive={false}
+            />
+            <YAxis domain={['dataMin', 'dataMax']} hide />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  };
+
+  const AssetAccordionItem = ({ asset }: { asset: MarketAsset }) => {
     const isPositive = asset.change24h >= 0;
     const favorite = isFavorite(asset.symbol);
     const widget = isWidget(asset.symbol);
 
     return (
-      <Card className={`border-2 transition-all hover:shadow-lg ${
-        favorite 
-          ? 'bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30 hover:border-primary/50' 
-          : 'hover:border-primary/30'
-      }`}>
-        <CardContent className="p-4 sm:p-6">
-          <div className="space-y-4">
-            {/* Header */}
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <h3 className="font-bold text-base sm:text-lg truncate">{asset.name}</h3>
+      <AccordionItem value={asset.symbol} className="border rounded-lg mb-2 px-2 bg-card">
+        <AccordionTrigger className="hover:no-underline py-3">
+          <div className="flex items-center justify-between w-full pr-4">
+            {/* Left: Symbol & Name */}
+            <div className="flex items-center gap-3 text-left min-w-0 flex-1">
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-base truncate">{asset.symbol}</span>
                   {widget && (
-                    <Badge variant="default" className="text-xs shrink-0">
-                      <Eye className="w-3 h-3 mr-1" />
-                      Dashboard
+                    <Badge variant="default" className="text-[10px] h-4 px-1">
+                      Dash
                     </Badge>
                   )}
                   {favorite && (
-                    <Badge variant="outline" className="text-xs shrink-0 border-primary/50">
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      Favorito
-                    </Badge>
+                    <Star className="w-3 h-3 fill-primary text-primary" />
                   )}
                 </div>
-                <p className="text-xs sm:text-sm text-muted-foreground font-mono">{asset.symbol}</p>
-              </div>
-              <Button
-                variant={favorite ? 'default' : 'outline'}
-                size="icon"
-                className="shrink-0"
-                onClick={() => handleToggleFavorite(asset)}
-              >
-                <Star className={`w-4 h-4 ${favorite ? 'fill-current' : ''}`} />
-              </Button>
-            </div>
-
-            {/* Price */}
-            <div>
-              <div className="text-2xl sm:text-3xl font-bold mb-1 font-mono">{formatPrice(asset.price)}</div>
-              <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                {isPositive ? '+' : ''}{(asset.change24h || 0).toFixed(2)}% (24h)
+                <span className="text-xs text-muted-foreground truncate hidden sm:inline-block">{asset.name}</span>
               </div>
             </div>
 
-            {/* Stats */}
-            {asset.marketCap && (
-              <div className="grid grid-cols-2 gap-3 pt-3 border-t">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Cap. Mercado</p>
-                  <p className="text-sm font-semibold font-mono">{formatMarketCap(asset.marketCap)}</p>
+            {/* Right: Price, Chart, Change */}
+            <div className="flex items-center gap-3 sm:gap-6">
+              {/* Mini Chart - Hidden on very small screens */}
+              {asset.sparkline && (
+                <div className="hidden sm:block">
+                  <MiniChart data={asset.sparkline} isPositive={isPositive} />
                 </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1">Volumen 24h</p>
-                  <p className="text-sm font-semibold font-mono">{formatMarketCap(asset.volume24h || 0)}</p>
+              )}
+
+              <div className="text-right">
+                <div className="font-mono font-medium">{formatPrice(asset.price)}</div>
+                <div className={`text-xs flex items-center justify-end gap-1 ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                  {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                  {Math.abs(asset.change24h).toFixed(2)}%
                 </div>
               </div>
-            )}
+            </div>
+          </div>
+        </AccordionTrigger>
+        
+        <AccordionContent>
+          <div className="pt-2 pb-4 px-1 space-y-4">
+            {/* Expanded Details */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-3 bg-muted/30 rounded-lg">
+                <p className="text-xs text-muted-foreground mb-1">Cap. Mercado</p>
+                <p className="font-mono font-medium">{asset.marketCap ? formatMarketCap(asset.marketCap) : 'N/A'}</p>
+              </div>
+              <div className="p-3 bg-muted/30 rounded-lg">
+                <p className="text-xs text-muted-foreground mb-1">Volumen 24h</p>
+                <p className="font-mono font-medium">{asset.volume24h ? formatMarketCap(asset.volume24h) : 'N/A'}</p>
+              </div>
+            </div>
 
             {/* Actions */}
-            {favorite && !widget && (
+            <div className="flex gap-2">
               <Button
-                variant="outline"
+                variant={favorite ? 'secondary' : 'outline'}
                 size="sm"
-                className="w-full mt-2"
-                onClick={() => handleSetWidget(asset.symbol)}
+                className="flex-1"
+                onClick={(e) => handleToggleFavorite(e, asset)}
               >
-                <Eye className="w-4 h-4 mr-2" />
-                Mostrar en Dashboard
+                <Star className={`w-4 h-4 mr-2 ${favorite ? 'fill-current' : ''}`} />
+                {favorite ? 'Quitar de Favoritos' : 'Agregar a Favoritos'}
               </Button>
-            )}
+              
+              {favorite && !widget && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => handleSetWidget(asset.symbol)}
+                >
+                  <Eye className="w-4 h-4 mr-2" />
+                  Mostrar en Dashboard
+                </Button>
+              )}
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </AccordionContent>
+      </AccordionItem>
     );
   };
 
@@ -231,7 +295,6 @@ export default function Markets() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground text-lg">Cargando mercados financieros...</p>
-          <p className="text-sm text-muted-foreground mt-2">Obteniendo datos en tiempo real</p>
         </div>
       </div>
     );
@@ -239,10 +302,9 @@ export default function Markets() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
+      <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
         {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          {/* Back Button */}
+        <div className="mb-6">
           <Button
             variant="ghost"
             size="sm"
@@ -253,110 +315,71 @@ export default function Markets() {
             Volver al Dashboard
           </Button>
           
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl">
-              <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <BarChart3 className="w-6 h-6 text-primary" />
             </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold truncate">Mercados Financieros</h1>
-              <p className="text-sm sm:text-base text-muted-foreground mt-1">
-                Criptomonedas en tiempo real • Actualización automática
-              </p>
-            </div>
+            <h1 className="text-2xl font-bold">Mercados</h1>
           </div>
           
-          {/* Stats Badge */}
           {favoriteCount > 0 && (
-            <div className="flex items-center gap-2 mt-4">
-              <Badge variant="outline" className="text-sm">
-                <Star className="w-3 h-3 mr-1 fill-current" />
-                {favoriteCount} {favoriteCount === 1 ? 'favorito' : 'favoritos'}
-              </Badge>
-              {dashboardWidget && (
-                <Badge variant="default" className="text-sm">
-                  <Eye className="w-3 h-3 mr-1" />
-                  Widget activo
-                </Badge>
-              )}
-            </div>
+            <Badge variant="outline" className="ml-11">
+              <Star className="w-3 h-3 mr-1 fill-current" />
+              {favoriteCount} favoritos
+            </Badge>
           )}
         </div>
 
         {/* Search */}
-        <Card className="mb-6 border-2">
-          <CardContent className="pt-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por nombre o símbolo (ej: Bitcoin, BTC)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-11 text-base"
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar activo..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
 
         {/* Tabs */}
         <Tabs defaultValue="crypto" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6 h-auto">
-            <TabsTrigger value="crypto" className="text-sm sm:text-base py-2">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Cripto
-            </TabsTrigger>
-            <TabsTrigger value="stocks" disabled className="text-sm sm:text-base py-2">
-              Acciones
-            </TabsTrigger>
-            <TabsTrigger value="forex" disabled className="text-sm sm:text-base py-2">
-              Forex
-            </TabsTrigger>
-            <TabsTrigger value="commodities" disabled className="text-sm sm:text-base py-2">
-              Commodities
-            </TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 mb-6">
+            <TabsTrigger value="crypto">Cripto</TabsTrigger>
+            <TabsTrigger value="stocks">Acciones</TabsTrigger>
+            <TabsTrigger value="forex">Forex</TabsTrigger>
+            <TabsTrigger value="commodities">Commodities</TabsTrigger>
           </TabsList>
 
           <TabsContent value="crypto">
-            {sortedCrypto.length === 0 ? (
-              <Card className="border-2">
-                <CardContent className="py-16 text-center">
-                  <Search className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium text-muted-foreground mb-2">
-                    No se encontraron resultados
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Intenta con otro término de búsqueda
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <>
-                {/* Results count */}
-                <div className="mb-4 text-sm text-muted-foreground">
-                  Mostrando {sortedCrypto.length} {sortedCrypto.length === 1 ? 'criptomoneda' : 'criptomonedas'}
-                  {favoriteCount > 0 && ' • Favoritos primero'}
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                  {sortedCrypto.map((asset) => (
-                    <AssetCard key={asset.symbol} asset={asset} />
-                  ))}
-                </div>
-              </>
-            )}
+            <Accordion type="single" collapsible className="w-full">
+              {sortAssets(filterAssets(cryptoData)).map((asset) => (
+                <AssetAccordionItem key={asset.symbol} asset={asset} />
+              ))}
+            </Accordion>
           </TabsContent>
 
           <TabsContent value="stocks">
-            <Card className="border-2">
-              <CardContent className="py-16 text-center">
-                <BarChart3 className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium text-muted-foreground mb-2">
-                  Próximamente: Acciones
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  NYSE, NASDAQ, S&P 500 y más
-                </p>
-              </CardContent>
-            </Card>
+            <Accordion type="single" collapsible className="w-full">
+              {sortAssets(filterAssets(MOCK_STOCKS)).map((asset) => (
+                <AssetAccordionItem key={asset.symbol} asset={asset} />
+              ))}
+            </Accordion>
+          </TabsContent>
+
+          <TabsContent value="forex">
+            <Accordion type="single" collapsible className="w-full">
+              {sortAssets(filterAssets(MOCK_FOREX)).map((asset) => (
+                <AssetAccordionItem key={asset.symbol} asset={asset} />
+              ))}
+            </Accordion>
+          </TabsContent>
+
+          <TabsContent value="commodities">
+            <Accordion type="single" collapsible className="w-full">
+              {sortAssets(filterAssets(MOCK_COMMODITIES)).map((asset) => (
+                <AssetAccordionItem key={asset.symbol} asset={asset} />
+              ))}
+            </Accordion>
           </TabsContent>
         </Tabs>
       </div>
