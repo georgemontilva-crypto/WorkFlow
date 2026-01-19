@@ -31,6 +31,8 @@ import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState } from 'react';
+import { CurrencySelect } from '@/components/CurrencySelect';
+import { formatCurrency, Currency } from '@/lib/currency';
 
 // SavingsGoal type based on backend schema
 type SavingsGoal = {
@@ -39,6 +41,7 @@ type SavingsGoal = {
   name: string;
   target_amount: string;
   current_amount: string;
+  currency: string;
   target_date: Date | null;
   status: 'active' | 'completed' | 'cancelled';
   created_at: Date;
@@ -89,6 +92,7 @@ export default function Savings() {
     name: '',
     target_amount: '',
     current_amount: '',
+    currency: 'USD',
     target_date: '',
     status: 'active' as 'active' | 'completed' | 'cancelled',
   });
@@ -112,6 +116,7 @@ export default function Savings() {
         name: formData.name,
         target_amount: formData.target_amount,
         current_amount: formData.current_amount || '0',
+        currency: formData.currency,
         target_date: formData.target_date,
         status: newStatus,
       });
@@ -120,6 +125,7 @@ export default function Savings() {
         name: formData.name,
         target_amount: formData.target_amount,
         current_amount: formData.current_amount || '0',
+        currency: formData.currency,
         target_date: formData.target_date,
         status: formData.status,
       });
@@ -131,6 +137,7 @@ export default function Savings() {
       name: '',
       target_amount: '',
       current_amount: '',
+      currency: 'USD',
       target_date: '',
       status: 'active',
     });
@@ -142,6 +149,7 @@ export default function Savings() {
       name: goal.name,
       target_amount: goal.target_amount,
       current_amount: goal.current_amount,
+      currency: goal.currency || 'USD',
       target_date: goal.target_date ? format(new Date(goal.target_date), 'yyyy-MM-dd') : '',
       status: goal.status,
     });
@@ -230,6 +238,13 @@ export default function Savings() {
                   />
                   <p className="text-xs text-muted-foreground">Dale un nombre descriptivo a tu objetivo</p>
                 </div>
+
+                <CurrencySelect
+                  value={formData.currency as Currency}
+                  onChange={(currency) => setFormData({ ...formData, currency })}
+                  label="Moneda"
+                  required
+                />
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -379,10 +394,10 @@ export default function Savings() {
                     <div>
                       <div className="flex justify-between items-baseline mb-2">
                         <span className="text-2xl font-bold text-foreground font-mono">
-                          ${currentAmount.toFixed(2)}
+                          {formatCurrency(currentAmount, goal.currency as Currency)}
                         </span>
                         <span className="text-sm text-muted-foreground font-mono">
-                          de ${targetAmount.toFixed(2)}
+                          de {formatCurrency(targetAmount, goal.currency as Currency)}
                         </span>
                       </div>
                       <Progress value={progress} className="h-2" />
@@ -396,7 +411,7 @@ export default function Savings() {
                         <div>
                           <p className="text-xs text-muted-foreground">Falta</p>
                           <p className="text-lg font-semibold text-foreground font-mono">
-                            ${remaining.toFixed(2)}
+                            {formatCurrency(remaining, goal.currency as Currency)}
                           </p>
                         </div>
                         <Button

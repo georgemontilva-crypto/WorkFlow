@@ -17,6 +17,7 @@ import { TrialBanner } from '@/components/TrialBanner';
 import { MarketWidget } from '@/components/MarketWidget';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { formatCurrency, Currency } from '@/lib/currency';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -177,7 +178,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
-                ${monthlyIncome.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                {formatCurrency(monthlyIncome, 'USD')}
               </div>
             </CardContent>
           </Card>
@@ -197,7 +198,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
-                ${monthlyExpenses.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                {formatCurrency(monthlyExpenses, 'USD')}
               </div>
             </CardContent>
           </Card>
@@ -494,10 +495,10 @@ export default function Home() {
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">
-                          ${parseFloat(goal.current_amount.toString()).toLocaleString('es-ES')}
+                          {formatCurrency(parseFloat(goal.current_amount.toString()), (goal as any).currency || 'USD')}
                         </span>
                         <span className="font-semibold">
-                          ${parseFloat(goal.target_amount.toString()).toLocaleString('es-ES')}
+                          {formatCurrency(parseFloat(goal.target_amount.toString()), (goal as any).currency || 'USD')}
                         </span>
                       </div>
                     </CardContent>
