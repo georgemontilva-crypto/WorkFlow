@@ -50,7 +50,7 @@ export async function createUser(data: {
     const result = await db.insert(users).values({
       name: data.name,
       email: data.email,
-      passwordHash,
+      password_hash: passwordHash,
       email_verified: 0,
       login_method: "email",
       role: "user",
