@@ -81,7 +81,8 @@ import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import jsPDF from 'jspdf';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation, useSearch } from 'wouter';
 
 // Helper function to parse invoice items
 const parseInvoiceItems = (items: string | InvoiceItem[]): InvoiceItem[] => {
@@ -98,6 +99,8 @@ const parseInvoiceItems = (items: string | InvoiceItem[]): InvoiceItem[] => {
 export default function Invoices() {
   const { t } = useLanguage();
   const utils = trpc.useUtils();
+  const search = useSearch();
+  const [, setLocation] = useLocation();
   
   // Fetch data using tRPC
   const { data: allInvoices, isLoading: invoicesLoading } = trpc.invoices.list.useQuery();
@@ -167,6 +170,16 @@ export default function Invoices() {
     unitPrice: 0,
     total: 0,
   });
+
+  // Open dialog automatically if ?new=true in URL
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    if (params.get('new') === 'true') {
+      setIsDialogOpen(true);
+      // Remove the parameter from URL
+      setLocation('/invoices', { replace: true });
+    }
+  }, [search, setLocation]);
 
   const getClientName = (client_id: number) => {
     const client = clients?.find(c => c.id === client_id);

@@ -37,7 +37,8 @@ import { format, parseISO, differenceInDays, addMonths, addDays } from 'date-fns
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation, useSearch } from 'wouter';
 
 // Client type based on tRPC schema
 type Client = {
@@ -61,6 +62,8 @@ type Client = {
 export default function Clients() {
   const { t } = useLanguage();
   const utils = trpc.useUtils();
+  const search = useSearch();
+  const [, setLocation] = useLocation();
   
   // Fetch clients using tRPC
   const { data: clients, isLoading } = trpc.clients.list.useQuery();
@@ -112,6 +115,16 @@ export default function Clients() {
     status: 'active',
     notes: '',
   });
+
+  // Open dialog automatically if ?new=true in URL
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    if (params.get('new') === 'true') {
+      setIsDialogOpen(true);
+      // Remove the parameter from URL
+      setLocation('/clients', { replace: true });
+    }
+  }, [search, setLocation]);
 
   const filteredClients = clients?.filter(client =>
     client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

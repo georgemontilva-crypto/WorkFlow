@@ -85,7 +85,7 @@ export default function Home() {
           {/* Action Buttons - Top Right */}
           <div className="flex flex-wrap gap-2 sm:gap-3">
             <Button
-              onClick={() => setLocation('/clients')}
+              onClick={() => setLocation('/clients?new=true')}
               className="bg-primary text-primary-foreground hover:opacity-90 flex-1 sm:flex-none"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -93,7 +93,7 @@ export default function Home() {
               <span className="sm:hidden">{t.clients.title}</span>
             </Button>
             <Button
-              onClick={() => setLocation('/invoices')}
+              onClick={() => setLocation('/invoices?new=true')}
               variant="outline"
               className="border-border text-foreground hover:bg-accent flex-1 sm:flex-none"
             >

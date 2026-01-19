@@ -6,12 +6,36 @@
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { differenceInDays } from 'date-fns';
-import { Clock, Sparkles } from 'lucide-react';
+import { Clock, Sparkles, X } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
 
 export function TrialBanner() {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const [isVisible, setIsVisible] = useState(true);
+
+  // Check if banner was dismissed
+  useEffect(() => {
+    if (user) {
+      const dismissed = localStorage.getItem(`trial-banner-dismissed-${user.id}`);
+      if (dismissed === 'true') {
+        setIsVisible(false);
+      }
+    }
+  }, [user]);
+
+  const handleDismiss = () => {
+    if (user) {
+      localStorage.setItem(`trial-banner-dismissed-${user.id}`, 'true');
+      setIsVisible(false);
+    }
+  };
+
+  if (!isVisible) {
+    return null;
+  }
 
   if (!user || !user.trial_ends_at || user.has_lifetime_access) {
     return null;
@@ -63,8 +87,16 @@ export function TrialBanner() {
   };
 
   return (
-    <Card className={`${colors.bg} border-2 p-4 mb-6`}>
-      <div className="flex items-center gap-4">
+    <Card className={`${colors.bg} border-2 p-4 mb-6 relative`}>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleDismiss}
+        className="absolute top-2 right-2 h-8 w-8 rounded-full hover:bg-background/50"
+      >
+        <X className="h-4 w-4" />
+      </Button>
+      <div className="flex items-center gap-4 pr-8">
         <div className={`p-3 rounded-full ${colors.bg}`}>
           <Icon className={`w-6 h-6 ${colors.icon}`} />
         </div>
