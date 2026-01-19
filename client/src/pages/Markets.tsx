@@ -27,6 +27,20 @@ interface MarketAsset {
   sparkline?: number[];
 }
 
+// Fallback data for crypto when API fails
+const MOCK_CRYPTO_FALLBACK: MarketAsset[] = [
+  { symbol: 'BTC', name: 'Bitcoin', price: 64230.50, change24h: 2.5, marketCap: 1200000000000, volume24h: 35000000000, type: 'crypto', sparkline: [62000, 63000, 62500, 64000, 63500, 64230, 64500] },
+  { symbol: 'ETH', name: 'Ethereum', price: 3450.20, change24h: 1.8, marketCap: 400000000000, volume24h: 15000000000, type: 'crypto', sparkline: [3300, 3350, 3400, 3380, 3420, 3450, 3460] },
+  { symbol: 'SOL', name: 'Solana', price: 145.80, change24h: 5.2, marketCap: 65000000000, volume24h: 4000000000, type: 'crypto', sparkline: [130, 135, 140, 138, 142, 145, 148] },
+  { symbol: 'BNB', name: 'Binance Coin', price: 590.10, change24h: 0.5, marketCap: 87000000000, volume24h: 1200000000, type: 'crypto', sparkline: [580, 585, 588, 590, 589, 590, 592] },
+  { symbol: 'XRP', name: 'Ripple', price: 0.62, change24h: -1.2, marketCap: 34000000000, volume24h: 1500000000, type: 'crypto', sparkline: [0.60, 0.61, 0.63, 0.62, 0.61, 0.62, 0.61] },
+  { symbol: 'ADA', name: 'Cardano', price: 0.45, change24h: -0.8, marketCap: 16000000000, volume24h: 400000000, type: 'crypto', sparkline: [0.44, 0.45, 0.46, 0.45, 0.45, 0.45, 0.44] },
+  { symbol: 'DOGE', name: 'Dogecoin', price: 0.16, change24h: 8.5, marketCap: 23000000000, volume24h: 2000000000, type: 'crypto', sparkline: [0.14, 0.15, 0.15, 0.16, 0.17, 0.16, 0.16] },
+  { symbol: 'AVAX', name: 'Avalanche', price: 35.40, change24h: 3.1, marketCap: 13000000000, volume24h: 500000000, type: 'crypto', sparkline: [32, 33, 34, 35, 34, 35, 36] },
+  { symbol: 'DOT', name: 'Polkadot', price: 7.20, change24h: -2.1, marketCap: 10000000000, volume24h: 200000000, type: 'crypto', sparkline: [7.5, 7.4, 7.3, 7.2, 7.3, 7.2, 7.1] },
+  { symbol: 'LINK', name: 'Chainlink', price: 14.50, change24h: 1.5, marketCap: 8500000000, volume24h: 300000000, type: 'crypto', sparkline: [13.5, 14.0, 14.2, 14.5, 14.4, 14.5, 14.6] },
+];
+
 // Mock data for other markets
 const MOCK_STOCKS: MarketAsset[] = [
   { symbol: 'AAPL', name: 'Apple Inc.', price: 185.92, change24h: 1.25, marketCap: 2890000000000, volume24h: 55000000, type: 'stock', sparkline: [180, 182, 181, 183, 184, 185, 186] },
@@ -34,6 +48,13 @@ const MOCK_STOCKS: MarketAsset[] = [
   { symbol: 'GOOGL', name: 'Alphabet Inc.', price: 175.30, change24h: -0.45, marketCap: 2150000000000, volume24h: 30000000, type: 'stock', sparkline: [178, 177, 176, 175, 176, 175, 175] },
   { symbol: 'AMZN', name: 'Amazon.com Inc.', price: 180.15, change24h: 2.10, marketCap: 1850000000000, volume24h: 40000000, type: 'stock', sparkline: [175, 176, 178, 179, 180, 181, 180] },
   { symbol: 'TSLA', name: 'Tesla Inc.', price: 178.20, change24h: -1.50, marketCap: 560000000000, volume24h: 95000000, type: 'stock', sparkline: [185, 182, 180, 178, 179, 177, 178] },
+  { symbol: 'NVDA', name: 'NVIDIA Corp.', price: 880.45, change24h: 3.20, marketCap: 2200000000000, volume24h: 45000000, type: 'stock', sparkline: [850, 860, 870, 865, 875, 880, 885] },
+  { symbol: 'META', name: 'Meta Platforms', price: 495.60, change24h: 1.10, marketCap: 1250000000000, volume24h: 18000000, type: 'stock', sparkline: [480, 485, 490, 492, 495, 494, 496] },
+  { symbol: 'BRK.B', name: 'Berkshire Hathaway', price: 405.30, change24h: 0.20, marketCap: 880000000000, volume24h: 3000000, type: 'stock', sparkline: [400, 402, 403, 404, 405, 405, 406] },
+  { symbol: 'LLY', name: 'Eli Lilly', price: 760.10, change24h: 2.50, marketCap: 720000000000, volume24h: 2500000, type: 'stock', sparkline: [740, 745, 750, 755, 758, 760, 765] },
+  { symbol: 'V', name: 'Visa Inc.', price: 275.40, change24h: -0.10, marketCap: 560000000000, volume24h: 6000000, type: 'stock', sparkline: [278, 277, 276, 275, 275, 274, 275] },
+  { symbol: 'JPM', name: 'JPMorgan Chase', price: 195.20, change24h: 0.80, marketCap: 560000000000, volume24h: 9000000, type: 'stock', sparkline: [190, 192, 193, 194, 195, 195, 196] },
+  { symbol: 'WMT', name: 'Walmart Inc.', price: 60.50, change24h: 0.30, marketCap: 480000000000, volume24h: 15000000, type: 'stock', sparkline: [59, 60, 60, 60.2, 60.5, 60.4, 60.6] },
 ];
 
 const MOCK_FOREX: MarketAsset[] = [
@@ -41,6 +62,10 @@ const MOCK_FOREX: MarketAsset[] = [
   { symbol: 'GBP/USD', name: 'British Pound / US Dollar', price: 1.2640, change24h: -0.20, type: 'forex', sparkline: [1.268, 1.267, 1.266, 1.265, 1.264, 1.263, 1.264] },
   { symbol: 'USD/JPY', name: 'US Dollar / Japanese Yen', price: 151.20, change24h: 0.50, type: 'forex', sparkline: [150.5, 150.8, 151.0, 151.1, 151.2, 151.3, 151.2] },
   { symbol: 'USD/CHF', name: 'US Dollar / Swiss Franc', price: 0.9050, change24h: 0.10, type: 'forex', sparkline: [0.902, 0.903, 0.904, 0.904, 0.905, 0.905, 0.905] },
+  { symbol: 'AUD/USD', name: 'Australian Dollar / USD', price: 0.6580, change24h: 0.30, type: 'forex', sparkline: [0.655, 0.656, 0.657, 0.658, 0.658, 0.659, 0.658] },
+  { symbol: 'USD/CAD', name: 'US Dollar / Canadian Dollar', price: 1.3560, change24h: -0.10, type: 'forex', sparkline: [1.360, 1.358, 1.357, 1.356, 1.355, 1.356, 1.356] },
+  { symbol: 'NZD/USD', name: 'New Zealand Dollar / USD', price: 0.6020, change24h: 0.25, type: 'forex', sparkline: [0.598, 0.600, 0.601, 0.602, 0.603, 0.602, 0.602] },
+  { symbol: 'EUR/GBP', name: 'Euro / British Pound', price: 0.8580, change24h: 0.05, type: 'forex', sparkline: [0.855, 0.856, 0.857, 0.858, 0.858, 0.859, 0.858] },
 ];
 
 const MOCK_COMMODITIES: MarketAsset[] = [
@@ -48,6 +73,10 @@ const MOCK_COMMODITIES: MarketAsset[] = [
   { symbol: 'XAG/USD', name: 'Silver', price: 28.40, change24h: 2.50, type: 'commodity', sparkline: [27.5, 27.8, 28.0, 28.1, 28.2, 28.3, 28.4] },
   { symbol: 'WTI', name: 'Crude Oil WTI', price: 85.60, change24h: -0.80, type: 'commodity', sparkline: [87.0, 86.5, 86.0, 85.8, 85.5, 85.6, 85.6] },
   { symbol: 'BRENT', name: 'Brent Crude Oil', price: 90.10, change24h: -0.70, type: 'commodity', sparkline: [91.5, 91.0, 90.5, 90.2, 90.0, 90.1, 90.1] },
+  { symbol: 'NG', name: 'Natural Gas', price: 1.85, change24h: -1.50, type: 'commodity', sparkline: [1.90, 1.88, 1.86, 1.85, 1.84, 1.85, 1.85] },
+  { symbol: 'HG', name: 'Copper', price: 4.25, change24h: 1.20, type: 'commodity', sparkline: [4.15, 4.18, 4.20, 4.22, 4.24, 4.25, 4.26] },
+  { symbol: 'PT', name: 'Platinum', price: 980.00, change24h: 0.50, type: 'commodity', sparkline: [970, 975, 978, 980, 982, 980, 981] },
+  { symbol: 'PD', name: 'Palladium', price: 1050.00, change24h: -0.30, type: 'commodity', sparkline: [1060, 1055, 1050, 1048, 1050, 1052, 1050] },
 ];
 
 export default function Markets() {
@@ -93,6 +122,9 @@ export default function Markets() {
         const response = await fetch(
           'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=true'
         );
+        
+        if (!response.ok) throw new Error('API Limit reached');
+        
         const data = await response.json();
         
         const formatted: MarketAsset[] = data.map((coin: any) => ({
@@ -109,7 +141,9 @@ export default function Markets() {
         setCryptoData(formatted);
       } catch (error) {
         console.error('Error fetching crypto data:', error);
-        toast.error('Error al cargar datos de criptomonedas');
+        // Fallback data if API fails
+        setCryptoData(MOCK_CRYPTO_FALLBACK);
+        toast.error('Usando datos de respaldo (API limitada)');
       } finally {
         setLoading(false);
       }
