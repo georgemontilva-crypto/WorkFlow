@@ -163,16 +163,25 @@ export default function Markets() {
   };
 
   const handleToggleFavorite = (e: React.MouseEvent, asset: MarketAsset) => {
-    e.stopPropagation(); // Prevent accordion toggle
+    e.stopPropagation();
     if (isFavorite(asset.symbol)) {
       removeFavoriteMutation.mutate({ symbol: asset.symbol });
     } else {
       addFavoriteMutation.mutate({ symbol: asset.symbol, type: asset.type });
+      // Persist custom asset
+      if (![...cryptoData, ...MOCK_STOCKS, ...MOCK_FOREX, ...MOCK_COMMODITIES, ...customAssets].some(a => a.symbol === asset.symbol)) {
+        setCustomAssets(prev => [...prev, asset]);
+      }
     }
   };
 
-  const handleSetWidget = (symbol: string) => {
-    setWidgetMutation.mutate({ symbol });
+  const handleSetWidget = (e: React.MouseEvent, asset: MarketAsset) => {
+    e.stopPropagation();
+    setWidgetMutation.mutate({ symbol: asset.symbol });
+    // Persist custom asset
+    if (![...cryptoData, ...MOCK_STOCKS, ...MOCK_FOREX, ...MOCK_COMMODITIES, ...customAssets].some(a => a.symbol === asset.symbol)) {
+      setCustomAssets(prev => [...prev, asset]);
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -294,28 +303,27 @@ export default function Markets() {
             </div>
 
             {/* Actions */}
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 mt-2">
               <Button
                 variant={favorite ? 'secondary' : 'outline'}
                 size="sm"
-                className="flex-1"
+                className="w-full justify-start"
                 onClick={(e) => handleToggleFavorite(e, asset)}
               >
-                <Star className={`w-4 h-4 mr-2 ${favorite ? 'fill-current' : ''}`} />
-                {favorite ? 'Quitar de Favoritos' : 'Agregar a Favoritos'}
+                <Star className={`w-4 h-4 mr-2 ${favorite ? 'fill-current text-yellow-500' : ''}`} />
+                {favorite ? 'En Favoritos' : 'Añadir a Favoritos'}
               </Button>
               
-              {favorite && !widget && (
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="flex-1"
-                  onClick={() => handleSetWidget(asset.symbol)}
-                >
-                  <Eye className="w-4 h-4 mr-2" />
-                  Mostrar en Dashboard
-                </Button>
-              )}
+              <Button
+                variant={widget ? 'secondary' : 'outline'}
+                size="sm"
+                className="w-full justify-start"
+                onClick={(e) => handleSetWidget(e, asset)}
+                disabled={widget}
+              >
+                <Eye className={`w-4 h-4 mr-2 ${widget ? 'text-primary' : ''}`} />
+                {widget ? 'Visible en Dashboard' : 'Añadir al Dashboard'}
+              </Button>
             </div>
           </div>
         </AccordionContent>
