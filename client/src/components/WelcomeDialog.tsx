@@ -46,7 +46,7 @@ export function WelcomeDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-primary/5 via-background to-background border-primary/20">
+      <DialogContent className="sm:max-w-[500px] bg-background border-primary/30 shadow-2xl">
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center animate-pulse">
