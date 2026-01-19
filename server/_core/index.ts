@@ -15,6 +15,17 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   
+  // Force HTTPS in production (Railway)
+  if (process.env.NODE_ENV === "production") {
+    app.use((req, res, next) => {
+      // Railway uses x-forwarded-proto header to indicate the original protocol
+      if (req.header('x-forwarded-proto') !== 'https') {
+        return res.redirect(301, `https://${req.header('host')}${req.url}`);
+      }
+      next();
+    });
+  }
+  
   // OAuth callback under /api/oauth/callback (disabled - using JWT auth instead)
   // registerOAuthRoutes(app);
   
