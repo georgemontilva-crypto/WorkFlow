@@ -37,11 +37,11 @@ export function WelcomeDialog() {
   };
 
   const features = [
-    t.welcome?.feature1 || 'Gestiona tus clientes y pagos',
-    t.welcome?.feature2 || 'Crea facturas profesionales',
-    t.welcome?.feature3 || 'Controla tus finanzas',
-    t.welcome?.feature4 || 'Establece metas de ahorro',
-    t.welcome?.feature5 || 'Recibe recordatorios automáticos',
+    t.welcome.feature1,
+    t.welcome.feature2,
+    t.welcome.feature3,
+    t.welcome.feature4,
+    t.welcome.feature5,
   ];
 
   return (
@@ -49,55 +49,58 @@ export function WelcomeDialog() {
       <DialogContent className="sm:max-w-[500px] bg-gradient-to-br from-primary/5 via-background to-background border-primary/20">
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center animate-pulse">
               <Sparkles className="w-8 h-8 text-primary" />
             </div>
           </div>
-          <DialogTitle className="text-2xl text-center">
-            {t.welcome?.title || '¡Bienvenido a HiWork!'}
+          <DialogTitle className="text-2xl sm:text-3xl text-center font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            {t.welcome.title}
           </DialogTitle>
-          <DialogDescription className="text-center text-base pt-2">
-            {t.welcome?.subtitle || 'Estamos emocionados de tenerte aquí. Tu período de prueba de 7 días ha comenzado.'}
+          <DialogDescription className="text-center text-base sm:text-lg pt-3 text-foreground/80">
+            {t.welcome.subtitle}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-5 py-4">
           {/* Trial Info */}
-          <div className="bg-primary/10 rounded-lg p-4 border border-primary/20">
-            <p className="text-sm font-medium text-center text-foreground">
-              {t.welcome?.trialInfo || '🎉 Tienes 7 días de acceso completo gratis'}
+          <div className="bg-gradient-to-r from-primary/15 to-primary/5 rounded-xl p-4 border-2 border-primary/30 shadow-sm">
+            <p className="text-sm sm:text-base font-semibold text-center text-foreground flex items-center justify-center gap-2">
+              <span className="text-2xl">🎉</span>
+              <span>{t.welcome.trialInfo}</span>
             </p>
           </div>
 
           {/* Features List */}
           <div className="space-y-3">
-            <p className="text-sm font-semibold text-foreground">
-              {t.welcome?.featuresTitle || 'Lo que puedes hacer:'}
+            <p className="text-sm sm:text-base font-bold text-foreground">
+              {t.welcome.featuresTitle}
             </p>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {features.map((feature, index) => (
-                <div key={index} className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-muted-foreground">{feature}</p>
+                <div key={index} className="flex items-start gap-3 group">
+                  <div className="flex-shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
+                  </div>
+                  <p className="text-sm sm:text-base text-foreground/90 leading-relaxed">{feature}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* CTA */}
-          <div className="pt-4">
+          <div className="pt-2">
             <Button 
               onClick={handleClose}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+              className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold shadow-lg hover:shadow-xl transition-all"
               size="lg"
             >
-              {t.welcome?.startButton || '¡Comenzar Ahora!'}
+              {t.welcome.startButton}
             </Button>
           </div>
 
           {/* Footer Note */}
-          <p className="text-xs text-center text-muted-foreground pt-2">
-            {t.welcome?.footerNote || 'Puedes acceder a todas las funcionalidades durante tu período de prueba'}
+          <p className="text-xs sm:text-sm text-center text-muted-foreground pt-1">
+            {t.welcome.footerNote}
           </p>
         </div>
       </DialogContent>
