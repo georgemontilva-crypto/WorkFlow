@@ -30,6 +30,31 @@ export const en = {
     viewReminders: 'View Reminders',
   },
 
+  // Welcome Dialog
+  welcome: {
+    title: 'Welcome to HiWork!',
+    subtitle: 'We\'re excited to have you here. Your 7-day trial period has started.',
+    trialInfo: '🎉 You have 7 days of full access for free',
+    featuresTitle: 'What you can do:',
+    feature1: 'Manage your clients and payments',
+    feature2: 'Create professional invoices',
+    feature3: 'Control your finances',
+    feature4: 'Set savings goals',
+    feature5: 'Receive automatic reminders',
+    startButton: 'Get Started!',
+    footerNote: 'You can access all features during your trial period',
+  },
+
+  // Trial Banner
+  trial: {
+    lastDay: 'Last day of trial',
+    oneDayLeft: '1 day of trial left',
+    daysLeft: '{days} days of trial left',
+    description: 'Enjoy all features during your trial period',
+    day: 'day',
+    days: 'days',
+  },
+
   // Navigation
   nav: {
     dashboard: 'Dashboard',

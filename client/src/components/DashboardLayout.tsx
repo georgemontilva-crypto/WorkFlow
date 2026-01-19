@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PaymentNotifications } from '@/components/PaymentNotifications';
+import { WelcomeDialog } from '@/components/WelcomeDialog';
 import { AccessBlocker } from './AccessBlocker';
 
 import { differenceInDays, parseISO } from 'date-fns';
@@ -210,6 +211,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Alert Popups */}
       {/* Payment Notifications */}
       <PaymentNotifications />
+      
+      {/* Welcome Dialog for new users */}
+      <WelcomeDialog />
     </div>
   );
 }

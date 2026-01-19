@@ -47,12 +47,13 @@ export default function Signup() {
           <div className="flex items-center gap-3">
             <img src="/hiwork-icon-new.png" alt="HiWork" className="h-10 w-auto" />
           </div>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">Already have an account?</span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="text-xs sm:text-sm text-muted-foreground hidden sm:inline">Already have an account?</span>
             <Button
               variant="outline"
               onClick={() => setLocation('/login')}
-              className="border-border text-foreground hover:bg-accent"
+              className="border-border text-foreground hover:bg-accent text-sm"
+              size="sm"
             >
               Sign In
             </Button>

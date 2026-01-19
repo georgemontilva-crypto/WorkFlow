@@ -13,6 +13,7 @@ import { es } from 'date-fns/locale';
 import { useLocation } from 'wouter';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/_core/hooks/useAuth';
+import { TrialBanner } from '@/components/TrialBanner';
 
 export default function Home() {
   // The userAuth hooks provides authentication state
@@ -69,6 +70,9 @@ export default function Home() {
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8">
+        {/* Trial Banner */}
+        <TrialBanner />
+        
         {/* Header with Action Buttons */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
           <div>
