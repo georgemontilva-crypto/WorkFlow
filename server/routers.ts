@@ -180,6 +180,88 @@ export const appRouter = router({
         
         return { success: true };
       }),
+
+    requestPasswordReset: publicProcedure
+      .input(z.object({
+        email: z.string().email("Invalid email address"),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const { nanoid } = await import('nanoid');
+          const { sendEmail, getPasswordResetEmailTemplate } = await import('./_core/email');
+          
+          // Get user by email
+          const user = await db.getUserByEmail(input.email);
+          
+          // Always return success to prevent email enumeration
+          if (!user) {
+            return { success: true, message: "If the email exists, a reset link has been sent" };
+          }
+          
+          // Generate secure token
+          const token = nanoid(64);
+          
+          // Save token to database
+          await db.createPasswordResetToken(user.id, token);
+          
+          // Create reset link
+          const resetLink = `${process.env.APP_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
+          
+          // Send email
+          const emailHtml = getPasswordResetEmailTemplate(user.name, resetLink);
+          await sendEmail({
+            to: user.email,
+            subject: "Recuperación de Contraseña - WorkFlow",
+            html: emailHtml,
+          });
+          
+          return { success: true, message: "If the email exists, a reset link has been sent" };
+        } catch (error: any) {
+          console.error("[Auth] Password reset request failed:", error);
+          return { success: true, message: "If the email exists, a reset link has been sent" };
+        }
+      }),
+
+    resetPassword: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        newPassword: z.string().min(8, "Password must be at least 8 characters"),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const bcrypt = await import('bcryptjs');
+          
+          // Get token from database
+          const resetToken = await db.getPasswordResetToken(input.token);
+          
+          if (!resetToken) {
+            throw new Error("Invalid or expired reset token");
+          }
+          
+          // Check if token is expired
+          if (new Date() > resetToken.expires_at) {
+            throw new Error("Reset token has expired");
+          }
+          
+          // Check if token was already used
+          if (resetToken.used === 1) {
+            throw new Error("Reset token has already been used");
+          }
+          
+          // Hash new password
+          const newHash = await bcrypt.hash(input.newPassword, 12);
+          
+          // Update password
+          await db.updateUserPassword(resetToken.user_id, newHash);
+          
+          // Mark token as used
+          await db.markPasswordResetTokenAsUsed(resetToken.id);
+          
+          return { success: true, message: "Password has been reset successfully" };
+        } catch (error: any) {
+          throw new Error(error.message || "Failed to reset password");
+        }
+      }),
   }),
 
   /**
@@ -362,6 +444,119 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await db.deleteInvoice(input.id, ctx.user.id);
         return { success: true };
+      }),
+
+    generatePDF: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const { generateInvoicePDF } = await import('./_core/pdf');
+          
+          // Get invoice with client data
+          const invoice = await db.getInvoiceById(input.id, ctx.user.id);
+          if (!invoice) {
+            throw new Error('Invoice not found');
+          }
+          
+          const client = await db.getClientById(invoice.client_id, ctx.user.id);
+          if (!client) {
+            throw new Error('Client not found');
+          }
+          
+          // Prepare invoice data for PDF
+          const invoiceData = {
+            ...invoice,
+            clientName: client.name,
+            clientEmail: client.email,
+            clientPhone: client.phone,
+            companyName: client.company || undefined,
+            items: typeof invoice.items === 'string' ? JSON.parse(invoice.items) : invoice.items,
+          };
+          
+          // Generate PDF
+          const pdfBase64 = await generateInvoicePDF(invoiceData);
+          
+          return { success: true, pdf: pdfBase64 };
+        } catch (error: any) {
+          throw new Error(error.message || 'Failed to generate PDF');
+        }
+      }),
+
+    sendByEmail: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const { generateInvoicePDF } = await import('./_core/pdf');
+          const { sendEmail } = await import('./_core/email');
+          
+          // Get invoice with client data
+          const invoice = await db.getInvoiceById(input.id, ctx.user.id);
+          if (!invoice) {
+            throw new Error('Invoice not found');
+          }
+          
+          const client = await db.getClientById(invoice.client_id, ctx.user.id);
+          if (!client) {
+            throw new Error('Client not found');
+          }
+          
+          // Prepare invoice data for PDF
+          const invoiceData = {
+            ...invoice,
+            clientName: client.name,
+            clientEmail: client.email,
+            clientPhone: client.phone,
+            companyName: client.company || undefined,
+            items: typeof invoice.items === 'string' ? JSON.parse(invoice.items) : invoice.items,
+          };
+          
+          // Generate PDF
+          const pdfBase64 = await generateInvoicePDF(invoiceData);
+          
+          // Send email with PDF attachment
+          const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #000; color: #fff; padding: 30px; text-align: center; }
+    .content { background: #f9f9f9; padding: 30px; }
+    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Factura - WorkFlow</h1>
+    </div>
+    <div class="content">
+      <h2>Hola ${client.name},</h2>
+      <p>Adjunto encontrarás la factura <strong>${invoice.invoice_number}</strong>.</p>
+      <p><strong>Total:</strong> $${parseFloat(invoice.total as any).toFixed(2)}</p>
+      <p><strong>Fecha de vencimiento:</strong> ${new Date(invoice.due_date).toLocaleDateString('es-ES')}</p>
+      <p>Gracias por tu preferencia.</p>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} WorkFlow. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</body>
+</html>
+          `;
+          
+          await sendEmail({
+            to: client.email,
+            subject: `Factura ${invoice.invoice_number} - WorkFlow`,
+            html: emailHtml,
+          });
+          
+          return { success: true, message: 'Invoice sent successfully' };
+        } catch (error: any) {
+          throw new Error(error.message || 'Failed to send invoice');
+        }
       }),
   }),
 

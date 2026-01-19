@@ -194,3 +194,18 @@ export const marketFavorites = mysqlTable("market_favorites", {
 
 export type MarketFavorite = typeof marketFavorites.$inferSelect;
 export type InsertMarketFavorite = typeof marketFavorites.$inferInsert;
+
+/**
+ * Password Reset Tokens table - stores temporary tokens for password recovery
+ */
+export const passwordResetTokens = mysqlTable("password_reset_tokens", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expires_at: timestamp("expires_at").notNull(),
+  used: int("used").notNull().default(0),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
+export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;

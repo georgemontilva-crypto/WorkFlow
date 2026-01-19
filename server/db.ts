@@ -888,3 +888,110 @@ export async function setDashboardWidget(user_id: number, symbol: string) {
     .where(eq(marketFavorites.user_id, user_id))
     .where(eq(marketFavorites.symbol, symbol));
 }
+
+/**
+ * Password Reset Token Functions
+ */
+
+/**
+ * Create a password reset token for a user
+ */
+export async function createPasswordResetToken(userId: number, token: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    const { passwordResetTokens } = await import("../drizzle/schema");
+    
+    // Token expires in 1 hour
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 1);
+
+    await db.insert(passwordResetTokens).values({
+      user_id: userId,
+      token,
+      expires_at: expiresAt,
+      used: 0,
+      created_at: new Date(),
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("[Database] Failed to create password reset token:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get password reset token by token string
+ */
+export async function getPasswordResetToken(token: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    const { passwordResetTokens } = await import("../drizzle/schema");
+    const result = await db.select()
+      .from(passwordResetTokens)
+      .where(eq(passwordResetTokens.token, token))
+      .limit(1);
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    return result[0];
+  } catch (error) {
+    console.error("[Database] Failed to get password reset token:", error);
+    throw error;
+  }
+}
+
+/**
+ * Mark password reset token as used
+ */
+export async function markPasswordResetTokenAsUsed(tokenId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    const { passwordResetTokens } = await import("../drizzle/schema");
+    await db.update(passwordResetTokens)
+      .set({ used: 1 })
+      .where(eq(passwordResetTokens.id, tokenId));
+
+    return { success: true };
+  } catch (error) {
+    console.error("[Database] Failed to mark token as used:", error);
+    throw error;
+  }
+}
+
+/**
+ * Get user by email
+ */
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    
+    if (result.length === 0) {
+      return null;
+    }
+
+    return result[0];
+  } catch (error) {
+    console.error("[Database] Failed to get user by email:", error);
+    throw error;
+  }
+}
