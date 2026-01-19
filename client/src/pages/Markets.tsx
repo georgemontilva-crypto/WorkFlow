@@ -180,7 +180,7 @@ export default function Markets() {
     const color = isPositive ? '#22c55e' : '#ef4444'; // green-500 : red-500
 
     return (
-      <div className="h-8 w-20 sm:w-24">
+      <div className="h-8 w-16 sm:w-24">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
             <Line 
@@ -204,16 +204,16 @@ export default function Markets() {
     const widget = isWidget(asset.symbol);
 
     return (
-      <AccordionItem value={asset.symbol} className="border rounded-lg mb-2 px-2 bg-card">
-        <AccordionTrigger className="hover:no-underline py-3">
-          <div className="flex items-center justify-between w-full pr-4">
+      <AccordionItem value={asset.symbol} className="border rounded-xl mb-3 px-3 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-200 shadow-sm">
+        <AccordionTrigger className="hover:no-underline py-4">
+          <div className="flex items-center justify-between w-full pr-2 sm:pr-4 gap-2">
             {/* Left: Symbol & Name */}
             <div className="flex items-center gap-3 text-left min-w-0 flex-1">
               <div className="flex flex-col min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-base truncate">{asset.symbol}</span>
+                  <span className="font-bold text-base sm:text-lg truncate">{asset.symbol}</span>
                   {widget && (
-                    <Badge variant="default" className="text-[10px] h-4 px-1">
+                    <Badge variant="default" className="text-[10px] h-4 px-1 hidden sm:inline-flex">
                       Dash
                     </Badge>
                   )}
@@ -221,22 +221,22 @@ export default function Markets() {
                     <Star className="w-3 h-3 fill-primary text-primary" />
                   )}
                 </div>
-                <span className="text-xs text-muted-foreground truncate hidden sm:inline-block">{asset.name}</span>
+                <span className="text-xs text-muted-foreground truncate max-w-[100px] sm:max-w-none">{asset.name}</span>
               </div>
             </div>
 
             {/* Right: Price, Chart, Change */}
-            <div className="flex items-center gap-3 sm:gap-6">
-              {/* Mini Chart - Hidden on very small screens */}
+            <div className="flex items-center gap-2 sm:gap-6 shrink-0">
+              {/* Mini Chart - Visible on all screens now, smaller on mobile */}
               {asset.sparkline && (
-                <div className="hidden sm:block">
+                <div className="opacity-80 hover:opacity-100 transition-opacity">
                   <MiniChart data={asset.sparkline} isPositive={isPositive} />
                 </div>
               )}
 
-              <div className="text-right">
-                <div className="font-mono font-medium">{formatPrice(asset.price)}</div>
-                <div className={`text-xs flex items-center justify-end gap-1 ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+              <div className="text-right min-w-[80px]">
+                <div className="font-mono font-medium text-sm sm:text-base">{formatPrice(asset.price)}</div>
+                <div className={`text-xs flex items-center justify-end gap-1 font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
                   {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                   {Math.abs(asset.change24h).toFixed(2)}%
                 </div>
