@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp, TrendingDown, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart3, Activity } from 'lucide-react';
 import { useLocation } from 'wouter';
 
 interface MarketWidgetProps {
@@ -60,12 +60,13 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
 
   if (loading) {
     return (
-      <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => setLocation('/markets')}>
-        <CardHeader className="pb-3">
+      <Card className="bg-card border-2 border-border hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer" onClick={() => setLocation('/markets')}>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-            <BarChart3 className="w-4 h-4" />
+            <BarChart3 className="w-4 h-4" strokeWidth={1.5} />
             Mercado
           </CardTitle>
+          <Activity className="w-4 h-4 text-muted-foreground animate-pulse" />
         </CardHeader>
         <CardContent>
           <div className="animate-pulse space-y-2">
@@ -79,15 +80,15 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
 
   if (!data) {
     return (
-      <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => setLocation('/markets')}>
-        <CardHeader className="pb-3">
+      <Card className="bg-card border-2 border-border hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer" onClick={() => setLocation('/markets')}>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-            <BarChart3 className="w-4 h-4" />
+            <BarChart3 className="w-4 h-4" strokeWidth={1.5} />
             Mercado
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No hay datos disponibles</p>
+          <p className="text-sm text-muted-foreground">Sin datos</p>
         </CardContent>
       </Card>
     );
@@ -101,34 +102,34 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
   };
 
   return (
-    <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => setLocation('/markets')}>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
-          <span className="flex items-center gap-2">
-            <BarChart3 className="w-4 h-4" />
-            {data.name}
-          </span>
-          <span className="text-xs">{symbol}</span>
+    <Card 
+      className={`bg-card border-2 transition-all cursor-pointer hover:shadow-lg ${
+        isPositive 
+          ? 'border-green-500/30 hover:border-green-500/50 bg-gradient-to-br from-green-500/5 to-green-500/10' 
+          : 'border-red-500/30 hover:border-red-500/50 bg-gradient-to-br from-red-500/5 to-red-500/10'
+      }`}
+      onClick={() => setLocation('/markets')}
+    >
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+          <BarChart3 className="w-4 h-4" strokeWidth={1.5} />
+          <span className="hidden sm:inline">{data.name}</span>
+          <span className="sm:hidden">{symbol}</span>
         </CardTitle>
+        <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
+          isPositive ? 'bg-green-500/20 text-green-600' : 'bg-red-500/20 text-red-600'
+        }`}>
+          {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+          {isPositive ? '+' : ''}{data.change24h.toFixed(1)}%
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <div className="text-3xl font-bold text-foreground font-mono">
+          <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
             {formatPrice(data.price)}
           </div>
-          <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-            {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-            {isPositive ? '+' : ''}{data.change24h.toFixed(2)}% (24h)
-          </div>
-          <div className="grid grid-cols-2 gap-2 pt-2 border-t text-xs">
-            <div>
-              <p className="text-muted-foreground">Máx 24h</p>
-              <p className="font-semibold">{formatPrice(data.high24h)}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Mín 24h</p>
-              <p className="font-semibold">{formatPrice(data.low24h)}</p>
-            </div>
+          <div className="text-xs text-muted-foreground">
+            <span className="hidden sm:inline">{symbol} • </span>Actualización en tiempo real
           </div>
         </div>
       </CardContent>

@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Star, Search, BarChart3, Eye } from 'lucide-react';
+import { TrendingUp, TrendingDown, Star, Search, BarChart3, Eye, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -137,32 +137,45 @@ export default function Markets() {
     return (b.marketCap || 0) - (a.marketCap || 0);
   });
 
+  const favoriteCount = favorites?.length || 0;
+
   const AssetCard = ({ asset }: { asset: MarketAsset }) => {
     const isPositive = asset.change24h >= 0;
     const favorite = isFavorite(asset.symbol);
     const widget = isWidget(asset.symbol);
 
     return (
-      <Card className={`border-2 hover:border-primary/50 transition-all ${favorite ? 'bg-primary/5' : ''}`}>
-        <CardContent className="pt-6">
+      <Card className={`border-2 transition-all hover:shadow-lg ${
+        favorite 
+          ? 'bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30 hover:border-primary/50' 
+          : 'hover:border-primary/30'
+      }`}>
+        <CardContent className="p-4 sm:p-6">
           <div className="space-y-4">
             {/* Header */}
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-bold text-lg truncate">{asset.name}</h3>
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <h3 className="font-bold text-base sm:text-lg truncate">{asset.name}</h3>
                   {widget && (
-                    <Badge variant="default" className="text-xs">
+                    <Badge variant="default" className="text-xs shrink-0">
                       <Eye className="w-3 h-3 mr-1" />
                       Dashboard
                     </Badge>
                   )}
+                  {favorite && (
+                    <Badge variant="outline" className="text-xs shrink-0 border-primary/50">
+                      <Sparkles className="w-3 h-3 mr-1" />
+                      Favorito
+                    </Badge>
+                  )}
                 </div>
-                <p className="text-sm text-muted-foreground">{asset.symbol}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground font-mono">{asset.symbol}</p>
               </div>
               <Button
                 variant={favorite ? 'default' : 'outline'}
                 size="icon"
+                className="shrink-0"
                 onClick={() => handleToggleFavorite(asset)}
               >
                 <Star className={`w-4 h-4 ${favorite ? 'fill-current' : ''}`} />
@@ -171,23 +184,23 @@ export default function Markets() {
 
             {/* Price */}
             <div>
-              <div className="text-3xl font-bold mb-1">{formatPrice(asset.price)}</div>
+              <div className="text-2xl sm:text-3xl font-bold mb-1 font-mono">{formatPrice(asset.price)}</div>
               <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
                 {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                {isPositive ? '+' : ''}{asset.change24h.toFixed(2)}%
+                {isPositive ? '+' : ''}{asset.change24h.toFixed(2)}% (24h)
               </div>
             </div>
 
             {/* Stats */}
             {asset.marketCap && (
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t">
+              <div className="grid grid-cols-2 gap-3 pt-3 border-t">
                 <div>
-                  <p className="text-xs text-muted-foreground">Cap. Mercado</p>
-                  <p className="text-sm font-semibold">{formatMarketCap(asset.marketCap)}</p>
+                  <p className="text-xs text-muted-foreground mb-1">Cap. Mercado</p>
+                  <p className="text-sm font-semibold font-mono">{formatMarketCap(asset.marketCap)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Volumen 24h</p>
-                  <p className="text-sm font-semibold">{formatMarketCap(asset.volume24h || 0)}</p>
+                  <p className="text-xs text-muted-foreground mb-1">Volumen 24h</p>
+                  <p className="text-sm font-semibold font-mono">{formatMarketCap(asset.volume24h || 0)}</p>
                 </div>
               </div>
             )}
@@ -197,7 +210,7 @@ export default function Markets() {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full"
+                className="w-full mt-2"
                 onClick={() => handleSetWidget(asset.symbol)}
               >
                 <Eye className="w-4 h-4 mr-2" />
@@ -212,10 +225,11 @@ export default function Markets() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full min-h-screen">
+      <div className="flex items-center justify-center h-full min-h-screen bg-background">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground text-lg">Cargando mercados...</p>
+          <p className="text-muted-foreground text-lg">Cargando mercados financieros...</p>
+          <p className="text-sm text-muted-foreground mt-2">Obteniendo datos en tiempo real</p>
         </div>
       </div>
     );
@@ -225,18 +239,34 @@ export default function Markets() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-3 bg-primary/10 rounded-xl">
-              <BarChart3 className="w-8 h-8 text-primary" />
+            <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl">
+              <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
             </div>
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-bold">Mercados Financieros</h1>
-              <p className="text-muted-foreground mt-1">
-                Criptomonedas, acciones y más en tiempo real
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold truncate">Mercados Financieros</h1>
+              <p className="text-sm sm:text-base text-muted-foreground mt-1">
+                Criptomonedas en tiempo real • Actualización automática
               </p>
             </div>
           </div>
+          
+          {/* Stats Badge */}
+          {favoriteCount > 0 && (
+            <div className="flex items-center gap-2 mt-4">
+              <Badge variant="outline" className="text-sm">
+                <Star className="w-3 h-3 mr-1 fill-current" />
+                {favoriteCount} {favoriteCount === 1 ? 'favorito' : 'favoritos'}
+              </Badge>
+              {dashboardWidget && (
+                <Badge variant="default" className="text-sm">
+                  <Eye className="w-3 h-3 mr-1" />
+                  Widget activo
+                </Badge>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Search */}
@@ -245,10 +275,10 @@ export default function Markets() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar por nombre o símbolo..."
+                placeholder="Buscar por nombre o símbolo (ej: Bitcoin, BTC)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-11"
+                className="pl-10 h-11 text-base"
               />
             </div>
           </CardContent>
@@ -256,16 +286,25 @@ export default function Markets() {
 
         {/* Tabs */}
         <Tabs defaultValue="crypto" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="crypto">Cripto</TabsTrigger>
-            <TabsTrigger value="stocks" disabled>Acciones</TabsTrigger>
-            <TabsTrigger value="forex" disabled>Forex</TabsTrigger>
-            <TabsTrigger value="commodities" disabled>Commodities</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6 h-auto">
+            <TabsTrigger value="crypto" className="text-sm sm:text-base py-2">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Cripto
+            </TabsTrigger>
+            <TabsTrigger value="stocks" disabled className="text-sm sm:text-base py-2">
+              Acciones
+            </TabsTrigger>
+            <TabsTrigger value="forex" disabled className="text-sm sm:text-base py-2">
+              Forex
+            </TabsTrigger>
+            <TabsTrigger value="commodities" disabled className="text-sm sm:text-base py-2">
+              Commodities
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="crypto">
             {sortedCrypto.length === 0 ? (
-              <Card>
+              <Card className="border-2">
                 <CardContent className="py-16 text-center">
                   <Search className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
                   <p className="text-lg font-medium text-muted-foreground mb-2">
@@ -277,20 +316,31 @@ export default function Markets() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sortedCrypto.map((asset) => (
-                  <AssetCard key={asset.symbol} asset={asset} />
-                ))}
-              </div>
+              <>
+                {/* Results count */}
+                <div className="mb-4 text-sm text-muted-foreground">
+                  Mostrando {sortedCrypto.length} {sortedCrypto.length === 1 ? 'criptomoneda' : 'criptomonedas'}
+                  {favoriteCount > 0 && ' • Favoritos primero'}
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+                  {sortedCrypto.map((asset) => (
+                    <AssetCard key={asset.symbol} asset={asset} />
+                  ))}
+                </div>
+              </>
             )}
           </TabsContent>
 
           <TabsContent value="stocks">
-            <Card>
+            <Card className="border-2">
               <CardContent className="py-16 text-center">
                 <BarChart3 className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium text-muted-foreground">
+                <p className="text-lg font-medium text-muted-foreground mb-2">
                   Próximamente: Acciones
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  NYSE, NASDAQ, S&P 500 y más
                 </p>
               </CardContent>
             </Card>
