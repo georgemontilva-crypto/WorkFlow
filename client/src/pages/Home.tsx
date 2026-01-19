@@ -7,13 +7,14 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { trpc } from '@/lib/trpc';
-import { Users, FileText, TrendingUp, TrendingDown, Plus, AlertCircle, Bell, Target } from 'lucide-react';
+import { Users, FileText, TrendingUp, TrendingDown, Plus, AlertCircle, Bell, Target, BarChart3, Star } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useLocation } from 'wouter';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { TrialBanner } from '@/components/TrialBanner';
+import { MarketWidget } from '@/components/MarketWidget';
 
 export default function Home() {
   // The userAuth hooks provides authentication state
@@ -28,6 +29,7 @@ export default function Home() {
   const { data: invoices } = trpc.invoices.list.useQuery();
   const { data: transactions } = trpc.transactions.list.useQuery();
   const { data: savingsGoals } = trpc.savingsGoals.list.useQuery();
+  const { data: dashboardWidget } = trpc.markets.getDashboardWidget.useQuery();
 
   // Calcular estadísticas
   const activeClients = clients?.filter(c => c.status === 'active').length || 0;
@@ -105,7 +107,7 @@ export default function Home() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8 ${dashboardWidget ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}>
           <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer" onClick={() => setLocation('/clients')}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -157,6 +159,11 @@ export default function Home() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Market Widget */}
+          {dashboardWidget && (
+            <MarketWidget symbol={dashboardWidget.symbol} type={dashboardWidget.type} />
+          )}
         </div>
 
         {/* Alerts Section */}

@@ -624,6 +624,56 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  /**
+   * Markets router - Market favorites and dashboard widget
+   */
+  markets: router({
+    // Get user's favorite assets
+    getFavorites: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getMarketFavoritesByUserId(ctx.user.id);
+    }),
+
+    // Get dashboard widget asset
+    getDashboardWidget: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getDashboardWidget(ctx.user.id);
+    }),
+
+    // Add to favorites
+    addFavorite: protectedProcedure
+      .input(z.object({
+        symbol: z.string(),
+        type: z.enum(['crypto', 'stock', 'forex', 'commodity']),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.addMarketFavorite({
+          user_id: ctx.user.id,
+          symbol: input.symbol,
+          type: input.type,
+        });
+        return { success: true };
+      }),
+
+    // Remove from favorites
+    removeFavorite: protectedProcedure
+      .input(z.object({
+        symbol: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.removeMarketFavorite(ctx.user.id, input.symbol);
+        return { success: true };
+      }),
+
+    // Set as dashboard widget
+    setDashboardWidget: protectedProcedure
+      .input(z.object({
+        symbol: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        await db.setDashboardWidget(ctx.user.id, input.symbol);
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

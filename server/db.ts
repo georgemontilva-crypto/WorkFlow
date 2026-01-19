@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { ENV } from "./_core/env";
-import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages } from "../drizzle/schema";
+import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
@@ -800,4 +800,91 @@ export async function updateUserLifetimeAccess(user_id: number, hasAccess: boole
     .update(users)
     .set({ has_lifetime_access: hasAccess ? 1 : 0 })
     .where(eq(users.id, user_id));
+}
+
+
+// ============================================
+// Market Favorites Functions
+// ============================================
+
+export async function getMarketFavoritesByUserId(user_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  return await db
+    .select()
+    .from(marketFavorites)
+    .where(eq(marketFavorites.user_id, user_id))
+    .orderBy(marketFavorites.created_at);
+}
+
+export async function getDashboardWidget(user_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  const result = await db
+    .select()
+    .from(marketFavorites)
+    .where(eq(marketFavorites.user_id, user_id))
+    .where(eq(marketFavorites.is_dashboard_widget, 1))
+    .limit(1);
+  return result[0] || null;
+}
+
+export async function addMarketFavorite(data: {
+  user_id: number;
+  symbol: string;
+  type: 'crypto' | 'stock' | 'forex' | 'commodity';
+}) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  // Check if already exists
+  const existing = await db
+    .select()
+    .from(marketFavorites)
+    .where(eq(marketFavorites.user_id, data.user_id))
+    .where(eq(marketFavorites.symbol, data.symbol))
+    .limit(1);
+  
+  if (existing.length > 0) {
+    throw new Error("This asset is already in your favorites");
+  }
+  
+  await db.insert(marketFavorites).values(data);
+}
+
+export async function removeMarketFavorite(user_id: number, symbol: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  await db
+    .delete(marketFavorites)
+    .where(eq(marketFavorites.user_id, user_id))
+    .where(eq(marketFavorites.symbol, symbol));
+}
+
+export async function setDashboardWidget(user_id: number, symbol: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  // First, unset all dashboard widgets for this user
+  await db
+    .update(marketFavorites)
+    .set({ is_dashboard_widget: 0 })
+    .where(eq(marketFavorites.user_id, user_id));
+  
+  // Then set the selected one
+  await db
+    .update(marketFavorites)
+    .set({ is_dashboard_widget: 1 })
+    .where(eq(marketFavorites.user_id, user_id))
+    .where(eq(marketFavorites.symbol, symbol));
 }

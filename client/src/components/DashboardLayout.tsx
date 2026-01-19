@@ -117,6 +117,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: t.nav.clients, href: '/clients', icon: Users },
     { name: t.nav.invoices, href: '/invoices', icon: FileText },
     { name: t.nav.finances, href: '/finances', icon: TrendingUp },
+    { name: 'Mercados', href: '/markets', icon: TrendingUp },
     { name: t.nav.goals, href: '/savings', icon: Target },
     { name: t.nav.reminders, href: '/reminders', icon: Bell },
     { name: t.nav.settings, href: '/settings', icon: Settings },

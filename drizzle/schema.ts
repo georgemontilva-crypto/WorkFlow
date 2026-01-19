@@ -179,3 +179,18 @@ export const supportMessages = mysqlTable("support_messages", {
 
 export type SupportMessage = typeof supportMessages.$inferSelect;
 export type InsertSupportMessage = typeof supportMessages.$inferInsert;
+
+/**
+ * Market Favorites table - stores user's favorite market assets
+ */
+export const marketFavorites = mysqlTable("market_favorites", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull(),
+  symbol: varchar("symbol", { length: 20 }).notNull(),
+  type: mysqlEnum("type", ["crypto", "stock", "forex", "commodity"]).notNull(),
+  is_dashboard_widget: int("is_dashboard_widget").notNull().default(0),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type MarketFavorite = typeof marketFavorites.$inferSelect;
+export type InsertMarketFavorite = typeof marketFavorites.$inferInsert;
