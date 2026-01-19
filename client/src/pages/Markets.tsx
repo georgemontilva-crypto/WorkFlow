@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Star, Search, BarChart3, Eye, Sparkles } from 'lucide-react';
+import { TrendingUp, TrendingDown, Star, Search, BarChart3, Eye, Sparkles, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
+import { useLocation } from 'wouter';
 
 interface MarketAsset {
   symbol: string;
@@ -24,6 +25,7 @@ interface MarketAsset {
 }
 
 export default function Markets() {
+  const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [cryptoData, setCryptoData] = useState<MarketAsset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -240,6 +242,17 @@ export default function Markets() {
       <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
+          {/* Back Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLocation('/dashboard')}
+            className="mb-4 -ml-2"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Volver al Dashboard
+          </Button>
+          
           <div className="flex items-center gap-3 mb-3">
             <div className="p-3 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl">
               <BarChart3 className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
