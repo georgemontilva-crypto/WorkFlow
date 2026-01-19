@@ -7,7 +7,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { Settings as SettingsIcon, Database, Download, Trash2, Upload, Languages, Shield, Key } from 'lucide-react';
 
 import { toast } from 'sonner';
@@ -256,9 +256,16 @@ export default function Settings() {
           {/* Security Settings - 2FA */}
           <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-foreground text-base sm:text-lg">
-                <Shield className="w-5 h-5" strokeWidth={1.5} />
-                Autenticación de Dos Factores
+              <CardTitle className="flex items-center justify-between text-foreground text-base sm:text-lg">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-5 h-5" strokeWidth={1.5} />
+                  Autenticación de Dos Factores
+                </div>
+                {user?.two_factor_enabled && (
+                  <Badge className="bg-green-500 hover:bg-green-600 text-white border-none">
+                    Activo
+                  </Badge>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
