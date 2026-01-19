@@ -1,47 +1,12 @@
 {
   "version": "7",
-  "dialect": "mysql",
+  "dialect": "postgresql",
   "entries": [
     {
       "idx": 0,
-      "version": "5",
-      "when": 1768766047163,
-      "tag": "0000_flashy_joseph",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1768766248225,
-      "tag": "0001_cute_blazing_skull",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1768772198695,
-      "tag": "0002_secret_inhumans",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1768774002462,
-      "tag": "0003_serious_frightful_four",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1768776824273,
-      "tag": "0004_superb_infant_terrible",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1768779783464,
-      "tag": "0005_brown_fallen_one",
+      "version": "7",
+      "when": 1768781852552,
+      "tag": "0000_gorgeous_lady_mastermind",
       "breakpoints": true
     }
   ]

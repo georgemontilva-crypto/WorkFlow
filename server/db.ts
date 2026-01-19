@@ -1,11 +1,11 @@
-import { drizzle } from "drizzle-orm/mysql2";
-import mysql from "mysql2/promise";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import { ENV } from "./_core/env";
 import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
-let pool: mysql.Pool | undefined;
+let client: ReturnType<typeof postgres> | undefined;
 let db: ReturnType<typeof drizzle> | undefined;
 
 /**
@@ -15,8 +15,8 @@ export async function getDb() {
   if (db) return db;
 
   try {
-    pool = mysql.createPool(ENV.databaseUrl);
-    db = drizzle(pool);
+    client = postgres(ENV.databaseUrl);
+    db = drizzle(client);
     console.log("[Database] Connected successfully");
     return db;
   } catch (error) {
