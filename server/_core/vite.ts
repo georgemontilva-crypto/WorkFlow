@@ -62,7 +62,9 @@ export function serveStatic(app: Express) {
   
   if (fs.existsSync(distPath)) {
     const files = fs.readdirSync(distPath);
-    console.log("[Static Files] Files in directory:", files.slice(0, 10));
+    console.log("[Static Files] Total files:", files.length);
+    console.log("[Static Files] All files:", files);
+    console.log("[Static Files] index.html exists:", files.includes('index.html'));
   }
   
   if (!fs.existsSync(distPath)) {
