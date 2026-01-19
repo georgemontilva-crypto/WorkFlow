@@ -238,14 +238,14 @@ export default function Markets() {
     const widget = isWidget(asset.symbol);
 
     return (
-      <AccordionItem value={asset.symbol} className="border rounded-xl mb-3 px-3 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-200 shadow-sm">
+      <AccordionItem value={asset.symbol} className="border rounded-xl px-3 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-200 shadow-sm h-fit">
         <AccordionTrigger className="hover:no-underline py-4">
-          <div className="flex items-center justify-between w-full pr-2 sm:pr-4 gap-2">
+          <div className="flex items-center justify-between w-full pr-2 gap-2">
             {/* Left: Symbol & Name */}
             <div className="flex items-center gap-3 text-left min-w-0 flex-1">
               <div className="flex flex-col min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-base sm:text-lg truncate">{asset.symbol}</span>
+                  <span className="font-bold text-base truncate">{asset.symbol}</span>
                   {widget && (
                     <Badge variant="default" className="text-[10px] h-4 px-1 hidden sm:inline-flex">
                       Dash
@@ -255,22 +255,22 @@ export default function Markets() {
                     <Star className="w-3 h-3 fill-primary text-primary" />
                   )}
                 </div>
-                <span className="text-xs text-muted-foreground truncate max-w-[100px] sm:max-w-none">{asset.name}</span>
+                <span className="text-xs text-muted-foreground truncate max-w-[80px]">{asset.name}</span>
               </div>
             </div>
 
             {/* Right: Price, Chart, Change */}
-            <div className="flex items-center gap-2 sm:gap-6 shrink-0">
-              {/* Mini Chart - Visible on all screens now, smaller on mobile */}
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Mini Chart - Compact for grid */}
               {asset.sparkline && (
-                <div className="opacity-80 hover:opacity-100 transition-opacity">
+                <div className="opacity-80 hover:opacity-100 transition-opacity hidden xs:block">
                   <MiniChart data={asset.sparkline} isPositive={isPositive} />
                 </div>
               )}
 
-              <div className="text-right min-w-[80px]">
-                <div className="font-mono font-medium text-sm sm:text-base">{formatPrice(asset.price)}</div>
-                <div className={`text-xs flex items-center justify-end gap-1 font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+              <div className="text-right min-w-[70px]">
+                <div className="font-mono font-medium text-sm">{formatPrice(asset.price)}</div>
+                <div className={`text-[10px] flex items-center justify-end gap-1 font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
                   {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                   {Math.abs(asset.change24h).toFixed(2)}%
                 </div>
@@ -385,7 +385,7 @@ export default function Markets() {
           </TabsList>
 
           <TabsContent value="crypto">
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {sortAssets(filterAssets(cryptoData)).map((asset) => (
                 <AssetAccordionItem key={asset.symbol} asset={asset} />
               ))}
@@ -393,7 +393,7 @@ export default function Markets() {
           </TabsContent>
 
           <TabsContent value="stocks">
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {sortAssets(filterAssets(MOCK_STOCKS)).map((asset) => (
                 <AssetAccordionItem key={asset.symbol} asset={asset} />
               ))}
@@ -401,7 +401,7 @@ export default function Markets() {
           </TabsContent>
 
           <TabsContent value="forex">
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {sortAssets(filterAssets(MOCK_FOREX)).map((asset) => (
                 <AssetAccordionItem key={asset.symbol} asset={asset} />
               ))}
@@ -409,7 +409,7 @@ export default function Markets() {
           </TabsContent>
 
           <TabsContent value="commodities">
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {sortAssets(filterAssets(MOCK_COMMODITIES)).map((asset) => (
                 <AssetAccordionItem key={asset.symbol} asset={asset} />
               ))}
