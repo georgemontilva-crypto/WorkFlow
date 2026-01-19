@@ -260,7 +260,7 @@ export default function Reminders() {
 
         {/* Tabs */}
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-2 h-auto mb-6 p-1">
             <TabsTrigger value="all">Todos ({allReminders.length})</TabsTrigger>
             <TabsTrigger value="overdue">Vencidos ({overdueReminders.length})</TabsTrigger>
             <TabsTrigger value="urgent">Urgentes ({urgentReminders.length})</TabsTrigger>
