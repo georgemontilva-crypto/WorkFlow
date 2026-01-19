@@ -973,25 +973,4 @@ export async function markPasswordResetTokenAsUsed(tokenId: number) {
   }
 }
 
-/**
- * Get user by email
- */
-export async function getUserByEmail(email: string) {
-  const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
 
-  try {
-    const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
-    
-    if (result.length === 0) {
-      return null;
-    }
-
-    return result[0];
-  } catch (error) {
-    console.error("[Database] Failed to get user by email:", error);
-    throw error;
-  }
-}
