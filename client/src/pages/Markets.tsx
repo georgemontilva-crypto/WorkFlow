@@ -4,7 +4,10 @@
  */
 
 import { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Star, Search, BarChart3, Eye, Sparkles, ArrowLeft, ChevronDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, Star, Search, BarChart3, Eye, Sparkles, ArrowLeft, ChevronDown, Bell, BellPlus, Trash2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -89,6 +92,46 @@ export default function Markets() {
   // Fetch favorites
   const { data: favorites, refetch: refetchFavorites } = trpc.markets.getFavorites.useQuery();
   const { data: dashboardWidget } = trpc.markets.getDashboardWidget.useQuery();
+  const { data: priceAlerts, refetch: refetchAlerts } = trpc.priceAlerts.list.useQuery();
+
+  const createAlertMutation = trpc.priceAlerts.create.useMutation({
+    onSuccess: () => {
+      refetchAlerts();
+      toast.success('Alerta creada exitosamente');
+      setAlertDialogOpen(false);
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
+  const deleteAlertMutation = trpc.priceAlerts.delete.useMutation({
+    onSuccess: () => {
+      refetchAlerts();
+      toast.success('Alerta eliminada');
+    },
+  });
+
+  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
+  const [selectedAssetForAlert, setSelectedAssetForAlert] = useState<MarketAsset | null>(null);
+  const [alertTargetPrice, setAlertTargetPrice] = useState('');
+  const [alertCondition, setAlertCondition] = useState<'above' | 'below'>('above');
+
+  const handleCreateAlert = () => {
+    if (!selectedAssetForAlert || !alertTargetPrice) return;
+    
+    createAlertMutation.mutate({
+      symbol: selectedAssetForAlert.symbol,
+      type: selectedAssetForAlert.type,
+      target_price: parseFloat(alertTargetPrice),
+      condition: alertCondition,
+    });
+  };
+
+  const openAlertDialog = (e: React.MouseEvent, asset: MarketAsset) => {
+    e.stopPropagation();
+    setSelectedAssetForAlert(asset);
+    setAlertTargetPrice(asset.price.toString());
+    setAlertDialogOpen(true);
+  };
 
   // Mutations
   const addFavoriteMutation = trpc.markets.addFavorite.useMutation({
@@ -325,6 +368,16 @@ export default function Markets() {
                 <Eye className={`w-4 h-4 mr-2 ${widget ? 'text-primary' : ''}`} />
                 {widget ? 'Visible en Dashboard' : 'Añadir al Dashboard'}
               </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start hover:text-yellow-500 hover:border-yellow-500/50"
+                onClick={(e) => openAlertDialog(e, asset)}
+              >
+                <BellPlus className="w-4 h-4 mr-2" />
+                Crear Alerta de Precio
+              </Button>
             </div>
           </div>
         </AccordionContent>
@@ -355,13 +408,102 @@ export default function Markets() {
             <h1 className="text-2xl font-bold">Mercados</h1>
           </div>
           
-          {favoriteCount > 0 && (
-            <Badge variant="outline" className="ml-11">
-              <Star className="w-3 h-3 mr-1 fill-current" />
-              {favoriteCount} favoritos
-            </Badge>
-          )}
+          <div className="flex items-center gap-2 ml-11">
+            {favoriteCount > 0 && (
+              <Badge variant="outline">
+                <Star className="w-3 h-3 mr-1 fill-current" />
+                {favoriteCount} favoritos
+              </Badge>
+            )}
+            {priceAlerts && priceAlerts.length > 0 && (
+              <Badge variant="outline" className="cursor-pointer hover:bg-white/5" onClick={() => document.getElementById('alerts-section')?.scrollIntoView({ behavior: 'smooth' })}>
+                <Bell className="w-3 h-3 mr-1 text-blue-500" />
+                {priceAlerts.length} alertas
+              </Badge>
+            )}
+          </div>
         </div>
+
+        {/* Active Alerts Section */}
+        {priceAlerts && priceAlerts.length > 0 && (
+          <div id="alerts-section" className="mb-8">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Bell className="w-5 h-5 text-blue-500" />
+              Alertas Activas
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {priceAlerts.map((alert) => (
+                <Card key={alert.id} className="bg-card/50 backdrop-blur-sm border-white/5">
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div>
+                      <div className="font-bold text-lg">{alert.symbol}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Avisar si {alert.condition === 'above' ? 'sube de' : 'baja de'} ${Number(alert.target_price).toLocaleString()}
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-red-500 hover:text-red-400 hover:bg-red-500/10"
+                      onClick={() => deleteAlertMutation.mutate({ id: alert.id })}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <Dialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
+          <DialogContent className="sm:max-w-[425px] bg-card border-white/10">
+            <DialogHeader>
+              <DialogTitle>Crear Alerta de Precio</DialogTitle>
+              <DialogDescription>
+                Recibe una notificación cuando {selectedAssetForAlert?.name} alcance el precio objetivo.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label>Activo</Label>
+                <div className="flex items-center gap-2 p-2 border rounded-md bg-background/50">
+                  <span className="font-bold">{selectedAssetForAlert?.symbol}</span>
+                  <span className="text-muted-foreground text-sm">{selectedAssetForAlert?.name}</span>
+                  <span className="ml-auto font-mono">${selectedAssetForAlert?.price.toLocaleString()}</span>
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label>Condición</Label>
+                <Select value={alertCondition} onValueChange={(v: 'above' | 'below') => setAlertCondition(v)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="above">El precio sube por encima de</SelectItem>
+                    <SelectItem value="below">El precio cae por debajo de</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label>Precio Objetivo ($)</Label>
+                <Input
+                  type="number"
+                  step="0.000001"
+                  value={alertTargetPrice}
+                  onChange={(e) => setAlertTargetPrice(e.target.value)}
+                  placeholder="0.00"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setAlertDialogOpen(false)}>Cancelar</Button>
+              <Button onClick={handleCreateAlert} disabled={createAlertMutation.isPending}>
+                {createAlertMutation.isPending ? 'Creando...' : 'Crear Alerta'}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Search */}
         <div className="relative mb-6">
@@ -386,7 +528,7 @@ export default function Markets() {
           </div>
 
           <TabsContent value="crypto">
-            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {sortAssets(filterAssets(cryptoData)).map((asset) => (
                 <AssetAccordionItem key={asset.symbol} asset={asset} />
               ))}
@@ -394,7 +536,7 @@ export default function Markets() {
           </TabsContent>
 
           <TabsContent value="stocks">
-            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {sortAssets(filterAssets(MOCK_STOCKS)).map((asset) => (
                 <AssetAccordionItem key={asset.symbol} asset={asset} />
               ))}
@@ -402,7 +544,7 @@ export default function Markets() {
           </TabsContent>
 
           <TabsContent value="forex">
-            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {sortAssets(filterAssets(MOCK_FOREX)).map((asset) => (
                 <AssetAccordionItem key={asset.symbol} asset={asset} />
               ))}
@@ -410,7 +552,7 @@ export default function Markets() {
           </TabsContent>
 
           <TabsContent value="commodities">
-            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {sortAssets(filterAssets(MOCK_COMMODITIES)).map((asset) => (
                 <AssetAccordionItem key={asset.symbol} asset={asset} />
               ))}

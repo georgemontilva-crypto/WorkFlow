@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { ENV } from "./_core/env";
-import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites } from "../drizzle/schema";
+import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
@@ -267,7 +267,80 @@ export async function updateUserPassword(user_id: number, password_hash: string)
   }
 }
 
-export { users, clients, invoices, transactions, savingsGoals };
+export { users, clients, invoices, transactions, savingsGoals, priceAlerts };
+
+// ============================================
+// Price Alerts Functions
+// ============================================
+
+export async function createPriceAlert(data: any) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db.insert(priceAlerts).values(data);
+  return { id: Number(result[0].insertId) };
+}
+
+export async function getPriceAlertsByUserId(user_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return await db
+    .select()
+    .from(priceAlerts)
+    .where(eq(priceAlerts.user_id, user_id));
+}
+
+export async function deletePriceAlert(id: number, user_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Verify ownership
+  const result = await db
+    .select()
+    .from(priceAlerts)
+    .where(eq(priceAlerts.id, id))
+    .limit(1);
+  
+  const alert = result[0];
+  if (!alert || alert.user_id !== user_id) {
+    throw new Error("Alert not found or access denied");
+  }
+
+  await db
+    .delete(priceAlerts)
+    .where(eq(priceAlerts.id, id));
+}
+
+export async function getAllActivePriceAlerts() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return await db
+    .select()
+    .from(priceAlerts)
+    .where(eq(priceAlerts.is_active, 1));
+}
+
+export async function updatePriceAlertLastTriggered(id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(priceAlerts)
+    .set({ last_triggered_at: new Date() })
+    .where(eq(priceAlerts.id, id));
+}
 
 // ============================================
 // Savings Goals Functions

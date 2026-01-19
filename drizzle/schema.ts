@@ -209,3 +209,21 @@ export const passwordResetTokens = mysqlTable("password_reset_tokens", {
 
 export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type InsertPasswordResetToken = typeof passwordResetTokens.$inferInsert;
+
+/**
+ * Price Alerts table - stores user configured price alerts
+ */
+export const priceAlerts = mysqlTable("price_alerts", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull(),
+  symbol: varchar("symbol", { length: 20 }).notNull(),
+  type: mysqlEnum("type", ["crypto", "stock", "forex", "commodity"]).notNull(),
+  target_price: decimal("target_price", { precision: 20, scale: 8 }).notNull(),
+  condition: mysqlEnum("condition", ["above", "below"]).notNull(),
+  is_active: int("is_active").notNull().default(1),
+  last_triggered_at: timestamp("last_triggered_at"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type PriceAlert = typeof priceAlerts.$inferSelect;
+export type InsertPriceAlert = typeof priceAlerts.$inferInsert;

@@ -1,3 +1,4 @@
+
 /**
  * Email Service Module
  * Handles email sending via Resend API
@@ -229,6 +230,108 @@ export function getInvoiceCreatedEmailTemplate(
         <p><strong>Fecha de Vencimiento:</strong> ${dueDate.toLocaleDateString('es-ES')}</p>
       </div>
       <a href="${process.env.APP_URL || 'http://localhost:3000'}/invoices" class="button">Ver Factura</a>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} WorkFlow. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+export function getLoginAlertEmailTemplate(
+  userName: string,
+  ipAddress: string,
+  userAgent: string,
+  time: Date
+): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #000; color: #fff; padding: 30px; text-align: center; }
+    .content { background: #f9f9f9; padding: 30px; }
+    .alert-box { background: #fff; border-left: 4px solid #000; padding: 20px; margin: 20px 0; }
+    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Nuevo Inicio de Sesión Detectado</h1>
+    </div>
+    <div class="content">
+      <h2>Hola ${userName},</h2>
+      <p>Hemos detectado un nuevo inicio de sesión en tu cuenta de WorkFlow.</p>
+      
+      <div class="alert-box">
+        <p><strong>Fecha y Hora:</strong> ${time.toLocaleString('es-ES')}</p>
+        <p><strong>Dirección IP:</strong> ${ipAddress}</p>
+        <p><strong>Dispositivo:</strong> ${userAgent}</p>
+      </div>
+
+      <p>Si fuiste tú, puedes ignorar este mensaje.</p>
+      <p><strong>¿No fuiste tú?</strong> Te recomendamos cambiar tu contraseña inmediatamente para proteger tu cuenta.</p>
+      
+      <a href="${process.env.APP_URL || 'http://localhost:3000'}/settings" style="display: inline-block; padding: 12px 24px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; margin: 20px 0;">Revisar Seguridad</a>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} WorkFlow. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
+export function getPriceAlertEmailTemplate(
+  userName: string,
+  symbol: string,
+  price: number,
+  targetPrice: number,
+  condition: 'above' | 'below'
+): string {
+  const conditionText = condition === 'above' ? 'superado' : 'caído por debajo de';
+  const arrow = condition === 'above' ? '📈' : '📉';
+  const color = condition === 'above' ? '#16a34a' : '#dc2626';
+  
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #000; color: #fff; padding: 30px; text-align: center; }
+    .content { background: #f9f9f9; padding: 30px; }
+    .price-box { background: #fff; border: 2px solid #000; padding: 20px; margin: 20px 0; text-align: center; }
+    .price { font-size: 36px; font-weight: bold; color: ${color}; }
+    .target { color: #666; font-size: 14px; margin-top: 5px; }
+    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>${arrow} Alerta de Precio: ${symbol}</h1>
+    </div>
+    <div class="content">
+      <h2>Hola ${userName},</h2>
+      <p>Tu alerta de precio para <strong>${symbol}</strong> se ha activado.</p>
+      
+      <div class="price-box">
+        <p style="margin: 0; color: #666;">El precio ha ${conditionText}:</p>
+        <div class="price">$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
+        <div class="target">Objetivo: $${targetPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
+      </div>
+
+      <a href="${process.env.APP_URL || 'http://localhost:3000'}/markets" style="display: inline-block; padding: 12px 24px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; margin: 20px 0;">Ver Mercado</a>
     </div>
     <div class="footer">
       <p>© ${new Date().getFullYear()} WorkFlow. Todos los derechos reservados.</p>

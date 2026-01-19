@@ -6,6 +6,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { startPriceMonitor } from "../services/priceMonitor";
 
 async function startServer() {
   const app = express();
@@ -54,6 +55,9 @@ async function startServer() {
   server.listen(port, "0.0.0.0", () => {
     console.log(`Server running on port ${port}`);
     console.log(`Environment: ${process.env.NODE_ENV}`);
+    
+    // Start background services
+    startPriceMonitor();
   });
 }
 

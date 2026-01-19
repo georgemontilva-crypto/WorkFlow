@@ -15,6 +15,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { TrialBanner } from '@/components/TrialBanner';
 import { MarketWidget } from '@/components/MarketWidget';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, horizontalListSortingStrategy } from '@dnd-kit/sortable';
+import { SortableItem } from '@/components/SortableItem';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
   // The userAuth hooks provides authentication state
@@ -30,6 +34,54 @@ export default function Home() {
   const { data: transactions } = trpc.transactions.list.useQuery();
   const { data: savingsGoals } = trpc.savingsGoals.list.useQuery();
   const { data: dashboardWidget } = trpc.markets.getDashboardWidget.useQuery();
+
+  // State for draggable items
+  const [items, setItems] = useState(['clients', 'invoices', 'income', 'expenses', 'widget']);
+  
+  // Load saved order from localStorage
+  useEffect(() => {
+    const savedOrder = localStorage.getItem('dashboardCardOrder');
+    if (savedOrder) {
+      try {
+        const parsed = JSON.parse(savedOrder);
+        // Ensure all current items exist in saved order (handle new/removed widgets)
+        const currentSet = new Set(['clients', 'invoices', 'income', 'expenses', 'widget']);
+        const validSaved = parsed.filter((id: string) => currentSet.has(id));
+        const missing = ['clients', 'invoices', 'income', 'expenses', 'widget'].filter(id => !validSaved.includes(id));
+        setItems([...validSaved, ...missing]);
+      } catch (e) {
+        console.error('Error parsing saved order', e);
+      }
+    }
+  }, []);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px movement before drag starts (prevents accidental clicks)
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setItems((items) => {
+        const oldIndex = items.indexOf(active.id as string);
+        const newIndex = items.indexOf(over.id as string);
+        const newOrder = arrayMove(items, oldIndex, newIndex);
+        
+        // Save to localStorage
+        localStorage.setItem('dashboardCardOrder', JSON.stringify(newOrder));
+        
+        return newOrder;
+      });
+    }
+  };
 
   // Calcular estadísticas
   const activeClients = clients?.filter(c => c.status === 'active').length || 0;
@@ -106,67 +158,102 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Stats Grid - Horizontal scroll on mobile */}
-        <div className={`flex sm:grid sm:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0 snap-x snap-mandatory sm:snap-none ${dashboardWidget ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0" onClick={() => setLocation('/clients')}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {t.dashboard.activeClients}
-              </CardTitle>
-              <Users className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold text-foreground">{activeClients}</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0" onClick={() => setLocation('/invoices')}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {t.dashboard.pendingInvoices}
-              </CardTitle>
-              <FileText className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold text-foreground">{pendingInvoices}</div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0" onClick={() => setLocation('/finances')}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {t.dashboard.monthlyIncome}
-              </CardTitle>
-              <TrendingUp className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
-                ${monthlyIncome.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0" onClick={() => setLocation('/finances')}>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {t.dashboard.monthlyExpenses}
-              </CardTitle>
-              <TrendingDown className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
-                ${monthlyExpenses.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Market Widget */}
-          {dashboardWidget && (
-            <div className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0">
-              <MarketWidget symbol={dashboardWidget.symbol} type={dashboardWidget.type} />
+        {/* Stats Grid - Draggable */}
+        <DndContext 
+          sensors={sensors} 
+          collisionDetection={closestCenter} 
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext 
+            items={items} 
+            strategy={horizontalListSortingStrategy}
+          >
+            <div className={`flex sm:grid sm:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0 snap-x snap-mandatory sm:snap-none ${dashboardWidget ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              {items.map((id) => {
+                if (id === 'clients') {
+                  return (
+                    <SortableItem key={id} id={id} className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full">
+                      <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full" onClick={() => setLocation('/clients')}>
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                          <CardTitle className="text-sm font-medium text-muted-foreground">
+                            {t.dashboard.activeClients}
+                          </CardTitle>
+                          <Users className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl sm:text-3xl font-bold text-foreground">{activeClients}</div>
+                        </CardContent>
+                      </Card>
+                    </SortableItem>
+                  );
+                }
+                if (id === 'invoices') {
+                  return (
+                    <SortableItem key={id} id={id} className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full">
+                      <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full" onClick={() => setLocation('/invoices')}>
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                          <CardTitle className="text-sm font-medium text-muted-foreground">
+                            {t.dashboard.pendingInvoices}
+                          </CardTitle>
+                          <FileText className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl sm:text-3xl font-bold text-foreground">{pendingInvoices}</div>
+                        </CardContent>
+                      </Card>
+                    </SortableItem>
+                  );
+                }
+                if (id === 'income') {
+                  return (
+                    <SortableItem key={id} id={id} className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full">
+                      <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full" onClick={() => setLocation('/finances')}>
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                          <CardTitle className="text-sm font-medium text-muted-foreground">
+                            {t.dashboard.monthlyIncome}
+                          </CardTitle>
+                          <TrendingUp className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
+                            ${monthlyIncome.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </SortableItem>
+                  );
+                }
+                if (id === 'expenses') {
+                  return (
+                    <SortableItem key={id} id={id} className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full">
+                      <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full" onClick={() => setLocation('/finances')}>
+                        <CardHeader className="flex flex-row items-center justify-between pb-2">
+                          <CardTitle className="text-sm font-medium text-muted-foreground">
+                            {t.dashboard.monthlyExpenses}
+                          </CardTitle>
+                          <TrendingDown className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
+                            ${monthlyExpenses.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </SortableItem>
+                  );
+                }
+                if (id === 'widget' && dashboardWidget) {
+                  return (
+                    <SortableItem key={id} id={id} className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full">
+                      <MarketWidget symbol={dashboardWidget.symbol} type={dashboardWidget.type} />
+                    </SortableItem>
+                  );
+                }
+                return null;
+              })}
             </div>
-          )}
-        </div>
+          </SortableContext>
+        </DndContext>
 
         {/* Alerts Section */}
         {(overduePayments.length > 0 || upcomingPayments.length > 0) && (

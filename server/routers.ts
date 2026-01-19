@@ -70,6 +70,29 @@ export const appRouter = router({
             throw new Error("Invalid email or password");
           }
 
+          // Send Login Alert Email
+          try {
+            const { sendEmail, getLoginAlertEmailTemplate } = await import("./_core/email");
+            const ip = ctx.req.headers['x-forwarded-for'] || ctx.req.socket.remoteAddress || 'Unknown IP';
+            const userAgent = ctx.req.headers['user-agent'] || 'Unknown Device';
+            
+            const emailHtml = getLoginAlertEmailTemplate(
+              user.name,
+              Array.isArray(ip) ? ip[0] : ip,
+              userAgent,
+              new Date()
+            );
+
+            // Send email asynchronously without blocking login
+            sendEmail({
+              to: user.email,
+              subject: "Nuevo Inicio de Sesión - WorkFlow",
+              html: emailHtml,
+            }).catch(err => console.error("[Auth] Failed to send login alert:", err));
+          } catch (error) {
+            console.error("[Auth] Error preparing login alert:", error);
+          }
+
           // Generate JWT token
           const token = await generateToken(user);
 
@@ -872,3 +895,37 @@ export const appRouter = router({
 });
 
 export type AppRouter = typeof appRouter;
+
+  /**
+   * Price Alerts router - Manage user price alerts
+   */
+  priceAlerts: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const { getPriceAlertsByUserId } = await import("./db");
+      return await getPriceAlertsByUserId(ctx.user.id);
+    }),
+
+    create: protectedProcedure
+      .input(z.object({
+        symbol: z.string(),
+        type: z.enum(["crypto", "stock", "forex", "commodity"]),
+        target_price: z.number(),
+        condition: z.enum(["above", "below"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { createPriceAlert } = await import("./db");
+        return await createPriceAlert({
+          ...input,
+          user_id: ctx.user.id,
+          target_price: input.target_price.toString(), // Store as string for decimal precision
+        });
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { deletePriceAlert } = await import("./db");
+        await deletePriceAlert(input.id, ctx.user.id);
+        return { success: true };
+      }),
+  }),
