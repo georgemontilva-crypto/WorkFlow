@@ -69,30 +69,30 @@ export default function Clients() {
   const createClient = trpc.clients.create.useMutation({
     onSuccess: () => {
       utils.clients.list.invalidate();
-      toast.success('Cliente agregado exitosamente');
+      toast.success(t.clients.clientAdded);
     },
     onError: () => {
-      toast.error('Error al agregar el cliente');
+      toast.error(t.clients.clientAddError);
     },
   });
   
   const updateClient = trpc.clients.update.useMutation({
     onSuccess: () => {
       utils.clients.list.invalidate();
-      toast.success('Cliente actualizado exitosamente');
+      toast.success(t.clients.clientUpdated);
     },
     onError: () => {
-      toast.error('Error al actualizar el cliente');
+      toast.error(t.clients.clientUpdateError);
     },
   });
   
   const deleteClient = trpc.clients.delete.useMutation({
     onSuccess: () => {
       utils.clients.list.invalidate();
-      toast.success('Cliente eliminado exitosamente');
+      toast.success(t.clients.clientDeleted);
     },
     onError: () => {
-      toast.error('Error al eliminar el cliente');
+      toast.error(t.clients.clientDeleteError);
     },
   });
   
@@ -132,7 +132,7 @@ export default function Clients() {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.amount || !formData.next_payment_date) {
-      toast.error('Por favor completa los campos requeridos');
+      toast.error(t.clients.completeRequiredFields);
       return;
     }
 
@@ -180,7 +180,7 @@ export default function Clients() {
   };
 
   const handleDelete = async (client_id: number) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este cliente? Esta acción no se puede deshacer.')) {
+    if (window.confirm(`${t.clients.deleteConfirm} ${t.clients.deleteWarning}`)) {
       await deleteClient.mutateAsync({ id: client_id });
     }
   };
@@ -205,7 +205,7 @@ export default function Clients() {
           <div className="flex items-center justify-center py-16">
             <div className="text-center">
               <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Cargando clientes...</p>
+              <p className="text-muted-foreground">{t.clients.loadingClients}</p>
             </div>
           </div>
         </div>
@@ -254,13 +254,13 @@ export default function Clients() {
                   {editingClient ? t.clients.editClient : t.clients.addClient}
                 </DialogTitle>
                 <DialogDescription className="text-muted-foreground text-sm">
-                  {editingClient ? 'Actualiza la información del cliente' : 'Completa los datos del nuevo cliente y su ciclo de facturación'}
+                  {editingClient ? t.clients.updateClientInfo : t.clients.completeClientInfo}
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-foreground font-semibold text-sm">Nombre <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="name" className="text-foreground font-semibold text-sm">{t.clients.name} <span className="text-destructive">*</span></Label>
                     <Input
                       id="name"
                       value={formData.name}
@@ -268,10 +268,10 @@ export default function Clients() {
                       className="bg-background border-border text-foreground h-10"
                       required
                     />
-                    <p className="text-xs text-muted-foreground">Nombre completo o razón social</p>
+                    <p className="text-xs text-muted-foreground">{t.clients.nameHelper}</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-foreground font-semibold">Email <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="email" className="text-foreground font-semibold">{t.clients.email} <span className="text-destructive">*</span></Label>
                     <Input
                       id="email"
                       type="email"
@@ -280,43 +280,43 @@ export default function Clients() {
                       className="bg-background border-border text-foreground h-11"
                       required
                     />
-                    <p className="text-xs text-muted-foreground">Correo electrónico de contacto</p>
+                    <p className="text-xs text-muted-foreground">{t.clients.emailHelper}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-foreground font-semibold">Teléfono</Label>
+                    <Label htmlFor="phone" className="text-foreground font-semibold">{t.clients.phone}</Label>
                     <Input
                       id="phone"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="bg-background border-border text-foreground h-11"
                     />
-                    <p className="text-xs text-muted-foreground">Número de teléfono (opcional)</p>
+                    <p className="text-xs text-muted-foreground">{t.clients.phoneHelper}</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="company" className="text-foreground font-semibold">Empresa</Label>
+                    <Label htmlFor="company" className="text-foreground font-semibold">{t.clients.company}</Label>
                     <Input
                       id="company"
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                       className="bg-background border-border text-foreground h-11"
                     />
-                    <p className="text-xs text-muted-foreground">Nombre de la empresa (opcional)</p>
+                    <p className="text-xs text-muted-foreground">{t.clients.companyHelper}</p>
                   </div>
                 </div>
 
                 {/* Billing Section */}
                 <div className="pt-4 border-t-2 border-border space-y-4">
                   <div>
-                    <h3 className="text-foreground font-semibold text-lg mb-1">Información de Facturación</h3>
-                    <p className="text-sm text-muted-foreground">Configura el ciclo de cobro y recordatorios</p>
+                    <h3 className="text-foreground font-semibold text-lg mb-1">{t.clients.billingInformation}</h3>
+                    <p className="text-sm text-muted-foreground">{t.clients.billingInformationSubtitle}</p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="next_payment_date" className="text-foreground font-semibold">Fecha de Próximo Cobro <span className="text-destructive">*</span></Label>
+                      <Label htmlFor="next_payment_date" className="text-foreground font-semibold">{t.clients.next_payment_date} <span className="text-destructive">*</span></Label>
                       <Input
                         id="next_payment_date"
                         type="date"
@@ -325,10 +325,10 @@ export default function Clients() {
                         className="bg-background border-border text-foreground h-11"
                         required
                       />
-                      <p className="text-xs text-muted-foreground">Fecha del próximo pago esperado</p>
+                      <p className="text-xs text-muted-foreground">{t.clients.nextPaymentDateHelper}</p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="reminder_days" className="text-foreground font-semibold">Días de Anticipación</Label>
+                      <Label htmlFor="reminder_days" className="text-foreground font-semibold">{t.clients.daysInAdvanceLabel}</Label>
                       <Input
                         id="reminder_days"
                         type="number"
@@ -338,13 +338,13 @@ export default function Clients() {
                         onChange={(e) => setFormData({ ...formData, reminder_days: parseInt(e.target.value) || 7 })}
                         className="bg-background border-border text-foreground h-11"
                       />
-                      <p className="text-xs text-muted-foreground">Días antes para mostrar recordatorio</p>
+                      <p className="text-xs text-muted-foreground">{t.clients.daysInAdvanceHelper}</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="billing_cycle" className="text-foreground font-semibold">Ciclo de Facturación</Label>
+                      <Label htmlFor="billing_cycle" className="text-foreground font-semibold">{t.clients.billing_cycle}</Label>
                       <Select
                         value={formData.billing_cycle}
                         onValueChange={(value: any) => setFormData({ ...formData, billing_cycle: value })}
@@ -353,13 +353,13 @@ export default function Clients() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="bg-popover border-border">
-                          <SelectItem value="monthly">Mensual</SelectItem>
-                          <SelectItem value="quarterly">Trimestral</SelectItem>
-                          <SelectItem value="yearly">Anual</SelectItem>
-                          <SelectItem value="custom">Personalizado</SelectItem>
+                          <SelectItem value="monthly">{t.clients.monthly}</SelectItem>
+                          <SelectItem value="quarterly">{t.clients.quarterly}</SelectItem>
+                          <SelectItem value="yearly">{t.clients.yearly}</SelectItem>
+                          <SelectItem value="custom">{t.clients.custom}</SelectItem>
                         </SelectContent>
                       </Select>
-                      <p className="text-xs text-muted-foreground">Frecuencia de cobro recurrente</p>
+                      <p className="text-xs text-muted-foreground">{t.clients.billingCycleHelper}</p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="amount" className="text-foreground font-semibold">{t.clients.amount} <span className="text-destructive">*</span></Label>
@@ -379,7 +379,7 @@ export default function Clients() {
 
                 {formData.billing_cycle === 'custom' && (
                   <div className="space-y-2">
-                    <Label htmlFor="custom_cycle_days" className="text-foreground font-semibold">Días del Ciclo Personalizado</Label>
+                    <Label htmlFor="custom_cycle_days" className="text-foreground font-semibold">{t.clients.customCycleDays}</Label>
                     <Input
                       id="custom_cycle_days"
                       type="number"
@@ -393,7 +393,7 @@ export default function Clients() {
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="status" className="text-foreground font-semibold">Estado</Label>
+                  <Label htmlFor="status" className="text-foreground font-semibold">{t.clients.status}</Label>
                   <Select
                     value={formData.status}
                     onValueChange={(value: any) => setFormData({ ...formData, status: value })}
@@ -406,11 +406,11 @@ export default function Clients() {
                       <SelectItem value="inactive">{t.clients.inactive}</SelectItem>
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">Estado actual del cliente</p>
+                  <p className="text-xs text-muted-foreground">{t.clients.statusHelper}</p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="notes" className="text-foreground font-semibold">Notas Adicionales</Label>
+                  <Label htmlFor="notes" className="text-foreground font-semibold">{t.clients.notes}</Label>
                   <Input
                     id="notes"
                     value={formData.notes}
@@ -418,7 +418,7 @@ export default function Clients() {
                     className="bg-background border-border text-foreground h-10"
                     placeholder={t.clients.notesPlaceholder}
                   />
-                  <p className="text-xs text-muted-foreground">Notas privadas sobre el cliente (opcional)</p>
+                  <p className="text-xs text-muted-foreground">{t.clients.notesHelper}</p>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-6 border-t border-border">
@@ -428,10 +428,10 @@ export default function Clients() {
                     onClick={() => setIsDialogOpen(false)}
                     className="border-border text-foreground hover:bg-accent"
                   >
-                    Cancelar
+                    {t.common.cancel}
                   </Button>
                   <Button type="submit" className="bg-primary text-primary-foreground hover:opacity-90">
-                    {editingClient ? 'Actualizar' : 'Agregar'} Cliente
+                    {editingClient ? t.clients.updateButton : t.clients.addButton} {t.clients.clientLabel}
                   </Button>
                 </div>
               </form>
@@ -461,10 +461,10 @@ export default function Clients() {
                 <Users className="w-16 h-16 text-muted-foreground" strokeWidth={1} />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
-                {searchQuery ? 'No se encontraron clientes' : 'No hay clientes aún'}
+                {searchQuery ? t.clients.noClientsFound : t.clients.noClients}
               </h3>
               <p className="text-muted-foreground mb-6">
-                {searchQuery ? 'Intenta con otro término de búsqueda' : 'Comienza agregando tu primer cliente'}
+                {searchQuery ? t.clients.tryAnotherSearch : t.clients.noClientsSubtitle}
               </p>
             </CardContent>
           </Card>
@@ -508,7 +508,7 @@ export default function Clients() {
                               className="text-foreground hover:bg-accent cursor-pointer"
                             >
                               <Pencil className="w-4 h-4 mr-2" />
-                              Editar
+                              {t.clients.editAction}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-border" />
                             <DropdownMenuItem 
@@ -516,7 +516,7 @@ export default function Clients() {
                               className="text-destructive hover:bg-destructive/10 cursor-pointer"
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
-                              Eliminar
+                              {t.clients.deleteAction}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
