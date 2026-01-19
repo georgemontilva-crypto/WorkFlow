@@ -146,8 +146,8 @@ export async function grantLifetimeAccess(user_id: number, stripeCustomerId?: st
     await db.update(users)
       .set({
         has_lifetime_access: 1,
-        stripeCustomerId,
-        stripePaymentId,
+        stripe_customer_id: stripeCustomerId,
+        stripe_payment_id: stripePaymentId,
         updated_at: new Date(),
       })
       .where(eq(users.id, user_id));
@@ -257,7 +257,7 @@ export async function updateUserPassword(user_id: number, password_hash: string)
   try {
     await db.update(users)
       .set({
-        passwordHash,
+        password_hash: password_hash,
         updated_at: new Date(),
       })
       .where(eq(users.id, user_id));
@@ -796,6 +796,6 @@ export async function updateUserLifetimeAccess(user_id: number, hasAccess: boole
 
   await db
     .update(users)
-    .set({ has_lifetime_access: hasAccess })
+    .set({ has_lifetime_access: hasAccess ? 1 : 0 })
     .where(eq(users.id, user_id));
 }

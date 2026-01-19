@@ -171,7 +171,7 @@ export const supportMessages = mysqlTable("support_messages", {
   ticket_id: int("ticket_id").notNull(),
   user_id: int("user_id").notNull(),
   message: text("message").notNull(),
-  is_staff: boolean("is_staff").notNull().default(false),
+  is_staff: int("is_staff").notNull().default(0),
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
