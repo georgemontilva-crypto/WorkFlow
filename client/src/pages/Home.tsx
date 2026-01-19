@@ -129,6 +129,11 @@ export default function Home() {
   // Get top 3 active savings goals
   const topSavingsGoals = savingsGoals?.filter(g => g.status === 'active').slice(0, 3) || [];
 
+  // Determine card item class based on total items
+  const cardItemClass = items.length <= 4 
+    ? 'min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full' 
+    : 'min-w-[280px] snap-start snap-always shrink-0 h-full';
+
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8">
@@ -157,9 +162,9 @@ export default function Home() {
             <Button
               onClick={() => setLocation('/invoices?new=true')}
               variant="outline"
-              className="border-border text-foreground hover:bg-accent flex-1 sm:flex-none"
+              className="flex-1 sm:flex-none"
             >
-              <FileText className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">{t.invoices.newInvoice}</span>
               <span className="sm:hidden">{t.invoices.title}</span>
             </Button>
@@ -176,11 +181,11 @@ export default function Home() {
             items={items} 
             strategy={horizontalListSortingStrategy}
           >
-            <div className={`flex sm:grid sm:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0 snap-x snap-mandatory sm:snap-none lg:grid-cols-4 xl:grid-cols-5`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className={`flex gap-4 lg:gap-6 mb-6 lg:mb-8 overflow-x-auto pb-2 snap-x snap-mandatory ${items.length <= 4 ? 'sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:overflow-x-visible sm:snap-none' : ''}`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {items.map((id) => {
                 if (id === 'clients') {
                   return (
-                    <SortableItem key={id} id={id} className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full">
+                    <SortableItem key={id} id={id} className={cardItemClass}>
                       <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full" onClick={() => setLocation('/clients')}>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                           <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -197,7 +202,7 @@ export default function Home() {
                 }
                 if (id === 'invoices') {
                   return (
-                    <SortableItem key={id} id={id} className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full">
+                    <SortableItem key={id} id={id} className={cardItemClass}>
                       <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full" onClick={() => setLocation('/invoices')}>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                           <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -214,7 +219,7 @@ export default function Home() {
                 }
                 if (id === 'income') {
                   return (
-                    <SortableItem key={id} id={id} className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full">
+                    <SortableItem key={id} id={id} className={cardItemClass}>
                       <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full" onClick={() => setLocation('/finances')}>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                           <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -233,7 +238,7 @@ export default function Home() {
                 }
                 if (id === 'expenses') {
                   return (
-                    <SortableItem key={id} id={id} className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full">
+                    <SortableItem key={id} id={id} className={cardItemClass}>
                       <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full" onClick={() => setLocation('/finances')}>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                           <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -255,7 +260,7 @@ export default function Home() {
                   const widget = dashboardWidgets.find(w => w.symbol === symbol);
                   if (widget) {
                     return (
-                      <SortableItem key={id} id={id} className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full">
+                      <SortableItem key={id} id={id} className={cardItemClass}>
                         <MarketWidget symbol={widget.symbol} type={widget.type} />
                       </SortableItem>
                     );
@@ -280,24 +285,33 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {overduePayments.slice(0, 3).map(client => (
-                      <div key={client.id} className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                    {overduePayments.slice(0, 3).map((client) => (
+                      <div 
+                        key={client.id} 
+                        className="flex items-center justify-between p-3 bg-background/50 rounded-lg cursor-pointer hover:bg-background/80 transition-colors"
+                        onClick={() => setLocation(`/clients?id=${client.id}`)}
+                      >
                         <div>
                           <p className="font-medium text-foreground">{client.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            {t.dashboard.dueDate}: {format(new Date(client.next_payment_date), 'dd MMM yyyy', { locale: es })}
+                            Vencido hace {Math.abs(differenceInDays(new Date(client.next_payment_date), new Date()))} días
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-foreground font-mono">
-                            ${parseFloat(client.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                          </p>
-                          <p className="text-xs text-destructive">
-                            {Math.abs(differenceInDays(new Date(client.next_payment_date), new Date()))} días vencido
-                          </p>
+                          <p className="font-mono font-bold text-destructive">${parseFloat(client.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}</p>
+                          <p className="text-xs text-muted-foreground">{format(new Date(client.next_payment_date), 'dd MMM yyyy', { locale: es })}</p>
                         </div>
                       </div>
                     ))}
+                    {overduePayments.length > 3 && (
+                      <Button 
+                        variant="ghost" 
+                        className="w-full mt-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => setLocation('/clients')}
+                      >
+                        Ver todos ({overduePayments.length})
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -313,24 +327,33 @@ export default function Home() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {upcomingPayments.slice(0, 3).map(client => (
-                      <div key={client.id} className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
+                    {upcomingPayments.slice(0, 3).map((client) => (
+                      <div 
+                        key={client.id} 
+                        className="flex items-center justify-between p-3 bg-background/50 rounded-lg cursor-pointer hover:bg-background/80 transition-colors"
+                        onClick={() => setLocation(`/clients?id=${client.id}`)}
+                      >
                         <div>
                           <p className="font-medium text-foreground">{client.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            {t.dashboard.dueDate}: {format(new Date(client.next_payment_date), 'dd MMM yyyy', { locale: es })}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-bold text-foreground font-mono">
-                            ${parseFloat(client.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                          </p>
-                          <p className="text-xs text-yellow-600 dark:text-yellow-500">
                             En {differenceInDays(new Date(client.next_payment_date), new Date())} días
                           </p>
                         </div>
+                        <div className="text-right">
+                          <p className="font-mono font-bold text-yellow-600 dark:text-yellow-500">${parseFloat(client.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}</p>
+                          <p className="text-xs text-muted-foreground">{format(new Date(client.next_payment_date), 'dd MMM yyyy', { locale: es })}</p>
+                        </div>
                       </div>
                     ))}
+                    {upcomingPayments.length > 3 && (
+                      <Button 
+                        variant="ghost" 
+                        className="w-full mt-2 text-yellow-600 dark:text-yellow-500 hover:text-yellow-600 dark:hover:text-yellow-500 hover:bg-yellow-500/10"
+                        onClick={() => setLocation('/clients')}
+                      >
+                        Ver todos ({upcomingPayments.length})
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -340,107 +363,107 @@ export default function Home() {
 
         {/* Savings Goals Section */}
         {topSavingsGoals.length > 0 && (
-          <Card className="bg-card border-border mb-6 lg:mb-8">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                {t.savings?.title || 'Metas de Ahorro'}
-              </CardTitle>
+          <div className="mb-6 lg:mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                <Target className="w-5 h-5 text-primary" />
+                {t.savings.goals}
+              </h2>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setLocation('/savings')}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-primary hover:text-primary hover:bg-primary/10"
               >
                 Ver todas
               </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {topSavingsGoals.map(goal => {
-                  const progress = (parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100;
-                  return (
-                    <div key={goal.id} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium text-foreground">{goal.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          ${parseFloat(goal.current_amount).toLocaleString('es-ES')} / ${parseFloat(goal.target_amount).toLocaleString('es-ES')}
-                        </p>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div
-                          className="bg-primary h-2 rounded-full transition-all"
-                          style={{ width: `${Math.min(progress, 100)}%` }}
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {progress.toFixed(1)}% completado
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Recent Transactions */}
-        <Card className="bg-card border-border">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">{t.dashboard.recentTransactions || 'Transacciones Recientes'}</CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLocation('/finances')}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              Ver todas
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {!transactions || transactions.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">
-                {t.dashboard.noTransactions || 'No hay transacciones recientes'}
-              </p>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                {transactions.slice(0, 6).map(transaction => (
-                  <div
-                    key={transaction.id}
-                    className="flex items-center justify-between p-3 bg-background rounded-lg border border-border"
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {topSavingsGoals.map((goal) => {
+                const progress = (parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100;
+                return (
+                  <Card 
+                    key={goal.id} 
+                    className="bg-card border-border hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer"
+                    onClick={() => setLocation('/savings')}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-full ${
-                        transaction.type === 'income' 
-                          ? 'bg-green-500/10' 
-                          : 'bg-red-500/10'
-                      }`}>
-                        {transaction.type === 'income' ? (
-                          <TrendingUp className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <TrendingDown className="w-4 h-4 text-red-500" />
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center justify-between">
+                        <span className="truncate">{goal.name}</span>
+                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 shrink-0" />
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-baseline justify-between">
+                          <span className="text-2xl font-bold font-mono text-foreground">
+                            ${parseFloat(goal.current_amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            de ${parseFloat(goal.target_amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <span>Progreso</span>
+                            <span className="font-medium">{progress.toFixed(0)}%</span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-primary transition-all duration-300"
+                              style={{ width: `${Math.min(progress, 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                        {goal.target_date && (
+                          <p className="text-xs text-muted-foreground">
+                            Meta: {format(new Date(goal.target_date), 'dd MMM yyyy', { locale: es })}
+                          </p>
                         )}
                       </div>
-                      <div>
-                        <p className="font-medium text-foreground text-sm">{transaction.description}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
-                        </p>
-                      </div>
-                    </div>
-                    <div className={`text-base font-bold font-mono ${
-                      transaction.type === 'income' 
-                        ? 'text-green-500' 
-                        : 'text-red-500'
-                    }`}>
-                      {transaction.type === 'income' ? '+' : '-'}${parseFloat(transaction.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <Button
+            variant="outline"
+            className="h-auto py-4 flex flex-col items-center gap-2"
+            onClick={() => setLocation('/finances')}
+          >
+            <BarChart3 className="w-6 h-6 text-primary" />
+            <span className="text-sm">{t.finances.title}</span>
+          </Button>
+          <Button
+            variant="outline"
+            className="h-auto py-4 flex flex-col items-center gap-2"
+            onClick={() => setLocation('/savings')}
+          >
+            <Target className="w-6 h-6 text-primary" />
+            <span className="text-sm">{t.savings.title}</span>
+          </Button>
+          <Button
+            variant="outline"
+            className="h-auto py-4 flex flex-col items-center gap-2"
+            onClick={() => setLocation('/markets')}
+          >
+            <TrendingUp className="w-6 h-6 text-primary" />
+            <span className="text-sm">Mercados</span>
+          </Button>
+          <Button
+            variant="outline"
+            className="h-auto py-4 flex flex-col items-center gap-2"
+            onClick={() => setLocation('/reminders')}
+          >
+            <Bell className="w-6 h-4 text-primary" />
+            <span className="text-sm">{t.reminders.title}</span>
+          </Button>
+        </div>
       </div>
     </DashboardLayout>
   );
