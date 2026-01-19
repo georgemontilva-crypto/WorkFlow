@@ -1,6 +1,7 @@
 /**
  * MarketWidget - Real-time market data widget for Dashboard
  * Design Philosophy: Apple Minimalism - Clean, informative
+ * Data Source: Binance API (faster and more accurate than CoinGecko)
  */
 
 import { useState, useEffect } from 'react';
@@ -21,38 +22,38 @@ interface MarketData {
   low24h: number;
 }
 
-// Map crypto symbols to CoinGecko IDs
-const CRYPTO_ID_MAP: Record<string, string> = {
-  'BTC': 'bitcoin',
-  'ETH': 'ethereum',
-  'SOL': 'solana',
-  'BNB': 'binancecoin',
-  'XRP': 'ripple',
-  'ADA': 'cardano',
-  'DOGE': 'dogecoin',
-  'AVAX': 'avalanche-2',
-  'DOT': 'polkadot',
-  'LINK': 'chainlink',
-  'MATIC': 'matic-network',
-  'UNI': 'uniswap',
-  'LTC': 'litecoin',
-  'ATOM': 'cosmos',
-  'XLM': 'stellar',
-  'ALGO': 'algorand',
-  'VET': 'vechain',
-  'ICP': 'internet-computer',
-  'FIL': 'filecoin',
-  'HBAR': 'hedera-hashgraph',
-  'APT': 'aptos',
-  'ARB': 'arbitrum',
-  'OP': 'optimism',
-  'NEAR': 'near',
-  'STX': 'blockstack',
-  'IMX': 'immutable-x',
-  'INJ': 'injective-protocol',
-  'TIA': 'celestia',
-  'SEI': 'sei-network',
-  'SUI': 'sui',
+// Map crypto symbols to display names
+const CRYPTO_NAMES: Record<string, string> = {
+  'BTC': 'Bitcoin',
+  'ETH': 'Ethereum',
+  'SOL': 'Solana',
+  'BNB': 'BNB',
+  'XRP': 'Ripple',
+  'ADA': 'Cardano',
+  'DOGE': 'Dogecoin',
+  'AVAX': 'Avalanche',
+  'DOT': 'Polkadot',
+  'LINK': 'Chainlink',
+  'MATIC': 'Polygon',
+  'UNI': 'Uniswap',
+  'LTC': 'Litecoin',
+  'ATOM': 'Cosmos',
+  'XLM': 'Stellar',
+  'ALGO': 'Algorand',
+  'VET': 'VeChain',
+  'ICP': 'Internet Computer',
+  'FIL': 'Filecoin',
+  'HBAR': 'Hedera',
+  'APT': 'Aptos',
+  'ARB': 'Arbitrum',
+  'OP': 'Optimism',
+  'NEAR': 'NEAR Protocol',
+  'STX': 'Stacks',
+  'IMX': 'Immutable X',
+  'INJ': 'Injective',
+  'TIA': 'Celestia',
+  'SEI': 'Sei',
+  'SUI': 'Sui',
 };
 
 export function MarketWidget({ symbol, type }: MarketWidgetProps) {
@@ -64,34 +65,44 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
     const fetchData = async () => {
       if (type === 'crypto') {
         try {
-          // Get CoinGecko ID from symbol
-          const coinId = CRYPTO_ID_MAP[symbol.toUpperCase()] || symbol.toLowerCase();
+          // Binance uses USDT pairs for most cryptos
+          const pair = `${symbol.toUpperCase()}USDT`;
           
+          // Fetch 24hr ticker data from Binance
           const response = await fetch(
-            `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinId}&order=market_cap_desc&per_page=1&page=1&sparkline=false`
+            `https://api.binance.com/api/v3/ticker/24hr?symbol=${pair}`
           );
           
           if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-          }
-          
-          const result = await response.json();
-          
-          if (result && result.length > 0) {
-            const coin = result[0];
+            // If USDT pair doesn't exist, try BUSD
+            const busdResponse = await fetch(
+              `https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol.toUpperCase()}BUSD`
+            );
+            
+            if (!busdResponse.ok) {
+              throw new Error(`API error: ${response.status}`);
+            }
+            
+            const result = await busdResponse.json();
             setData({
-              name: coin.name,
-              price: coin.current_price,
-              change24h: coin.price_change_percentage_24h,
-              high24h: coin.high_24h,
-              low24h: coin.low_24h,
+              name: CRYPTO_NAMES[symbol.toUpperCase()] || symbol.toUpperCase(),
+              price: parseFloat(result.lastPrice),
+              change24h: parseFloat(result.priceChangePercent),
+              high24h: parseFloat(result.highPrice),
+              low24h: parseFloat(result.lowPrice),
             });
           } else {
-            console.warn(`No data found for ${symbol} (${coinId})`);
-            setData(null);
+            const result = await response.json();
+            setData({
+              name: CRYPTO_NAMES[symbol.toUpperCase()] || symbol.toUpperCase(),
+              price: parseFloat(result.lastPrice),
+              change24h: parseFloat(result.priceChangePercent),
+              high24h: parseFloat(result.highPrice),
+              low24h: parseFloat(result.lowPrice),
+            });
           }
         } catch (error) {
-          console.error('Error fetching market data:', error);
+          console.error('Error fetching market data from Binance:', error);
           setData(null);
         } finally {
           setLoading(false);
@@ -103,7 +114,8 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 60000); // Update every minute
+    // Update every 30 seconds (Binance is faster, so we can update more frequently)
+    const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, [symbol, type]);
 
@@ -118,10 +130,7 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
           <Activity className="w-4 h-4 text-muted-foreground animate-pulse" />
         </CardHeader>
         <CardContent>
-          <div className="animate-pulse space-y-2">
-            <div className="h-8 bg-muted rounded w-3/4"></div>
-            <div className="h-4 bg-muted rounded w-1/2"></div>
-          </div>
+          <p className="text-xs text-muted-foreground">Cargando...</p>
         </CardContent>
       </Card>
     );
@@ -137,50 +146,49 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Sin datos disponibles</p>
-          <p className="text-xs text-muted-foreground mt-1">{symbol}</p>
+          <p className="text-xs text-muted-foreground">Sin datos</p>
         </CardContent>
       </Card>
     );
   }
 
   const isPositive = data.change24h >= 0;
-  const formatPrice = (price: number) => {
-    if (price < 1) return `$${price.toFixed(6)}`;
-    if (price < 100) return `$${price.toFixed(2)}`;
-    return `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
+  const changeColor = isPositive ? 'text-green-500' : 'text-red-500';
+  const changeBgColor = isPositive ? 'bg-green-500/10' : 'bg-red-500/10';
+  const borderColor = isPositive ? 'border-green-500/30' : 'border-red-500/30';
 
   return (
     <Card 
-      className={`bg-card border-2 transition-all cursor-pointer hover:shadow-lg ${
-        isPositive 
-          ? 'border-green-500/30 hover:border-green-500/50 bg-gradient-to-br from-green-500/5 to-green-500/10' 
-          : 'border-red-500/30 hover:border-red-500/50 bg-gradient-to-br from-red-500/5 to-red-500/10'
-      }`}
+      className={`bg-card border-2 ${borderColor} hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer`}
       onClick={() => setLocation('/markets')}
     >
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
           <BarChart3 className="w-4 h-4" strokeWidth={1.5} />
-          <span className="hidden sm:inline">{data.name}</span>
-          <span className="sm:hidden">{symbol}</span>
+          {symbol.toUpperCase()}
         </CardTitle>
-        <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
-          isPositive ? 'bg-green-500/20 text-green-600' : 'bg-red-500/20 text-red-600'
-        }`}>
-          {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-          {isPositive ? '+' : ''}{(data.change24h || 0).toFixed(1)}%
+        <div className={`flex items-center gap-1 px-2 py-1 rounded-md ${changeBgColor}`}>
+          {isPositive ? (
+            <TrendingUp className={`w-3 h-3 ${changeColor}`} />
+          ) : (
+            <TrendingDown className={`w-3 h-3 ${changeColor}`} />
+          )}
+          <span className={`text-xs font-semibold ${changeColor}`}>
+            {isPositive ? '+' : ''}{data.change24h.toFixed(2)}%
+          </span>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
+        <div className="space-y-1">
           <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
-            {formatPrice(data.price)}
+            ${data.price.toLocaleString('en-US', { 
+              minimumFractionDigits: data.price < 1 ? 4 : 2,
+              maximumFractionDigits: data.price < 1 ? 6 : 2
+            })}
           </div>
-          <div className="text-xs text-muted-foreground">
-            <span className="hidden sm:inline">{symbol} • </span>Actualización en tiempo real
-          </div>
+          <p className="text-xs text-muted-foreground">
+            {data.name} • Actualización en tiempo real
+          </p>
         </div>
       </CardContent>
     </Card>
