@@ -383,14 +383,16 @@ export default function Markets() {
           />
         </div>
 
-        {/* Tabs */}
+        {/* Tabs - Scrollable on mobile */}
         <Tabs defaultValue="crypto" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
-            <TabsTrigger value="crypto">Cripto</TabsTrigger>
-            <TabsTrigger value="stocks">Acciones</TabsTrigger>
-            <TabsTrigger value="forex">Forex</TabsTrigger>
-            <TabsTrigger value="commodities">Commodities</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+            <TabsList className="w-full min-w-max flex md:grid md:grid-cols-4 mb-2 md:mb-6 pr-4 md:pr-0">
+              <TabsTrigger value="crypto" className="flex-1">Cripto</TabsTrigger>
+              <TabsTrigger value="stocks" className="flex-1">Acciones</TabsTrigger>
+              <TabsTrigger value="forex" className="flex-1">Forex</TabsTrigger>
+              <TabsTrigger value="commodities" className="flex-1">Commodities</TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="crypto">
             <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

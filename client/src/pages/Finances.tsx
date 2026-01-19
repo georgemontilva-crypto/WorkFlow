@@ -251,14 +251,14 @@ export default function Finances() {
           </Dialog>
         </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-card border-border">
+        {/* Summary Cards - Horizontal Scroll on Mobile, Grid on Desktop */}
+        <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-6 mb-8 overflow-x-auto pb-4 md:pb-0 snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
+          <Card className="bg-card border-border min-w-[85vw] md:min-w-0 snap-center">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Total Ingresos
               </CardTitle>
-              <TrendingUp className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+              <TrendingUp className="w-4 h-4 text-green-500" strokeWidth={1.5} />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground font-mono">
@@ -267,12 +267,12 @@ export default function Finances() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
+          <Card className="bg-card border-border min-w-[85vw] md:min-w-0 snap-center">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Total Gastos
               </CardTitle>
-              <TrendingDown className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+              <TrendingDown className="w-4 h-4 text-red-500" strokeWidth={1.5} />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-foreground font-mono">
@@ -281,7 +281,7 @@ export default function Finances() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
+          <Card className="bg-card border-border min-w-[85vw] md:min-w-0 snap-center">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 Balance
