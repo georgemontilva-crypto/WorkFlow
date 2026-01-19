@@ -103,7 +103,7 @@ export default function Invoices() {
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery();
   
   // Filter invoices
-  const invoices = allInvoices?.filter(inv => inv.status !== 'archived');
+  const invoices = allInvoices?.filter(inv => inv.status !== 'cancelled');
   const archivedInvoices = allInvoices?.filter(inv => inv.status === 'cancelled');
   
   // Mutations
@@ -260,7 +260,7 @@ export default function Invoices() {
     setNewStatus(status);
     
     // Si el cambio es a "paid" y la factura estaba pendiente, mostrar diálogo
-    if (status === 'paid' && invoice.status === 'draft' || status === 'sent') {
+    if (status === 'paid' && (invoice.status === 'draft' || invoice.status === 'sent')) {
       setShowStatusDialog(true);
     } else {
       // Cambiar estado directamente

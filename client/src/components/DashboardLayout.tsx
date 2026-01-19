@@ -11,8 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ReminderAlert } from '@/components/ReminderAlert';
 import { AccessBlocker } from './AccessBlocker';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/db';
+
 import { differenceInDays, parseISO } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/_core/hooks/useAuth';
@@ -36,9 +35,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [showOverdueAlert, setShowOverdueAlert] = useState(false);
   const [showUrgentAlert, setShowUrgentAlert] = useState(false);
   
-  // Fetch clients and invoices for alerts
-  const clients = useLiveQuery(() => db.clients.where('status').equals('active').toArray());
-  const invoices = useLiveQuery(() => db.invoices.where('status').equals('pending').toArray());
+  // Fetch clients and invoices for alerts using tRPC
+  const { data: allClients } = trpc.clients.list.useQuery(undefined, { enabled: isAuthenticated });
+  const { data: allInvoices } = trpc.invoices.list.useQuery(undefined, { enabled: isAuthenticated });
+  
+  const clients = allClients?.filter(c => c.status === 'active');
+  const invoices = allInvoices?.filter(i => i.status === 'draft' || i.status === 'sent');
   
   // Check for overdue and urgent reminders
   useEffect(() => {
@@ -50,22 +52,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     
     // Count overdue items
     const overdueClients = clients.filter(c => {
-      const daysUntil = differenceInDays(parseISO(c.next_payment_date), new Date());
+      const daysUntil = differenceInDays(new Date(c.next_payment_date), new Date());
       return daysUntil < 0;
     });
     const overdueInvoices = invoices.filter(i => {
-      const daysUntil = differenceInDays(parseISO(i.due_date), new Date());
+      const daysUntil = differenceInDays(new Date(i.due_date), new Date());
       return daysUntil < 0;
     });
     const overdueCount = overdueClients.length + overdueInvoices.length;
     
     // Count urgent items (5 days or less)
     const urgentClients = clients.filter(c => {
-      const daysUntil = differenceInDays(parseISO(c.next_payment_date), new Date());
+      const daysUntil = differenceInDays(new Date(c.next_payment_date), new Date());
       return daysUntil >= 0 && daysUntil <= 5;
     });
     const urgentInvoices = invoices.filter(i => {
-      const daysUntil = differenceInDays(parseISO(i.due_date), new Date());
+      const daysUntil = differenceInDays(new Date(i.due_date), new Date());
       return daysUntil >= 0 && daysUntil <= 5;
     });
     const urgentCount = urgentClients.length + urgentInvoices.length;

@@ -8,10 +8,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/db';
+import { trpc } from '@/lib/trpc';
 import { AlertCircle, Clock, CheckCircle2, Eye, Building2, Calendar, DollarSign } from 'lucide-react';
-import { format, parseISO, differenceInDays } from 'date-fns';
+import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLocation } from 'wouter';
@@ -21,7 +20,7 @@ type ReminderItem = {
   type: 'client' | 'invoice';
   clientName: string;
   company?: string;
-  amount: number;
+  amount: string;
   due_date: string;
   daysUntil: number;
   status: 'overdue' | 'urgent' | 'upcoming';
@@ -31,34 +30,38 @@ type ReminderItem = {
 export default function Reminders() {
   const { t } = useLanguage();
   const [, setLocation] = useLocation();
-  const clients = useLiveQuery(() => 
-    db.clients.where('status').equals('active').toArray()
-  );
-  const invoices = useLiveQuery(() => db.invoices.where('status').equals('pending').toArray());
+  
+  // Fetch data using tRPC
+  const { data: clients } = trpc.clients.list.useQuery();
+  const { data: invoices } = trpc.invoices.list.useQuery();
+
+  // Filter active clients and pending invoices
+  const activeClients = clients?.filter(c => c.status === 'active') || [];
+  const pendingInvoices = invoices?.filter(i => i.status === 'draft' || i.status === 'sent') || [];
 
   // Procesar recordatorios de clientes
-  const clientReminders: ReminderItem[] = clients?.map(client => {
-    const daysUntil = differenceInDays(parseISO(client.next_payment_date), new Date());
+  const clientReminders: ReminderItem[] = activeClients.map(client => {
+    const daysUntil = differenceInDays(new Date(client.next_payment_date), new Date());
     let status: 'overdue' | 'urgent' | 'upcoming' = 'upcoming';
     
     if (daysUntil < 0) status = 'overdue';
     else if (daysUntil <= 5) status = 'urgent';
     
     return {
-      id: client.id!,
+      id: client.id,
       type: 'client' as const,
       clientName: client.name,
-      company: client.company,
+      company: client.company || undefined,
       amount: client.amount,
-      due_date: client.next_payment_date,
+      due_date: new Date(client.next_payment_date).toISOString(),
       daysUntil,
       status
     };
-  }) || [];
+  });
 
   // Procesar recordatorios de facturas
-  const invoiceReminders: ReminderItem[] = invoices?.map(invoice => {
-    const daysUntil = differenceInDays(parseISO(invoice.due_date), new Date());
+  const invoiceReminders: ReminderItem[] = pendingInvoices.map(invoice => {
+    const daysUntil = differenceInDays(new Date(invoice.due_date), new Date());
     let status: 'overdue' | 'urgent' | 'upcoming' = 'upcoming';
     
     if (daysUntil < 0) status = 'overdue';
@@ -67,17 +70,17 @@ export default function Reminders() {
     const client = clients?.find(c => c.id === invoice.client_id);
     
     return {
-      id: invoice.id!,
+      id: invoice.id,
       type: 'invoice' as const,
       clientName: client?.name || 'Cliente Desconocido',
-      company: client?.company,
-      amount: invoice.amount,
-      due_date: invoice.due_date,
+      company: client?.company || undefined,
+      amount: invoice.total,
+      due_date: new Date(invoice.due_date).toISOString(),
       daysUntil,
       status,
       invoice_number: invoice.invoice_number
     };
-  }) || [];
+  });
 
   // Combinar y ordenar todos los recordatorios
   const allReminders = [...clientReminders, ...invoiceReminders]
@@ -95,125 +98,109 @@ export default function Reminders() {
   const urgentReminders = allReminders.filter(r => r.status === 'urgent');
   const upcomingReminders = allReminders.filter(r => r.status === 'upcoming');
 
-
-
   const getStatusConfig = (status: 'overdue' | 'urgent' | 'upcoming') => {
     switch (status) {
       case 'overdue':
         return {
-          label: t.reminders.overdue,
           icon: AlertCircle,
-          badgeClass: 'bg-red-500/10 text-red-500 border-red-500/30',
-          cardBorder: 'border-l-4 border-l-red-500',
-          iconColor: 'text-red-500'
+          color: 'text-red-500',
+          bgColor: 'bg-red-500/10',
+          borderColor: 'border-red-500/20',
+          label: 'Vencido'
         };
       case 'urgent':
         return {
-          label: t.reminders.urgent,
           icon: Clock,
-          badgeClass: 'bg-orange-500/10 text-orange-500 border-orange-500/30',
-          cardBorder: 'border-l-4 border-l-orange-500',
-          iconColor: 'text-orange-500'
+          color: 'text-yellow-500',
+          bgColor: 'bg-yellow-500/10',
+          borderColor: 'border-yellow-500/20',
+          label: 'Urgente'
         };
       case 'upcoming':
         return {
-          label: t.reminders.upcoming,
           icon: CheckCircle2,
-          badgeClass: 'bg-green-500/10 text-green-500 border-green-500/30',
-          cardBorder: 'border-l-4 border-l-green-500',
-          iconColor: 'text-green-500'
+          color: 'text-blue-500',
+          bgColor: 'bg-blue-500/10',
+          borderColor: 'border-blue-500/20',
+          label: 'Próximo'
         };
     }
   };
 
-  const getDaysText = (daysUntil: number) => {
-    if (daysUntil < 0) {
-      return `${Math.abs(daysUntil)} ${t.common.days} ${t.reminders.overdueAgo}`;
-    } else if (daysUntil === 0) {
-      return 'Vence hoy';
-    } else if (daysUntil === 1) {
-      return 'Vence mañana';
-    } else {
-      return `Vence en ${daysUntil} ${t.common.days}`;
-    }
-  };
-
-  const handleViewItem = (item: ReminderItem) => {
-    if (item.type === 'invoice') {
-      setLocation('/invoices');
-    } else {
-      setLocation('/clients');
-    }
-  };
-
-
-
-  const ReminderCard = ({ item }: { item: ReminderItem }) => {
-    const config = getStatusConfig(item.status);
-    const StatusIcon = config.icon;
+  const ReminderCard = ({ reminder }: { reminder: ReminderItem }) => {
+    const config = getStatusConfig(reminder.status);
+    const Icon = config.icon;
 
     return (
-      <Card className={`bg-card border-border hover:bg-accent/5 transition-all ${config.cardBorder}`}>
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4">
-            {/* Left: Icon and Info */}
-            <div className="flex items-start gap-3 flex-1 min-w-0">
-              <div className={`p-2 rounded-lg bg-accent/20 ${config.iconColor} flex-shrink-0`}>
-                <StatusIcon className="w-5 h-5" />
+      <Card className={`${config.bgColor} ${config.borderColor} border-2 hover:scale-[1.02] transition-transform`}>
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            {/* Left Section */}
+            <div className="flex items-start gap-3 sm:gap-4 flex-1">
+              <div className={`${config.bgColor} p-2 sm:p-3 rounded-full`}>
+                <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${config.color}`} />
               </div>
               
               <div className="flex-1 min-w-0">
-                {/* Client Name and Company */}
-                <div className="mb-2">
-                  <h3 className="font-semibold text-foreground truncate">{item.clientName}</h3>
-                  {item.company && (
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mt-0.5">
-                      <Building2 className="w-3 h-3" />
-                      <span className="truncate">{item.company}</span>
-                    </div>
-                  )}
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="outline" className={`${config.color} border-current text-xs`}>
+                    {config.label}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {reminder.type === 'client' ? 'Cliente' : 'Factura'}
+                  </Badge>
                 </div>
-
-                {/* Invoice Number (if applicable) */}
-                {item.invoice_number && (
-                  <p className="text-xs text-muted-foreground mb-2">
-                    {t.invoices.invoice}: {item.invoice_number}
+                
+                <h3 className="text-base sm:text-lg font-bold text-foreground mb-1 truncate">
+                  {reminder.clientName}
+                </h3>
+                
+                {reminder.company && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                    <Building2 className="w-4 h-4" />
+                    <span className="truncate">{reminder.company}</span>
+                  </div>
+                )}
+                
+                {reminder.invoice_number && (
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Factura: {reminder.invoice_number}
                   </p>
                 )}
-
-                {/* Date and Days */}
-                <div className="flex flex-wrap items-center gap-3 text-sm">
-                  <div className="flex items-center gap-1.5 text-muted-foreground">
+                
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    <span>{format(parseISO(item.due_date), 'dd MMM yyyy', { locale: es })}</span>
+                    <span>{format(new Date(reminder.due_date), 'dd MMM yyyy', { locale: es })}</span>
                   </div>
-                  <Badge variant="outline" className={config.badgeClass}>
-                    {getDaysText(item.daysUntil)}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4" />
+                    <span className="font-mono">${parseFloat(reminder.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Right: Amount and Actions */}
-            <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-2 flex-shrink-0 w-full sm:w-auto">
-              <div className="flex items-center gap-1 text-foreground">
-                <DollarSign className="w-4 h-4 text-muted-foreground" />
-                <span className="font-bold font-mono text-lg">
-                  ${item.amount.toLocaleString('es-ES')}
-                </span>
+            {/* Right Section */}
+            <div className="flex sm:flex-col items-center sm:items-end gap-3 sm:gap-2">
+              <div className="text-center sm:text-right">
+                <p className={`text-2xl sm:text-3xl font-bold ${config.color}`}>
+                  {Math.abs(reminder.daysUntil)}
+                </p>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  {reminder.daysUntil < 0 ? 'días vencido' : 'días restantes'}
+                </p>
               </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleViewItem(item)}
-                  className="border-border text-foreground hover:bg-accent whitespace-nowrap"
-                >
-                  <Eye className="w-3 h-3 mr-1" />
-                  Ver
-                </Button>
-
-              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setLocation(reminder.type === 'client' ? '/clients' : '/invoices')}
+                className="border-border text-foreground hover:bg-accent"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Ver
+              </Button>
             </div>
           </div>
         </CardContent>
@@ -221,107 +208,124 @@ export default function Reminders() {
     );
   };
 
-  const EmptyState = ({ message }: { message: string }) => (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mb-4">
-        <CheckCircle2 className="w-8 h-8 text-muted-foreground" />
-      </div>
-      <p className="text-muted-foreground">{message}</p>
-    </div>
-  );
-
   return (
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8">
         {/* Header */}
-        <div className="mb-6 max-w-[90%] sm:max-w-full">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
-            {t.reminders.title}
-          </h1>
-          <p className="text-sm md:text-base text-muted-foreground">
-            {t.reminders.subtitle}
+        <div className="mb-6 lg:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Recordatorios</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Gestiona tus pagos y vencimientos pendientes
           </p>
         </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="all" className="space-y-6">
-          <TabsList className="bg-muted/50 border border-border">
-            <TabsTrigger value="all" className="data-[state=active]:bg-background">
-              Todas
-              <Badge variant="secondary" className="ml-2 bg-accent text-accent-foreground">
-                {allReminders.length}
-              </Badge>
-            </TabsTrigger>
-            <TabsTrigger value="overdue" className="data-[state=active]:bg-background">
-              {t.reminders.overdue}
-              {overdueReminders.length > 0 && (
-                <Badge className="ml-2 bg-red-500/10 text-red-500 border-red-500/30">
-                  {overdueReminders.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="urgent" className="data-[state=active]:bg-background">
-              {t.reminders.urgent}
-              {urgentReminders.length > 0 && (
-                <Badge className="ml-2 bg-orange-500/10 text-orange-500 border-orange-500/30">
-                  {urgentReminders.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="upcoming" className="data-[state=active]:bg-background">
-              {t.reminders.upcoming}
-              <Badge variant="secondary" className="ml-2 bg-accent text-accent-foreground">
-                {upcomingReminders.length}
-              </Badge>
-            </TabsTrigger>
+        {/* Summary Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 lg:mb-8">
+          <Card className="bg-red-500/10 border-red-500/20">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Vencidos</p>
+                  <p className="text-3xl font-bold text-red-500">{overdueReminders.length}</p>
+                </div>
+                <AlertCircle className="w-8 h-8 text-red-500" />
+              </div>
+            </CardContent>
+          </Card>
 
+          <Card className="bg-yellow-500/10 border-yellow-500/20">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Urgentes</p>
+                  <p className="text-3xl font-bold text-yellow-500">{urgentReminders.length}</p>
+                </div>
+                <Clock className="w-8 h-8 text-yellow-500" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-blue-500/10 border-blue-500/20">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Próximos</p>
+                  <p className="text-3xl font-bold text-blue-500">{upcomingReminders.length}</p>
+                </div>
+                <CheckCircle2 className="w-8 h-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tabs */}
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
+            <TabsTrigger value="all">Todos ({allReminders.length})</TabsTrigger>
+            <TabsTrigger value="overdue">Vencidos ({overdueReminders.length})</TabsTrigger>
+            <TabsTrigger value="urgent">Urgentes ({urgentReminders.length})</TabsTrigger>
+            <TabsTrigger value="upcoming">Próximos ({upcomingReminders.length})</TabsTrigger>
           </TabsList>
 
-          {/* All Reminders */}
-          <TabsContent value="all" className="space-y-3">
+          <TabsContent value="all" className="space-y-4">
             {allReminders.length === 0 ? (
-              <EmptyState message={t.reminders.noReminders} />
+              <Card className="bg-card border-border">
+                <CardContent className="p-8 text-center">
+                  <CheckCircle2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No hay recordatorios pendientes</p>
+                </CardContent>
+              </Card>
             ) : (
-              allReminders.map(item => (
-                <ReminderCard key={`${item.type}-${item.id}`} item={item} />
+              allReminders.map(reminder => (
+                <ReminderCard key={`${reminder.type}-${reminder.id}`} reminder={reminder} />
               ))
             )}
           </TabsContent>
 
-          {/* Overdue Reminders */}
-          <TabsContent value="overdue" className="space-y-3">
+          <TabsContent value="overdue" className="space-y-4">
             {overdueReminders.length === 0 ? (
-              <EmptyState message="No hay recordatorios vencidos" />
+              <Card className="bg-card border-border">
+                <CardContent className="p-8 text-center">
+                  <CheckCircle2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No hay pagos vencidos</p>
+                </CardContent>
+              </Card>
             ) : (
-              overdueReminders.map(item => (
-                <ReminderCard key={`${item.type}-${item.id}`} item={item} />
+              overdueReminders.map(reminder => (
+                <ReminderCard key={`${reminder.type}-${reminder.id}`} reminder={reminder} />
               ))
             )}
           </TabsContent>
 
-          {/* Urgent Reminders */}
-          <TabsContent value="urgent" className="space-y-3">
+          <TabsContent value="urgent" className="space-y-4">
             {urgentReminders.length === 0 ? (
-              <EmptyState message="No hay recordatorios urgentes" />
+              <Card className="bg-card border-border">
+                <CardContent className="p-8 text-center">
+                  <CheckCircle2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No hay pagos urgentes</p>
+                </CardContent>
+              </Card>
             ) : (
-              urgentReminders.map(item => (
-                <ReminderCard key={`${item.type}-${item.id}`} item={item} />
+              urgentReminders.map(reminder => (
+                <ReminderCard key={`${reminder.type}-${reminder.id}`} reminder={reminder} />
               ))
             )}
           </TabsContent>
 
-          {/* Upcoming Reminders */}
-          <TabsContent value="upcoming" className="space-y-3">
+          <TabsContent value="upcoming" className="space-y-4">
             {upcomingReminders.length === 0 ? (
-              <EmptyState message="No hay recordatorios próximos" />
+              <Card className="bg-card border-border">
+                <CardContent className="p-8 text-center">
+                  <CheckCircle2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No hay pagos próximos</p>
+                </CardContent>
+              </Card>
             ) : (
-              upcomingReminders.map(item => (
-                <ReminderCard key={`${item.type}-${item.id}`} item={item} />
+              upcomingReminders.map(reminder => (
+                <ReminderCard key={`${reminder.type}-${reminder.id}`} reminder={reminder} />
               ))
             )}
           </TabsContent>
-
-
         </Tabs>
       </div>
     </DashboardLayout>

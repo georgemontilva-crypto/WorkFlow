@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Settings as SettingsIcon, Database, Download, Trash2, Upload, Languages, Shield, Key } from 'lucide-react';
-import { db } from '@/lib/db';
+
 import { toast } from 'sonner';
 import { useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -44,18 +44,19 @@ export default function Settings() {
   const disable2FAMutation = trpc.auth.disable2FA.useMutation();
   const changePasswordMutation = trpc.auth.changePassword.useMutation();
 
+  // Fetch all data using tRPC
+  const { data: clients } = trpc.clients.list.useQuery();
+  const { data: invoices } = trpc.invoices.list.useQuery();
+  const { data: transactions } = trpc.transactions.list.useQuery();
+  const { data: savingsGoals } = trpc.savingsGoals.list.useQuery();
+
   const exportData = async () => {
     try {
-      const clients = await db.clients.toArray();
-      const invoices = await db.invoices.toArray();
-      const transactions = await db.transactions.toArray();
-      const savingsGoals = await db.savingsGoals.toArray();
-
       const data = {
-        clients,
-        invoices,
-        transactions,
-        savingsGoals,
+        clients: clients || [],
+        invoices: invoices || [],
+        transactions: transactions || [],
+        savingsGoals: savingsGoals || [],
         exportDate: new Date().toISOString(),
       };
 
@@ -74,49 +75,8 @@ export default function Settings() {
   };
 
   const importData = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-
-      if (!data.clients || !data.invoices || !data.transactions || !data.savingsGoals) {
-        toast.error('Invalid file format');
-        return;
-      }
-
-      if (window.confirm('Are you sure you want to import this data? This will add the data to the existing system.')) {
-        // Importar clientes
-        for (const client of data.clients) {
-          const { id, ...clientData } = client;
-          await db.clients.add(clientData);
-        }
-
-        // Importar facturas
-        for (const invoice of data.invoices) {
-          const { id, ...invoiceData } = invoice;
-          await db.invoices.add(invoiceData);
-        }
-
-        // Importar transacciones
-        for (const transaction of data.transactions) {
-          const { id, ...transactionData } = transaction;
-          await db.transactions.add(transactionData);
-        }
-
-        // Importar metas de ahorro
-        for (const goal of data.savingsGoals) {
-          const { id, ...goalData } = goal;
-          await db.savingsGoals.add(goalData);
-        }
-
-        toast.success(t.settings.importSuccess);
-      }
-    } catch (error) {
-      toast.error(t.settings.importError);
-    }
-
+    toast.info('La funcionalidad de importación de datos se implementará próximamente.');
+    
     // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -124,17 +84,7 @@ export default function Settings() {
   };
 
   const clearAllData = async () => {
-    if (window.confirm('Are you sure you want to delete all data? This action cannot be undone.')) {
-      try {
-        await db.clients.clear();
-        await db.invoices.clear();
-        await db.transactions.clear();
-        await db.savingsGoals.clear();
-        toast.success('All data has been deleted');
-      } catch (error) {
-        toast.error('Error deleting data');
-      }
-    }
+    toast.info('Para eliminar todos los datos, contacta al administrador del sistema.');
   };
 
   // 2FA Functions
@@ -316,7 +266,7 @@ export default function Settings() {
                 Agrega una capa adicional de seguridad a tu cuenta
               </p>
               
-              {user?.twoFactorEnabled ? (
+              {user?.two_factor_enabled ? (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
                     <span className="text-sm font-medium text-foreground">2FA Activado</span>

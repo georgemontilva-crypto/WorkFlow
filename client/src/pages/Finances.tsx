@@ -22,8 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db, type Transaction } from '@/lib/db';
+import { trpc } from '@/lib/trpc';
 import { Plus, TrendingUp, TrendingDown } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -32,21 +31,55 @@ import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, R
 import { format, parseISO, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
 
+type Transaction = {
+  id: number;
+  user_id: number;
+  type: 'income' | 'expense';
+  category: string;
+  amount: string;
+  description: string;
+  date: Date;
+  created_at: Date;
+};
+
 export default function Finances() {
   const { t } = useLanguage();
-  const transactions = useLiveQuery(() => db.transactions.orderBy('date').reverse().toArray());
+  const utils = trpc.useUtils();
+  
+  // Fetch transactions using tRPC
+  const { data: transactions, isLoading } = trpc.transactions.list.useQuery();
+  
+  // Create transaction mutation
+  const createTransaction = trpc.transactions.create.useMutation({
+    onSuccess: () => {
+      utils.transactions.list.invalidate();
+      toast.success('Transacción registrada exitosamente');
+      setIsDialogOpen(false);
+      setFormData({
+        type: 'income',
+        category: '',
+        amount: '',
+        description: '',
+        date: new Date().toISOString().split('T')[0],
+      });
+    },
+    onError: (error) => {
+      toast.error('Error al registrar la transacción: ' + error.message);
+    },
+  });
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [formData, setFormData] = useState<Partial<Transaction>>({
-    type: 'income',
+  const [formData, setFormData] = useState({
+    type: 'income' as 'income' | 'expense',
     category: '',
-    amount: 0,
+    amount: '',
     description: '',
     date: new Date().toISOString().split('T')[0],
   });
 
   // Calcular totales
-  const totalIncome = transactions?.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) || 0;
-  const totalExpenses = transactions?.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0) || 0;
+  const totalIncome = transactions?.filter(t => t.type === 'income').reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
+  const totalExpenses = transactions?.filter(t => t.type === 'expense').reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
   const balance = totalIncome - totalExpenses;
 
   // Datos para gráfico mensual (últimos 6 meses)
@@ -60,14 +93,14 @@ export default function Finances() {
     const monthEnd = endOfMonth(month);
 
     const income = transactions?.filter(t => {
-      const tDate = parseISO(t.date);
+      const tDate = new Date(t.date);
       return t.type === 'income' && tDate >= monthStart && tDate <= monthEnd;
-    }).reduce((sum, t) => sum + t.amount, 0) || 0;
+    }).reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
 
     const expenses = transactions?.filter(t => {
-      const tDate = parseISO(t.date);
+      const tDate = new Date(t.date);
       return t.type === 'expense' && tDate >= monthStart && tDate <= monthEnd;
-    }).reduce((sum, t) => sum + t.amount, 0) || 0;
+    }).reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
 
     return {
       month: format(month, 'MMM', { locale: es }),
@@ -84,19 +117,12 @@ export default function Finances() {
       return;
     }
 
-    await db.transactions.add({
-      ...formData as Transaction,
-      created_at: new Date().toISOString(),
-    });
-
-    toast.success('Transacción registrada exitosamente');
-    setIsDialogOpen(false);
-    setFormData({
-      type: 'income',
-      category: '',
-      amount: 0,
-      description: '',
-      date: new Date().toISOString().split('T')[0],
+    createTransaction.mutate({
+      type: formData.type,
+      category: formData.category,
+      amount: formData.amount,
+      description: formData.description,
+      date: formData.date,
     });
   };
 
@@ -141,14 +167,34 @@ export default function Finances() {
 
                 <div className="space-y-2">
                   <Label htmlFor="category" className="text-foreground">Categoría</Label>
-                  <Input
-                    id="category"
+                  <Select
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="bg-background border-border text-foreground"
-                    placeholder="Ej: Servicios, Ventas, Gastos Operativos"
-                    required
-                  />
+                    onValueChange={(value) => setFormData({ ...formData, category: value })}
+                  >
+                    <SelectTrigger className="bg-background border-border text-foreground">
+                      <SelectValue placeholder="Selecciona una categoría" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border-border">
+                      {formData.type === 'income' ? (
+                        <>
+                          <SelectItem value="salary">Salario</SelectItem>
+                          <SelectItem value="freelance">Freelance</SelectItem>
+                          <SelectItem value="investment">Inversión</SelectItem>
+                          <SelectItem value="other_income">Otro Ingreso</SelectItem>
+                        </>
+                      ) : (
+                        <>
+                          <SelectItem value="rent">Alquiler</SelectItem>
+                          <SelectItem value="utilities">Servicios</SelectItem>
+                          <SelectItem value="food">Comida</SelectItem>
+                          <SelectItem value="transportation">Transporte</SelectItem>
+                          <SelectItem value="healthcare">Salud</SelectItem>
+                          <SelectItem value="entertainment">Entretenimiento</SelectItem>
+                          <SelectItem value="other_expense">Otro Gasto</SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">
@@ -158,7 +204,7 @@ export default function Finances() {
                     type="number"
                     step="0.01"
                     value={formData.amount}
-                    onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                     className="bg-background border-border text-foreground font-mono"
                     required
                   />
@@ -308,43 +354,44 @@ export default function Finances() {
             <CardTitle className="text-foreground">Transacciones Recientes</CardTitle>
           </CardHeader>
           <CardContent>
-            {!transactions || transactions.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="w-32 h-32 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4">
-                  <TrendingUp className="w-16 h-16 text-muted-foreground" strokeWidth={1} />
-                </div>
-                <p className="text-muted-foreground">No hay transacciones registradas</p>
-              </div>
+            {isLoading ? (
+              <p className="text-muted-foreground text-center py-8">Cargando transacciones...</p>
+            ) : !transactions || transactions.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                No hay transacciones registradas
+              </p>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {transactions.slice(0, 10).map((transaction) => (
-                  <div 
-                    key={transaction.id} 
-                    className="p-3 sm:p-4 rounded-lg bg-accent/30 border border-border"
+                  <div
+                    key={transaction.id}
+                    className="flex items-center justify-between p-4 bg-background rounded-lg border border-border"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className={`w-10 h-10 flex-shrink-0 rounded-lg flex items-center justify-center ${
-                          transaction.type === 'income' ? 'bg-accent' : 'bg-muted'
-                        }`}>
-                          {transaction.type === 'income' ? (
-                            <TrendingUp className="w-5 h-5 text-accent-foreground" strokeWidth={1.5} />
-                          ) : (
-                            <TrendingDown className="w-5 h-5 text-muted-foreground" strokeWidth={1.5} />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground break-words">{transaction.description}</p>
-                          <p className="text-sm text-muted-foreground break-words">
-                            {transaction.category} • {format(parseISO(transaction.date), 'dd MMM yyyy', { locale: es })}
-                          </p>
-                        </div>
-                      </div>
-                      <p className={`text-lg sm:text-xl font-bold font-mono self-end sm:self-center ${
-                        transaction.type === 'income' ? 'text-foreground' : 'text-muted-foreground'
+                    <div className="flex items-center gap-4">
+                      <div className={`p-2 rounded-full ${
+                        transaction.type === 'income' 
+                          ? 'bg-green-500/10' 
+                          : 'bg-red-500/10'
                       }`}>
-                        {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                      </p>
+                        {transaction.type === 'income' ? (
+                          <TrendingUp className="w-5 h-5 text-green-500" />
+                        ) : (
+                          <TrendingDown className="w-5 h-5 text-red-500" />
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">{transaction.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {transaction.category} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className={`text-lg font-bold font-mono ${
+                      transaction.type === 'income' 
+                        ? 'text-green-500' 
+                        : 'text-red-500'
+                    }`}>
+                      {transaction.type === 'income' ? '+' : '-'}${parseFloat(transaction.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                     </div>
                   </div>
                 ))}
