@@ -267,7 +267,7 @@ export default function Reminders() {
             <TabsTrigger value="upcoming">Próximos ({upcomingReminders.length})</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="all" className="space-y-4">
+          <TabsContent value="all" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {allReminders.length === 0 ? (
               <Card className="bg-card border-border">
                 <CardContent className="p-8 text-center">
@@ -282,7 +282,7 @@ export default function Reminders() {
             )}
           </TabsContent>
 
-          <TabsContent value="overdue" className="space-y-4">
+          <TabsContent value="overdue" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {overdueReminders.length === 0 ? (
               <Card className="bg-card border-border">
                 <CardContent className="p-8 text-center">
@@ -297,7 +297,7 @@ export default function Reminders() {
             )}
           </TabsContent>
 
-          <TabsContent value="urgent" className="space-y-4">
+          <TabsContent value="urgent" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {urgentReminders.length === 0 ? (
               <Card className="bg-card border-border">
                 <CardContent className="p-8 text-center">
@@ -312,7 +312,7 @@ export default function Reminders() {
             )}
           </TabsContent>
 
-          <TabsContent value="upcoming" className="space-y-4">
+          <TabsContent value="upcoming" className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {upcomingReminders.length === 0 ? (
               <Card className="bg-card border-border">
                 <CardContent className="p-8 text-center">

@@ -248,7 +248,7 @@ export default function Home() {
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {topSavingsGoals.map(goal => {
                   const progress = (parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100;
                   return (
@@ -295,8 +295,8 @@ export default function Home() {
                 {t.dashboard.noTransactions || 'No hay transacciones recientes'}
               </p>
             ) : (
-              <div className="space-y-3">
-                {transactions.slice(0, 5).map(transaction => (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {transactions.slice(0, 6).map(transaction => (
                   <div
                     key={transaction.id}
                     className="flex items-center justify-between p-3 bg-background rounded-lg border border-border"

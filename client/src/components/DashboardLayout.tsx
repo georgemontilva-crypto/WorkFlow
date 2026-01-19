@@ -4,7 +4,7 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -177,6 +177,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             );
           })}
         </nav>
+
+        {/* Trial Status Indicator */}
+        {accessStatus && !accessStatus.has_lifetime_access && accessStatus.trialDaysRemaining !== null && (
+          <div className="mx-3 mb-4">
+            <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 space-y-2">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <p className="text-sm font-semibold text-foreground">
+                  {accessStatus.trialDaysRemaining > 0 
+                    ? `Quedan ${accessStatus.trialDaysRemaining} día${accessStatus.trialDaysRemaining !== 1 ? 's' : ''} de prueba`
+                    : 'Período de prueba finalizado'
+                  }
+                </p>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Disfruta de todas las funcionalidades durante tu período de prueba
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="p-4 border-t border-border">
