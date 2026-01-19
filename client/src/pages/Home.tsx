@@ -645,13 +645,13 @@ function SortableWidget({ widget, children }: { widget: any; children: React.Rea
     transform,
     transition,
     isDragging,
+    setActivatorNodeRef,
   } = useSortable({ id: widget.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    cursor: isDragging ? 'grabbing' : 'grab',
   };
 
   return (
@@ -659,9 +659,37 @@ function SortableWidget({ widget, children }: { widget: any; children: React.Rea
       ref={setNodeRef}
       style={style}
       {...attributes}
-      {...listeners}
       className="group relative"
     >
+      {/* Drag Handle - Only this area triggers drag */}
+      <div
+        ref={setActivatorNodeRef}
+        {...listeners}
+        className="absolute top-2 left-2 z-10 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{ touchAction: 'none' }}
+      >
+        <div className="bg-background/80 hover:bg-background rounded p-1.5 backdrop-blur-sm border border-border">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-muted-foreground"
+          >
+            <circle cx="9" cy="12" r="1" />
+            <circle cx="9" cy="5" r="1" />
+            <circle cx="9" cy="19" r="1" />
+            <circle cx="15" cy="12" r="1" />
+            <circle cx="15" cy="5" r="1" />
+            <circle cx="15" cy="19" r="1" />
+          </svg>
+        </div>
+      </div>
       {children}
     </div>
   );
