@@ -227,3 +227,18 @@ export const priceAlerts = mysqlTable("price_alerts", {
 
 export type PriceAlert = typeof priceAlerts.$inferSelect;
 export type InsertPriceAlert = typeof priceAlerts.$inferInsert;
+
+/**
+ * Dashboard Widgets table - stores user's dashboard widget preferences
+ */
+export const dashboardWidgets = mysqlTable("dashboard_widgets", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull(),
+  widget_type: varchar("widget_type", { length: 50 }).notNull(), // 'clients', 'invoices', 'income', 'expenses', 'savings', 'reminders', 'market'
+  widget_data: text("widget_data"), // JSON data for market widgets (symbol, type)
+  position: int("position").notNull().default(0), // Order position
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type DashboardWidget = typeof dashboardWidgets.$inferSelect;
+export type InsertDashboardWidget = typeof dashboardWidgets.$inferInsert;

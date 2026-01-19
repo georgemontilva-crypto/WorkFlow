@@ -1,5 +1,5 @@
 /**
- * Home Page - Dashboard Principal
+ * Home Page - Dashboard Principal con Widgets Personalizables
  * Design Philosophy: Apple Minimalism - Responsive mobile-first
  */
 
@@ -7,7 +7,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { trpc } from '@/lib/trpc';
-import { Users, FileText, TrendingUp, TrendingDown, Plus, AlertCircle, Bell, Target, BarChart3, Star } from 'lucide-react';
+import { Users, FileText, TrendingUp, TrendingDown, Plus, AlertCircle, Bell, Target, BarChart3, X, Sparkles } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useLocation } from 'wouter';
@@ -15,16 +15,19 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { TrialBanner } from '@/components/TrialBanner';
 import { MarketWidget } from '@/components/MarketWidget';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, horizontalListSortingStrategy } from '@dnd-kit/sortable';
-import { SortableItem } from '@/components/SortableItem';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Home() {
-  // The userAuth hooks provides authentication state
-  // To implement login/logout functionality, simply call logout() or redirect to getLoginUrl()
-  let { user, loading, error, isAuthenticated, logout } = useAuth();
-
+  let { user } = useAuth();
   const [, setLocation] = useLocation();
   const { t } = useLanguage();
   
@@ -33,106 +36,245 @@ export default function Home() {
   const { data: invoices } = trpc.invoices.list.useQuery();
   const { data: transactions } = trpc.transactions.list.useQuery();
   const { data: savingsGoals } = trpc.savingsGoals.list.useQuery();
-  const { data: dashboardWidgets } = trpc.markets.getDashboardWidgets.useQuery();
+  const { data: dashboardWidgets, refetch: refetchWidgets } = trpc.dashboardWidgets.list.useQuery();
+  const { data: marketWidgets } = trpc.markets.getDashboardWidgets.useQuery();
 
-  // State for draggable items
-  const [items, setItems] = useState(['clients', 'invoices', 'income', 'expenses']);
-  
-  // Load saved order from localStorage
-  useEffect(() => {
-    const savedOrder = localStorage.getItem('dashboardCardOrder');
-    const baseItems = ['clients', 'invoices', 'income', 'expenses'];
-    
-    // Add widget IDs to the base items if they exist
-    const widgetIds = dashboardWidgets?.map(w => `widget-${w.symbol}`) || [];
-    const allCurrentItems = [...baseItems, ...widgetIds];
-    
-    if (savedOrder) {
-      try {
-        const parsed = JSON.parse(savedOrder);
-        const currentSet = new Set(allCurrentItems);
-        const validSaved = parsed.filter((id: string) => currentSet.has(id));
-        const missing = allCurrentItems.filter(id => !validSaved.includes(id));
-        setItems([...validSaved, ...missing]);
-      } catch (e) {
-        console.error('Error parsing saved order', e);
-        setItems(allCurrentItems);
-      }
-    } else {
-      setItems(allCurrentItems);
-    }
-  }, [dashboardWidgets]);
+  // Mutations
+  const addWidgetMutation = trpc.dashboardWidgets.add.useMutation({
+    onSuccess: () => {
+      refetchWidgets();
+      toast.success('Widget añadido');
+    },
+    onError: () => toast.error('Error al añadir widget'),
+  });
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8, // Require 8px movement before drag starts (prevents accidental clicks)
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  const removeWidgetMutation = trpc.dashboardWidgets.remove.useMutation({
+    onSuccess: () => {
+      refetchWidgets();
+      toast.success('Widget eliminado');
+    },
+    onError: () => toast.error('Error al eliminar widget'),
+  });
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      setItems((items) => {
-        const oldIndex = items.indexOf(active.id as string);
-        const newIndex = items.indexOf(over.id as string);
-        const newOrder = arrayMove(items, oldIndex, newIndex);
-        
-        // Save to localStorage
-        localStorage.setItem('dashboardCardOrder', JSON.stringify(newOrder));
-        
-        return newOrder;
-      });
-    }
-  };
-
-  // Calcular estadísticas
+  // Calculate stats
   const activeClients = clients?.filter(c => c.status === 'active').length || 0;
-  const pendingInvoices = invoices?.filter(i => i.status === 'draft' || i.status === 'sent').length || 0;
+  const pendingInvoices = invoices?.filter(i => i.status === 'pending').length || 0;
   
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
+  const monthlyIncome = transactions
+    ?.filter(t => {
+      const date = new Date(t.date);
+      return t.type === 'income' && date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+    })
+    .reduce((sum, t) => sum + parseFloat(t.amount.toString()), 0) || 0;
   
-  const monthlyIncome = transactions?.filter(t => {
-    const date = new Date(t.date);
-    return t.type === 'income' && 
-           date.getMonth() === currentMonth && 
-           date.getFullYear() === currentYear;
-  }).reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
+  const monthlyExpenses = transactions
+    ?.filter(t => {
+      const date = new Date(t.date);
+      return t.type === 'expense' && date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+    })
+    .reduce((sum, t) => sum + parseFloat(t.amount.toString()), 0) || 0;
 
-  const monthlyExpenses = transactions?.filter(t => {
-    const date = new Date(t.date);
-    return t.type === 'expense' && 
-           date.getMonth() === currentMonth && 
-           date.getFullYear() === currentYear;
-  }).reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
+  // Get reminders
+  const today = new Date();
+  const overduePayments = clients?.filter(c => {
+    if (!c.next_payment_date || c.status !== 'active') return false;
+    return new Date(c.next_payment_date) < today;
+  }) || [];
 
-  // Próximos pagos (7 días)
-  const upcomingPayments = clients?.filter(client => {
-    const daysUntil = differenceInDays(new Date(client.next_payment_date), new Date());
-    return daysUntil >= 0 && daysUntil <= client.reminder_days && client.status === 'active';
-  }).sort((a, b) => 
-    new Date(a.next_payment_date).getTime() - new Date(b.next_payment_date).getTime()
-  ) || [];
-
-  // Pagos vencidos
-  const overduePayments = clients?.filter(client => {
-    const daysUntil = differenceInDays(new Date(client.next_payment_date), new Date());
-    return daysUntil < 0 && client.status === 'active';
+  const upcomingPayments = clients?.filter(c => {
+    if (!c.next_payment_date || c.status !== 'active') return false;
+    const daysUntil = differenceInDays(new Date(c.next_payment_date), today);
+    return daysUntil >= 0 && daysUntil <= (c.reminder_days || 3);
   }) || [];
 
   // Get top 3 active savings goals
   const topSavingsGoals = savingsGoals?.filter(g => g.status === 'active').slice(0, 3) || [];
 
-  // Determine card item class based on total items
-  const cardItemClass = items.length <= 4 
-    ? 'min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full' 
-    : 'min-w-[280px] snap-start snap-always shrink-0 h-full';
+  // Handle widget addition
+  const handleAddWidget = (widgetType: string) => {
+    addWidgetMutation.mutate({ widget_type: widgetType });
+  };
+
+  // Handle widget removal
+  const handleRemoveWidget = (widgetId: number) => {
+    removeWidgetMutation.mutate({ id: widgetId });
+  };
+
+  // Check if widget type exists
+  const hasWidget = (type: string) => {
+    return dashboardWidgets?.some(w => w.widget_type === type);
+  };
+
+  // Render widget based on type
+  const renderWidget = (widget: any) => {
+    const widgetType = widget.widget_type;
+
+    // Remove button component
+    const RemoveButton = () => (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleRemoveWidget(widget.id);
+        }}
+      >
+        <X className="h-4 w-4" />
+      </Button>
+    );
+
+    switch (widgetType) {
+      case 'clients':
+        return (
+          <Card key={widget.id} className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full group relative" onClick={() => setLocation('/clients')}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {t.dashboard.activeClients}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+                <RemoveButton />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground">{activeClients}</div>
+            </CardContent>
+          </Card>
+        );
+
+      case 'invoices':
+        return (
+          <Card key={widget.id} className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full group relative" onClick={() => setLocation('/invoices')}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {t.dashboard.pendingInvoices}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <FileText className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+                <RemoveButton />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground">{pendingInvoices}</div>
+            </CardContent>
+          </Card>
+        );
+
+      case 'income':
+        return (
+          <Card key={widget.id} className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full group relative" onClick={() => setLocation('/finances')}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {t.dashboard.monthlyIncome}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+                <RemoveButton />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
+                ${monthlyIncome.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case 'expenses':
+        return (
+          <Card key={widget.id} className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full group relative" onClick={() => setLocation('/finances')}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {t.dashboard.monthlyExpenses}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <TrendingDown className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+                <RemoveButton />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
+                ${monthlyExpenses.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+              </div>
+            </CardContent>
+          </Card>
+        );
+
+      case 'savings':
+        return (
+          <Card key={widget.id} className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full group relative" onClick={() => setLocation('/savings')}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {t.goals.title}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+                <RemoveButton />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground">
+                {savingsGoals?.filter(g => g.status === 'active').length || 0}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Metas activas</p>
+            </CardContent>
+          </Card>
+        );
+
+      case 'reminders':
+        return (
+          <Card key={widget.id} className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full group relative" onClick={() => setLocation('/reminders')}>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                {t.reminders.title}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
+                <RemoveButton />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl sm:text-3xl font-bold text-foreground">
+                {overduePayments.length + upcomingPayments.length}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Recordatorios activos</p>
+            </CardContent>
+          </Card>
+        );
+
+      case 'market':
+        if (widget.widget_data) {
+          try {
+            const marketData = JSON.parse(widget.widget_data);
+            return (
+              <div key={widget.id} className="group relative">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2 z-10 bg-background/80 hover:bg-background"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveWidget(widget.id);
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+                <MarketWidget symbol={marketData.symbol} type={marketData.type} />
+              </div>
+            );
+          } catch (e) {
+            return null;
+          }
+        }
+        return null;
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -151,6 +293,67 @@ export default function Home() {
           
           {/* Action Buttons - Top Right */}
           <div className="flex flex-wrap gap-2 sm:gap-3">
+            {/* Add Widget Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex-1 sm:flex-none">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Añadir Widget
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Widgets Disponibles</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem 
+                  onClick={() => handleAddWidget('clients')}
+                  disabled={hasWidget('clients')}
+                >
+                  <Users className="w-4 h-4 mr-2" />
+                  Clientes Activos
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handleAddWidget('invoices')}
+                  disabled={hasWidget('invoices')}
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Facturas Pendientes
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handleAddWidget('income')}
+                  disabled={hasWidget('income')}
+                >
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Ingresos del Mes
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handleAddWidget('expenses')}
+                  disabled={hasWidget('expenses')}
+                >
+                  <TrendingDown className="w-4 h-4 mr-2" />
+                  Gastos del Mes
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handleAddWidget('savings')}
+                  disabled={hasWidget('savings')}
+                >
+                  <Target className="w-4 h-4 mr-2" />
+                  Metas de Ahorro
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handleAddWidget('reminders')}
+                  disabled={hasWidget('reminders')}
+                >
+                  <Bell className="w-4 h-4 mr-2" />
+                  Recordatorios
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setLocation('/markets')}>
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Ver Mercados
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button
               onClick={() => setLocation('/clients?new=true')}
               className="bg-primary text-primary-foreground hover:opacity-90 flex-1 sm:flex-none"
@@ -171,106 +374,34 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Stats Grid - Draggable */}
-        <DndContext 
-          sensors={sensors} 
-          collisionDetection={closestCenter} 
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext 
-            items={items} 
-            strategy={horizontalListSortingStrategy}
-          >
-            <div className={`flex gap-4 lg:gap-6 mb-6 lg:mb-8 overflow-x-auto pb-2 snap-x snap-mandatory ${items.length <= 4 ? 'sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:overflow-x-visible sm:snap-none' : ''}`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              {items.map((id) => {
-                if (id === 'clients') {
-                  return (
-                    <SortableItem key={id} id={id} className={cardItemClass}>
-                      <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full" onClick={() => setLocation('/clients')}>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                          <CardTitle className="text-sm font-medium text-muted-foreground">
-                            {t.dashboard.activeClients}
-                          </CardTitle>
-                          <Users className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-2xl sm:text-3xl font-bold text-foreground">{activeClients}</div>
-                        </CardContent>
-                      </Card>
-                    </SortableItem>
-                  );
-                }
-                if (id === 'invoices') {
-                  return (
-                    <SortableItem key={id} id={id} className={cardItemClass}>
-                      <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full" onClick={() => setLocation('/invoices')}>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                          <CardTitle className="text-sm font-medium text-muted-foreground">
-                            {t.dashboard.pendingInvoices}
-                          </CardTitle>
-                          <FileText className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-2xl sm:text-3xl font-bold text-foreground">{pendingInvoices}</div>
-                        </CardContent>
-                      </Card>
-                    </SortableItem>
-                  );
-                }
-                if (id === 'income') {
-                  return (
-                    <SortableItem key={id} id={id} className={cardItemClass}>
-                      <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full" onClick={() => setLocation('/finances')}>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                          <CardTitle className="text-sm font-medium text-muted-foreground">
-                            {t.dashboard.monthlyIncome}
-                          </CardTitle>
-                          <TrendingUp className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
-                            ${monthlyIncome.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </SortableItem>
-                  );
-                }
-                if (id === 'expenses') {
-                  return (
-                    <SortableItem key={id} id={id} className={cardItemClass}>
-                      <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer h-full" onClick={() => setLocation('/finances')}>
-                        <CardHeader className="flex flex-row items-center justify-between pb-2">
-                          <CardTitle className="text-sm font-medium text-muted-foreground">
-                            {t.dashboard.monthlyExpenses}
-                          </CardTitle>
-                          <TrendingDown className="w-4 h-4 text-muted-foreground" strokeWidth={1.5} />
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
-                            ${monthlyExpenses.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </SortableItem>
-                  );
-                }
-                if (id.startsWith('widget-') && dashboardWidgets) {
-                  const symbol = id.replace('widget-', '');
-                  const widget = dashboardWidgets.find(w => w.symbol === symbol);
-                  if (widget) {
-                    return (
-                      <SortableItem key={id} id={id} className={cardItemClass}>
-                        <MarketWidget symbol={widget.symbol} type={widget.type} />
-                      </SortableItem>
-                    );
-                  }
-                }
-                return null;
-              })}
+        {/* Widgets Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+          {dashboardWidgets?.map(widget => renderWidget(widget))}
+          
+          {/* Market Widgets from market_favorites */}
+          {marketWidgets?.map(market => (
+            <div key={`market-${market.id}`} className="group relative">
+              <MarketWidget symbol={market.symbol} type={market.type} />
             </div>
-          </SortableContext>
-        </DndContext>
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {(!dashboardWidgets || dashboardWidgets.length === 0) && (!marketWidgets || marketWidgets.length === 0) && (
+          <Card className="border-dashed border-2 mb-6 lg:mb-8">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Sparkles className="w-12 h-12 text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Personaliza tu Dashboard</h3>
+              <p className="text-sm text-muted-foreground text-center mb-4">
+                Añade widgets para ver la información que más te importa
+              </p>
+              <Button onClick={() => handleAddWidget('clients')}>
+                <Plus className="w-4 h-4 mr-2" />
+                Añadir Primer Widget
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Alerts Section */}
         {(overduePayments.length > 0 || upcomingPayments.length > 0) && (
@@ -278,83 +409,48 @@ export default function Home() {
             {overduePayments.length > 0 && (
               <Card className="bg-destructive/10 border-destructive/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2 text-destructive">
-                    <AlertCircle className="w-5 h-5" />
-                    {t.dashboard.overduePayments} ({overduePayments.length})
-                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 text-destructive" />
+                    <CardTitle className="text-base font-semibold text-destructive">
+                      {t.notifications.overduePayments}
+                    </CardTitle>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    {overduePayments.slice(0, 3).map((client) => (
-                      <div 
-                        key={client.id} 
-                        className="flex items-center justify-between p-3 bg-background/50 rounded-lg cursor-pointer hover:bg-background/80 transition-colors"
-                        onClick={() => setLocation(`/clients?id=${client.id}`)}
-                      >
-                        <div>
-                          <p className="font-medium text-foreground">{client.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Vencido hace {Math.abs(differenceInDays(new Date(client.next_payment_date), new Date()))} días
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-mono font-bold text-destructive">${parseFloat(client.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}</p>
-                          <p className="text-xs text-muted-foreground">{format(new Date(client.next_payment_date), 'dd MMM yyyy', { locale: es })}</p>
-                        </div>
-                      </div>
-                    ))}
-                    {overduePayments.length > 3 && (
-                      <Button 
-                        variant="ghost" 
-                        className="w-full mt-2 text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => setLocation('/clients')}
-                      >
-                        Ver todos ({overduePayments.length})
-                      </Button>
-                    )}
-                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t.notifications.overdueMessage.replace('{count}', overduePayments.length.toString())}
+                  </p>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => setLocation('/reminders')}
+                  >
+                    {t.notifications.viewReminders}
+                  </Button>
                 </CardContent>
               </Card>
             )}
 
             {upcomingPayments.length > 0 && (
-              <Card className="bg-yellow-500/10 border-yellow-500/20">
+              <Card className="bg-primary/10 border-primary/20">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2 text-yellow-600 dark:text-yellow-500">
-                    <Bell className="w-5 h-5" />
-                    {t.dashboard.upcomingPayments} ({upcomingPayments.length})
-                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Bell className="w-5 h-5 text-primary" />
+                    <CardTitle className="text-base font-semibold text-primary">
+                      {t.notifications.upcomingPayments}
+                    </CardTitle>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2">
-                    {upcomingPayments.slice(0, 3).map((client) => (
-                      <div 
-                        key={client.id} 
-                        className="flex items-center justify-between p-3 bg-background/50 rounded-lg cursor-pointer hover:bg-background/80 transition-colors"
-                        onClick={() => setLocation(`/clients?id=${client.id}`)}
-                      >
-                        <div>
-                          <p className="font-medium text-foreground">{client.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            En {differenceInDays(new Date(client.next_payment_date), new Date())} días
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-mono font-bold text-yellow-600 dark:text-yellow-500">${parseFloat(client.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}</p>
-                          <p className="text-xs text-muted-foreground">{format(new Date(client.next_payment_date), 'dd MMM yyyy', { locale: es })}</p>
-                        </div>
-                      </div>
-                    ))}
-                    {upcomingPayments.length > 3 && (
-                      <Button 
-                        variant="ghost" 
-                        className="w-full mt-2 text-yellow-600 dark:text-yellow-500 hover:text-yellow-600 dark:hover:text-yellow-500 hover:bg-yellow-500/10"
-                        onClick={() => setLocation('/clients')}
-                      >
-                        Ver todos ({upcomingPayments.length})
-                      </Button>
-                    )}
-                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    {t.notifications.upcomingMessage.replace('{count}', upcomingPayments.length.toString())}
+                  </p>
+                  <Button 
+                    size="sm" 
+                    onClick={() => setLocation('/reminders')}
+                  >
+                    {t.notifications.viewReminders}
+                  </Button>
                 </CardContent>
               </Card>
             )}
@@ -373,53 +469,36 @@ export default function Home() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setLocation('/savings')}
-                className="text-primary hover:text-primary hover:bg-primary/10"
               >
-                Ver todas
+                {t.dashboard.viewAll}
               </Button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {topSavingsGoals.map((goal) => {
-                const progress = (parseFloat(goal.current_amount) / parseFloat(goal.target_amount)) * 100;
+                const progress = (parseFloat(goal.current_amount.toString()) / parseFloat(goal.target_amount.toString())) * 100;
                 return (
-                  <Card 
-                    key={goal.id} 
-                    className="bg-card border-border hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer"
-                    onClick={() => setLocation('/savings')}
-                  >
+                  <Card key={goal.id} className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer" onClick={() => setLocation('/savings')}>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-base flex items-center justify-between">
-                        <span className="truncate">{goal.name}</span>
-                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500 shrink-0" />
-                      </CardTitle>
+                      <CardTitle className="text-base font-medium">{goal.name}</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        <div className="flex items-baseline justify-between">
-                          <span className="text-2xl font-bold font-mono text-foreground">
-                            ${parseFloat(goal.current_amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                          </span>
-                          <span className="text-sm text-muted-foreground">
-                            de ${parseFloat(goal.target_amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                          </span>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-xs text-muted-foreground">
-                            <span>Progreso</span>
-                            <span className="font-medium">{progress.toFixed(0)}%</span>
-                          </div>
-                          <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-primary transition-all duration-300"
-                              style={{ width: `${Math.min(progress, 100)}%` }}
-                            />
-                          </div>
-                        </div>
-                        {goal.target_date && (
-                          <p className="text-xs text-muted-foreground">
-                            Meta: {format(new Date(goal.target_date), 'dd MMM yyyy', { locale: es })}
-                          </p>
-                        )}
+                    <CardContent className="space-y-3">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Progreso</span>
+                        <span className="font-semibold">{progress.toFixed(0)}%</span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className="bg-primary h-2 rounded-full transition-all"
+                          style={{ width: `${Math.min(progress, 100)}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          ${parseFloat(goal.current_amount.toString()).toLocaleString('es-ES')}
+                        </span>
+                        <span className="font-semibold">
+                          ${parseFloat(goal.target_amount.toString()).toLocaleString('es-ES')}
+                        </span>
                       </div>
                     </CardContent>
                   </Card>
@@ -430,7 +509,7 @@ export default function Home() {
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <Button
             variant="outline"
             className="h-auto py-4 flex flex-col items-center gap-2"
@@ -460,7 +539,7 @@ export default function Home() {
             className="h-auto py-4 flex flex-col items-center gap-2"
             onClick={() => setLocation('/reminders')}
           >
-            <Bell className="w-6 h-4 text-primary" />
+            <Bell className="w-6 h-6 text-primary" />
             <span className="text-sm">{t.reminders.title}</span>
           </Button>
         </div>

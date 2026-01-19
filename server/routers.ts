@@ -925,6 +925,48 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  /**
+   * Dashboard Widgets Router
+   */
+  dashboardWidgets: router({
+    // Get user's dashboard widgets
+    list: protectedProcedure.query(async ({ ctx }) => {
+      const { getUserDashboardWidgets } = await import("./db");
+      return await getUserDashboardWidgets(ctx.user.id);
+    }),
+
+    // Add a widget
+    add: protectedProcedure
+      .input(z.object({
+        widget_type: z.string(),
+        widget_data: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { addDashboardWidget } = await import("./db");
+        return await addDashboardWidget({
+          user_id: ctx.user.id,
+          widget_type: input.widget_type,
+          widget_data: input.widget_data,
+        });
+      }),
+
+    // Remove a widget
+    remove: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const { removeDashboardWidget } = await import("./db");
+        return await removeDashboardWidget(ctx.user.id, input.id);
+      }),
+
+    // Update widgets order
+    updateOrder: protectedProcedure
+      .input(z.object({ widgetIds: z.array(z.number()) }))
+      .mutation(async ({ ctx, input }) => {
+        const { updateDashboardWidgetsOrder } = await import("./db");
+        return await updateDashboardWidgetsOrder(ctx.user.id, input.widgetIds);
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { ENV } from "./_core/env";
-import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts } from "../drizzle/schema";
+import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts, dashboardWidgets } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
@@ -1057,3 +1057,95 @@ export async function markPasswordResetTokenAsUsed(tokenId: number) {
 }
 
 
+/**
+ * Dashboard Widgets Functions
+ */
+
+/**
+ * Get all dashboard widgets for a user
+ */
+export async function getUserDashboardWidgets(user_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  const widgets = await db
+    .select()
+    .from(dashboardWidgets)
+    .where(eq(dashboardWidgets.user_id, user_id))
+    .orderBy(dashboardWidgets.position);
+    
+  return widgets;
+}
+
+/**
+ * Add a dashboard widget
+ */
+export async function addDashboardWidget(data: {
+  user_id: number;
+  widget_type: string;
+  widget_data?: string;
+}) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  // Get current max position
+  const existing = await db
+    .select()
+    .from(dashboardWidgets)
+    .where(eq(dashboardWidgets.user_id, data.user_id));
+    
+  const maxPosition = existing.length > 0 
+    ? Math.max(...existing.map(w => w.position || 0))
+    : -1;
+  
+  await db.insert(dashboardWidgets).values({
+    user_id: data.user_id,
+    widget_type: data.widget_type,
+    widget_data: data.widget_data || null,
+    position: maxPosition + 1,
+  });
+  
+  return { success: true };
+}
+
+/**
+ * Remove a dashboard widget
+ */
+export async function removeDashboardWidget(user_id: number, widget_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  await db
+    .delete(dashboardWidgets)
+    .where(eq(dashboardWidgets.id, widget_id))
+    .where(eq(dashboardWidgets.user_id, user_id));
+    
+  return { success: true };
+}
+
+/**
+ * Update dashboard widgets order
+ */
+export async function updateDashboardWidgetsOrder(user_id: number, widgetIds: number[]) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+  
+  // Update position for each widget
+  for (let i = 0; i < widgetIds.length; i++) {
+    await db
+      .update(dashboardWidgets)
+      .set({ position: i })
+      .where(eq(dashboardWidgets.id, widgetIds[i]))
+      .where(eq(dashboardWidgets.user_id, user_id));
+  }
+  
+  return { success: true };
+}
