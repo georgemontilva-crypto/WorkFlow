@@ -91,7 +91,7 @@ export default function Markets() {
 
   // Fetch favorites
   const { data: favorites, refetch: refetchFavorites } = trpc.markets.getFavorites.useQuery();
-  const { data: dashboardWidget } = trpc.markets.getDashboardWidget.useQuery();
+  const { data: dashboardWidgets } = trpc.markets.getDashboardWidgets.useQuery();
   const { data: priceAlerts, refetch: refetchAlerts } = trpc.priceAlerts.list.useQuery();
 
   const createAlertMutation = trpc.priceAlerts.create.useMutation({
