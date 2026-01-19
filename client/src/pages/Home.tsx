@@ -448,6 +448,7 @@ export default function Home() {
         </div>
 
         {/* Widgets Grid */}
+        {/* Sortable Widgets Grid */}
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -463,16 +464,20 @@ export default function Home() {
                   {renderWidget(widget)}
                 </SortableWidget>
               ))}
-              
-              {/* Market Widgets from market_favorites */}
-              {marketWidgets?.map(market => (
-                <div key={`market-${market.id}`} className="group relative">
-                  <MarketWidget symbol={market.symbol} type={market.type} />
-                </div>
-              ))}
             </div>
           </SortableContext>
         </DndContext>
+
+        {/* Market Widgets (non-sortable) */}
+        {marketWidgets && marketWidgets.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+            {marketWidgets.map(market => (
+              <div key={`market-${market.id}`} className="group relative">
+                <MarketWidget symbol={market.symbol} type={market.type} />
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Empty State */}
         {(!dashboardWidgets || dashboardWidgets.length === 0) && (!marketWidgets || marketWidgets.length === 0) && (
