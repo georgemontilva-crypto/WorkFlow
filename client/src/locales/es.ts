@@ -18,6 +18,16 @@ export const es = {
     status: 'Estado',
     date: 'Fecha',
     description: 'Descripción',
+    dismiss: 'Descartar',
+  },
+
+  // Notifications
+  notifications: {
+    overduePayments: 'Pagos Vencidos',
+    upcomingPayments: 'Pagos Próximos',
+    overdueMessage: 'Tienes {count} cliente(s) con pagos vencidos',
+    upcomingMessage: 'Tienes {count} cliente(s) con pagos próximos',
+    viewReminders: 'Ver Recordatorios',
   },
 
   // Navigation
@@ -131,6 +141,9 @@ export const es = {
     additionalNotes: 'Notas Adicionales',
     notesPlaceholder: 'Términos de pago, condiciones especiales, información adicional...',
     notesHelper: 'Información adicional que aparecerá en el PDF',
+    paidAmountLabel: 'Abono / Pago Parcial (Opcional)',
+    paidAmountHelper: 'Si el cliente hizo un abono, ingresa el monto aquí',
+    balancePending: 'Saldo Pendiente',
     pending: 'Pendiente',
     paid: 'Pagado',
     overdue: 'Vencido',

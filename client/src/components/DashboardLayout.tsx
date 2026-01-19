@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { ReminderAlert } from '@/components/ReminderAlert';
+import { PaymentNotifications } from '@/components/PaymentNotifications';
 import { AccessBlocker } from './AccessBlocker';
 
 import { differenceInDays, parseISO } from 'date-fns';
@@ -151,7 +151,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         {/* Logo */}
         <div className="h-16 flex items-center gap-3 px-6 border-b border-border">
-          <img src="/hiwork-logo-final.png" alt="HiWork" className="h-10 w-auto object-contain" />
+          <img src="/src/assets/logo.png" alt="HiWork" className="h-12 w-auto object-contain" />
         </div>
 
         {/* Navigation */}
@@ -208,22 +208,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </main>
       
       {/* Alert Popups */}
-      {showOverdueAlert && overdueCount > 0 && (
-        <ReminderAlert
-          type="overdue"
-          count={overdueCount}
-          onView={handleViewReminders}
-          onDismiss={handleDismissOverdue}
-        />
-      )}
-      {showUrgentAlert && urgentCount > 0 && !showOverdueAlert && (
-        <ReminderAlert
-          type="urgent"
-          count={urgentCount}
-          onView={handleViewReminders}
-          onDismiss={handleDismissUrgent}
-        />
-      )}
+      {/* Payment Notifications */}
+      <PaymentNotifications />
     </div>
   );
 }

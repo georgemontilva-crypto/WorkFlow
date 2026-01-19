@@ -73,6 +73,7 @@ type InvoiceFormData = {
   status?: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
   items?: InvoiceItem[];
   notes?: string;
+  paid_amount?: string;
 };
 import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User, FolderArchive, ArchiveRestore } from 'lucide-react';
 import { format, parseISO, addDays } from 'date-fns';
@@ -158,6 +159,7 @@ export default function Invoices() {
     status: 'draft',
     items: [],
     notes: '',
+    paid_amount: '0',
   });
   const [currentItem, setCurrentItem] = useState<Partial<InvoiceItem>>({
     description: '',
@@ -240,6 +242,7 @@ export default function Invoices() {
       subtotal: subtotal.toString(),
       tax: tax.toString(),
       total: total.toString(),
+      paid_amount: formData.paid_amount || '0',
       status: formData.status || 'draft',
       items: formData.items!,
       notes: formData.notes,
@@ -252,6 +255,7 @@ export default function Invoices() {
       status: 'draft',
       items: [],
       notes: '',
+      paid_amount: '0',
     });
   };
 
@@ -568,11 +572,41 @@ export default function Invoices() {
                           </Button>
                         </div>
                       ))}
-                      <div className="text-right pt-3 border-t border-border">
-                        <p className="text-sm text-muted-foreground mb-1">{t.invoices.totalInvoice}</p>
-                        <p className="text-2xl font-bold font-mono text-foreground">
-                          ${calculateTotal().toFixed(2)}
-                        </p>
+                      <div className="space-y-3 pt-3 border-t border-border">
+                        <div className="text-right">
+                          <p className="text-sm text-muted-foreground mb-1">{t.invoices.totalInvoice}</p>
+                          <p className="text-2xl font-bold font-mono text-foreground">
+                            ${calculateTotal().toFixed(2)}
+                          </p>
+                        </div>
+                        
+                        {/* Paid Amount Field */}
+                        <div className="space-y-2">
+                          <Label htmlFor="paid_amount" className="text-foreground font-semibold">
+                            {t.invoices.paidAmountLabel}
+                          </Label>
+                          <Input
+                            id="paid_amount"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            max={calculateTotal()}
+                            placeholder="0.00"
+                            value={formData.paid_amount || ''}
+                            onChange={(e) => setFormData({ ...formData, paid_amount: e.target.value })}
+                            className="bg-background border-border text-foreground h-11"
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            {t.invoices.paidAmountHelper}
+                          </p>
+                          {formData.paid_amount && parseFloat(formData.paid_amount) > 0 && (
+                            <div className="mt-2 p-3 bg-accent/20 rounded-lg">
+                              <p className="text-sm font-medium text-foreground">
+                                {t.invoices.balancePending}: ${(calculateTotal() - parseFloat(formData.paid_amount || '0')).toFixed(2)}
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}

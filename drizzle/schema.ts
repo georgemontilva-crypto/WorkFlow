@@ -91,6 +91,8 @@ export const invoices = mysqlTable("invoices", {
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   tax: decimal("tax", { precision: 10, scale: 2 }).notNull().default("0"),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  paid_amount: decimal("paid_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  balance: decimal("balance", { precision: 10, scale: 2 }).notNull(),
   status: mysqlEnum("status", ["draft", "sent", "paid", "overdue", "cancelled"]).notNull().default("draft"),
   notes: text("notes"),
   created_at: timestamp("created_at").defaultNow().notNull(),

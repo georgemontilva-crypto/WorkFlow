@@ -279,6 +279,7 @@ export const appRouter = router({
         subtotal: z.string(),
         tax: z.string().optional(),
         total: z.string(),
+        paid_amount: z.string().optional().default("0"),
         status: z.enum(["draft", "sent", "paid", "overdue", "cancelled"]).default("draft"),
         items: z.array(z.object({
           description: z.string(),
@@ -289,6 +290,11 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        const paidAmount = input.paid_amount || "0";
+        const totalAmount = parseFloat(input.total);
+        const paid = parseFloat(paidAmount);
+        const balance = (totalAmount - paid).toFixed(2);
+        
         const result = await db.createInvoice({
           user_id: ctx.user.id,
           client_id: input.client_id,
@@ -299,6 +305,8 @@ export const appRouter = router({
           subtotal: input.subtotal,
           tax: input.tax || "0",
           total: input.total,
+          paid_amount: paidAmount,
+          balance: balance,
           status: input.status,
           notes: input.notes || null,
         });
@@ -331,6 +339,19 @@ export const appRouter = router({
         }
         if (data.due_date) {
           updateData.due_date = new Date(data.due_date);
+        }
+        // Calculate balance if paid_amount or amount is updated
+        if (data.paid_amount !== undefined || data.amount !== undefined) {
+          const invoice = await db.getInvoiceById(id, ctx.user.id);
+          if (invoice) {
+            const total = data.amount ? parseFloat(data.amount) : parseFloat(invoice.total);
+            const paid = data.paid_amount ? parseFloat(data.paid_amount) : parseFloat(invoice.paid_amount || "0");
+            updateData.balance = (total - paid).toFixed(2);
+            // Auto-update status if fully paid
+            if (paid >= total) {
+              updateData.status = "paid";
+            }
+          }
         }
         await db.updateInvoice(id, ctx.user.id, updateData);
         return { success: true };

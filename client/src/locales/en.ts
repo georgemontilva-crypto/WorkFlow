@@ -18,6 +18,16 @@ export const en = {
     status: 'Status',
     date: 'Date',
     description: 'Description',
+    dismiss: 'Dismiss',
+  },
+
+  // Notifications
+  notifications: {
+    overduePayments: 'Overdue Payments',
+    upcomingPayments: 'Upcoming Payments',
+    overdueMessage: 'You have {count} client(s) with overdue payments',
+    upcomingMessage: 'You have {count} client(s) with upcoming payments',
+    viewReminders: 'View Reminders',
   },
 
   // Navigation
@@ -131,6 +141,9 @@ export const en = {
     additionalNotes: 'Additional Notes',
     notesPlaceholder: 'Payment terms, special conditions, additional information...',
     notesHelper: 'Additional information that will appear in the PDF',
+    paidAmountLabel: 'Down Payment / Partial Payment (Optional)',
+    paidAmountHelper: 'If the client made a down payment, enter the amount here',
+    balancePending: 'Balance Pending',
     pending: 'Pending',
     paid: 'Paid',
     overdue: 'Overdue',
