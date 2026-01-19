@@ -187,7 +187,7 @@ export default function Markets() {
               <div className="text-2xl sm:text-3xl font-bold mb-1 font-mono">{formatPrice(asset.price)}</div>
               <div className={`flex items-center gap-1 text-sm font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
                 {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-                {isPositive ? '+' : ''}{asset.change24h.toFixed(2)}% (24h)
+                {isPositive ? '+' : ''}{(asset.change24h || 0).toFixed(2)}% (24h)
               </div>
             </div>
 

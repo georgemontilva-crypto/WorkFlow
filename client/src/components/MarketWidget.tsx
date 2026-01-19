@@ -120,7 +120,7 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
           isPositive ? 'bg-green-500/20 text-green-600' : 'bg-red-500/20 text-red-600'
         }`}>
           {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-          {isPositive ? '+' : ''}{data.change24h.toFixed(1)}%
+          {isPositive ? '+' : ''}{(data.change24h || 0).toFixed(1)}%
         </div>
       </CardHeader>
       <CardContent>
