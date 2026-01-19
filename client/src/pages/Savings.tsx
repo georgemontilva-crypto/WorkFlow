@@ -24,8 +24,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db, type SavingsGoal } from '@/lib/db';
+import { trpc } from '@/lib/trpc';
 import { Target, Plus, TrendingUp, MoreVertical, Pencil, Trash2, CheckCircle2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -33,57 +32,106 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState } from 'react';
 
+// SavingsGoal type based on backend schema
+type SavingsGoal = {
+  id: number;
+  user_id: number;
+  name: string;
+  target_amount: string;
+  current_amount: string;
+  target_date: Date | null;
+  status: 'active' | 'completed' | 'cancelled';
+  created_at: Date;
+  updated_at: Date;
+};
+
 export default function Savings() {
   const { t } = useLanguage();
-  const savingsGoals = useLiveQuery(() => db.savingsGoals.orderBy('createdAt').reverse().toArray());
+  const utils = trpc.useUtils();
+  
+  // Fetch savings goals using tRPC
+  const { data: savingsGoals, isLoading } = trpc.savingsGoals.list.useQuery();
+  
+  // Mutations
+  const createGoal = trpc.savingsGoals.create.useMutation({
+    onSuccess: () => {
+      utils.savingsGoals.list.invalidate();
+      toast.success('Meta creada exitosamente');
+    },
+    onError: (error) => {
+      toast.error('Error al crear la meta: ' + error.message);
+    },
+  });
+  
+  const updateGoal = trpc.savingsGoals.update.useMutation({
+    onSuccess: () => {
+      utils.savingsGoals.list.invalidate();
+      toast.success('Meta actualizada exitosamente');
+    },
+    onError: (error) => {
+      toast.error('Error al actualizar la meta: ' + error.message);
+    },
+  });
+  
+  const deleteGoal = trpc.savingsGoals.delete.useMutation({
+    onSuccess: () => {
+      utils.savingsGoals.list.invalidate();
+      toast.success('Meta eliminada exitosamente');
+    },
+    onError: (error) => {
+      toast.error('Error al eliminar la meta: ' + error.message);
+    },
+  });
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
-  const [formData, setFormData] = useState<Partial<SavingsGoal>>({
+  const [formData, setFormData] = useState({
     name: '',
-    target_amount: 0,
-    current_amount: 0,
-    deadline: '',
-    status: 'active',
+    target_amount: '',
+    current_amount: '',
+    target_date: '',
+    status: 'active' as 'active' | 'completed' | 'cancelled',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.target_amount || !formData.deadline) {
+    if (!formData.name || !formData.target_amount || !formData.target_date) {
       toast.error('Por favor completa los campos requeridos');
       return;
     }
 
-    const now = new Date().toISOString();
-
     if (editingGoal) {
       // Recalcular estado basado en el nuevo objetivo
-      const newCurrentAmount = formData.current_amount || 0;
-      const newTargetAmount = formData.target_amount || 0;
+      const newCurrentAmount = parseFloat(formData.current_amount) || 0;
+      const newTargetAmount = parseFloat(formData.target_amount) || 0;
       const newStatus = newCurrentAmount >= newTargetAmount ? 'completed' : 'active';
       
-      await db.savingsGoals.update(editingGoal.id!, {
-        ...formData as SavingsGoal,
+      updateGoal.mutate({
+        id: editingGoal.id,
+        name: formData.name,
+        target_amount: formData.target_amount,
+        current_amount: formData.current_amount || '0',
+        target_date: formData.target_date,
         status: newStatus,
-        updated_at: now,
       });
-      toast.success('Meta actualizada exitosamente');
     } else {
-      await db.savingsGoals.add({
-        ...formData as SavingsGoal,
-        created_at: now,
-        updated_at: now,
+      createGoal.mutate({
+        name: formData.name,
+        target_amount: formData.target_amount,
+        current_amount: formData.current_amount || '0',
+        target_date: formData.target_date,
+        status: formData.status,
       });
-      toast.success('Meta creada exitosamente');
     }
 
     setIsDialogOpen(false);
     setEditingGoal(null);
     setFormData({
       name: '',
-      target_amount: 0,
-      current_amount: 0,
-      deadline: '',
+      target_amount: '',
+      current_amount: '',
+      target_date: '',
       status: 'active',
     });
   };
@@ -94,7 +142,7 @@ export default function Savings() {
       name: goal.name,
       target_amount: goal.target_amount,
       current_amount: goal.current_amount,
-      deadline: goal.deadline.split('T')[0],
+      target_date: goal.target_date ? format(new Date(goal.target_date), 'yyyy-MM-dd') : '',
       status: goal.status,
     });
     setIsDialogOpen(true);
@@ -102,31 +150,29 @@ export default function Savings() {
 
   const handleDelete = async (goalId: number) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta meta de ahorro?')) {
-      await db.savingsGoals.delete(goalId);
-      toast.success('Meta eliminada exitosamente');
+      deleteGoal.mutate({ id: goalId });
     }
   };
 
-  const handleAddAmount = async (goalId: number, current_amount: number) => {
+  const handleAddAmount = async (goal: SavingsGoal) => {
     const amount = prompt('¿Cuánto deseas agregar a esta meta?');
     if (!amount) return;
 
-    const newAmount = current_amount + parseFloat(amount);
-    const goal = await db.savingsGoals.get(goalId);
+    const currentAmount = parseFloat(goal.current_amount) || 0;
+    const newAmount = currentAmount + parseFloat(amount);
+    const targetAmount = parseFloat(goal.target_amount) || 0;
+    const newStatus = newAmount >= targetAmount ? 'completed' : 'active';
     
-    if (goal) {
-      const newStatus = newAmount >= goal.target_amount ? 'completed' : 'active';
-      await db.savingsGoals.update(goalId, {
-        current_amount: newAmount,
-        status: newStatus,
-        updated_at: new Date().toISOString(),
-      });
-      
-      if (newStatus === 'completed') {
-        toast.success('¡Felicidades! Meta completada');
-      } else {
-        toast.success('Monto actualizado');
-      }
+    updateGoal.mutate({
+      id: goal.id,
+      current_amount: newAmount.toString(),
+      status: newStatus,
+    });
+    
+    if (newStatus === 'completed') {
+      toast.success('¡Felicidades! Meta completada');
+    } else {
+      toast.success('Monto actualizado');
     }
   };
 
@@ -147,9 +193,9 @@ export default function Savings() {
               setEditingGoal(null);
               setFormData({
                 name: '',
-                target_amount: 0,
-                current_amount: 0,
-                deadline: '',
+                target_amount: '',
+                current_amount: '',
+                target_date: '',
                 status: 'active',
               });
             }
@@ -196,7 +242,7 @@ export default function Savings() {
                       step="0.01"
                       min="0"
                       value={formData.target_amount}
-                      onChange={(e) => setFormData({ ...formData, target_amount: parseFloat(e.target.value) || 0 })}
+                      onChange={(e) => setFormData({ ...formData, target_amount: e.target.value })}
                       className="bg-background border-border text-foreground font-mono h-11"
                       required
                     />
@@ -212,7 +258,7 @@ export default function Savings() {
                       step="0.01"
                       min="0"
                       value={formData.current_amount}
-                      onChange={(e) => setFormData({ ...formData, current_amount: parseFloat(e.target.value) || 0 })}
+                      onChange={(e) => setFormData({ ...formData, current_amount: e.target.value })}
                       className="bg-background border-border text-foreground font-mono h-11"
                     />
                     <p className="text-xs text-muted-foreground">Ahorro actual</p>
@@ -220,14 +266,14 @@ export default function Savings() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="deadline" className="text-foreground font-semibold">
+                  <Label htmlFor="target_date" className="text-foreground font-semibold">
                     Fecha Límite <span className="text-destructive">*</span>
                   </Label>
                   <Input
-                    id="deadline"
+                    id="target_date"
                     type="date"
-                    value={formData.deadline}
-                    onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+                    value={formData.target_date}
+                    onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
                     className="bg-background border-border text-foreground h-11"
                     required
                   />
@@ -243,7 +289,11 @@ export default function Savings() {
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit" className="bg-primary text-primary-foreground hover:opacity-90">
+                  <Button 
+                    type="submit" 
+                    className="bg-primary text-primary-foreground hover:opacity-90"
+                    disabled={createGoal.isPending || updateGoal.isPending}
+                  >
                     {editingGoal ? 'Actualizar' : 'Crear'} Meta
                   </Button>
                 </div>
@@ -253,7 +303,13 @@ export default function Savings() {
         </div>
 
         {/* Savings Goals */}
-        {!savingsGoals || savingsGoals.length === 0 ? (
+        {isLoading ? (
+          <Card className="bg-card border-border">
+            <CardContent className="flex items-center justify-center py-16">
+              <div className="text-muted-foreground">Cargando metas...</div>
+            </CardContent>
+          </Card>
+        ) : !savingsGoals || savingsGoals.length === 0 ? (
           <Card className="bg-card border-border">
             <CardContent className="flex flex-col items-center justify-center py-16">
               <div className="w-32 h-32 rounded-full bg-accent/20 flex items-center justify-center mb-6">
@@ -270,55 +326,47 @@ export default function Savings() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {savingsGoals.map((goal) => {
-              const progress = goal.target_amount > 0 ? (goal.current_amount / goal.target_amount) * 100 : 0;
-              const remaining = goal.target_amount - goal.current_amount;
+              const targetAmount = parseFloat(goal.target_amount) || 0;
+              const currentAmount = parseFloat(goal.current_amount) || 0;
+              const progress = targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0;
+              const remaining = targetAmount - currentAmount;
 
               return (
                 <Card key={goal.id} className="bg-card border-border hover:border-accent transition-colors">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-accent/20 flex items-center justify-center flex-shrink-0">
-                          {goal.status === 'completed' ? (
-                            <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" strokeWidth={1.5} />
-                          ) : (
-                            <Target className="w-5 h-5 sm:w-6 sm:h-6 text-accent-foreground" strokeWidth={1.5} />
-                          )}
-                        </div>
+                        {goal.status === 'completed' ? (
+                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                            <CheckCircle2 className="w-5 h-5 text-green-500" />
+                          </div>
+                        ) : (
+                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
+                            <Target className="w-5 h-5 text-muted-foreground" />
+                          </div>
+                        )}
                         <div className="min-w-0 flex-1">
                           <CardTitle className="text-foreground text-base sm:text-lg truncate">{goal.name}</CardTitle>
                           <p className="text-xs sm:text-sm text-muted-foreground">
-                            Fecha límite: {format(parseISO(goal.deadline), 'dd MMM yyyy', { locale: es })}
+                            {goal.target_date && `Fecha límite: ${format(new Date(goal.target_date), 'dd MMM yyyy', { locale: es })}`}
                           </p>
                         </div>
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground flex-shrink-0">
+                          <Button variant="ghost" size="icon" className="flex-shrink-0">
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className="bg-popover border-border" align="end">
-                          <DropdownMenuItem 
-                            onClick={() => handleEdit(goal)}
-                            className="text-foreground hover:bg-accent cursor-pointer"
-                          >
+                        <DropdownMenuContent align="end" className="bg-popover border-border">
+                          <DropdownMenuItem onClick={() => handleEdit(goal)} className="cursor-pointer">
                             <Pencil className="w-4 h-4 mr-2" />
                             Editar
                           </DropdownMenuItem>
-                          {goal.status !== 'completed' && (
-                            <DropdownMenuItem 
-                              onClick={() => handleAddAmount(goal.id!, goal.current_amount)}
-                              className="text-foreground hover:bg-accent cursor-pointer"
-                            >
-                              <TrendingUp className="w-4 h-4 mr-2" />
-                              Agregar Monto
-                            </DropdownMenuItem>
-                          )}
                           <DropdownMenuSeparator className="bg-border" />
                           <DropdownMenuItem 
-                            onClick={() => handleDelete(goal.id!)}
-                            className="text-destructive hover:bg-destructive/10 cursor-pointer"
+                            onClick={() => handleDelete(goal.id)} 
+                            className="cursor-pointer text-destructive"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
                             Eliminar
@@ -328,45 +376,44 @@ export default function Savings() {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {goal.status === 'completed' && (
-                      <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
-                        <p className="text-sm font-medium text-green-400 flex items-center gap-2">
-                          <CheckCircle2 className="w-4 h-4" />
-                          Completada
-                        </p>
-                      </div>
-                    )}
-                    
                     <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-muted-foreground">Progreso</span>
-                        <span className="text-sm font-bold text-foreground">
-                          {Math.min(progress, 100).toFixed(1)}%
+                      <div className="flex justify-between items-baseline mb-2">
+                        <span className="text-2xl font-bold text-foreground font-mono">
+                          ${currentAmount.toFixed(2)}
+                        </span>
+                        <span className="text-sm text-muted-foreground font-mono">
+                          de ${targetAmount.toFixed(2)}
                         </span>
                       </div>
-                      <Progress value={Math.min(progress, 100)} className="h-2" />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 pt-3 border-t border-border">
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Actual</p>
-                        <p className="text-lg sm:text-xl font-bold font-mono text-foreground">
-                          ${goal.current_amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">Objetivo</p>
-                        <p className="text-lg sm:text-xl font-bold font-mono text-foreground">
-                          ${goal.target_amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                        </p>
-                      </div>
+                      <Progress value={progress} className="h-2" />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {progress.toFixed(1)}% completado
+                      </p>
                     </div>
 
                     {goal.status !== 'completed' && remaining > 0 && (
-                      <div className="pt-3 border-t border-border">
-                        <p className="text-xs text-muted-foreground mb-1">Falta</p>
-                        <p className="text-base sm:text-lg font-bold font-mono text-foreground">
-                          ${remaining.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                      <div className="flex items-center justify-between p-3 bg-accent/10 rounded-lg">
+                        <div>
+                          <p className="text-xs text-muted-foreground">Falta</p>
+                          <p className="text-lg font-semibold text-foreground font-mono">
+                            ${remaining.toFixed(2)}
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => handleAddAmount(goal)}
+                          className="bg-primary text-primary-foreground hover:opacity-90"
+                        >
+                          <TrendingUp className="w-4 h-4 mr-2" />
+                          Agregar
+                        </Button>
+                      </div>
+                    )}
+
+                    {goal.status === 'completed' && (
+                      <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                        <p className="text-sm text-green-600 dark:text-green-400 font-medium text-center">
+                          ¡Meta completada! 🎉
                         </p>
                       </div>
                     )}

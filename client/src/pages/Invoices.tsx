@@ -50,14 +50,16 @@ import type { InvoiceItem } from '../../../drizzle/schema';
 // Invoice type based on tRPC schema
 type Invoice = {
   id: number;
+  user_id: number;
   client_id: number;
   invoice_number: string;
   issue_date: Date;
   due_date: Date;
-  amount: string;
-  paid_amount: string | null;
-  status: 'pending' | 'paid' | 'overdue' | 'cancelled' | 'archived';
-  items: InvoiceItem[];
+  items: string; // JSON string
+  subtotal: string;
+  tax: string;
+  total: string;
+  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
   notes?: string | null;
   created_at: Date;
   updated_at: Date;
@@ -68,8 +70,7 @@ type InvoiceFormData = {
   client_id?: number;
   issue_date?: string;
   due_date?: string;
-  status?: 'pending' | 'paid' | 'overdue' | 'cancelled';
-  paid_amount?: number | string;
+  status?: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
   items?: InvoiceItem[];
   notes?: string;
 };
@@ -80,6 +81,18 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import jsPDF from 'jspdf';
 import { useState } from 'react';
+
+// Helper function to parse invoice items
+const parseInvoiceItems = (items: string | InvoiceItem[]): InvoiceItem[] => {
+  if (typeof items === 'string') {
+    try {
+      return JSON.parse(items);
+    } catch (e) {
+      return [];
+    }
+  }
+  return items || [];
+};
 
 export default function Invoices() {
   const { t } = useLanguage();
@@ -142,8 +155,7 @@ export default function Invoices() {
     client_id: 0,
     issue_date: new Date().toISOString().split('T')[0],
     due_date: addDays(new Date(), 30).toISOString().split('T')[0],
-    status: 'pending',
-    paid_amount: 0,
+    status: 'draft',
     items: [],
     notes: '',
   });
@@ -216,16 +228,19 @@ export default function Invoices() {
     }
 
     const invoice_number = `INV-${Date.now()}`;
-    const total = calculateTotal();
+    const subtotal = calculateTotal();
+    const tax = subtotal * 0; // 0% tax, can be changed
+    const total = subtotal + tax;
 
     await createInvoice.mutateAsync({
       client_id: formData.client_id!,
       invoice_number,
       issue_date: formData.issue_date!,
       due_date: formData.due_date!,
-      amount: total.toString(),
-      paid_amount: '0',
-      status: formData.status!,
+      subtotal: subtotal.toString(),
+      tax: tax.toString(),
+      total: total.toString(),
+      status: formData.status || 'draft',
       items: formData.items!,
       notes: formData.notes,
     });
@@ -234,7 +249,7 @@ export default function Invoices() {
       client_id: 0,
       issue_date: new Date().toISOString().split('T')[0],
       due_date: addDays(new Date(), 30).toISOString().split('T')[0],
-      status: 'pending',
+      status: 'draft',
       items: [],
       notes: '',
     });
@@ -267,7 +282,7 @@ export default function Invoices() {
       const client = clients?.find(c => c.id === selectedInvoice.client_id);
       await createTransaction.mutateAsync({
         type: 'income',
-        amount: selectedInvoice.amount,
+        amount: selectedInvoice.total,
         category: 'Pago de Factura',
         description: `Pago de factura ${selectedInvoice.invoice_number} - ${client?.name || 'Cliente'}`,
         date: new Date().toISOString(),
@@ -309,42 +324,10 @@ export default function Invoices() {
   };
 
   const confirmPartialPayment = async () => {
-    if (!selectedInvoice || partialPaymentAmount <= 0) {
-      toast.error('Ingresa un monto válido');
-      return;
-    }
-
-    const currentPaid = parseFloat(selectedInvoice.paid_amount || '0') || 0;
-    const newPaidAmount = currentPaid + partialPaymentAmount;
-    const invoiceAmount = parseFloat(selectedInvoice.amount);
-
-    if (newPaidAmount > invoiceAmount) {
-      toast.error('El monto total pagado no puede exceder el monto de la factura');
-      return;
-    }
-
-    // Actualizar factura con el pago parcial
-    const newStatus = newPaidAmount >= invoiceAmount ? 'paid' : selectedInvoice.status;
-    await updateInvoice.mutateAsync({
-      id: selectedInvoice.id,
-      paid_amount: newPaidAmount.toString() || '0',
-      status: newStatus,
-    });
-
-    // Agregar transacción de ingreso
-    const client = clients?.find(c => c.id === selectedInvoice.client_id);
-    await createTransaction.mutateAsync({
-      type: 'income',
-      amount: partialPaymentAmount.toString(),
-      category: 'Pago Parcial de Factura',
-      description: `Abono a factura ${selectedInvoice.invoice_number} - ${client?.name || 'Cliente'}`,
-      date: new Date().toISOString(),
-    });
-
-    toast.success(`Pago parcial de $${partialPaymentAmount.toFixed(2)} registrado exitosamente`);
+    // Funcionalidad de pagos parciales deshabilitada temporalmente
+    // El backend actual no soporta paid_amount
+    toast.error('Funcionalidad no disponible');
     setShowPartialPaymentDialog(false);
-    setSelectedInvoice(null);
-    setPartialPaymentAmount(0);
   };
 
   const generatePDF = async (invoiceId: number) => {
@@ -872,33 +855,12 @@ export default function Invoices() {
                           <div>
                             <p className="text-xs text-muted-foreground mb-1">Monto</p>
                             <p className="text-lg font-bold font-mono text-foreground">
-                              ${parseFloat(invoice.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                              ${parseFloat(invoice.total).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                             </p>
                           </div>
                         </div>
 
-                      {/* Pagos Parciales */}
-                      {(invoice.paid_amount && parseFloat(invoice.paid_amount) > 0) && (
-                        <div className="pt-2 border-t border-border">
-                          <div className="grid grid-cols-2 gap-3">
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-1">Pagado</p>
-                              <p className="text-sm font-medium text-green-500">
-                                ${parseFloat(invoice.paid_amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-1">Restante</p>
-                              <p className="text-sm font-bold text-orange-400">
-                                ${(parseFloat(invoice.amount) - parseFloat(invoice.paid_amount)).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="mt-2">
-                            <Progress value={(parseFloat(invoice.paid_amount) / parseFloat(invoice.amount)) * 100} className="h-2" />
-                          </div>
-                        </div>
-                      )}
+                      {/* Pagos Parciales - Deshabilitado temporalmente */}
 
                       <div className="pt-3 border-t border-border">
                         <p className="text-xs text-muted-foreground mb-2">Estado</p>
@@ -937,7 +899,7 @@ export default function Invoices() {
                 Factura Pagada
               </AlertDialogTitle>
               <AlertDialogDescription className="text-muted-foreground">
-                ¿Deseas agregar el monto de ${parseFloat(selectedInvoice?.amount || '0').toFixed(2)} como ingreso en la sección de Finanzas?
+                ¿Deseas agregar el monto de ${parseFloat(selectedInvoice?.total || '0').toFixed(2)} como ingreso en la sección de Finanzas?
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -967,13 +929,8 @@ export default function Invoices() {
               </AlertDialogTitle>
               <AlertDialogDescription className="text-muted-foreground">
                 {t.invoices.invoice_number} {selectedInvoice?.invoice_number}<br />
-                {t.invoices.totalAmount}: ${parseFloat(selectedInvoice?.amount || '0').toFixed(2)}<br />
-                {selectedInvoice?.paid_amount && parseFloat(selectedInvoice.paid_amount) > 0 && (
-                  <>
-                    Pagado: ${parseFloat(selectedInvoice.paid_amount).toFixed(2)}<br />
-                    Restante: ${(parseFloat(selectedInvoice.amount) - parseFloat(selectedInvoice.paid_amount)).toFixed(2)}<br />
-                  </>
-                )}
+                Total: ${parseFloat(selectedInvoice?.total || '0').toFixed(2)}<br />
+                <span className="text-xs text-orange-400">Funcionalidad de pagos parciales temporalmente deshabilitada</span>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <div className="py-4">
@@ -985,7 +942,7 @@ export default function Invoices() {
                 type="number"
                 step="0.01"
                 min="0"
-                max={selectedInvoice ? parseFloat(selectedInvoice.amount) - parseFloat(selectedInvoice.paid_amount || '0') : 0}
+                max={selectedInvoice ? parseFloat(selectedInvoice.total) : 0}
                 value={partialPaymentAmount}
                 onChange={(e) => setPartialPaymentAmount(parseFloat(e.target.value) || 0)}
                 placeholder="0.00"
@@ -1140,7 +1097,7 @@ export default function Invoices() {
                           </div>
                           <div className="flex flex-col sm:items-end gap-2">
                             <div className="text-2xl font-bold font-mono text-foreground">
-                              ${(invoice.items?.reduce((sum, item) => sum + item.total, 0) || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                              ${parseFloat(invoice.total).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                             </div>
                             <Button
                               size="sm"

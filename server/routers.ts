@@ -276,9 +276,10 @@ export const appRouter = router({
         invoice_number: z.string(),
         issue_date: z.string(),
         due_date: z.string(),
-        amount: z.string(),
-        paid_amount: z.string().optional(),
-        status: z.enum(["pending", "paid", "overdue", "cancelled", "archived"]).default("pending"),
+        subtotal: z.string(),
+        tax: z.string().optional(),
+        total: z.string(),
+        status: z.enum(["draft", "sent", "paid", "overdue", "cancelled"]).default("draft"),
         items: z.array(z.object({
           description: z.string(),
           quantity: z.number(),
@@ -288,15 +289,20 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        await db.createInvoice({
-          ...input,
+        const result = await db.createInvoice({
+          user_id: ctx.user.id,
+          client_id: input.client_id,
+          invoice_number: input.invoice_number,
           issue_date: new Date(input.issue_date),
           due_date: new Date(input.due_date),
-          user_id: ctx.user.id,
-          created_at: new Date(),
-          updated_at: new Date(),
+          items: JSON.stringify(input.items),
+          subtotal: input.subtotal,
+          tax: input.tax || "0",
+          total: input.total,
+          status: input.status,
+          notes: input.notes || null,
         });
-        return { success: true };
+        return { success: true, id: result.id };
       }),
     
     update: protectedProcedure
@@ -556,18 +562,19 @@ export const appRouter = router({
         name: z.string(),
         target_amount: z.string(),
         current_amount: z.string().optional(),
-        deadline: z.string(),
+        target_date: z.string(),
         status: z.enum(["active", "completed", "cancelled"]).default("active"),
       }))
       .mutation(async ({ ctx, input }) => {
-        await db.createSavingsGoal({
-          ...input,
-          deadline: new Date(input.deadline),
+        const result = await db.createSavingsGoal({
+          name: input.name,
+          target_amount: input.target_amount,
+          current_amount: input.current_amount || "0",
+          target_date: new Date(input.target_date),
+          status: input.status,
           user_id: ctx.user.id,
-          created_at: new Date(),
-          updated_at: new Date(),
         });
-        return { success: true };
+        return { success: true, id: result.id };
       }),
     
     update: protectedProcedure
@@ -576,14 +583,14 @@ export const appRouter = router({
         name: z.string().optional(),
         target_amount: z.string().optional(),
         current_amount: z.string().optional(),
-        deadline: z.string().optional(),
+        target_date: z.string().optional(),
         status: z.enum(["active", "completed", "cancelled"]).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
-        const updateData: any = { ...data, updated_at: new Date() };
-        if (data.deadline) {
-          updateData.deadline = new Date(data.deadline);
+        const updateData: any = { ...data };
+        if (data.target_date) {
+          updateData.target_date = new Date(data.target_date);
         }
         await db.updateSavingsGoal(id, ctx.user.id, updateData);
         return { success: true };

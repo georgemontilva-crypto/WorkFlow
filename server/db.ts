@@ -299,7 +299,8 @@ export async function createSavingsGoal(data: any) {
     throw new Error("Database not available");
   }
 
-  await db.insert(savingsGoals).values(data);
+  const result = await db.insert(savingsGoals).values(data);
+  return { id: Number(result[0].insertId) };
 }
 
 export async function updateSavingsGoal(id: number, user_id: number, data: any) {
@@ -560,7 +561,8 @@ export async function createInvoice(data: any) {
     throw new Error("Database not available");
   }
 
-  await db.insert(invoices).values(data);
+  const result = await db.insert(invoices).values(data);
+  return { id: Number(result[0].insertId) };
 }
 
 
