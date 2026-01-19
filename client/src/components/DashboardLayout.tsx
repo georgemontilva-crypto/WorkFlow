@@ -168,7 +168,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             const isActive = location === item.href;
             return (
               <Link key={item.name} href={item.href}>
-                <div
+                <a
                   className={cn(
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 cursor-pointer',
                     isActive
@@ -179,7 +179,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 >
                   <item.icon className="w-5 h-5" strokeWidth={1.5} />
                   {item.name}
-                </div>
+                </a>
               </Link>
             );
           })}
