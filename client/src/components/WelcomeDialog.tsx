@@ -29,11 +29,12 @@ export function WelcomeDialog() {
     }
   }, [user]);
 
-  const handleClose = () => {
-    if (user) {
+  const handleClose = (open: boolean) => {
+    if (!open && user) {
+      // Save to localStorage when closing (regardless of how it's closed)
       localStorage.setItem(`welcome-seen-${user.id}`, 'true');
     }
-    setIsOpen(false);
+    setIsOpen(open);
   };
 
   const features = [
@@ -45,7 +46,7 @@ export function WelcomeDialog() {
   ];
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px] bg-background border-primary/30 shadow-2xl">
         <DialogHeader>
           <div className="flex items-center justify-center mb-4">
@@ -90,7 +91,7 @@ export function WelcomeDialog() {
           {/* CTA */}
           <div className="pt-2">
             <Button 
-              onClick={handleClose}
+              onClick={() => handleClose(false)}
               className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold shadow-lg hover:shadow-xl transition-all"
               size="lg"
             >
