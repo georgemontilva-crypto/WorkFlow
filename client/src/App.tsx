@@ -21,6 +21,7 @@ import Finances from "./pages/Finances";
 import Savings from "./pages/Savings";
 import Settings from "./pages/Settings";
 import Reminders from "./pages/Reminders";
+import Admin from "./pages/Admin";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/savings" component={Savings} />
       <Route path="/reminders" component={Reminders} />
       <Route path="/settings" component={Settings} />
+      <Route path="/admin" component={Admin} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -4,7 +4,7 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X, Sparkles, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X, Sparkles, LogOut, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -111,7 +111,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       return d >= 0 && d <= 5;
     }).length : 0;
 
-  const navigation = [
+  // Base navigation items
+  const baseNavigation = [
     { name: t.nav.dashboard, href: '/dashboard', icon: LayoutDashboard },
     { name: t.nav.clients, href: '/clients', icon: Users },
     { name: t.nav.invoices, href: '/invoices', icon: FileText },
@@ -120,6 +121,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: t.nav.reminders, href: '/reminders', icon: Bell },
     { name: t.nav.settings, href: '/settings', icon: Settings },
   ];
+
+  // Add admin link for super admins
+  const navigation = user?.role === 'super_admin'
+    ? [...baseNavigation, { name: 'Admin', href: '/admin', icon: Shield }]
+    : baseNavigation;
 
   // Handle upgrade action
   const handleUpgrade = () => {
