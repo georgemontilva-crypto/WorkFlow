@@ -4,7 +4,7 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X, Sparkles, LogOut, Shield } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X, Sparkles, LogOut, Shield, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -116,7 +116,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: t.nav.dashboard, href: '/dashboard', icon: LayoutDashboard },
     { name: t.nav.clients, href: '/clients', icon: Users },
     { name: t.nav.invoices, href: '/invoices', icon: FileText },
-    { name: t.nav.finances, href: '/finances', icon: TrendingUp },
+    { name: t.nav.finances, href: '/finances', icon: Coins },
     { name: 'Mercados', href: '/markets', icon: TrendingUp },
     { name: t.nav.goals, href: '/savings', icon: Target },
     { name: t.nav.reminders, href: '/reminders', icon: Bell },
