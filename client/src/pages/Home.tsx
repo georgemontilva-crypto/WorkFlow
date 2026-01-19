@@ -106,9 +106,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8 ${dashboardWidget ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}>
-          <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer" onClick={() => setLocation('/clients')}>
+        {/* Stats Grid - Horizontal scroll on mobile */}
+        <div className={`flex sm:grid sm:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0 snap-x snap-mandatory sm:snap-none ${dashboardWidget ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0" onClick={() => setLocation('/clients')}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {t.dashboard.activeClients}
@@ -120,7 +120,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer" onClick={() => setLocation('/invoices')}>
+          <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0" onClick={() => setLocation('/invoices')}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {t.dashboard.pendingInvoices}
@@ -132,7 +132,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer" onClick={() => setLocation('/finances')}>
+          <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0" onClick={() => setLocation('/finances')}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {t.dashboard.monthlyIncome}
@@ -146,7 +146,7 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer" onClick={() => setLocation('/finances')}>
+          <Card className="bg-card border-border hover:bg-accent/5 transition-colors cursor-pointer min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0" onClick={() => setLocation('/finances')}>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {t.dashboard.monthlyExpenses}
@@ -162,7 +162,9 @@ export default function Home() {
 
           {/* Market Widget */}
           {dashboardWidget && (
-            <MarketWidget symbol={dashboardWidget.symbol} type={dashboardWidget.type} />
+            <div className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0">
+              <MarketWidget symbol={dashboardWidget.symbol} type={dashboardWidget.type} />
+            </div>
           )}
         </div>
 
