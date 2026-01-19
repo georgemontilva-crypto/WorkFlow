@@ -23,22 +23,62 @@ import Settings from "./pages/Settings";
 import Reminders from "./pages/Reminders";
 import Admin from "./pages/Admin";
 import Markets from "./pages/Markets";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
+      {/* Public routes */}
       <Route path="/" component={Landing} />
       <Route path="/signup" component={Signup} />
       <Route path="/login" component={Login} />
-      <Route path="/dashboard" component={Home} />
-      <Route path="/clients" component={Clients} />
-      <Route path="/invoices" component={Invoices} />
-      <Route path="/finances" component={Finances} />
-      <Route path="/savings" component={Savings} />
-      <Route path="/reminders" component={Reminders} />
-      <Route path="/settings" component={Settings} />
-      <Route path="/admin" component={Admin} />
-      <Route path="/markets" component={Markets} />
+      
+      {/* Protected routes - require authentication */}
+      <Route path="/dashboard">
+        <ProtectedRoute>
+          <Home />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/clients">
+        <ProtectedRoute>
+          <Clients />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/invoices">
+        <ProtectedRoute>
+          <Invoices />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/finances">
+        <ProtectedRoute>
+          <Finances />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/savings">
+        <ProtectedRoute>
+          <Savings />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/reminders">
+        <ProtectedRoute>
+          <Reminders />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/settings">
+        <ProtectedRoute>
+          <Settings />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin">
+        <ProtectedRoute>
+          <Admin />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/markets">
+        <ProtectedRoute>
+          <Markets />
+        </ProtectedRoute>
+      </Route>
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
