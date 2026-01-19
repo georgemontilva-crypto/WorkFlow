@@ -40,8 +40,8 @@ export default function Savings() {
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
   const [formData, setFormData] = useState<Partial<SavingsGoal>>({
     name: '',
-    targetAmount: 0,
-    currentAmount: 0,
+    target_amount: 0,
+    current_amount: 0,
     deadline: '',
     status: 'active',
   });
@@ -49,7 +49,7 @@ export default function Savings() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.targetAmount || !formData.deadline) {
+    if (!formData.name || !formData.target_amount || !formData.deadline) {
       toast.error('Por favor completa los campos requeridos');
       return;
     }
@@ -58,21 +58,21 @@ export default function Savings() {
 
     if (editingGoal) {
       // Recalcular estado basado en el nuevo objetivo
-      const newCurrentAmount = formData.currentAmount || 0;
-      const newTargetAmount = formData.targetAmount || 0;
+      const newCurrentAmount = formData.current_amount || 0;
+      const newTargetAmount = formData.target_amount || 0;
       const newStatus = newCurrentAmount >= newTargetAmount ? 'completed' : 'active';
       
       await db.savingsGoals.update(editingGoal.id!, {
         ...formData as SavingsGoal,
         status: newStatus,
-        updatedAt: now,
+        updated_at: now,
       });
       toast.success('Meta actualizada exitosamente');
     } else {
       await db.savingsGoals.add({
         ...formData as SavingsGoal,
-        createdAt: now,
-        updatedAt: now,
+        created_at: now,
+        updated_at: now,
       });
       toast.success('Meta creada exitosamente');
     }
@@ -81,8 +81,8 @@ export default function Savings() {
     setEditingGoal(null);
     setFormData({
       name: '',
-      targetAmount: 0,
-      currentAmount: 0,
+      target_amount: 0,
+      current_amount: 0,
       deadline: '',
       status: 'active',
     });
@@ -92,8 +92,8 @@ export default function Savings() {
     setEditingGoal(goal);
     setFormData({
       name: goal.name,
-      targetAmount: goal.targetAmount,
-      currentAmount: goal.currentAmount,
+      target_amount: goal.target_amount,
+      current_amount: goal.current_amount,
       deadline: goal.deadline.split('T')[0],
       status: goal.status,
     });
@@ -107,19 +107,19 @@ export default function Savings() {
     }
   };
 
-  const handleAddAmount = async (goalId: number, currentAmount: number) => {
+  const handleAddAmount = async (goalId: number, current_amount: number) => {
     const amount = prompt('¿Cuánto deseas agregar a esta meta?');
     if (!amount) return;
 
-    const newAmount = currentAmount + parseFloat(amount);
+    const newAmount = current_amount + parseFloat(amount);
     const goal = await db.savingsGoals.get(goalId);
     
     if (goal) {
-      const newStatus = newAmount >= goal.targetAmount ? 'completed' : 'active';
+      const newStatus = newAmount >= goal.target_amount ? 'completed' : 'active';
       await db.savingsGoals.update(goalId, {
-        currentAmount: newAmount,
+        current_amount: newAmount,
         status: newStatus,
-        updatedAt: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       });
       
       if (newStatus === 'completed') {
@@ -147,8 +147,8 @@ export default function Savings() {
               setEditingGoal(null);
               setFormData({
                 name: '',
-                targetAmount: 0,
-                currentAmount: 0,
+                target_amount: 0,
+                current_amount: 0,
                 deadline: '',
                 status: 'active',
               });
@@ -187,32 +187,32 @@ export default function Savings() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="targetAmount" className="text-foreground font-semibold">
+                    <Label htmlFor="target_amount" className="text-foreground font-semibold">
                       Monto Objetivo <span className="text-destructive">*</span>
                     </Label>
                     <Input
-                      id="targetAmount"
+                      id="target_amount"
                       type="number"
                       step="0.01"
                       min="0"
-                      value={formData.targetAmount}
-                      onChange={(e) => setFormData({ ...formData, targetAmount: parseFloat(e.target.value) || 0 })}
+                      value={formData.target_amount}
+                      onChange={(e) => setFormData({ ...formData, target_amount: parseFloat(e.target.value) || 0 })}
                       className="bg-background border-border text-foreground font-mono h-11"
                       required
                     />
                     <p className="text-xs text-muted-foreground">Meta a alcanzar</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="currentAmount" className="text-foreground font-semibold">
+                    <Label htmlFor="current_amount" className="text-foreground font-semibold">
                       Monto Actual
                     </Label>
                     <Input
-                      id="currentAmount"
+                      id="current_amount"
                       type="number"
                       step="0.01"
                       min="0"
-                      value={formData.currentAmount}
-                      onChange={(e) => setFormData({ ...formData, currentAmount: parseFloat(e.target.value) || 0 })}
+                      value={formData.current_amount}
+                      onChange={(e) => setFormData({ ...formData, current_amount: parseFloat(e.target.value) || 0 })}
                       className="bg-background border-border text-foreground font-mono h-11"
                     />
                     <p className="text-xs text-muted-foreground">Ahorro actual</p>
@@ -270,8 +270,8 @@ export default function Savings() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {savingsGoals.map((goal) => {
-              const progress = goal.targetAmount > 0 ? (goal.currentAmount / goal.targetAmount) * 100 : 0;
-              const remaining = goal.targetAmount - goal.currentAmount;
+              const progress = goal.target_amount > 0 ? (goal.current_amount / goal.target_amount) * 100 : 0;
+              const remaining = goal.target_amount - goal.current_amount;
 
               return (
                 <Card key={goal.id} className="bg-card border-border hover:border-accent transition-colors">
@@ -308,7 +308,7 @@ export default function Savings() {
                           </DropdownMenuItem>
                           {goal.status !== 'completed' && (
                             <DropdownMenuItem 
-                              onClick={() => handleAddAmount(goal.id!, goal.currentAmount)}
+                              onClick={() => handleAddAmount(goal.id!, goal.current_amount)}
                               className="text-foreground hover:bg-accent cursor-pointer"
                             >
                               <TrendingUp className="w-4 h-4 mr-2" />
@@ -351,13 +351,13 @@ export default function Savings() {
                       <div>
                         <p className="text-xs text-muted-foreground mb-1">Actual</p>
                         <p className="text-lg sm:text-xl font-bold font-mono text-foreground">
-                          ${goal.currentAmount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                          ${goal.current_amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground mb-1">Objetivo</p>
                         <p className="text-lg sm:text-xl font-bold font-mono text-foreground">
-                          ${goal.targetAmount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                          ${goal.target_amount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                         </p>
                       </div>
                     </div>

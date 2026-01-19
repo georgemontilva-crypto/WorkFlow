@@ -46,16 +46,16 @@ type Client = {
   email: string;
   phone: string;
   company?: string | null;
-  billingCycle: 'monthly' | 'quarterly' | 'yearly' | 'custom';
-  customCycleDays?: number | null;
+  billing_cycle: 'monthly' | 'quarterly' | 'yearly' | 'custom';
+  custom_cycle_days?: number | null;
   amount: string;
-  nextPaymentDate: Date;
-  reminderDays: number;
+  next_payment_date: Date;
+  reminder_days: number;
   status: 'active' | 'inactive' | 'overdue';
   archived: number;
   notes?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 };
 
 export default function Clients() {
@@ -105,10 +105,10 @@ export default function Clients() {
     email: '',
     phone: '',
     company: '',
-    billingCycle: 'monthly',
+    billing_cycle: 'monthly',
     amount: '0',
-    nextPaymentDate: '',
-    reminderDays: 7,
+    next_payment_date: '',
+    reminder_days: 7,
     status: 'active',
     notes: '',
   });
@@ -118,12 +118,12 @@ export default function Clients() {
     client.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const toggleCard = (clientId: number) => {
+  const toggleCard = (client_id: number) => {
     const newExpanded = new Set(expandedCards);
-    if (newExpanded.has(clientId)) {
-      newExpanded.delete(clientId);
+    if (newExpanded.has(client_id)) {
+      newExpanded.delete(client_id);
     } else {
-      newExpanded.add(clientId);
+      newExpanded.add(client_id);
     }
     setExpandedCards(newExpanded);
   };
@@ -131,7 +131,7 @@ export default function Clients() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.amount || !formData.nextPaymentDate) {
+    if (!formData.name || !formData.email || !formData.amount || !formData.next_payment_date) {
       toast.error('Por favor completa los campos requeridos');
       return;
     }
@@ -152,10 +152,10 @@ export default function Clients() {
       email: '',
       phone: '',
       company: '',
-      billingCycle: 'monthly',
+      billing_cycle: 'monthly',
       amount: '0',
-      nextPaymentDate: '',
-      reminderDays: 7,
+      next_payment_date: '',
+      reminder_days: 7,
       status: 'active',
       notes: '',
     });
@@ -168,31 +168,31 @@ export default function Clients() {
       email: client.email,
       phone: client.phone,
       company: client.company || '',
-      billingCycle: client.billingCycle,
-      customCycleDays: client.customCycleDays,
+      billing_cycle: client.billing_cycle,
+      custom_cycle_days: client.custom_cycle_days,
       amount: client.amount,
-      nextPaymentDate: format(new Date(client.nextPaymentDate), 'yyyy-MM-dd'),
-      reminderDays: client.reminderDays,
+      next_payment_date: format(new Date(client.next_payment_date), 'yyyy-MM-dd'),
+      reminder_days: client.reminder_days,
       status: client.status,
       notes: client.notes || '',
     });
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (clientId: number) => {
+  const handleDelete = async (client_id: number) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este cliente? Esta acción no se puede deshacer.')) {
-      await deleteClient.mutateAsync({ id: clientId });
+      await deleteClient.mutateAsync({ id: client_id });
     }
   };
 
-  const getPaymentStatus = (nextPaymentDate: Date, reminderDays: number) => {
-    const daysUntil = differenceInDays(new Date(nextPaymentDate), new Date());
+  const getPaymentStatus = (next_payment_date: Date, reminder_days: number) => {
+    const daysUntil = differenceInDays(new Date(next_payment_date), new Date());
     
     if (daysUntil < 0) {
       return { color: 'bg-destructive/10 text-destructive border-destructive/30', label: t.clients.overdue, icon: '🔴' };
     } else if (daysUntil <= 3) {
       return { color: 'bg-orange-500/10 text-orange-500 border-orange-500/30', label: `${daysUntil} ${t.common.days}`, icon: '🟠' };
-    } else if (daysUntil <= reminderDays) {
+    } else if (daysUntil <= reminder_days) {
       return { color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30', label: `${daysUntil} ${t.common.days}`, icon: '🟡' };
     }
     return { color: 'bg-muted text-muted-foreground border-border', label: `${daysUntil} ${t.common.days}`, icon: '🟢' };
@@ -233,10 +233,10 @@ export default function Clients() {
                 email: '',
                 phone: '',
                 company: '',
-                billingCycle: 'monthly',
+                billing_cycle: 'monthly',
                 amount: '0',
-                nextPaymentDate: '',
-                reminderDays: 7,
+                next_payment_date: '',
+                reminder_days: 7,
                 status: 'active',
                 notes: '',
               });
@@ -316,26 +316,26 @@ export default function Clients() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="nextPaymentDate" className="text-foreground font-semibold">Fecha de Próximo Cobro <span className="text-destructive">*</span></Label>
+                      <Label htmlFor="next_payment_date" className="text-foreground font-semibold">Fecha de Próximo Cobro <span className="text-destructive">*</span></Label>
                       <Input
-                        id="nextPaymentDate"
+                        id="next_payment_date"
                         type="date"
-                        value={formData.nextPaymentDate}
-                        onChange={(e) => setFormData({ ...formData, nextPaymentDate: e.target.value })}
+                        value={formData.next_payment_date}
+                        onChange={(e) => setFormData({ ...formData, next_payment_date: e.target.value })}
                         className="bg-background border-border text-foreground h-11"
                         required
                       />
                       <p className="text-xs text-muted-foreground">Fecha del próximo pago esperado</p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="reminderDays" className="text-foreground font-semibold">Días de Anticipación</Label>
+                      <Label htmlFor="reminder_days" className="text-foreground font-semibold">Días de Anticipación</Label>
                       <Input
-                        id="reminderDays"
+                        id="reminder_days"
                         type="number"
                         min="1"
                         max="30"
-                        value={formData.reminderDays}
-                        onChange={(e) => setFormData({ ...formData, reminderDays: parseInt(e.target.value) || 7 })}
+                        value={formData.reminder_days}
+                        onChange={(e) => setFormData({ ...formData, reminder_days: parseInt(e.target.value) || 7 })}
                         className="bg-background border-border text-foreground h-11"
                       />
                       <p className="text-xs text-muted-foreground">Días antes para mostrar recordatorio</p>
@@ -344,10 +344,10 @@ export default function Clients() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="billingCycle" className="text-foreground font-semibold">Ciclo de Facturación</Label>
+                      <Label htmlFor="billing_cycle" className="text-foreground font-semibold">Ciclo de Facturación</Label>
                       <Select
-                        value={formData.billingCycle}
-                        onValueChange={(value: any) => setFormData({ ...formData, billingCycle: value })}
+                        value={formData.billing_cycle}
+                        onValueChange={(value: any) => setFormData({ ...formData, billing_cycle: value })}
                       >
                         <SelectTrigger className="bg-background border-border text-foreground h-11">
                           <SelectValue />
@@ -377,18 +377,18 @@ export default function Clients() {
                   </div>
                 </div>
 
-                {formData.billingCycle === 'custom' && (
+                {formData.billing_cycle === 'custom' && (
                   <div className="space-y-2">
-                    <Label htmlFor="customCycleDays" className="text-foreground font-semibold">Días del Ciclo Personalizado</Label>
+                    <Label htmlFor="custom_cycle_days" className="text-foreground font-semibold">Días del Ciclo Personalizado</Label>
                     <Input
-                      id="customCycleDays"
+                      id="custom_cycle_days"
                       type="number"
                       min="1"
-                      value={formData.customCycleDays}
-                      onChange={(e) => setFormData({ ...formData, customCycleDays: parseInt(e.target.value) })}
+                      value={formData.custom_cycle_days}
+                      onChange={(e) => setFormData({ ...formData, custom_cycle_days: parseInt(e.target.value) })}
                       className="bg-background border-border text-foreground h-11"
                     />
-                    <p className="text-xs text-muted-foreground">{t.clients.reminderDays}</p>
+                    <p className="text-xs text-muted-foreground">{t.clients.reminder_days}</p>
                   </div>
                 )}
 
@@ -471,7 +471,7 @@ export default function Clients() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredClients.map((client) => {
-              const paymentStatus = getPaymentStatus(client.nextPaymentDate, client.reminderDays);
+              const paymentStatus = getPaymentStatus(client.next_payment_date, client.reminder_days);
               const isExpanded = expandedCards.has(client.id);
 
               return (
@@ -543,7 +543,7 @@ export default function Clients() {
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-sm text-muted-foreground">{t.clients.nextPayment}</span>
                           <span className="text-sm font-semibold text-foreground">
-                            {format(new Date(client.nextPaymentDate), 'dd/MM/yyyy')}
+                            {format(new Date(client.next_payment_date), 'dd/MM/yyyy')}
                           </span>
                         </div>
                         <div className="flex items-center justify-between mb-2">

@@ -50,22 +50,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     
     // Count overdue items
     const overdueClients = clients.filter(c => {
-      const daysUntil = differenceInDays(parseISO(c.nextPaymentDate), new Date());
+      const daysUntil = differenceInDays(parseISO(c.next_payment_date), new Date());
       return daysUntil < 0;
     });
     const overdueInvoices = invoices.filter(i => {
-      const daysUntil = differenceInDays(parseISO(i.dueDate), new Date());
+      const daysUntil = differenceInDays(parseISO(i.due_date), new Date());
       return daysUntil < 0;
     });
     const overdueCount = overdueClients.length + overdueInvoices.length;
     
     // Count urgent items (5 days or less)
     const urgentClients = clients.filter(c => {
-      const daysUntil = differenceInDays(parseISO(c.nextPaymentDate), new Date());
+      const daysUntil = differenceInDays(parseISO(c.next_payment_date), new Date());
       return daysUntil >= 0 && daysUntil <= 5;
     });
     const urgentInvoices = invoices.filter(i => {
-      const daysUntil = differenceInDays(parseISO(i.dueDate), new Date());
+      const daysUntil = differenceInDays(parseISO(i.due_date), new Date());
       return daysUntil >= 0 && daysUntil <= 5;
     });
     const urgentCount = urgentClients.length + urgentInvoices.length;
@@ -95,16 +95,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   
   // Calculate counts for alerts
   const overdueCount = clients && invoices ? 
-    clients.filter(c => differenceInDays(parseISO(c.nextPaymentDate), new Date()) < 0).length +
-    invoices.filter(i => differenceInDays(parseISO(i.dueDate), new Date()) < 0).length : 0;
+    clients.filter(c => differenceInDays(parseISO(c.next_payment_date), new Date()) < 0).length +
+    invoices.filter(i => differenceInDays(parseISO(i.due_date), new Date()) < 0).length : 0;
   
   const urgentCount = clients && invoices ?
     clients.filter(c => {
-      const d = differenceInDays(parseISO(c.nextPaymentDate), new Date());
+      const d = differenceInDays(parseISO(c.next_payment_date), new Date());
       return d >= 0 && d <= 5;
     }).length +
     invoices.filter(i => {
-      const d = differenceInDays(parseISO(i.dueDate), new Date());
+      const d = differenceInDays(parseISO(i.due_date), new Date());
       return d >= 0 && d <= 5;
     }).length : 0;
 
@@ -126,7 +126,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex h-screen bg-background overflow-hidden">
       {/* Access Blocker */}
-      {accessStatus && !accessStatus.hasLifetimeAccess && (
+      {accessStatus && !accessStatus.has_lifetime_access && (
         <AccessBlocker 
           trialDaysRemaining={accessStatus.trialDaysRemaining}
           onUpgrade={handleUpgrade}

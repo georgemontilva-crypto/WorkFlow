@@ -8,7 +8,7 @@ const JWT_EXPIRATION = '7d'; // 7 days
 const BCRYPT_SALT_ROUNDS = 12; // Military-grade: 12 rounds = ~1 second per hash
 
 export interface JWTPayload {
-  userId: number;
+  user_id: number;
   email: string;
   role: string;
 }
@@ -18,7 +18,7 @@ export interface JWTPayload {
  */
 export async function generateToken(user: User): Promise<string> {
   const token = await new SignJWT({
-    userId: user.id,
+    user_id: user.id,
     email: user.email,
     role: user.role,
   })

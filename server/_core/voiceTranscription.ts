@@ -269,12 +269,12 @@ function getLanguageName(langCode: string): string {
  *       
  *       // Optionally save transcription to database
  *       await db.insert(transcriptions).values({
- *         userId: ctx.user.id,
+ *         user_id: ctx.user.id,
  *         text: result.text,
  *         duration: result.duration,
  *         language: result.language,
  *         audioUrl: input.audioUrl,
- *         createdAt: new Date(),
+ *         created_at: new Date(),
  *       });
  *       
  *       return result;

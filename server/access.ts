@@ -9,15 +9,15 @@ import { User } from "../drizzle/schema";
  * Check if user has active trial (within 7 days of registration)
  */
 export function hasActiveTrial(user: User): boolean {
-  if (!user.trialEndsAt) return false;
-  return new Date() < new Date(user.trialEndsAt);
+  if (!user.trial_ends_at) return false;
+  return new Date() < new Date(user.trial_ends_at);
 }
 
 /**
  * Check if user has lifetime access
  */
 export function hasLifetimeAccess(user: User): boolean {
-  return user.hasLifetimeAccess === 1;
+  return user.has_lifetime_access === 1;
 }
 
 /**
@@ -31,9 +31,9 @@ export function hasAccess(user: User): boolean {
  * Get days remaining in trial
  */
 export function getTrialDaysRemaining(user: User): number {
-  if (!user.trialEndsAt) return 0;
+  if (!user.trial_ends_at) return 0;
   const now = new Date();
-  const trialEnd = new Date(user.trialEndsAt);
+  const trialEnd = new Date(user.trial_ends_at);
   const diffTime = trialEnd.getTime() - now.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return Math.max(0, diffDays);
@@ -54,7 +54,7 @@ export function calculateTrialEndDate(): Date {
  */
 export interface AccessStatus {
   hasAccess: boolean;
-  hasLifetimeAccess: boolean;
+  has_lifetime_access: boolean;
   hasActiveTrial: boolean;
   trialDaysRemaining: number;
   trialExpired: boolean;
@@ -67,9 +67,9 @@ export function getUserAccessStatus(user: User): AccessStatus {
   
   return {
     hasAccess: hasLifetime || hasTrial,
-    hasLifetimeAccess: hasLifetime,
+    has_lifetime_access: hasLifetime,
     hasActiveTrial: hasTrial,
     trialDaysRemaining: daysRemaining,
-    trialExpired: !hasLifetime && !hasTrial && user.trialEndsAt !== null,
+    trialExpired: !hasLifetime && !hasTrial && user.trial_ends_at !== null,
   };
 }

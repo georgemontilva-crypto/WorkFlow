@@ -40,7 +40,7 @@ export default function Home() {
 
   // Calcular estadísticas
   const activeClients = clients?.filter(c => c.status === 'active').length || 0;
-  const pendingInvoices = invoices?.filter(i => i.status === 'pending').length || 0;
+  const pendingInvoices = invoices?.filter(i => i.status === 'draft' || status === 'sent').length || 0;
   
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -61,15 +61,15 @@ export default function Home() {
 
   // Próximos pagos (7 días)
   const upcomingPayments = clients?.filter(client => {
-    const daysUntil = differenceInDays(parseISO(client.nextPaymentDate), new Date());
-    return daysUntil >= 0 && daysUntil <= client.reminderDays && client.status === 'active';
+    const daysUntil = differenceInDays(parseISO(client.next_payment_date), new Date());
+    return daysUntil >= 0 && daysUntil <= client.reminder_days && client.status === 'active';
   }).sort((a, b) => 
-    new Date(a.nextPaymentDate).getTime() - new Date(b.nextPaymentDate).getTime()
+    new Date(a.next_payment_date).getTime() - new Date(b.next_payment_date).getTime()
   ) || [];
 
   // Pagos vencidos
   const overduePayments = clients?.filter(client => {
-    const daysUntil = differenceInDays(parseISO(client.nextPaymentDate), new Date());
+    const daysUntil = differenceInDays(parseISO(client.next_payment_date), new Date());
     return daysUntil < 0 && client.status === 'active';
   }) || [];
 
@@ -197,7 +197,7 @@ export default function Home() {
                       <div className="min-w-0 flex-1">
                         <p className="font-medium text-foreground text-sm sm:text-base truncate">{client.name}</p>
                         <p className="text-xs sm:text-sm text-destructive">
-                          Vencido: {format(parseISO(client.nextPaymentDate), 'dd/MM/yyyy')}
+                          Vencido: {format(parseISO(client.next_payment_date), 'dd/MM/yyyy')}
                         </p>
                       </div>
                       <p className="text-sm sm:text-base font-bold font-mono text-foreground ml-2">
@@ -226,13 +226,13 @@ export default function Home() {
               ) : (
                 <div className="space-y-2 max-h-32 sm:max-h-40 overflow-y-auto">
                   {upcomingPayments.map((client) => {
-                    const daysUntil = differenceInDays(parseISO(client.nextPaymentDate), new Date());
+                    const daysUntil = differenceInDays(parseISO(client.next_payment_date), new Date());
                     return (
                       <div key={client.id} className="flex items-center justify-between p-2 sm:p-3 bg-accent/10 rounded-lg">
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-foreground text-sm sm:text-base truncate">{client.name}</p>
                           <p className="text-xs sm:text-sm text-muted-foreground">
-                            {format(parseISO(client.nextPaymentDate), 'dd/MM/yyyy', { locale: es })} ({daysUntil} días)
+                            {format(parseISO(client.next_payment_date), 'dd/MM/yyyy', { locale: es })} ({daysUntil} días)
                           </p>
                         </div>
                         <p className="text-sm sm:text-base font-bold font-mono text-foreground ml-2">
@@ -273,7 +273,7 @@ export default function Home() {
               ) : (
                 <div className="space-y-3 sm:space-y-4 max-h-48 sm:max-h-64 overflow-y-auto">
                   {savingsGoals.map((goal) => {
-                    const progress = goal.targetAmount > 0 ? (goal.currentAmount / goal.targetAmount) * 100 : 0;
+                    const progress = goal.target_amount > 0 ? (goal.current_amount / goal.target_amount) * 100 : 0;
                     const isCompleted = progress >= 100;
                     return (
                       <div key={goal.id} className="space-y-2">
@@ -295,10 +295,10 @@ export default function Home() {
                         </div>
                         <div className="flex items-center justify-between text-xs sm:text-sm">
                           <span className="text-muted-foreground">
-                            ${goal.currentAmount.toLocaleString('es-ES')}
+                            ${goal.current_amount.toLocaleString('es-ES')}
                           </span>
                           <span className="font-medium text-foreground">
-                            ${goal.targetAmount.toLocaleString('es-ES')}
+                            ${goal.target_amount.toLocaleString('es-ES')}
                           </span>
                         </div>
                       </div>

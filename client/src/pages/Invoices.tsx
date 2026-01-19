@@ -50,26 +50,26 @@ import type { InvoiceItem } from '../../../drizzle/schema';
 // Invoice type based on tRPC schema
 type Invoice = {
   id: number;
-  clientId: number;
-  invoiceNumber: string;
-  issueDate: Date;
-  dueDate: Date;
+  client_id: number;
+  invoice_number: string;
+  issue_date: Date;
+  due_date: Date;
   amount: string;
-  paidAmount: string | null;
+  paid_amount: string | null;
   status: 'pending' | 'paid' | 'overdue' | 'cancelled' | 'archived';
   items: InvoiceItem[];
   notes?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 };
 
 // Form data type with string dates for inputs
 type InvoiceFormData = {
-  clientId?: number;
-  issueDate?: string;
-  dueDate?: string;
+  client_id?: number;
+  issue_date?: string;
+  due_date?: string;
   status?: 'pending' | 'paid' | 'overdue' | 'cancelled';
-  paidAmount?: number | string;
+  paid_amount?: number | string;
   items?: InvoiceItem[];
   notes?: string;
 };
@@ -91,7 +91,7 @@ export default function Invoices() {
   
   // Filter invoices
   const invoices = allInvoices?.filter(inv => inv.status !== 'archived');
-  const archivedInvoices = allInvoices?.filter(inv => inv.status === 'archived');
+  const archivedInvoices = allInvoices?.filter(inv => inv.status === 'cancelled');
   
   // Mutations
   const createInvoice = trpc.invoices.create.useMutation({
@@ -139,11 +139,11 @@ export default function Invoices() {
   const [showArchivedDialog, setShowArchivedDialog] = useState(false);
   const [clientSearch, setClientSearch] = useState('');
   const [formData, setFormData] = useState<InvoiceFormData>({
-    clientId: 0,
-    issueDate: new Date().toISOString().split('T')[0],
-    dueDate: addDays(new Date(), 30).toISOString().split('T')[0],
+    client_id: 0,
+    issue_date: new Date().toISOString().split('T')[0],
+    due_date: addDays(new Date(), 30).toISOString().split('T')[0],
     status: 'pending',
-    paidAmount: 0,
+    paid_amount: 0,
     items: [],
     notes: '',
   });
@@ -154,8 +154,8 @@ export default function Invoices() {
     total: 0,
   });
 
-  const getClientName = (clientId: number) => {
-    const client = clients?.find(c => c.id === clientId);
+  const getClientName = (client_id: number) => {
+    const client = clients?.find(c => c.id === client_id);
     return client?.name || 'Cliente Desconocido';
   };
 
@@ -210,30 +210,30 @@ export default function Invoices() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.clientId || !formData.items || formData.items.length === 0) {
+    if (!formData.client_id || !formData.items || formData.items.length === 0) {
       toast.error('Selecciona un cliente y agrega al menos un item');
       return;
     }
 
-    const invoiceNumber = `INV-${Date.now()}`;
+    const invoice_number = `INV-${Date.now()}`;
     const total = calculateTotal();
 
     await createInvoice.mutateAsync({
-      clientId: formData.clientId!,
-      invoiceNumber,
-      issueDate: formData.issueDate!,
-      dueDate: formData.dueDate!,
+      client_id: formData.client_id!,
+      invoice_number,
+      issue_date: formData.issue_date!,
+      due_date: formData.due_date!,
       amount: total.toString(),
-      paidAmount: '0',
+      paid_amount: '0',
       status: formData.status!,
       items: formData.items!,
       notes: formData.notes,
     });
     setIsDialogOpen(false);
     setFormData({
-      clientId: 0,
-      issueDate: new Date().toISOString().split('T')[0],
-      dueDate: addDays(new Date(), 30).toISOString().split('T')[0],
+      client_id: 0,
+      issue_date: new Date().toISOString().split('T')[0],
+      due_date: addDays(new Date(), 30).toISOString().split('T')[0],
       status: 'pending',
       items: [],
       notes: '',
@@ -245,7 +245,7 @@ export default function Invoices() {
     setNewStatus(status);
     
     // Si el cambio es a "paid" y la factura estaba pendiente, mostrar diálogo
-    if (status === 'paid' && invoice.status === 'pending') {
+    if (status === 'paid' && invoice.status === 'draft' || status === 'sent') {
       setShowStatusDialog(true);
     } else {
       // Cambiar estado directamente
@@ -264,12 +264,12 @@ export default function Invoices() {
 
     if (addToFinances) {
       // Agregar ingreso a finanzas
-      const client = clients?.find(c => c.id === selectedInvoice.clientId);
+      const client = clients?.find(c => c.id === selectedInvoice.client_id);
       await createTransaction.mutateAsync({
         type: 'income',
         amount: selectedInvoice.amount,
         category: 'Pago de Factura',
-        description: `Pago de factura ${selectedInvoice.invoiceNumber} - ${client?.name || 'Cliente'}`,
+        description: `Pago de factura ${selectedInvoice.invoice_number} - ${client?.name || 'Cliente'}`,
         date: new Date().toISOString(),
       });
       toast.success('Factura marcada como pagada e ingreso agregado a Finanzas');
@@ -314,7 +314,7 @@ export default function Invoices() {
       return;
     }
 
-    const currentPaid = parseFloat(selectedInvoice.paidAmount || '0') || 0;
+    const currentPaid = parseFloat(selectedInvoice.paid_amount || '0') || 0;
     const newPaidAmount = currentPaid + partialPaymentAmount;
     const invoiceAmount = parseFloat(selectedInvoice.amount);
 
@@ -327,17 +327,17 @@ export default function Invoices() {
     const newStatus = newPaidAmount >= invoiceAmount ? 'paid' : selectedInvoice.status;
     await updateInvoice.mutateAsync({
       id: selectedInvoice.id,
-      paidAmount: newPaidAmount.toString() || '0',
+      paid_amount: newPaidAmount.toString() || '0',
       status: newStatus,
     });
 
     // Agregar transacción de ingreso
-    const client = clients?.find(c => c.id === selectedInvoice.clientId);
+    const client = clients?.find(c => c.id === selectedInvoice.client_id);
     await createTransaction.mutateAsync({
       type: 'income',
       amount: partialPaymentAmount.toString(),
       category: 'Pago Parcial de Factura',
-      description: `Abono a factura ${selectedInvoice.invoiceNumber} - ${client?.name || 'Cliente'}`,
+      description: `Abono a factura ${selectedInvoice.invoice_number} - ${client?.name || 'Cliente'}`,
       date: new Date().toISOString(),
     });
 
@@ -351,7 +351,7 @@ export default function Invoices() {
     const invoice = allInvoices?.find(inv => inv.id === invoiceId);
     if (!invoice) return;
 
-    const client = clients?.find(c => c.id === invoice.clientId);
+    const client = clients?.find(c => c.id === invoice.client_id);
     if (!client) return;
 
     const doc = new jsPDF();
@@ -364,9 +364,9 @@ export default function Invoices() {
     // Invoice Info
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Factura #: ${invoice.invoiceNumber}`, 20, 40);
-    doc.text(`Fecha de Emisión: ${format(new Date(invoice.issueDate), 'dd/MM/yyyy')}`, 20, 47);
-    doc.text(`Fecha de Vencimiento: ${format(new Date(invoice.dueDate), 'dd/MM/yyyy')}`, 20, 54);
+    doc.text(`Factura #: ${invoice.invoice_number}`, 20, 40);
+    doc.text(`Fecha de Emisión: ${format(new Date(invoice.issue_date), 'dd/MM/yyyy')}`, 20, 47);
+    doc.text(`Fecha de Vencimiento: ${format(new Date(invoice.due_date), 'dd/MM/yyyy')}`, 20, 54);
 
     // Client Info
     doc.setFontSize(12);
@@ -396,7 +396,8 @@ export default function Invoices() {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
 
-    invoice.items.forEach(item => {
+    const items = typeof invoice.items === 'string' ? JSON.parse(invoice.items) : invoice.items;
+    items.forEach((item: any) => {
       doc.text(item.description, 20, yPos, { maxWidth: 95 });
       doc.text(item.quantity.toString(), 125, yPos, { align: 'center' });
       doc.text(`$${item.unitPrice.toFixed(2)}`, 165, yPos, { align: 'right' });
@@ -412,7 +413,7 @@ export default function Invoices() {
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.text('TOTAL:', 140, yPos);
-    doc.text(`$${parseFloat(invoice.amount).toFixed(2)}`, 190, yPos, { align: 'right' });
+    doc.text(`$${parseFloat(invoice.total).toFixed(2)}`, 190, yPos, { align: 'right' });
 
     // Notes
     if (invoice.notes) {
@@ -425,7 +426,7 @@ export default function Invoices() {
       doc.text(splitNotes, 20, yPos + 7);
     }
 
-    doc.save(`factura-${invoice.invoiceNumber}.pdf`);
+    doc.save(`factura-${invoice.invoice_number}.pdf`);
     toast.success('PDF generado exitosamente');
   };
 
@@ -448,11 +449,11 @@ export default function Invoices() {
 
   // Calculate statistics
   const totalInvoices = invoices?.length || 0;
-  const pendingInvoices = invoices?.filter(inv => inv.status === 'pending').length || 0;
+  const pendingInvoices = invoices?.filter(inv => inv.status === 'draft' || inv.status === 'sent').length || 0;
   const paidInvoices = invoices?.filter(inv => inv.status === 'paid').length || 0;
   const overdueInvoices = invoices?.filter(inv => inv.status === 'overdue').length || 0;
-  const totalAmount = invoices?.reduce((sum, inv) => sum + parseFloat(inv.amount), 0) || 0;
-  const paidAmount = invoices?.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + parseFloat(inv.amount), 0) || 0;
+  const totalAmount = invoices?.reduce((sum, inv) => sum + parseFloat(inv.total), 0) || 0;
+  const paid_amount = invoices?.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + parseFloat(inv.total), 0) || 0;
 
   return (
     <DashboardLayout>
@@ -489,7 +490,7 @@ export default function Invoices() {
                 {/* Client and Status */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="clientId" className="text-foreground font-semibold">
+                    <Label htmlFor="client_id" className="text-foreground font-semibold">
                       Cliente <span className="text-destructive">*</span>
                     </Label>
                     <Button
@@ -499,7 +500,7 @@ export default function Invoices() {
                       onClick={() => setShowClientSelector(true)}
                     >
                       <span className="truncate">
-                        {formData.clientId ? getClientName(formData.clientId) : 'Selecciona un cliente'}
+                        {formData.client_id ? getClientName(formData.client_id) : 'Selecciona un cliente'}
                       </span>
                       <Search className="w-4 h-4 ml-2 flex-shrink-0" />
                     </Button>
@@ -528,23 +529,23 @@ export default function Invoices() {
                 {/* Dates */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="issueDate" className="text-foreground font-semibold">Fecha de Emisión</Label>
+                    <Label htmlFor="issue_date" className="text-foreground font-semibold">Fecha de Emisión</Label>
                     <Input
-                      id="issueDate"
+                      id="issue_date"
                       type="date"
-                      value={formData.issueDate}
-                      onChange={(e) => setFormData({ ...formData, issueDate: e.target.value })}
+                      value={formData.issue_date}
+                      onChange={(e) => setFormData({ ...formData, issue_date: e.target.value })}
                       className="bg-background border-border text-foreground h-11"
                     />
                     <p className="text-xs text-muted-foreground">Fecha en que se emite la factura</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="dueDate" className="text-foreground font-semibold">Fecha de Vencimiento</Label>
+                    <Label htmlFor="due_date" className="text-foreground font-semibold">Fecha de Vencimiento</Label>
                     <Input
-                      id="dueDate"
+                      id="due_date"
                       type="date"
-                      value={formData.dueDate}
-                      onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                      value={formData.due_date}
+                      onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
                       className="bg-background border-border text-foreground h-11"
                     />
                     <p className="text-xs text-muted-foreground">Fecha límite de pago</p>
@@ -717,8 +718,8 @@ export default function Invoices() {
                     {!isExpanded ? (
                       <div className="flex items-center justify-between gap-4">
                         <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-lg text-foreground truncate">{invoice.invoiceNumber}</p>
-                          <p className="text-sm text-muted-foreground truncate">{getClientName(invoice.clientId)}</p>
+                          <p className="font-semibold text-lg text-foreground truncate">{invoice.invoice_number}</p>
+                          <p className="text-sm text-muted-foreground truncate">{getClientName(invoice.client_id)}</p>
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
                           <Button
@@ -791,8 +792,8 @@ export default function Invoices() {
                         {/* Header with Invoice Number, Client and Actions */}
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
-                            <p className="font-semibold text-lg text-foreground truncate">{invoice.invoiceNumber}</p>
-                            <p className="text-sm text-muted-foreground truncate">{getClientName(invoice.clientId)}</p>
+                            <p className="font-semibold text-lg text-foreground truncate">{invoice.invoice_number}</p>
+                            <p className="text-sm text-muted-foreground truncate">{getClientName(invoice.client_id)}</p>
                           </div>
                           <div className="flex items-center gap-1 flex-shrink-0">
                             <Button
@@ -865,7 +866,7 @@ export default function Invoices() {
                           <div>
                             <p className="text-xs text-muted-foreground mb-1">Vencimiento</p>
                             <p className="text-sm font-medium text-foreground">
-                              {format(new Date(invoice.dueDate), 'dd MMM yyyy', { locale: es })}
+                              {format(new Date(invoice.due_date), 'dd MMM yyyy', { locale: es })}
                             </p>
                           </div>
                           <div>
@@ -877,24 +878,24 @@ export default function Invoices() {
                         </div>
 
                       {/* Pagos Parciales */}
-                      {(invoice.paidAmount && parseFloat(invoice.paidAmount) > 0) && (
+                      {(invoice.paid_amount && parseFloat(invoice.paid_amount) > 0) && (
                         <div className="pt-2 border-t border-border">
                           <div className="grid grid-cols-2 gap-3">
                             <div>
                               <p className="text-xs text-muted-foreground mb-1">Pagado</p>
                               <p className="text-sm font-medium text-green-500">
-                                ${parseFloat(invoice.paidAmount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                                ${parseFloat(invoice.paid_amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                               </p>
                             </div>
                             <div>
                               <p className="text-xs text-muted-foreground mb-1">Restante</p>
                               <p className="text-sm font-bold text-orange-400">
-                                ${(parseFloat(invoice.amount) - parseFloat(invoice.paidAmount)).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                                ${(parseFloat(invoice.amount) - parseFloat(invoice.paid_amount)).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                               </p>
                             </div>
                           </div>
                           <div className="mt-2">
-                            <Progress value={(parseFloat(invoice.paidAmount) / parseFloat(invoice.amount)) * 100} className="h-2" />
+                            <Progress value={(parseFloat(invoice.paid_amount) / parseFloat(invoice.amount)) * 100} className="h-2" />
                           </div>
                         </div>
                       )}
@@ -965,12 +966,12 @@ export default function Invoices() {
                 Registrar Pago Parcial
               </AlertDialogTitle>
               <AlertDialogDescription className="text-muted-foreground">
-                {t.invoices.invoiceNumber} {selectedInvoice?.invoiceNumber}<br />
+                {t.invoices.invoice_number} {selectedInvoice?.invoice_number}<br />
                 {t.invoices.totalAmount}: ${parseFloat(selectedInvoice?.amount || '0').toFixed(2)}<br />
-                {selectedInvoice?.paidAmount && parseFloat(selectedInvoice.paidAmount) > 0 && (
+                {selectedInvoice?.paid_amount && parseFloat(selectedInvoice.paid_amount) > 0 && (
                   <>
-                    Pagado: ${parseFloat(selectedInvoice.paidAmount).toFixed(2)}<br />
-                    Restante: ${(parseFloat(selectedInvoice.amount) - parseFloat(selectedInvoice.paidAmount)).toFixed(2)}<br />
+                    Pagado: ${parseFloat(selectedInvoice.paid_amount).toFixed(2)}<br />
+                    Restante: ${(parseFloat(selectedInvoice.amount) - parseFloat(selectedInvoice.paid_amount)).toFixed(2)}<br />
                   </>
                 )}
               </AlertDialogDescription>
@@ -984,7 +985,7 @@ export default function Invoices() {
                 type="number"
                 step="0.01"
                 min="0"
-                max={selectedInvoice ? parseFloat(selectedInvoice.amount) - parseFloat(selectedInvoice.paidAmount || '0') : 0}
+                max={selectedInvoice ? parseFloat(selectedInvoice.amount) - parseFloat(selectedInvoice.paid_amount || '0') : 0}
                 value={partialPaymentAmount}
                 onChange={(e) => setPartialPaymentAmount(parseFloat(e.target.value) || 0)}
                 placeholder="0.00"
@@ -1057,7 +1058,7 @@ export default function Invoices() {
                       key={client.id}
                       type="button"
                       onClick={() => {
-                        setFormData({ ...formData, clientId: client.id });
+                        setFormData({ ...formData, client_id: client.id });
                         setShowClientSelector(false);
                         setClientSearch('');
                         toast.success(`Cliente seleccionado: ${client.name}`);
@@ -1118,7 +1119,7 @@ export default function Invoices() {
                 </div>
               ) : (
                 archivedInvoices?.map((invoice) => {
-                  const client = clients?.find(c => c.id === invoice.clientId);
+                  const client = clients?.find(c => c.id === invoice.client_id);
                   return (
                     <Card key={invoice.id} className="bg-card border-border">
                       <CardContent className="p-4">
@@ -1126,15 +1127,15 @@ export default function Invoices() {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <FileText className="w-4 h-4 text-muted-foreground" />
-                              <span className="font-mono text-sm text-muted-foreground">{invoice.invoiceNumber}</span>
+                              <span className="font-mono text-sm text-muted-foreground">{invoice.invoice_number}</span>
                             </div>
                             <h3 className="font-semibold text-foreground mb-1">{client?.name || 'Cliente desconocido'}</h3>
                             {client?.company && (
                               <p className="text-sm text-muted-foreground">{client.company}</p>
                             )}
                             <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
-                              <span>Emitida: {format(new Date(invoice.issueDate), 'dd/MM/yyyy')}</span>
-                              <span>Vencimiento: {format(new Date(invoice.dueDate), 'dd/MM/yyyy')}</span>
+                              <span>Emitida: {format(new Date(invoice.issue_date), 'dd/MM/yyyy')}</span>
+                              <span>Vencimiento: {format(new Date(invoice.due_date), 'dd/MM/yyyy')}</span>
                             </div>
                           </div>
                           <div className="flex flex-col sm:items-end gap-2">

@@ -46,7 +46,7 @@ class OAuthService {
     state: string
   ): Promise<ExchangeTokenResponse> {
     const payload: ExchangeTokenRequest = {
-      clientId: ENV.appId,
+      client_id: ENV.appId,
       grantType: "authorization_code",
       code,
       redirectUri: this.decodeState(state),
@@ -276,8 +276,8 @@ class SDKServer {
           openId: userInfo.openId,
           name: userInfo.name || null,
           email: userInfo.email ?? null,
-          loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
-          lastSignedIn: signedInAt,
+          login_method: userInfo.login_method ?? userInfo.platform ?? null,
+          last_signed_in: signedInAt,
         });
         user = await db.getUserByOpenId(userInfo.openId);
       } catch (error) {
@@ -292,7 +292,7 @@ class SDKServer {
 
     await db.upsertUser({
       openId: user.openId,
-      lastSignedIn: signedInAt,
+      last_signed_in: signedInAt,
     });
 
     return user;

@@ -1,28 +1,22 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import { ENV } from "./_core/env";
 import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
-let client: ReturnType<typeof postgres> | undefined;
-let db: ReturnType<typeof drizzle> | undefined;
+// Initialize MySQL connection pool
+const pool = mysql.createPool({
+  uri: ENV.databaseUrl,
+});
+
+const db = drizzle(pool);
 
 /**
- * Get or create database connection pool and Drizzle instance
+ * Get database instance
  */
 export async function getDb() {
-  if (db) return db;
-
-  try {
-    client = postgres(ENV.databaseUrl);
-    db = drizzle(client);
-    console.log("[Database] Connected successfully");
-    return db;
-  } catch (error) {
-    console.error("[Database] Connection failed:", error);
-    return undefined;
-  }
+  return db;
 }
 
 /**
@@ -57,14 +51,14 @@ export async function createUser(data: {
       name: data.name,
       email: data.email,
       passwordHash,
-      emailVerified: 0,
-      loginMethod: "email",
+      email_verified: 0,
+      login_method: "email",
       role: "user",
-      trialEndsAt: trialEnd,
-      hasLifetimeAccess: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      lastSignedIn: new Date(),
+      trial_ends_at: trialEnd,
+      has_lifetime_access: 0,
+      created_at: new Date(),
+      updated_at: new Date(),
+      last_signed_in: new Date(),
     });
 
     // Get the created user
@@ -93,7 +87,7 @@ export async function verifyUserCredentials(email: string, password: string) {
     }
 
     const user = result[0];
-    const isValid = await bcrypt.compare(password, user.passwordHash);
+    const isValid = await bcrypt.compare(password, user.password_hash);
 
     if (!isValid) {
       return null; // Invalid password
@@ -101,7 +95,7 @@ export async function verifyUserCredentials(email: string, password: string) {
 
     // Update last signed in
     await db.update(users)
-      .set({ lastSignedIn: new Date() })
+      .set({ last_signed_in: new Date() })
       .where(eq(users.id, user.id));
 
     return user;
@@ -142,7 +136,7 @@ export async function getUserByEmail(email: string) {
 /**
  * Update user's lifetime access status
  */
-export async function grantLifetimeAccess(userId: number, stripeCustomerId?: string, stripePaymentId?: string) {
+export async function grantLifetimeAccess(user_id: number, stripeCustomerId?: string, stripePaymentId?: string) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -151,12 +145,12 @@ export async function grantLifetimeAccess(userId: number, stripeCustomerId?: str
   try {
     await db.update(users)
       .set({
-        hasLifetimeAccess: 1,
+        has_lifetime_access: 1,
         stripeCustomerId,
         stripePaymentId,
-        updatedAt: new Date(),
+        updated_at: new Date(),
       })
-      .where(eq(users.id, userId));
+      .where(eq(users.id, user_id));
   } catch (error) {
     console.error("[Database] Failed to grant lifetime access:", error);
     throw error;
@@ -166,19 +160,19 @@ export async function grantLifetimeAccess(userId: number, stripeCustomerId?: str
 /**
  * Check if user has active access (trial or lifetime)
  */
-export async function hasActiveAccess(userId: number): Promise<boolean> {
-  const user = await getUserById(userId);
+export async function hasActiveAccess(user_id: number): Promise<boolean> {
+  const user = await getUserById(user_id);
   if (!user) return false;
 
   // Check if user has lifetime access
-  if (user.hasLifetimeAccess === 1) {
+  if (user.has_lifetime_access === 1) {
     return true;
   }
 
   // Check if trial is still active
-  if (user.trialEndsAt) {
+  if (user.trial_ends_at) {
     const now = new Date();
-    return now < user.trialEndsAt;
+    return now < user.trial_ends_at;
   }
 
   return false;
@@ -187,7 +181,7 @@ export async function hasActiveAccess(userId: number): Promise<boolean> {
 /**
  * Update user's 2FA secret
  */
-export async function updateUser2FASecret(userId: number, secret: string) {
+export async function updateUser2FASecret(user_id: number, secret: string) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -196,10 +190,10 @@ export async function updateUser2FASecret(userId: number, secret: string) {
   try {
     await db.update(users)
       .set({
-        twoFactorSecret: secret,
-        updatedAt: new Date(),
+        two_factor_secret: secret,
+        updated_at: new Date(),
       })
-      .where(eq(users.id, userId));
+      .where(eq(users.id, user_id));
   } catch (error) {
     console.error("[Database] Failed to update 2FA secret:", error);
     throw error;
@@ -209,7 +203,7 @@ export async function updateUser2FASecret(userId: number, secret: string) {
 /**
  * Enable 2FA for user
  */
-export async function enable2FA(userId: number) {
+export async function enable2FA(user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -218,10 +212,10 @@ export async function enable2FA(userId: number) {
   try {
     await db.update(users)
       .set({
-        twoFactorEnabled: 1,
-        updatedAt: new Date(),
+        two_factor_enabled: 1,
+        updated_at: new Date(),
       })
-      .where(eq(users.id, userId));
+      .where(eq(users.id, user_id));
   } catch (error) {
     console.error("[Database] Failed to enable 2FA:", error);
     throw error;
@@ -231,7 +225,7 @@ export async function enable2FA(userId: number) {
 /**
  * Disable 2FA for user
  */
-export async function disable2FA(userId: number) {
+export async function disable2FA(user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -240,11 +234,11 @@ export async function disable2FA(userId: number) {
   try {
     await db.update(users)
       .set({
-        twoFactorEnabled: 0,
-        twoFactorSecret: null,
-        updatedAt: new Date(),
+        two_factor_enabled: 0,
+        two_factor_secret: null,
+        updated_at: new Date(),
       })
-      .where(eq(users.id, userId));
+      .where(eq(users.id, user_id));
   } catch (error) {
     console.error("[Database] Failed to disable 2FA:", error);
     throw error;
@@ -254,7 +248,7 @@ export async function disable2FA(userId: number) {
 /**
  * Update user password
  */
-export async function updateUserPassword(userId: number, passwordHash: string) {
+export async function updateUserPassword(user_id: number, password_hash: string) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -264,9 +258,9 @@ export async function updateUserPassword(userId: number, passwordHash: string) {
     await db.update(users)
       .set({
         passwordHash,
-        updatedAt: new Date(),
+        updated_at: new Date(),
       })
-      .where(eq(users.id, userId));
+      .where(eq(users.id, user_id));
   } catch (error) {
     console.error("[Database] Failed to update password:", error);
     throw error;
@@ -279,7 +273,7 @@ export { users, clients, invoices, transactions, savingsGoals };
 // Savings Goals Functions
 // ============================================
 
-export async function getSavingsGoalById(id: number, userId: number) {
+export async function getSavingsGoalById(id: number, user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -292,7 +286,7 @@ export async function getSavingsGoalById(id: number, userId: number) {
     .limit(1);
   
   const goal = result[0];
-  if (!goal || goal.userId !== userId) {
+  if (!goal || goal.user_id !== user_id) {
     return null;
   }
   
@@ -308,14 +302,14 @@ export async function createSavingsGoal(data: any) {
   await db.insert(savingsGoals).values(data);
 }
 
-export async function updateSavingsGoal(id: number, userId: number, data: any) {
+export async function updateSavingsGoal(id: number, user_id: number, data: any) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
   }
 
   // Verify ownership
-  const goal = await getSavingsGoalById(id, userId);
+  const goal = await getSavingsGoalById(id, user_id);
   if (!goal) {
     throw new Error("Savings goal not found or access denied");
   }
@@ -326,14 +320,14 @@ export async function updateSavingsGoal(id: number, userId: number, data: any) {
     .where(eq(savingsGoals.id, id));
 }
 
-export async function deleteSavingsGoal(id: number, userId: number) {
+export async function deleteSavingsGoal(id: number, user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
   }
 
   // Verify ownership
-  const goal = await getSavingsGoalById(id, userId);
+  const goal = await getSavingsGoalById(id, user_id);
   if (!goal) {
     throw new Error("Savings goal not found or access denied");
   }
@@ -357,7 +351,7 @@ export async function createTransaction(data: any) {
   await db.insert(transactions).values(data);
 }
 
-export async function updateTransaction(id: number, userId: number, data: any) {
+export async function updateTransaction(id: number, user_id: number, data: any) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -371,7 +365,7 @@ export async function updateTransaction(id: number, userId: number, data: any) {
     .limit(1);
   
   const transaction = result[0];
-  if (!transaction || transaction.userId !== userId) {
+  if (!transaction || transaction.user_id !== user_id) {
     throw new Error("Transaction not found or access denied");
   }
 
@@ -381,7 +375,7 @@ export async function updateTransaction(id: number, userId: number, data: any) {
     .where(eq(transactions.id, id));
 }
 
-export async function deleteTransaction(id: number, userId: number) {
+export async function deleteTransaction(id: number, user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -395,7 +389,7 @@ export async function deleteTransaction(id: number, userId: number) {
     .limit(1);
   
   const transaction = result[0];
-  if (!transaction || transaction.userId !== userId) {
+  if (!transaction || transaction.user_id !== user_id) {
     throw new Error("Transaction not found or access denied");
   }
 
@@ -404,7 +398,7 @@ export async function deleteTransaction(id: number, userId: number) {
     .where(eq(transactions.id, id));
 }
 
-export async function getSavingsGoalsByUserId(userId: number) {
+export async function getSavingsGoalsByUserId(user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -413,7 +407,7 @@ export async function getSavingsGoalsByUserId(userId: number) {
   return await db
     .select()
     .from(savingsGoals)
-    .where(eq(savingsGoals.userId, userId));
+    .where(eq(savingsGoals.user_id, user_id));
 }
 
 
@@ -421,7 +415,7 @@ export async function getSavingsGoalsByUserId(userId: number) {
 // Invoices Functions
 // ============================================
 
-export async function updateInvoice(id: number, userId: number, data: any) {
+export async function updateInvoice(id: number, user_id: number, data: any) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -435,7 +429,7 @@ export async function updateInvoice(id: number, userId: number, data: any) {
     .limit(1);
   
   const invoice = result[0];
-  if (!invoice || invoice.userId !== userId) {
+  if (!invoice || invoice.user_id !== user_id) {
     throw new Error("Invoice not found or access denied");
   }
 
@@ -445,7 +439,7 @@ export async function updateInvoice(id: number, userId: number, data: any) {
     .where(eq(invoices.id, id));
 }
 
-export async function deleteInvoice(id: number, userId: number) {
+export async function deleteInvoice(id: number, user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -459,7 +453,7 @@ export async function deleteInvoice(id: number, userId: number) {
     .limit(1);
   
   const invoice = result[0];
-  if (!invoice || invoice.userId !== userId) {
+  if (!invoice || invoice.user_id !== user_id) {
     throw new Error("Invoice not found or access denied");
   }
 
@@ -468,7 +462,7 @@ export async function deleteInvoice(id: number, userId: number) {
     .where(eq(invoices.id, id));
 }
 
-export async function getTransactionsByUserId(userId: number) {
+export async function getTransactionsByUserId(user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -477,10 +471,10 @@ export async function getTransactionsByUserId(userId: number) {
   return await db
     .select()
     .from(transactions)
-    .where(eq(transactions.userId, userId));
+    .where(eq(transactions.user_id, user_id));
 }
 
-export async function getTransactionById(id: number, userId: number) {
+export async function getTransactionById(id: number, user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -493,7 +487,7 @@ export async function getTransactionById(id: number, userId: number) {
     .limit(1);
   
   const transaction = result[0];
-  if (!transaction || transaction.userId !== userId) {
+  if (!transaction || transaction.user_id !== user_id) {
     return null;
   }
   
@@ -505,7 +499,7 @@ export async function getTransactionById(id: number, userId: number) {
 // Clients Functions
 // ============================================
 
-export async function deleteClient(id: number, userId: number) {
+export async function deleteClient(id: number, user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -519,7 +513,7 @@ export async function deleteClient(id: number, userId: number) {
     .limit(1);
   
   const client = result[0];
-  if (!client || client.userId !== userId) {
+  if (!client || client.user_id !== user_id) {
     throw new Error("Client not found or access denied");
   }
 
@@ -528,7 +522,7 @@ export async function deleteClient(id: number, userId: number) {
     .where(eq(clients.id, id));
 }
 
-export async function getInvoicesByUserId(userId: number) {
+export async function getInvoicesByUserId(user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -537,10 +531,10 @@ export async function getInvoicesByUserId(userId: number) {
   return await db
     .select()
     .from(invoices)
-    .where(eq(invoices.userId, userId));
+    .where(eq(invoices.user_id, user_id));
 }
 
-export async function getInvoiceById(id: number, userId: number) {
+export async function getInvoiceById(id: number, user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -553,7 +547,7 @@ export async function getInvoiceById(id: number, userId: number) {
     .limit(1);
   
   const invoice = result[0];
-  if (!invoice || invoice.userId !== userId) {
+  if (!invoice || invoice.user_id !== user_id) {
     return null;
   }
   
@@ -570,7 +564,7 @@ export async function createInvoice(data: any) {
 }
 
 
-export async function getClientsByUserId(userId: number) {
+export async function getClientsByUserId(user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -579,10 +573,10 @@ export async function getClientsByUserId(userId: number) {
   return await db
     .select()
     .from(clients)
-    .where(eq(clients.userId, userId));
+    .where(eq(clients.user_id, user_id));
 }
 
-export async function getClientById(id: number, userId: number) {
+export async function getClientById(id: number, user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -595,7 +589,7 @@ export async function getClientById(id: number, userId: number) {
     .limit(1);
   
   const client = result[0];
-  if (!client || client.userId !== userId) {
+  if (!client || client.user_id !== user_id) {
     return null;
   }
   
@@ -611,7 +605,7 @@ export async function createClient(data: any) {
   await db.insert(clients).values(data);
 }
 
-export async function updateClient(id: number, userId: number, data: any) {
+export async function updateClient(id: number, user_id: number, data: any) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -625,7 +619,7 @@ export async function updateClient(id: number, userId: number, data: any) {
     .limit(1);
   
   const client = result[0];
-  if (!client || client.userId !== userId) {
+  if (!client || client.user_id !== user_id) {
     throw new Error("Client not found or access denied");
   }
 
@@ -640,7 +634,7 @@ export async function updateClient(id: number, userId: number, data: any) {
 // ============================================
 
 export async function createSupportTicket(data: {
-  userId: number;
+  user_id: number;
   subject: string;
   priority?: "low" | "medium" | "high" | "urgent";
 }) {
@@ -650,26 +644,26 @@ export async function createSupportTicket(data: {
   }
 
   const result = await db.insert(supportTickets).values({
-    userId: data.userId,
+    user_id: data.user_id,
     subject: data.subject,
     status: "open",
     priority: data.priority || "medium",
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    created_at: new Date(),
+    updated_at: new Date(),
   });
 
   // Get the last inserted ticket
   const tickets = await db
     .select()
     .from(supportTickets)
-    .where(eq(supportTickets.userId, data.userId))
+    .where(eq(supportTickets.user_id, data.user_id))
     .orderBy(supportTickets.id)
     .limit(1);
 
   return tickets[0];
 }
 
-export async function getSupportTicketsByUserId(userId: number) {
+export async function getSupportTicketsByUserId(user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -678,8 +672,8 @@ export async function getSupportTicketsByUserId(userId: number) {
   return await db
     .select()
     .from(supportTickets)
-    .where(eq(supportTickets.userId, userId))
-    .orderBy(supportTickets.createdAt);
+    .where(eq(supportTickets.user_id, user_id))
+    .orderBy(supportTickets.created_at);
 }
 
 export async function getAllSupportTickets() {
@@ -691,7 +685,7 @@ export async function getAllSupportTickets() {
   return await db
     .select()
     .from(supportTickets)
-    .orderBy(supportTickets.createdAt);
+    .orderBy(supportTickets.created_at);
 }
 
 export async function getSupportTicketById(id: number) {
@@ -720,7 +714,7 @@ export async function updateSupportTicketStatus(
 
   await db
     .update(supportTickets)
-    .set({ status, updatedAt: new Date() })
+    .set({ status, updated_at: new Date() })
     .where(eq(supportTickets.id, id));
 }
 
@@ -729,10 +723,10 @@ export async function updateSupportTicketStatus(
 // ============================================
 
 export async function createSupportMessage(data: {
-  ticketId: number;
-  senderId: number;
+  ticket_id: number;
+  user_id: number;
   message: string;
-  isAdminReply: boolean;
+  is_staff: boolean;
 }) {
   const db = await getDb();
   if (!db) {
@@ -740,23 +734,23 @@ export async function createSupportMessage(data: {
   }
 
   const result = await db.insert(supportMessages).values({
-    ticketId: data.ticketId,
-    senderId: data.senderId,
+    ticket_id: data.ticket_id,
+    user_id: data.user_id,
     message: data.message,
-    isAdminReply: data.isAdminReply ? 1 : 0,
-    createdAt: new Date(),
+    is_staff: data.is_staff ? 1 : 0,
+    created_at: new Date(),
   });
 
   // Update ticket's updatedAt timestamp
   await db
     .update(supportTickets)
-    .set({ updatedAt: new Date() })
-    .where(eq(supportTickets.id, data.ticketId));
+    .set({ updated_at: new Date() })
+    .where(eq(supportTickets.id, data.ticket_id));
 
   return result;
 }
 
-export async function getSupportMessagesByTicketId(ticketId: number) {
+export async function getSupportMessagesByTicketId(ticket_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -765,8 +759,8 @@ export async function getSupportMessagesByTicketId(ticketId: number) {
   return await db
     .select()
     .from(supportMessages)
-    .where(eq(supportMessages.ticketId, ticketId))
-    .orderBy(supportMessages.createdAt);
+    .where(eq(supportMessages.ticket_id, ticket_id))
+    .orderBy(supportMessages.created_at);
 }
 
 // ============================================
@@ -785,16 +779,16 @@ export async function getAllUsers() {
       name: users.name,
       email: users.email,
       role: users.role,
-      trialEndsAt: users.trialEndsAt,
-      hasLifetimeAccess: users.hasLifetimeAccess,
-      createdAt: users.createdAt,
-      lastSignedIn: users.lastSignedIn,
+      trial_ends_at: users.trial_ends_at,
+      has_lifetime_access: users.has_lifetime_access,
+      created_at: users.created_at,
+
     })
     .from(users)
-    .orderBy(users.createdAt);
+    .orderBy(users.created_at);
 }
 
-export async function updateUserLifetimeAccess(userId: number, hasAccess: boolean) {
+export async function updateUserLifetimeAccess(user_id: number, hasAccess: boolean) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -802,6 +796,6 @@ export async function updateUserLifetimeAccess(userId: number, hasAccess: boolea
 
   await db
     .update(users)
-    .set({ hasLifetimeAccess: hasAccess ? 1 : 0, updatedAt: new Date() })
-    .where(eq(users.id, userId));
+    .set({ has_lifetime_access: hasAccess })
+    .where(eq(users.id, user_id));
 }

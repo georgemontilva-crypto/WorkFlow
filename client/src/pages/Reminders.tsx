@@ -22,10 +22,10 @@ type ReminderItem = {
   clientName: string;
   company?: string;
   amount: number;
-  dueDate: string;
+  due_date: string;
   daysUntil: number;
   status: 'overdue' | 'urgent' | 'upcoming';
-  invoiceNumber?: string;
+  invoice_number?: string;
 };
 
 export default function Reminders() {
@@ -38,7 +38,7 @@ export default function Reminders() {
 
   // Procesar recordatorios de clientes
   const clientReminders: ReminderItem[] = clients?.map(client => {
-    const daysUntil = differenceInDays(parseISO(client.nextPaymentDate), new Date());
+    const daysUntil = differenceInDays(parseISO(client.next_payment_date), new Date());
     let status: 'overdue' | 'urgent' | 'upcoming' = 'upcoming';
     
     if (daysUntil < 0) status = 'overdue';
@@ -50,7 +50,7 @@ export default function Reminders() {
       clientName: client.name,
       company: client.company,
       amount: client.amount,
-      dueDate: client.nextPaymentDate,
+      due_date: client.next_payment_date,
       daysUntil,
       status
     };
@@ -58,13 +58,13 @@ export default function Reminders() {
 
   // Procesar recordatorios de facturas
   const invoiceReminders: ReminderItem[] = invoices?.map(invoice => {
-    const daysUntil = differenceInDays(parseISO(invoice.dueDate), new Date());
+    const daysUntil = differenceInDays(parseISO(invoice.due_date), new Date());
     let status: 'overdue' | 'urgent' | 'upcoming' = 'upcoming';
     
     if (daysUntil < 0) status = 'overdue';
     else if (daysUntil <= 5) status = 'urgent';
     
-    const client = clients?.find(c => c.id === invoice.clientId);
+    const client = clients?.find(c => c.id === invoice.client_id);
     
     return {
       id: invoice.id!,
@@ -72,10 +72,10 @@ export default function Reminders() {
       clientName: client?.name || 'Cliente Desconocido',
       company: client?.company,
       amount: invoice.amount,
-      dueDate: invoice.dueDate,
+      due_date: invoice.due_date,
       daysUntil,
       status,
-      invoiceNumber: invoice.invoiceNumber
+      invoice_number: invoice.invoice_number
     };
   }) || [];
 
@@ -175,9 +175,9 @@ export default function Reminders() {
                 </div>
 
                 {/* Invoice Number (if applicable) */}
-                {item.invoiceNumber && (
+                {item.invoice_number && (
                   <p className="text-xs text-muted-foreground mb-2">
-                    {t.invoices.invoice}: {item.invoiceNumber}
+                    {t.invoices.invoice}: {item.invoice_number}
                   </p>
                 )}
 
@@ -185,7 +185,7 @@ export default function Reminders() {
                 <div className="flex flex-wrap items-center gap-3 text-sm">
                   <div className="flex items-center gap-1.5 text-muted-foreground">
                     <Calendar className="w-4 h-4" />
-                    <span>{format(parseISO(item.dueDate), 'dd MMM yyyy', { locale: es })}</span>
+                    <span>{format(parseISO(item.due_date), 'dd MMM yyyy', { locale: es })}</span>
                   </div>
                   <Badge variant="outline" className={config.badgeClass}>
                     {getDaysText(item.daysUntil)}

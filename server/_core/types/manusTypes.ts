@@ -18,7 +18,7 @@ export interface ExchangeTokenRequest {
   grantType: string;
   code: string;
   refreshToken?: string;
-  clientId: string;
+  client_id: string;
   clientSecret?: string;
   redirectUri: string;
 }

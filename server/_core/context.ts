@@ -27,7 +27,7 @@ export async function createContext(
       
       if (payload) {
         // Get user from database
-        user = await getUserById(payload.userId) || null;
+        user = await getUserById(payload.user_id) || null;
       }
     }
   } catch (error) {

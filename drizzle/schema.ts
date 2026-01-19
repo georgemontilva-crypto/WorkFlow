@@ -1,36 +1,13 @@
-import { pgTable, serial, text, varchar, integer, timestamp, decimal, pgEnum } from "drizzle-orm/pg-core";
+import { mysqlTable, serial, varchar, text, int, timestamp, decimal, mysqlEnum, boolean } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
  * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
+ * Uses snake_case for MySQL compatibility.
  */
 
-// Enums
-export const roleEnum = pgEnum("role", ["user", "admin", "super_admin"]);
-export const loginMethodEnum = pgEnum("login_method", ["email", "oauth"]);
-export const billingCycleEnum = pgEnum("billing_cycle", ["monthly", "quarterly", "yearly", "custom"]);
-export const clientStatusEnum = pgEnum("client_status", ["active", "inactive", "overdue"]);
-export const invoiceStatusEnum = pgEnum("invoice_status", ["draft", "sent", "paid", "overdue", "cancelled"]);
-export const transactionTypeEnum = pgEnum("transaction_type", ["income", "expense"]);
-export const transactionCategoryEnum = pgEnum("transaction_category", [
-  "salary",
-  "freelance",
-  "investment",
-  "other_income",
-  "rent",
-  "utilities",
-  "food",
-  "transportation",
-  "healthcare",
-  "entertainment",
-  "other_expense"
-]);
-export const goalStatusEnum = pgEnum("goal_status", ["active", "completed", "cancelled"]);
-export const ticketStatusEnum = pgEnum("ticket_status", ["open", "in_progress", "resolved", "closed"]);
-export const ticketPriorityEnum = pgEnum("ticket_priority", ["low", "medium", "high", "urgent"]);
-
-export const users = pgTable("user", {
+// MySQL enums are defined inline in the column definition
+export const users = mysqlTable("user", {
   /**
    * Surrogate primary key. Auto-incremented numeric value managed by the database.
    * Use this for relations between tables.
@@ -41,27 +18,25 @@ export const users = pgTable("user", {
   /** User's email address - unique identifier for login */
   email: varchar("email", { length: 320 }).notNull().unique(),
   /** Hashed password using bcrypt */
-  passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
-  /** Whether email has been verified */
-  emailVerified: integer("emailVerified").notNull().default(0), // 0 = false, 1 = true
+  password_hash: varchar("password_hash", { length: 255 }).notNull(),
+  /** Email verification status */
+  email_verified: int("email_verified").notNull().default(0),
   /** Login method: 'email' for our own auth system */
-  loginMethod: loginMethodEnum("loginMethod").notNull().default("email"),
-  role: roleEnum("role").default("user").notNull(),
+  login_method: mysqlEnum("login_method", ["email", "oauth"]).notNull().default("email"),
+  role: mysqlEnum("role", ["user", "admin", "super_admin"]).default("user").notNull(),
   /** Trial period end date - 7 days from registration */
-  trialEndsAt: timestamp("trialEndsAt"),
+  trial_ends_at: timestamp("trial_ends_at"),
   /** Whether user has purchased lifetime access */
-  hasLifetimeAccess: integer("hasLifetimeAccess").notNull().default(0), // 0 = false, 1 = true
-  /** Stripe customer ID for payment tracking */
-  stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
-  /** Stripe payment intent ID for lifetime purchase */
-  stripePaymentId: varchar("stripePaymentId", { length: 255 }),
+  has_lifetime_access: int("has_lifetime_access").notNull().default(0),
+  stripe_customer_id: varchar("stripe_customer_id", { length: 255 }),
+  stripe_payment_id: varchar("stripe_payment_id", { length: 255 }),
   /** Two-factor authentication secret (base32 encoded) */
-  twoFactorSecret: varchar("twoFactorSecret", { length: 255 }),
+  two_factor_secret: varchar("two_factor_secret", { length: 255 }),
   /** Whether 2FA is enabled for this user */
-  twoFactorEnabled: integer("twoFactorEnabled").notNull().default(0), // 0 = false, 1 = true
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
-  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
+  two_factor_enabled: int("two_factor_enabled").notNull().default(0),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+  last_signed_in: timestamp("last_signed_in").defaultNow().notNull(),
 });
 
 export type User = typeof users.$inferSelect;
@@ -70,23 +45,23 @@ export type InsertUser = typeof users.$inferInsert;
 /**
  * Clients table - stores client information for invoicing and reminders
  */
-export const clients = pgTable("clients", {
+export const clients = mysqlTable("clients", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(), // Owner of the client
+  user_id: int("user_id").notNull(), // Owner of the client
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 320 }).notNull(),
   phone: varchar("phone", { length: 50 }).notNull(),
   company: varchar("company", { length: 255 }),
-  billingCycle: billingCycleEnum("billingCycle").notNull(),
-  customCycleDays: integer("customCycleDays"),
+  billing_cycle: mysqlEnum("billing_cycle", ["monthly", "quarterly", "yearly", "custom"]).notNull(),
+  custom_cycle_days: int("custom_cycle_days"),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
-  nextPaymentDate: timestamp("nextPaymentDate").notNull(),
-  reminderDays: integer("reminderDays").notNull().default(7),
-  status: clientStatusEnum("status").notNull().default("active"),
-  archived: integer("archived").notNull().default(0), // 0 = false, 1 = true
+  next_payment_date: timestamp("next_payment_date").notNull(),
+  reminder_days: int("reminder_days").notNull().default(7),
+  status: mysqlEnum("status", ["active", "inactive", "overdue"]).notNull().default("active"),
+  archived: boolean("archived").notNull().default(false),
   notes: text("notes"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export type Client = typeof clients.$inferSelect;
@@ -103,41 +78,52 @@ export interface InvoiceItem {
 }
 
 /**
- * Invoices table - stores invoices for clients
+ * Invoices table - stores invoice information
  */
-export const invoices = pgTable("invoices", {
+export const invoices = mysqlTable("invoices", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(), // Owner of the invoice
-  clientId: integer("clientId").notNull(),
-  invoiceNumber: varchar("invoiceNumber", { length: 50 }).notNull().unique(),
-  issueDate: timestamp("issueDate").notNull(),
-  dueDate: timestamp("dueDate").notNull(),
+  user_id: int("user_id").notNull(),
+  client_id: int("client_id").notNull(),
+  invoice_number: varchar("invoice_number", { length: 50 }).notNull().unique(),
+  issue_date: timestamp("issue_date").notNull(),
+  due_date: timestamp("due_date").notNull(),
   items: text("items").notNull(), // JSON string of InvoiceItem[]
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   tax: decimal("tax", { precision: 10, scale: 2 }).notNull().default("0"),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
-  status: invoiceStatusEnum("status").notNull().default("draft"),
+  status: mysqlEnum("status", ["draft", "sent", "paid", "overdue", "cancelled"]).notNull().default("draft"),
   notes: text("notes"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export type Invoice = typeof invoices.$inferSelect;
 export type InsertInvoice = typeof invoices.$inferInsert;
 
 /**
- * Transactions table - stores income and expenses
+ * Transactions table - stores income and expense records
  */
-export const transactions = pgTable("transactions", {
+export const transactions = mysqlTable("transactions", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(), // Owner of the transaction
-  type: transactionTypeEnum("type").notNull(),
-  category: transactionCategoryEnum("category").notNull(),
+  user_id: int("user_id").notNull(),
+  type: mysqlEnum("type", ["income", "expense"]).notNull(),
+  category: mysqlEnum("category", [
+    "salary",
+    "freelance",
+    "investment",
+    "other_income",
+    "rent",
+    "utilities",
+    "food",
+    "transportation",
+    "healthcare",
+    "entertainment",
+    "other_expense"
+  ]).notNull(),
   amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
   description: text("description").notNull(),
   date: timestamp("date").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
 export type Transaction = typeof transactions.$inferSelect;
@@ -146,16 +132,16 @@ export type InsertTransaction = typeof transactions.$inferInsert;
 /**
  * Savings Goals table - stores user savings goals
  */
-export const savingsGoals = pgTable("savings_goals", {
+export const savingsGoals = mysqlTable("savings_goals", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(), // Owner of the goal
+  user_id: int("user_id").notNull(),
   name: varchar("name", { length: 255 }).notNull(),
-  targetAmount: decimal("targetAmount", { precision: 10, scale: 2 }).notNull(),
-  currentAmount: decimal("currentAmount", { precision: 10, scale: 2 }).notNull().default("0"),
-  deadline: timestamp("deadline"),
-  status: goalStatusEnum("status").notNull().default("active"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  target_amount: decimal("target_amount", { precision: 10, scale: 2 }).notNull(),
+  current_amount: decimal("current_amount", { precision: 10, scale: 2 }).notNull().default("0"),
+  target_date: timestamp("target_date"),
+  status: mysqlEnum("status", ["active", "completed", "cancelled"]).notNull().default("active"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export type SavingsGoal = typeof savingsGoals.$inferSelect;
@@ -164,29 +150,29 @@ export type InsertSavingsGoal = typeof savingsGoals.$inferInsert;
 /**
  * Support Tickets table - stores user support requests
  */
-export const supportTickets = pgTable("support_tickets", {
+export const supportTickets = mysqlTable("support_tickets", {
   id: serial("id").primaryKey(),
-  userId: integer("userId").notNull(), // User who created the ticket
-  subject: varchar("subject", { length: 255 }).notNull(),
-  status: ticketStatusEnum("status").notNull().default("open"),
-  priority: ticketPriorityEnum("priority").notNull().default("medium"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
+  user_id: int("user_id").notNull(),
+  subject: text("subject").notNull(),
+  status: mysqlEnum("status", ["open", "in_progress", "resolved", "closed"]).notNull().default("open"),
+  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).notNull().default("medium"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export type SupportTicket = typeof supportTickets.$inferSelect;
 export type InsertSupportTicket = typeof supportTickets.$inferInsert;
 
 /**
- * Support Messages table - stores messages within support tickets
+ * Support Messages table - stores messages in support tickets
  */
-export const supportMessages = pgTable("support_messages", {
+export const supportMessages = mysqlTable("support_messages", {
   id: serial("id").primaryKey(),
-  ticketId: integer("ticketId").notNull(), // Reference to support ticket
-  userId: integer("userId").notNull(), // User who sent the message
+  ticket_id: int("ticket_id").notNull(),
+  user_id: int("user_id").notNull(),
   message: text("message").notNull(),
-  isStaff: integer("isStaff").notNull().default(0), // 0 = user, 1 = staff
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  is_staff: boolean("is_staff").notNull().default(false),
+  created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
 export type SupportMessage = typeof supportMessages.$inferSelect;

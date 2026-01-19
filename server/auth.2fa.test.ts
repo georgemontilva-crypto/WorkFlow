@@ -24,8 +24,8 @@ describe('2FA and Password Management', () => {
     
     const user = await getUserById(testUserId);
     expect(user).toBeDefined();
-    expect(user?.twoFactorSecret).toBe(testSecret);
-    expect(user?.twoFactorEnabled).toBe(0); // Not enabled yet
+    expect(user?.two_factor_secret).toBe(testSecret);
+    expect(user?.two_factor_enabled).toBe(0); // Not enabled yet
   });
 
   it('should enable 2FA for user', async () => {
@@ -33,7 +33,7 @@ describe('2FA and Password Management', () => {
     
     const user = await getUserById(testUserId);
     expect(user).toBeDefined();
-    expect(user?.twoFactorEnabled).toBe(1);
+    expect(user?.two_factor_enabled).toBe(1);
   });
 
   it('should disable 2FA for user', async () => {
@@ -41,8 +41,8 @@ describe('2FA and Password Management', () => {
     
     const user = await getUserById(testUserId);
     expect(user).toBeDefined();
-    expect(user?.twoFactorEnabled).toBe(0);
-    expect(user?.twoFactorSecret).toBeNull();
+    expect(user?.two_factor_enabled).toBe(0);
+    expect(user?.two_factor_secret).toBeNull();
   });
 
   it('should update user password', async () => {
@@ -55,11 +55,11 @@ describe('2FA and Password Management', () => {
     expect(user).toBeDefined();
     
     // Verify new password works
-    const isValid = await bcrypt.compare(newPassword, user!.passwordHash);
+    const isValid = await bcrypt.compare(newPassword, user!.password_hash);
     expect(isValid).toBe(true);
     
     // Verify old password doesn't work
-    const isOldValid = await bcrypt.compare(testPassword, user!.passwordHash);
+    const isOldValid = await bcrypt.compare(testPassword, user!.password_hash);
     expect(isOldValid).toBe(false);
   });
 
@@ -77,7 +77,7 @@ describe('2FA and Password Management', () => {
     // Verify 2FA is still enabled
     const user = await getUserById(testUserId);
     expect(user).toBeDefined();
-    expect(user?.twoFactorEnabled).toBe(1);
-    expect(user?.twoFactorSecret).toBe(testSecret);
+    expect(user?.two_factor_enabled).toBe(1);
+    expect(user?.two_factor_secret).toBe(testSecret);
   });
 });

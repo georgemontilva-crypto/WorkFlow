@@ -14,31 +14,32 @@ export interface Client {
   email: string;
   phone: string;
   company?: string;
-  billingCycle: 'monthly' | 'quarterly' | 'yearly' | 'custom';
-  customCycleDays?: number;
+  billing_cycle: 'monthly' | 'quarterly' | 'yearly' | 'custom';
+  custom_cycle_days?: number;
   amount: number;
-  nextPaymentDate: string;
-  reminderDays: number; // Días de anticipación para recordatorio
+  next_payment_date: string;
+  reminder_days: number; // Días de anticipación para recordatorio
   status: 'active' | 'inactive' | 'overdue';
   archived?: boolean; // Indica si el recordatorio está archivado
   notes?: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Invoice {
   id?: number;
-  clientId: number;
-  invoiceNumber: string;
-  issueDate: string;
-  dueDate: string;
-  amount: number;
-  paidAmount?: number; // Monto pagado (para pagos parciales)
-  status: 'pending' | 'paid' | 'overdue' | 'cancelled' | 'archived';
-  items: InvoiceItem[];
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
+  client_id: number;
+  invoice_number: string;
+  issue_date: string;
+  due_date: string;
+  subtotal: string;
+  tax: string;
+  total: string;
+  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+  items: string; // JSON string
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface InvoiceItem {
@@ -55,21 +56,21 @@ export interface Transaction {
   amount: number;
   description: string;
   date: string;
-  clientId?: number;
-  invoiceId?: number;
-  createdAt: string;
-  updatedAt?: string;
+  client_id?: number;
+  invoice_id?: number;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface SavingsGoal {
   id?: number;
   name: string;
-  targetAmount: number;
-  currentAmount: number;
+  target_amount: number;
+  current_amount: number;
   deadline: string;
   status: 'active' | 'completed' | 'cancelled';
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // Configuración de la base de datos

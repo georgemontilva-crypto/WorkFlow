@@ -132,11 +132,11 @@ export const appRouter = router({
         const { verify } = await import('otplib');
         const user = await db.getUserById(ctx.user.id);
         
-        if (!user || !user.twoFactorSecret) {
+        if (!user || !user.two_factor_secret) {
           throw new Error('2FA not configured');
         }
         
-        const isValid = verify({ token: input.token, secret: user.twoFactorSecret });
+        const isValid = verify({ token: input.token, secret: user.two_factor_secret });
         
         if (!isValid) {
           throw new Error('Invalid 2FA code');
@@ -167,7 +167,7 @@ export const appRouter = router({
         }
         
         // Verify old password
-        const isValid = await bcrypt.compare(input.oldPassword, user.passwordHash);
+        const isValid = await bcrypt.compare(input.oldPassword, user.password_hash);
         if (!isValid) {
           throw new Error('Current password is incorrect');
         }
@@ -202,11 +202,11 @@ export const appRouter = router({
         email: z.string().email(),
         phone: z.string(),
         company: z.string().optional(),
-        billingCycle: z.enum(["monthly", "quarterly", "yearly", "custom"]),
-        customCycleDays: z.number().optional(),
+        billing_cycle: z.enum(["monthly", "quarterly", "yearly", "custom"]),
+        custom_cycle_days: z.number().optional(),
         amount: z.string(),
-        nextPaymentDate: z.string(),
-        reminderDays: z.number().default(7),
+        next_payment_date: z.string(),
+        reminder_days: z.number().default(7),
         status: z.enum(["active", "inactive", "overdue"]).default("active"),
         archived: z.number().default(0),
         notes: z.string().optional(),
@@ -214,10 +214,10 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await db.createClient({
           ...input,
-          nextPaymentDate: new Date(input.nextPaymentDate),
-          userId: ctx.user.id,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          next_payment_date: new Date(input.next_payment_date),
+          user_id: ctx.user.id,
+          created_at: new Date(),
+          updated_at: new Date(),
         });
         return { success: true };
       }),
@@ -229,20 +229,20 @@ export const appRouter = router({
         email: z.string().email().optional(),
         phone: z.string().optional(),
         company: z.string().optional(),
-        billingCycle: z.enum(["monthly", "quarterly", "yearly", "custom"]).optional(),
-        customCycleDays: z.number().optional(),
+        billing_cycle: z.enum(["monthly", "quarterly", "yearly", "custom"]).optional(),
+        custom_cycle_days: z.number().optional(),
         amount: z.string().optional(),
-        nextPaymentDate: z.string().optional(),
-        reminderDays: z.number().optional(),
+        next_payment_date: z.string().optional(),
+        reminder_days: z.number().optional(),
         status: z.enum(["active", "inactive", "overdue"]).optional(),
         archived: z.number().optional(),
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
-        const updateData: any = { ...data, updatedAt: new Date() };
-        if (data.nextPaymentDate) {
-          updateData.nextPaymentDate = new Date(data.nextPaymentDate);
+        const updateData: any = { ...data, updated_at: new Date() };
+        if (data.next_payment_date) {
+          updateData.next_payment_date = new Date(data.next_payment_date);
         }
         await db.updateClient(id, ctx.user.id, updateData);
         return { success: true };
@@ -272,12 +272,12 @@ export const appRouter = router({
     
     create: protectedProcedure
       .input(z.object({
-        clientId: z.number(),
-        invoiceNumber: z.string(),
-        issueDate: z.string(),
-        dueDate: z.string(),
+        client_id: z.number(),
+        invoice_number: z.string(),
+        issue_date: z.string(),
+        due_date: z.string(),
         amount: z.string(),
-        paidAmount: z.string().optional(),
+        paid_amount: z.string().optional(),
         status: z.enum(["pending", "paid", "overdue", "cancelled", "archived"]).default("pending"),
         items: z.array(z.object({
           description: z.string(),
@@ -290,11 +290,11 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await db.createInvoice({
           ...input,
-          issueDate: new Date(input.issueDate),
-          dueDate: new Date(input.dueDate),
-          userId: ctx.user.id,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          issue_date: new Date(input.issue_date),
+          due_date: new Date(input.due_date),
+          user_id: ctx.user.id,
+          created_at: new Date(),
+          updated_at: new Date(),
         });
         return { success: true };
       }),
@@ -302,12 +302,12 @@ export const appRouter = router({
     update: protectedProcedure
       .input(z.object({
         id: z.number(),
-        clientId: z.number().optional(),
-        invoiceNumber: z.string().optional(),
-        issueDate: z.string().optional(),
-        dueDate: z.string().optional(),
+        client_id: z.number().optional(),
+        invoice_number: z.string().optional(),
+        issue_date: z.string().optional(),
+        due_date: z.string().optional(),
         amount: z.string().optional(),
-        paidAmount: z.string().optional(),
+        paid_amount: z.string().optional(),
         status: z.enum(["pending", "paid", "overdue", "cancelled", "archived"]).optional(),
         items: z.array(z.object({
           description: z.string(),
@@ -319,12 +319,12 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
-        const updateData: any = { ...data, updatedAt: new Date() };
-        if (data.issueDate) {
-          updateData.issueDate = new Date(data.issueDate);
+        const updateData: any = { ...data, updated_at: new Date() };
+        if (data.issue_date) {
+          updateData.issue_date = new Date(data.issue_date);
         }
-        if (data.dueDate) {
-          updateData.dueDate = new Date(data.dueDate);
+        if (data.due_date) {
+          updateData.due_date = new Date(data.due_date);
         }
         await db.updateInvoice(id, ctx.user.id, updateData);
         return { success: true };
@@ -359,15 +359,15 @@ export const appRouter = router({
         amount: z.string(),
         description: z.string(),
         date: z.string(),
-        clientId: z.number().optional(),
+        client_id: z.number().optional(),
         invoiceId: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         await db.createTransaction({
           ...input,
           date: new Date(input.date),
-          userId: ctx.user.id,
-          createdAt: new Date(),
+          user_id: ctx.user.id,
+          created_at: new Date(),
         });
         return { success: true };
       }),
@@ -380,12 +380,12 @@ export const appRouter = router({
         amount: z.string().optional(),
         description: z.string().optional(),
         date: z.string().optional(),
-        clientId: z.number().optional(),
+        client_id: z.number().optional(),
         invoiceId: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
-        const updateData: any = { ...data, updatedAt: new Date() };
+        const updateData: any = { ...data, updated_at: new Date() };
         if (data.date) {
           updateData.date = new Date(data.date);
         }
@@ -415,22 +415,22 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         // Create ticket
         const ticket = await db.createSupportTicket({
-          userId: ctx.user.id,
+          user_id: ctx.user.id,
           subject: input.subject,
           priority: input.priority,
         });
 
-        const ticketId = ticket.id;
+        const ticket_id = ticket.id;
 
         // Add first message
         await db.createSupportMessage({
-          ticketId,
-          senderId: ctx.user.id,
+          ticket_id,
+          user_id: ctx.user.id,
           message: input.message,
-          isAdminReply: false,
+          is_staff: false,
         });
 
-        return { success: true, ticketId };
+        return { success: true, ticket_id };
       }),
 
     // Get user's tickets
@@ -440,51 +440,51 @@ export const appRouter = router({
 
     // Get ticket details with messages
     getTicket: protectedProcedure
-      .input(z.object({ ticketId: z.number() }))
+      .input(z.object({ ticket_id: z.number() }))
       .query(async ({ ctx, input }) => {
-        const ticket = await db.getSupportTicketById(input.ticketId);
+        const ticket = await db.getSupportTicketById(input.ticket_id);
         if (!ticket) {
           throw new Error("Ticket not found");
         }
 
         // Verify ownership (users can only see their own tickets)
-        if (ticket.userId !== ctx.user.id && ctx.user.role !== 'super_admin') {
+        if (ticket.user_id !== ctx.user.id && ctx.user.role !== 'super_admin') {
           throw new Error("Access denied");
         }
 
-        const messages = await db.getSupportMessagesByTicketId(input.ticketId);
+        const messages = await db.getSupportMessagesByTicketId(input.ticket_id);
         return { ticket, messages };
       }),
 
     // Add message to ticket
     addMessage: protectedProcedure
       .input(z.object({
-        ticketId: z.number(),
+        ticket_id: z.number(),
         message: z.string().min(1, "Message cannot be empty"),
       }))
       .mutation(async ({ ctx, input }) => {
-        const ticket = await db.getSupportTicketById(input.ticketId);
+        const ticket = await db.getSupportTicketById(input.ticket_id);
         if (!ticket) {
           throw new Error("Ticket not found");
         }
 
         // Verify ownership
-        if (ticket.userId !== ctx.user.id && ctx.user.role !== 'super_admin') {
+        if (ticket.user_id !== ctx.user.id && ctx.user.role !== 'super_admin') {
           throw new Error("Access denied");
         }
 
-        const isAdminReply = ctx.user.role === 'super_admin';
+        const is_staff = ctx.user.role === 'super_admin';
 
         await db.createSupportMessage({
-          ticketId: input.ticketId,
-          senderId: ctx.user.id,
+          ticket_id: input.ticket_id,
+          user_id: ctx.user.id,
           message: input.message,
-          isAdminReply,
+          is_staff,
         });
 
         // If admin replied, update status to in_progress
-        if (isAdminReply && ticket.status === 'open') {
-          await db.updateSupportTicketStatus(input.ticketId, 'in_progress');
+        if (is_staff && ticket.status === 'open') {
+          await db.updateSupportTicketStatus(input.ticket_id, 'in_progress');
         }
 
         return { success: true };
@@ -508,31 +508,31 @@ export const appRouter = router({
     // Update ticket status
     updateTicketStatus: superAdminProcedure
       .input(z.object({
-        ticketId: z.number(),
+        ticket_id: z.number(),
         status: z.enum(["open", "in_progress", "resolved", "closed"]),
       }))
       .mutation(async ({ input }) => {
-        await db.updateSupportTicketStatus(input.ticketId, input.status);
+        await db.updateSupportTicketStatus(input.ticket_id, input.status);
         return { success: true };
       }),
 
     // Grant lifetime access to user
     grantLifetimeAccess: superAdminProcedure
       .input(z.object({
-        userId: z.number(),
+        user_id: z.number(),
       }))
       .mutation(async ({ input }) => {
-        await db.updateUserLifetimeAccess(input.userId, true);
+        await db.updateUserLifetimeAccess(input.user_id, true);
         return { success: true };
       }),
 
     // Revoke lifetime access from user
     revokeLifetimeAccess: superAdminProcedure
       .input(z.object({
-        userId: z.number(),
+        user_id: z.number(),
       }))
       .mutation(async ({ input }) => {
-        await db.updateUserLifetimeAccess(input.userId, false);
+        await db.updateUserLifetimeAccess(input.user_id, false);
         return { success: true };
       }),
   }),
@@ -554,8 +554,8 @@ export const appRouter = router({
     create: protectedProcedure
       .input(z.object({
         name: z.string(),
-        targetAmount: z.string(),
-        currentAmount: z.string().optional(),
+        target_amount: z.string(),
+        current_amount: z.string().optional(),
         deadline: z.string(),
         status: z.enum(["active", "completed", "cancelled"]).default("active"),
       }))
@@ -563,9 +563,9 @@ export const appRouter = router({
         await db.createSavingsGoal({
           ...input,
           deadline: new Date(input.deadline),
-          userId: ctx.user.id,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          user_id: ctx.user.id,
+          created_at: new Date(),
+          updated_at: new Date(),
         });
         return { success: true };
       }),
@@ -574,14 +574,14 @@ export const appRouter = router({
       .input(z.object({
         id: z.number(),
         name: z.string().optional(),
-        targetAmount: z.string().optional(),
-        currentAmount: z.string().optional(),
+        target_amount: z.string().optional(),
+        current_amount: z.string().optional(),
         deadline: z.string().optional(),
         status: z.enum(["active", "completed", "cancelled"]).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
-        const updateData: any = { ...data, updatedAt: new Date() };
+        const updateData: any = { ...data, updated_at: new Date() };
         if (data.deadline) {
           updateData.deadline = new Date(data.deadline);
         }

@@ -86,7 +86,7 @@ export default function Finances() {
 
     await db.transactions.add({
       ...formData as Transaction,
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
     });
 
     toast.success('Transacción registrada exitosamente');
