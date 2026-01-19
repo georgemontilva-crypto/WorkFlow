@@ -13,6 +13,7 @@ import { trpc } from '@/lib/trpc';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import DashboardLayout from '@/components/DashboardLayout';
 
 export default function Admin() {
   const { t } = useLanguage();
@@ -101,7 +102,7 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <DashboardLayout>
       <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
         {/* Header */}
         <div className="mb-8">
@@ -381,6 +382,6 @@ export default function Admin() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

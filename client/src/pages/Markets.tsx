@@ -15,6 +15,7 @@ import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
 import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
+import DashboardLayout from '@/components/DashboardLayout';
 
 interface MarketAsset {
   symbol: string;
@@ -343,20 +344,10 @@ export default function Markets() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <DashboardLayout>
       <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
         {/* Header */}
         <div className="mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setLocation('/dashboard')}
-            className="mb-4 -ml-2"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver al Dashboard
-          </Button>
-          
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-primary/10 rounded-lg">
               <BarChart3 className="w-6 h-6 text-primary" />
@@ -427,6 +418,6 @@ export default function Markets() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
