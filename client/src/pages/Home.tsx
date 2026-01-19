@@ -33,27 +33,35 @@ export default function Home() {
   const { data: invoices } = trpc.invoices.list.useQuery();
   const { data: transactions } = trpc.transactions.list.useQuery();
   const { data: savingsGoals } = trpc.savingsGoals.list.useQuery();
-  const { data: dashboardWidget } = trpc.markets.getDashboardWidget.useQuery();
+  const { data: dashboardWidgets } = trpc.markets.getDashboardWidgets.useQuery();
 
   // State for draggable items
-  const [items, setItems] = useState(['clients', 'invoices', 'income', 'expenses', 'widget']);
+  const [items, setItems] = useState(['clients', 'invoices', 'income', 'expenses']);
   
   // Load saved order from localStorage
   useEffect(() => {
     const savedOrder = localStorage.getItem('dashboardCardOrder');
+    const baseItems = ['clients', 'invoices', 'income', 'expenses'];
+    
+    // Add widget IDs to the base items if they exist
+    const widgetIds = dashboardWidgets?.map(w => `widget-${w.symbol}`) || [];
+    const allCurrentItems = [...baseItems, ...widgetIds];
+    
     if (savedOrder) {
       try {
         const parsed = JSON.parse(savedOrder);
-        // Ensure all current items exist in saved order (handle new/removed widgets)
-        const currentSet = new Set(['clients', 'invoices', 'income', 'expenses', 'widget']);
+        const currentSet = new Set(allCurrentItems);
         const validSaved = parsed.filter((id: string) => currentSet.has(id));
-        const missing = ['clients', 'invoices', 'income', 'expenses', 'widget'].filter(id => !validSaved.includes(id));
+        const missing = allCurrentItems.filter(id => !validSaved.includes(id));
         setItems([...validSaved, ...missing]);
       } catch (e) {
         console.error('Error parsing saved order', e);
+        setItems(allCurrentItems);
       }
+    } else {
+      setItems(allCurrentItems);
     }
-  }, []);
+  }, [dashboardWidgets]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -168,7 +176,7 @@ export default function Home() {
             items={items} 
             strategy={horizontalListSortingStrategy}
           >
-            <div className={`flex sm:grid sm:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0 snap-x snap-mandatory sm:snap-none ${dashboardWidget ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className={`flex sm:grid sm:grid-cols-2 gap-4 lg:gap-6 mb-6 lg:mb-8 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0 snap-x snap-mandatory sm:snap-none lg:grid-cols-4 xl:grid-cols-5`} style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {items.map((id) => {
                 if (id === 'clients') {
                   return (
@@ -242,12 +250,16 @@ export default function Home() {
                     </SortableItem>
                   );
                 }
-                if (id === 'widget' && dashboardWidget) {
-                  return (
-                    <SortableItem key={id} id={id} className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full">
-                      <MarketWidget symbol={dashboardWidget.symbol} type={dashboardWidget.type} />
-                    </SortableItem>
-                  );
+                if (id.startsWith('widget-') && dashboardWidgets) {
+                  const symbol = id.replace('widget-', '');
+                  const widget = dashboardWidgets.find(w => w.symbol === symbol);
+                  if (widget) {
+                    return (
+                      <SortableItem key={id} id={id} className="min-w-[280px] sm:min-w-0 snap-start snap-always shrink-0 h-full">
+                        <MarketWidget symbol={widget.symbol} type={widget.type} />
+                      </SortableItem>
+                    );
+                  }
                 }
                 return null;
               })}

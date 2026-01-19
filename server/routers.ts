@@ -852,9 +852,9 @@ export const appRouter = router({
       return await db.getMarketFavoritesByUserId(ctx.user.id);
     }),
 
-    // Get dashboard widget asset
-    getDashboardWidget: protectedProcedure.query(async ({ ctx }) => {
-      return await db.getDashboardWidget(ctx.user.id);
+    // Get dashboard widget assets
+    getDashboardWidgets: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getDashboardWidgets(ctx.user.id);
     }),
 
     // Add to favorites
@@ -882,14 +882,13 @@ export const appRouter = router({
         return { success: true };
       }),
 
-    // Set as dashboard widget
-    setDashboardWidget: protectedProcedure
+    // Toggle dashboard widget
+    toggleDashboardWidget: protectedProcedure
       .input(z.object({
         symbol: z.string(),
       }))
       .mutation(async ({ ctx, input }) => {
-        await db.setDashboardWidget(ctx.user.id, input.symbol);
-        return { success: true };
+        return await db.toggleDashboardWidget(ctx.user.id, input.symbol);
       }),
   }),
 

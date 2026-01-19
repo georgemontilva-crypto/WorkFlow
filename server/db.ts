@@ -279,7 +279,9 @@ export async function createPriceAlert(data: any) {
     throw new Error("Database not available");
   }
 
-  const result = await db.insert(priceAlerts).values(data);
+  // Ensure id is not present to let DB handle autoincrement
+  const { id, ...insertData } = data;
+  const result = await db.insert(priceAlerts).values(insertData);
   return { id: Number(result[0].insertId) };
 }
 
@@ -892,18 +894,17 @@ export async function getMarketFavoritesByUserId(user_id: number) {
     .orderBy(marketFavorites.created_at);
 }
 
-export async function getDashboardWidget(user_id: number) {
+export async function getDashboardWidgets(user_id: number) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
   }
-  const result = await db
+  return await db
     .select()
     .from(marketFavorites)
     .where(eq(marketFavorites.user_id, user_id))
     .where(eq(marketFavorites.is_dashboard_widget, 1))
-    .limit(1);
-  return result[0] || null;
+    .orderBy(marketFavorites.created_at);
 }
 
 export async function addMarketFavorite(data: {
@@ -942,24 +943,33 @@ export async function removeMarketFavorite(user_id: number, symbol: string) {
     .where(eq(marketFavorites.symbol, symbol));
 }
 
-export async function setDashboardWidget(user_id: number, symbol: string) {
+export async function toggleDashboardWidget(user_id: number, symbol: string) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
   }
   
-  // First, unset all dashboard widgets for this user
-  await db
-    .update(marketFavorites)
-    .set({ is_dashboard_widget: 0 })
-    .where(eq(marketFavorites.user_id, user_id));
+  // Get current status
+  const existing = await db
+    .select()
+    .from(marketFavorites)
+    .where(eq(marketFavorites.user_id, user_id))
+    .where(eq(marketFavorites.symbol, symbol))
+    .limit(1);
+    
+  if (existing.length === 0) {
+    throw new Error("Asset not found in favorites");
+  }
   
-  // Then set the selected one
+  const newStatus = existing[0].is_dashboard_widget === 1 ? 0 : 1;
+  
   await db
     .update(marketFavorites)
-    .set({ is_dashboard_widget: 1 })
+    .set({ is_dashboard_widget: newStatus })
     .where(eq(marketFavorites.user_id, user_id))
     .where(eq(marketFavorites.symbol, symbol));
+    
+  return { is_dashboard_widget: newStatus };
 }
 
 /**

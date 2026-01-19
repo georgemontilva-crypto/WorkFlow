@@ -151,10 +151,10 @@ export default function Markets() {
     },
   });
 
-  const setWidgetMutation = trpc.markets.setDashboardWidget.useMutation({
-    onSuccess: () => {
+  const toggleWidgetMutation = trpc.markets.toggleDashboardWidget.useMutation({
+    onSuccess: (data) => {
       refetchFavorites();
-      toast.success('Widget configurado en Dashboard');
+      toast.success(data.is_dashboard_widget ? 'Añadido al Dashboard' : 'Quitado del Dashboard');
     },
   });
 
@@ -203,7 +203,7 @@ export default function Markets() {
   };
 
   const isWidget = (symbol: string) => {
-    return dashboardWidget?.symbol === symbol;
+    return dashboardWidgets?.some(w => w.symbol === symbol);
   };
 
   const handleToggleFavorite = (e: React.MouseEvent, asset: MarketAsset) => {
@@ -221,7 +221,7 @@ export default function Markets() {
 
   const handleSetWidget = (e: React.MouseEvent, asset: MarketAsset) => {
     e.stopPropagation();
-    setWidgetMutation.mutate({ symbol: asset.symbol });
+    toggleWidgetMutation.mutate({ symbol: asset.symbol });
     // Persist custom asset
     if (![...cryptoData, ...MOCK_STOCKS, ...MOCK_FOREX, ...MOCK_COMMODITIES, ...customAssets].some(a => a.symbol === asset.symbol)) {
       setCustomAssets(prev => [...prev, asset]);
@@ -363,10 +363,9 @@ export default function Markets() {
                 size="sm"
                 className="w-full justify-start"
                 onClick={(e) => handleSetWidget(e, asset)}
-                disabled={widget}
               >
                 <Eye className={`w-4 h-4 mr-2 ${widget ? 'text-primary' : ''}`} />
-                {widget ? 'Visible en Dashboard' : 'Añadir al Dashboard'}
+                {widget ? 'Quitar del Dashboard' : 'Añadir al Dashboard'}
               </Button>
               
               <Button
