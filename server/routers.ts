@@ -929,3 +929,4 @@ export type AppRouter = typeof appRouter;
         return { success: true };
       }),
   }),
+});
