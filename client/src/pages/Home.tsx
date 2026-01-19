@@ -661,35 +661,35 @@ function SortableWidget({ widget, children }: { widget: any; children: React.Rea
       {...attributes}
       className="group relative"
     >
-      {/* Drag Handle - Only this area triggers drag */}
-      <div
+      {/* Drag Handle - Always visible, larger, and easier to grab */}
+      <button
         ref={setActivatorNodeRef}
         {...listeners}
-        className="absolute top-2 left-2 z-10 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-3 left-3 z-20 cursor-grab active:cursor-grabbing bg-background/90 hover:bg-background rounded-md p-2 backdrop-blur-sm border border-border shadow-sm transition-all hover:scale-110"
         style={{ touchAction: 'none' }}
+        onClick={(e) => e.stopPropagation()}
+        aria-label="Arrastrar para reordenar"
       >
-        <div className="bg-background/80 hover:bg-background rounded p-1.5 backdrop-blur-sm border border-border">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-muted-foreground"
-          >
-            <circle cx="9" cy="12" r="1" />
-            <circle cx="9" cy="5" r="1" />
-            <circle cx="9" cy="19" r="1" />
-            <circle cx="15" cy="12" r="1" />
-            <circle cx="15" cy="5" r="1" />
-            <circle cx="15" cy="19" r="1" />
-          </svg>
-        </div>
-      </div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-muted-foreground"
+        >
+          <circle cx="9" cy="12" r="1.5" fill="currentColor" />
+          <circle cx="9" cy="5" r="1.5" fill="currentColor" />
+          <circle cx="9" cy="19" r="1.5" fill="currentColor" />
+          <circle cx="15" cy="12" r="1.5" fill="currentColor" />
+          <circle cx="15" cy="5" r="1.5" fill="currentColor" />
+          <circle cx="15" cy="19" r="1.5" fill="currentColor" />
+        </svg>
+      </button>
       {children}
     </div>
   );
