@@ -6,15 +6,24 @@
 
 import { Button } from '@/components/ui/button';
 import { Check, TrendingUp, FileText, Users, Target, Bell, Shield, Menu, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { LandingLanguageProvider, useLandingLanguage } from '@/contexts/LandingLanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { useAuth } from '@/_core/hooks/useAuth';
 
 function LandingContent() {
   const { t } = useLandingLanguage();
   const [, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isAuthenticated, loading } = useAuth();
+
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      setLocation('/dashboard');
+    }
+  }, [isAuthenticated, loading, setLocation]);
 
   const features = [
     {
