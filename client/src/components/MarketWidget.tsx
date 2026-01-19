@@ -21,6 +21,40 @@ interface MarketData {
   low24h: number;
 }
 
+// Map crypto symbols to CoinGecko IDs
+const CRYPTO_ID_MAP: Record<string, string> = {
+  'BTC': 'bitcoin',
+  'ETH': 'ethereum',
+  'SOL': 'solana',
+  'BNB': 'binancecoin',
+  'XRP': 'ripple',
+  'ADA': 'cardano',
+  'DOGE': 'dogecoin',
+  'AVAX': 'avalanche-2',
+  'DOT': 'polkadot',
+  'LINK': 'chainlink',
+  'MATIC': 'matic-network',
+  'UNI': 'uniswap',
+  'LTC': 'litecoin',
+  'ATOM': 'cosmos',
+  'XLM': 'stellar',
+  'ALGO': 'algorand',
+  'VET': 'vechain',
+  'ICP': 'internet-computer',
+  'FIL': 'filecoin',
+  'HBAR': 'hedera-hashgraph',
+  'APT': 'aptos',
+  'ARB': 'arbitrum',
+  'OP': 'optimism',
+  'NEAR': 'near',
+  'STX': 'blockstack',
+  'IMX': 'immutable-x',
+  'INJ': 'injective-protocol',
+  'TIA': 'celestia',
+  'SEI': 'sei-network',
+  'SUI': 'sui',
+};
+
 export function MarketWidget({ symbol, type }: MarketWidgetProps) {
   const [, setLocation] = useLocation();
   const [data, setData] = useState<MarketData | null>(null);
@@ -30,9 +64,17 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
     const fetchData = async () => {
       if (type === 'crypto') {
         try {
+          // Get CoinGecko ID from symbol
+          const coinId = CRYPTO_ID_MAP[symbol.toUpperCase()] || symbol.toLowerCase();
+          
           const response = await fetch(
-            `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&symbols=${symbol.toLowerCase()}&order=market_cap_desc&per_page=1&page=1&sparkline=false`
+            `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinId}&order=market_cap_desc&per_page=1&page=1&sparkline=false`
           );
+          
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status}`);
+          }
+          
           const result = await response.json();
           
           if (result && result.length > 0) {
@@ -44,12 +86,19 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
               high24h: coin.high_24h,
               low24h: coin.low_24h,
             });
+          } else {
+            console.warn(`No data found for ${symbol} (${coinId})`);
+            setData(null);
           }
         } catch (error) {
           console.error('Error fetching market data:', error);
+          setData(null);
         } finally {
           setLoading(false);
         }
+      } else {
+        // For non-crypto assets, set loading to false
+        setLoading(false);
       }
     };
 
@@ -88,7 +137,8 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Sin datos</p>
+          <p className="text-sm text-muted-foreground">Sin datos disponibles</p>
+          <p className="text-xs text-muted-foreground mt-1">{symbol}</p>
         </CardContent>
       </Card>
     );
