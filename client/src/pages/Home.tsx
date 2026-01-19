@@ -367,7 +367,7 @@ export default function Home() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
                 <Target className="w-5 h-5 text-primary" />
-                {t.savings.goals}
+                {t.goals.title}
               </h2>
               <Button
                 variant="ghost"
@@ -445,7 +445,7 @@ export default function Home() {
             onClick={() => setLocation('/savings')}
           >
             <Target className="w-6 h-6 text-primary" />
-            <span className="text-sm">{t.savings.title}</span>
+            <span className="text-sm">{t.goals.title}</span>
           </Button>
           <Button
             variant="outline"
