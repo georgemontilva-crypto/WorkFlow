@@ -98,16 +98,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   
   // Calculate counts for alerts
   const overdueCount = clients && invoices ? 
-    clients.filter(c => differenceInDays(parseISO(c.next_payment_date), new Date()) < 0).length +
-    invoices.filter(i => differenceInDays(parseISO(i.due_date), new Date()) < 0).length : 0;
+    clients.filter(c => differenceInDays(new Date(c.next_payment_date), new Date()) < 0).length +
+    invoices.filter(i => differenceInDays(new Date(i.due_date), new Date()) < 0).length : 0;
   
   const urgentCount = clients && invoices ?
     clients.filter(c => {
-      const d = differenceInDays(parseISO(c.next_payment_date), new Date());
+      const d = differenceInDays(new Date(c.next_payment_date), new Date());
       return d >= 0 && d <= 5;
     }).length +
     invoices.filter(i => {
-      const d = differenceInDays(parseISO(i.due_date), new Date());
+      const d = differenceInDays(new Date(i.due_date), new Date());
       return d >= 0 && d <= 5;
     }).length : 0;
 
