@@ -15,8 +15,26 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { TrialBanner } from '@/components/TrialBanner';
 import { MarketWidget } from '@/components/MarketWidget';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  TouchSensor,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { formatCurrency, Currency } from '@/lib/currency';
 import {
   DropdownMenu,
@@ -56,6 +74,40 @@ export default function Home() {
     },
     onError: () => toast.error('Error al eliminar widget'),
   });
+
+  const updateOrderMutation = trpc.dashboardWidgets.updateOrder.useMutation({
+    onSuccess: () => {
+      refetchWidgets();
+    },
+    onError: () => toast.error('Error al reordenar widgets'),
+  });
+
+  // DnD sensors configuration
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px de movimiento antes de activar drag
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250, // 250ms de presión antes de activar drag en móvil
+        tolerance: 5,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Local state for widget order
+  const [localWidgets, setLocalWidgets] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (dashboardWidgets) {
+      setLocalWidgets(dashboardWidgets);
+    }
+  }, [dashboardWidgets]);
 
   // Calculate stats
   const activeClients = clients?.filter(c => c.status === 'active').length || 0;
@@ -101,6 +153,26 @@ export default function Home() {
   // Handle widget removal
   const handleRemoveWidget = (widgetId: number) => {
     removeWidgetMutation.mutate({ id: widgetId });
+  };
+
+  // Handle drag end
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    setLocalWidgets((items) => {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+
+      const newOrder = arrayMove(items, oldIndex, newIndex);
+      
+      // Update positions in database - send array of IDs in new order
+      const widgetIds = newOrder.map(widget => widget.id);
+      updateOrderMutation.mutate({ widgetIds });
+      
+      return newOrder;
+    });
   };
 
   // Check if widget type exists
@@ -376,16 +448,31 @@ export default function Home() {
         </div>
 
         {/* Widgets Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
-          {dashboardWidgets?.map(widget => renderWidget(widget))}
-          
-          {/* Market Widgets from market_favorites */}
-          {marketWidgets?.map(market => (
-            <div key={`market-${market.id}`} className="group relative">
-              <MarketWidget symbol={market.symbol} type={market.type} />
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={localWidgets.map(w => w.id)}
+            strategy={rectSortingStrategy}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+              {localWidgets?.map(widget => (
+                <SortableWidget key={widget.id} widget={widget}>
+                  {renderWidget(widget)}
+                </SortableWidget>
+              ))}
+              
+              {/* Market Widgets from market_favorites */}
+              {marketWidgets?.map(market => (
+                <div key={`market-${market.id}`} className="group relative">
+                  <MarketWidget symbol={market.symbol} type={market.type} />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </SortableContext>
+        </DndContext>
 
         {/* Empty State */}
         {(!dashboardWidgets || dashboardWidgets.length === 0) && (!marketWidgets || marketWidgets.length === 0) && (
@@ -546,5 +633,36 @@ export default function Home() {
         </div>
       </div>
     </DashboardLayout>
+  );
+}
+
+// Sortable Widget Wrapper Component
+function SortableWidget({ widget, children }: { widget: any; children: React.ReactNode }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: widget.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    cursor: isDragging ? 'grabbing' : 'grab',
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="group relative"
+    >
+      {children}
+    </div>
   );
 }
