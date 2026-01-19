@@ -197,8 +197,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </Button>
           
           <div className="flex-1" />
-          
-          <img src="/hiwork-logo-final.png" alt="HiWork" className="h-7 w-auto sm:h-8" />
         </header>
 
         {/* Scrollable Content */}
