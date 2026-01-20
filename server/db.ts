@@ -509,15 +509,10 @@ export async function updateInvoice(id: number, user_id: number, data: any) {
     throw new Error("Invoice not found or access denied");
   }
 
-  // Always add updated_at
-  const updateData = {
-    ...data,
-    updated_at: new Date(),
-  };
-
+  // Don't manually set updated_at, let the database handle it
   await db
     .update(invoices)
-    .set(updateData)
+    .set(data)
     .where(eq(invoices.id, id));
 }
 
