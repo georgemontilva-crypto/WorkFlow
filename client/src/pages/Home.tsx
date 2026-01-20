@@ -109,20 +109,43 @@ export default function Home() {
     
     // Añadir dashboard widgets
     if (dashboardWidgets) {
-      allWidgets.push(...dashboardWidgets);
+      dashboardWidgets.forEach(widget => {
+        allWidgets.push({
+          ...widget,
+          globalPosition: widget.position,
+          widgetSource: 'dashboard'
+        });
+      });
     }
     
-    // Añadir market widgets con un prefijo para identificarlos
+    // Añadir market widgets con prefijo "market-" en su ID
     if (marketWidgets) {
-      const marketWidgetsWithType = marketWidgets.map(market => ({
-        ...market,
-        id: `market-${market.id}`, // Prefijo para evitar conflictos de ID
-        widget_type: 'market',
-        symbol: market.symbol,
-        marketType: market.type,
-      }));
-      allWidgets.push(...marketWidgetsWithType);
+      marketWidgets.forEach(market => {
+        allWidgets.push({
+          ...market,
+          id: `market-${market.id}`,
+          widget_type: 'market',
+          symbol: market.symbol,
+          marketType: market.type,
+          globalPosition: market.position,
+          widgetSource: 'market'
+        });
+      });
     }
+    
+    // Ordenar por globalPosition, y usar el ID como tiebreaker para posiciones duplicadas
+    allWidgets.sort((a, b) => {
+      const posA = a.globalPosition || 0;
+      const posB = b.globalPosition || 0;
+      if (posA === posB) {
+        // Si las posiciones son iguales, ordenar por widgetSource (dashboard primero)
+        if (a.widgetSource === 'dashboard' && b.widgetSource === 'market') return -1;
+        if (a.widgetSource === 'market' && b.widgetSource === 'dashboard') return 1;
+        // Si son del mismo tipo, ordenar por ID
+        return String(a.id).localeCompare(String(b.id));
+      }
+      return posA - posB;
+    });
     
     setLocalWidgets(allWidgets);
   }, [dashboardWidgets, marketWidgets]);
@@ -187,6 +210,7 @@ export default function Home() {
       
       // Update positions in database - send array of IDs in new order
       const widgetIds = newOrder.map(widget => widget.id);
+      console.log('Nuevo orden de widgets:', widgetIds);
       updateOrderMutation.mutate({ widgetIds });
       
       return newOrder;
