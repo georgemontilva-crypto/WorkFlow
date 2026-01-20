@@ -222,6 +222,22 @@ export const es = {
     status: 'Estado',
     invoice: 'Factura',
     invoice_number: 'Factura:',
+    // PDF translations
+    pdf: {
+      title: 'FACTURA',
+      invoiceNumber: 'Factura #:',
+      issueDate: 'Fecha de Emisión:',
+      dueDate: 'Fecha de Vencimiento:',
+      client: 'Cliente:',
+      description: 'Descripción',
+      quantity: 'Cant.',
+      unitPrice: 'Precio Unit.',
+      total: 'Total',
+      totalLabel: 'TOTAL:',
+      notes: 'Notas:',
+      payButton: 'PAGAR AHORA',
+      payHelper: 'Haz clic en el botón para realizar el pago de forma segura',
+    },
   },
 
   // Client Selector Modal

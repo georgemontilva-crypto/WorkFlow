@@ -222,6 +222,22 @@ export const en = {
     status: 'Status',
     invoice: 'Invoice',
     invoice_number: 'Invoice:',
+    // PDF translations
+    pdf: {
+      title: 'INVOICE',
+      invoiceNumber: 'Invoice #:',
+      issueDate: 'Issue Date:',
+      dueDate: 'Due Date:',
+      client: 'Client:',
+      description: 'Description',
+      quantity: 'Qty.',
+      unitPrice: 'Unit Price',
+      total: 'Total',
+      totalLabel: 'TOTAL:',
+      notes: 'Notes:',
+      payButton: 'PAY NOW',
+      payHelper: 'Click the button to make a secure payment',
+    },
   },
 
   // Client Selector Modal

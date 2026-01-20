@@ -357,23 +357,24 @@ export default function Invoices() {
     if (!client) return;
 
     const doc = new jsPDF();
+    const pdfT = t.invoices.pdf; // PDF translations
 
     // Header
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    doc.text('FACTURA', 105, 20, { align: 'center' });
+    doc.text(pdfT.title, 105, 20, { align: 'center' });
 
     // Invoice Info
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Factura #: ${invoice.invoice_number}`, 20, 40);
-    doc.text(`Fecha de Emisión: ${format(new Date(invoice.issue_date), 'dd/MM/yyyy')}`, 20, 47);
-    doc.text(`Fecha de Vencimiento: ${format(new Date(invoice.due_date), 'dd/MM/yyyy')}`, 20, 54);
+    doc.text(`${pdfT.invoiceNumber} ${invoice.invoice_number}`, 20, 40);
+    doc.text(`${pdfT.issueDate} ${format(new Date(invoice.issue_date), 'dd/MM/yyyy')}`, 20, 47);
+    doc.text(`${pdfT.dueDate} ${format(new Date(invoice.due_date), 'dd/MM/yyyy')}`, 20, 54);
 
     // Client Info
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text('Cliente:', 20, 70);
+    doc.text(pdfT.client, 20, 70);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(client.name, 20, 77);
@@ -385,10 +386,10 @@ export default function Invoices() {
     let yPos = 115;
     doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.text('Descripción', 20, yPos);
-    doc.text('Cant.', 120, yPos);
-    doc.text('Precio Unit.', 145, yPos);
-    doc.text('Total', 175, yPos);
+    doc.text(pdfT.description, 20, yPos);
+    doc.text(pdfT.quantity, 120, yPos);
+    doc.text(pdfT.unitPrice, 145, yPos);
+    doc.text(pdfT.total, 175, yPos);
 
     doc.setLineWidth(0.5);
     doc.line(20, yPos + 2, 190, yPos + 2);
@@ -414,7 +415,7 @@ export default function Invoices() {
     yPos += 10;
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('TOTAL:', 140, yPos);
+    doc.text(pdfT.totalLabel, 140, yPos);
     doc.text(`$${parseFloat(invoice.total).toFixed(2)}`, 190, yPos, { align: 'right' });
 
     // Payment Button
@@ -433,7 +434,7 @@ export default function Invoices() {
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(255, 255, 255); // White text
-      doc.text('PAGAR AHORA', 105, yPos + 4, { align: 'center' });
+      doc.text(pdfT.payButton, 105, yPos + 4, { align: 'center' });
       doc.setTextColor(0, 0, 0); // Reset to black
       
       // Helper text below button
@@ -441,7 +442,7 @@ export default function Invoices() {
       doc.setFontSize(8);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(100, 100, 100); // Gray
-      doc.text('Haz clic en el botón para realizar el pago de forma segura', 105, yPos, { align: 'center' });
+      doc.text(pdfT.payHelper, 105, yPos, { align: 'center' });
       doc.setTextColor(0, 0, 0); // Reset to black
     }
 
@@ -450,7 +451,7 @@ export default function Invoices() {
       yPos += 20;
       doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
-      doc.text('Notas:', 20, yPos);
+      doc.text(pdfT.notes, 20, yPos);
       doc.setFont('helvetica', 'normal');
       const splitNotes = doc.splitTextToSize(invoice.notes, 170);
       doc.text(splitNotes, 20, yPos + 7);
