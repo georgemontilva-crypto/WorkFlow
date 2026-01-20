@@ -40,7 +40,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center">
             <img src="/finwrk-logo.png" alt="Finwrk" className="h-10 w-auto" />
@@ -60,7 +60,7 @@ export default function Login() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-4 pt-24 pb-12">
+      <main className="flex-1 flex items-center justify-center px-4 pt-24 pb-12" style={{ paddingTop: 'calc(6rem + env(safe-area-inset-top))' }}>
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">
