@@ -81,6 +81,8 @@ import { format, parseISO, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/_core/hooks/useAuth';
+import { PlanLimitDialog } from '@/components/PlanLimitDialog';
 import jsPDF from 'jspdf';
 import { useState, useEffect } from 'react';
 import { useLocation, useSearch } from 'wouter';
@@ -150,6 +152,10 @@ export default function Invoices() {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [showStatusDialog, setShowStatusDialog] = useState(false);
   const [showPartialPaymentDialog, setShowPartialPaymentDialog] = useState(false);
+  const [showLimitDialog, setShowLimitDialog] = useState(false);
+  
+  // Get user subscription plan
+  const { user } = useAuth();
   const [partialPaymentAmount, setPartialPaymentAmount] = useState<number>(0);
   const [newStatus, setNewStatus] = useState<'pending' | 'paid' | 'overdue' | 'cancelled'>('pending');
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
@@ -501,7 +507,19 @@ export default function Invoices() {
           </div>
           <div className="flex gap-2 sm:gap-3">
             <Button
-              onClick={() => setIsDialogOpen(true)}
+              onClick={() => {
+                // Check plan limits for Free users
+                if (user?.subscription_plan === 'free') {
+                  const invoiceLimit = 5; // Free plan limit
+                  const currentCount = invoices?.length || 0;
+                  
+                  if (currentCount >= invoiceLimit) {
+                    setShowLimitDialog(true);
+                    return;
+                  }
+                }
+                setIsDialogOpen(true);
+              }}
               className="bg-primary text-primary-foreground hover:opacity-90"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -1243,6 +1261,15 @@ export default function Invoices() {
             </div>
           </DialogContent>
         </Dialog>
+        
+        {/* Plan Limit Dialog */}
+        <PlanLimitDialog
+          open={showLimitDialog}
+          onOpenChange={setShowLimitDialog}
+          limitType="invoices"
+          currentCount={invoices?.length || 0}
+          limit={5}
+        />
       </div>
     </DashboardLayout>
   );
