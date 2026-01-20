@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 /**
  * CrispChat Component
@@ -15,6 +16,8 @@ import { useEffect } from 'react';
 const CRISP_WEBSITE_ID = 'df45aad0-50ab-4415-b389-eff534fd5a80';
 
 export function CrispChat() {
+  const { language } = useLanguage();
+
   useEffect(() => {
     // Only load Crisp if website ID is configured
     if (CRISP_WEBSITE_ID === 'YOUR_WEBSITE_ID') {
@@ -31,6 +34,15 @@ export function CrispChat() {
     script.async = true;
     document.head.appendChild(script);
 
+    // Wait for Crisp to load, then set language
+    script.onload = () => {
+      if (window.$crisp) {
+        // Set Crisp language based on app language
+        window.$crisp.push(['set', 'session:data', [['language', language]]]);
+        window.$crisp.push(['set', 'user:nickname', ['Usuario']]);
+      }
+    };
+
     return () => {
       // Cleanup on unmount
       if (window.$crisp) {
@@ -38,6 +50,8 @@ export function CrispChat() {
       }
     };
   }, []);
+
+  // Language sync is now handled in LanguageContext
 
   return null; // This component doesn't render anything
 }

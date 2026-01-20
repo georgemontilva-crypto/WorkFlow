@@ -3,7 +3,8 @@
  * Design Philosophy: Apple Minimalism
  */
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { es } from '@/locales/es';
 import { en } from '@/locales/en';
 
@@ -19,20 +20,26 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('workflow-language');
-    return (saved as Language) || 'es';
-  });
-
+  const { i18n } = useTranslation();
+  
+  const language = (i18n.language.split('-')[0] as Language) || 'es';
+  
   const translations: Record<Language, Translations> = {
     es,
     en,
   };
 
   const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
+    i18n.changeLanguage(lang);
     localStorage.setItem('workflow-language', lang);
   };
+
+  // Sync with Crisp when language changes
+  useEffect(() => {
+    if (window.$crisp && window.$crisp.is) {
+      window.$crisp.push(['set', 'session:data', [['language', language]]]);
+    }
+  }, [language]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t: translations[language] }}>
