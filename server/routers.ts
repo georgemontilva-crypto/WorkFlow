@@ -931,10 +931,25 @@ export const appRouter = router({
                 dashboardLink
               );
               
-              // Extract base64 content (remove data:image/xxx;base64, prefix if present)
-              const base64Content = input.proof.includes('base64,') 
-                ? input.proof.split('base64,')[1] 
-                : input.proof;
+              // Extract base64 content and detect file type
+              let base64Content = input.proof;
+              let contentType = 'image/jpeg';
+              let extension = 'jpg';
+              
+              if (input.proof.includes('base64,')) {
+                const parts = input.proof.split('base64,');
+                base64Content = parts[1];
+                
+                // Detect content type from data URL
+                const mimeMatch = parts[0].match(/data:([^;]+)/);
+                if (mimeMatch) {
+                  contentType = mimeMatch[1];
+                  // Map content type to extension
+                  if (contentType.includes('png')) extension = 'png';
+                  else if (contentType.includes('pdf')) extension = 'pdf';
+                  else if (contentType.includes('jpeg') || contentType.includes('jpg')) extension = 'jpg';
+                }
+              }
               
               // Send email with proof as attachment
               await sendEmail({
@@ -942,8 +957,9 @@ export const appRouter = router({
                 subject: `Comprobante de Pago Recibido - Factura ${invoice.invoice_number}`,
                 html: emailHtml,
                 attachments: [{
-                  filename: `comprobante-${invoice.invoice_number}.jpg`,
+                  filename: `comprobante-${invoice.invoice_number}.${extension}`,
                   content: base64Content,
+                  contentType: contentType,
                 }],
               });
               

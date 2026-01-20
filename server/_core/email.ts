@@ -11,6 +11,7 @@ interface EmailOptions {
   attachments?: Array<{
     filename: string;
     content: string; // base64 encoded
+    contentType?: string;
   }>;
 }
 
