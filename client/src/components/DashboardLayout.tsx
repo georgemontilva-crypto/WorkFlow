@@ -207,6 +207,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         )}
 
+        {/* Plan Badge */}
+        <div className="mx-3 mb-3">
+          <PlanBadge />
+        </div>
+
         {/* Logout Button */}
         <div className="mx-3 mb-4">
           <Button
@@ -241,9 +246,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </Button>
           
           <div className="flex-1" />
-          
-          {/* Plan Badge */}
-          <PlanBadge />
         </header>
 
         {/* Scrollable Content */}

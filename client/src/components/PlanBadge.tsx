@@ -41,20 +41,43 @@ export function PlanBadge() {
   const Icon = config.icon;
 
   return (
-    <div className="flex items-center gap-2">
-      <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${config.bg} ${config.color}`}>
-        {Icon && <Icon className="w-3.5 h-3.5" />}
-        <span>{config.label}</span>
+    <div className="space-y-2">
+      {/* Current Plan Display */}
+      <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${config.bg}`}>
+        {Icon && <Icon className={`w-4 h-4 ${config.color}`} />}
+        <div className="flex-1">
+          <p className="text-xs text-muted-foreground">Plan Actual</p>
+          <p className={`text-sm font-semibold ${config.color}`}>{config.label}</p>
+        </div>
       </div>
       
+      {/* Upgrade Button for Free users */}
       {subscription.plan === 'free' && (
         <Button
           size="sm"
           variant="outline"
-          className="text-xs h-7"
-          onClick={() => setLocation('/#pricing')}
+          className="w-full border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white transition-colors font-semibold"
+          onClick={() => {
+            // Navigate to landing page pricing section
+            window.location.href = '/#pricing';
+          }}
         >
-          Upgrade
+          Upgrade a Pro
+        </Button>
+      )}
+      
+      {/* Upgrade Button for Pro users */}
+      {subscription.plan === 'pro' && (
+        <Button
+          size="sm"
+          variant="outline"
+          className="w-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-white transition-colors font-semibold"
+          onClick={() => {
+            // Navigate to landing page pricing section
+            window.location.href = '/#pricing';
+          }}
+        >
+          Upgrade a Business
         </Button>
       )}
     </div>
