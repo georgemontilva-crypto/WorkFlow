@@ -160,8 +160,13 @@ export const supportTickets = mysqlTable("support_tickets", {
   id: serial("id").primaryKey(),
   user_id: int("user_id").notNull(),
   subject: text("subject").notNull(),
-  status: mysqlEnum("status", ["open", "in_progress", "resolved", "closed"]).notNull().default("open"),
+  status: mysqlEnum("status", ["open", "in_progress", "waiting_user", "waiting_agent", "resolved", "closed"]).notNull().default("open"),
   priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).notNull().default("medium"),
+  assigned_to: int("assigned_to"),
+  has_unread_user: int("has_unread_user").notNull().default(0),
+  has_unread_agent: int("has_unread_agent").notNull().default(0),
+  resolved_at: timestamp("resolved_at"),
+  closed_at: timestamp("closed_at"),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -175,9 +180,10 @@ export type InsertSupportTicket = typeof supportTickets.$inferInsert;
 export const supportMessages = mysqlTable("support_messages", {
   id: serial("id").primaryKey(),
   ticket_id: int("ticket_id").notNull(),
-  user_id: int("user_id").notNull(),
+  sender_id: int("sender_id").notNull(),
+  sender_type: mysqlEnum("sender_type", ["user", "agent", "ai"]).notNull().default("user"),
   message: text("message").notNull(),
-  is_staff: int("is_staff").notNull().default(0),
+  is_read: int("is_read").notNull().default(0),
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
