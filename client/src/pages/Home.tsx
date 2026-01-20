@@ -107,45 +107,43 @@ export default function Home() {
     // Combinar dashboard widgets y market widgets en un solo array
     const allWidgets = [];
     
-    // Añadir dashboard widgets con prefijo "widget-" para consistencia
+    // Añadir dashboard widgets
     if (dashboardWidgets) {
       dashboardWidgets.forEach(widget => {
         allWidgets.push({
           ...widget,
-          id: `widget-${widget.id}`, // Prefijo para consistencia con market widgets
-          originalId: widget.id, // Guardar el ID original para el backend
-          globalPosition: widget.position,
+          // Crear un ID único compuesto para drag & drop
+          dragId: `widget-${widget.id}`,
           widgetSource: 'dashboard'
         });
       });
     }
     
-    // Añadir market widgets con prefijo "market-" en su ID
+    // Añadir market widgets
     if (marketWidgets) {
       marketWidgets.forEach(market => {
         allWidgets.push({
           ...market,
-          id: `market-${market.id}`,
-          originalId: market.id, // Guardar el ID original para el backend
+          // Crear un ID único compuesto para drag & drop
+          dragId: `market-${market.id}`,
           widget_type: 'market',
           symbol: market.symbol,
           marketType: market.type,
-          globalPosition: market.position,
           widgetSource: 'market'
         });
       });
     }
     
-    // Ordenar por globalPosition, y usar el ID como tiebreaker para posiciones duplicadas
+    // Ordenar por position
     allWidgets.sort((a, b) => {
-      const posA = a.globalPosition || 0;
-      const posB = b.globalPosition || 0;
+      const posA = a.position || 0;
+      const posB = b.position || 0;
       if (posA === posB) {
         // Si las posiciones son iguales, ordenar por widgetSource (dashboard primero)
         if (a.widgetSource === 'dashboard' && b.widgetSource === 'market') return -1;
         if (a.widgetSource === 'market' && b.widgetSource === 'dashboard') return 1;
         // Si son del mismo tipo, ordenar por ID
-        return String(a.id).localeCompare(String(b.id));
+        return a.id - b.id;
       }
       return posA - posB;
     });
@@ -195,8 +193,12 @@ export default function Home() {
   };
 
   // Handle widget removal
-  const handleRemoveWidget = (widgetId: number) => {
-    removeWidgetMutation.mutate({ id: widgetId });
+  const handleRemoveWidget = (widget: any) => {
+    // Si es un widget normal (dashboard), usar el id original
+    if (widget.widgetSource === 'dashboard') {
+      removeWidgetMutation.mutate({ id: widget.id });
+    }
+    // Si es un market widget, no se puede eliminar desde aquí (se elimina desde Markets)
   };
 
   // Handle drag end
@@ -206,13 +208,13 @@ export default function Home() {
     if (!over || active.id === over.id) return;
 
     setLocalWidgets((items) => {
-      const oldIndex = items.findIndex((item) => item.id === active.id);
-      const newIndex = items.findIndex((item) => item.id === over.id);
+      const oldIndex = items.findIndex((item) => item.dragId === active.id);
+      const newIndex = items.findIndex((item) => item.dragId === over.id);
 
       const newOrder = arrayMove(items, oldIndex, newIndex);
       
-      // Update positions in database - send array of IDs in new order
-      const widgetIds = newOrder.map(widget => widget.id);
+      // Update positions in database - send array of dragIds
+      const widgetIds = newOrder.map(widget => widget.dragId);
       console.log('Nuevo orden de widgets:', widgetIds);
       updateOrderMutation.mutate({ widgetIds });
       
@@ -237,7 +239,7 @@ export default function Home() {
         className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
         onClick={(e) => {
           e.stopPropagation();
-          handleRemoveWidget(widget.id);
+          handleRemoveWidget(widget);
         }}
       >
         <X className="h-4 w-4" />
@@ -482,12 +484,12 @@ export default function Home() {
           onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={localWidgets.map(w => w.id)}
+            items={localWidgets.map(w => w.dragId)}
             strategy={rectSortingStrategy}
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
               {localWidgets?.map(widget => (
-                <SortableWidget key={widget.id} widget={widget}>
+                <SortableWidget key={widget.dragId} widget={widget}>
                   {renderWidget(widget)}
                 </SortableWidget>
               ))}
@@ -667,7 +669,7 @@ function SortableWidget({ widget, children }: { widget: any; children: React.Rea
     transition,
     isDragging,
     setActivatorNodeRef,
-  } = useSortable({ id: widget.id });
+  } = useSortable({ id: widget.dragId });
 
   const style = {
     transform: CSS.Transform.toString(transform),
