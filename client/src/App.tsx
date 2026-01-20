@@ -24,6 +24,7 @@ import Settings from "./pages/Settings";
 import Reminders from "./pages/Reminders";
 import Admin from "./pages/Admin";
 import Markets from "./pages/Markets";
+import PricingPage from "./pages/PricingPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { CrispChat } from "./components/CrispChat";
 function Router() {
@@ -80,6 +81,11 @@ function Router() {
       <Route path="/markets">
         <ProtectedRoute>
           <Markets />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/pricing">
+        <ProtectedRoute>
+          <PricingPage />
         </ProtectedRoute>
       </Route>
 

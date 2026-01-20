@@ -58,8 +58,8 @@ export function PlanBadge() {
           variant="outline"
           className="w-full border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white transition-colors font-semibold"
           onClick={() => {
-            // Navigate to landing page pricing section
-            window.location.href = '/#pricing';
+            // Navigate to pricing page within the app
+            window.location.href = '/pricing';
           }}
         >
           Upgrade a Pro
@@ -73,8 +73,8 @@ export function PlanBadge() {
           variant="outline"
           className="w-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-white transition-colors font-semibold"
           onClick={() => {
-            // Navigate to landing page pricing section
-            window.location.href = '/#pricing';
+            // Navigate to pricing page within the app
+            window.location.href = '/pricing';
           }}
         >
           Upgrade a Business
