@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Loader2 } from 'lucide-react';
+import { VerificationModal } from '@/components/VerificationModal';
 
 export default function Signup() {
   const [, setLocation] = useLocation();
@@ -17,6 +18,7 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   // Password strength calculator
   const getPasswordStrength = (pwd: string): { strength: number; label: string; color: string } => {
@@ -37,14 +39,33 @@ export default function Signup() {
   const passwordStrength = getPasswordStrength(password);
 
   const signupMutation = trpc.auth.signup.useMutation({
-    onSuccess: () => {
-      // Redirect to dashboard after successful signup
-      setLocation('/dashboard');
+    onSuccess: (data) => {
+      if (data.requiresVerification) {
+        // Show verification modal
+        setShowVerificationModal(true);
+      } else {
+        // Old flow - direct login (shouldn't happen anymore)
+        setLocation('/dashboard');
+      }
     },
     onError: (error) => {
       setError(error.message);
     },
   });
+
+  const resendMutation = trpc.auth.resendVerification.useMutation({
+    onSuccess: () => {
+      // Show success message
+      setError('');
+    },
+    onError: (error) => {
+      setError(error.message);
+    },
+  });
+
+  const handleResendVerification = () => {
+    resendMutation.mutate({ email });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -195,6 +216,16 @@ export default function Signup() {
           </div>
         </div>
       </main>
+
+      {/* Verification Modal */}
+      {showVerificationModal && (
+        <VerificationModal
+          email={email}
+          onClose={() => setShowVerificationModal(false)}
+          onResend={handleResendVerification}
+          isResending={resendMutation.isPending}
+        />
+      )}
     </div>
   );
 }

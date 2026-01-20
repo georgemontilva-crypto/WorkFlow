@@ -253,3 +253,17 @@ export const dashboardWidgets = mysqlTable("dashboard_widgets", {
 
 export type DashboardWidget = typeof dashboardWidgets.$inferSelect;
 export type InsertDashboardWidget = typeof dashboardWidgets.$inferInsert;
+
+/**
+ * Verification Tokens table - stores temporary tokens for email verification
+ */
+export const verificationTokens = mysqlTable("verification_tokens", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull(),
+  token: varchar("token", { length: 255 }).notNull().unique(),
+  expires_at: timestamp("expires_at").notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type VerificationToken = typeof verificationTokens.$inferSelect;
+export type InsertVerificationToken = typeof verificationTokens.$inferInsert;

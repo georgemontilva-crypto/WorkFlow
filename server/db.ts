@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { ENV } from "./_core/env";
-import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts, dashboardWidgets } from "../drizzle/schema";
+import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts, dashboardWidgets, verificationTokens } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
@@ -1210,4 +1210,101 @@ export async function updateDashboardWidgetsOrder(user_id: number, widgetIds: (n
   }
   
   return { success: true };
+}
+
+/**
+ * Create verification token for email verification
+ */
+export async function createVerificationToken(userId: number): Promise<string> {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    // Generate random token
+    const crypto = await import('crypto');
+    const token = crypto.randomBytes(32).toString('hex');
+
+    // Set expiration (24 hours from now)
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+
+    // Delete any existing tokens for this user
+    await db.delete(verificationTokens).where(eq(verificationTokens.user_id, userId));
+
+    // Insert new token
+    await db.insert(verificationTokens).values({
+      user_id: userId,
+      token,
+      expires_at: expiresAt,
+    });
+
+    return token;
+  } catch (error) {
+    console.error("[DB] Error creating verification token:", error);
+    throw new Error("Failed to create verification token");
+  }
+}
+
+/**
+ * Verify email token and mark user as verified
+ */
+export async function verifyEmailToken(token: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    // Find token
+    const tokenRecords = await db
+      .select()
+      .from(verificationTokens)
+      .where(eq(verificationTokens.token, token))
+      .limit(1);
+
+    if (tokenRecords.length === 0) {
+      return null;
+    }
+
+    const tokenRecord = tokenRecords[0];
+
+    // Check if expired
+    if (new Date() > new Date(tokenRecord.expires_at)) {
+      // Delete expired token
+      await db.delete(verificationTokens).where(eq(verificationTokens.id, tokenRecord.id));
+      return null;
+    }
+
+    // Get user
+    const userRecords = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, tokenRecord.user_id))
+      .limit(1);
+
+    if (userRecords.length === 0) {
+      return null;
+    }
+
+    const user = userRecords[0];
+
+    // Mark email as verified
+    await db
+      .update(users)
+      .set({ email_verified: 1 })
+      .where(eq(users.id, user.id));
+
+    // Delete token
+    await db.delete(verificationTokens).where(eq(verificationTokens.id, tokenRecord.id));
+
+    return {
+      ...user,
+      email_verified: 1,
+    };
+  } catch (error) {
+    console.error("[DB] Error verifying email token:", error);
+    throw new Error("Failed to verify email token");
+  }
 }

@@ -17,35 +17,39 @@ export const appRouter = router({
         email: z.string().email("Invalid email address"),
         password: z.string().min(8, "Password must be at least 8 characters"),
       }))
-      .mutation(async ({ input, ctx }) => {
+      .mutation(async ({ input }) => {
         try {
-          const { createUser } = await import("./db");
-          const { generateToken } = await import("./_core/auth");
+          const { createUser, createVerificationToken } = await import("./db");
+          const { sendVerificationEmail } = await import("./emails/service");
           
-          // Create user
+          // Create user (email_verified = 0 by default)
           const user = await createUser({
             name: input.name,
             email: input.email,
             password: input.password,
           });
 
-          // Generate JWT token
-          const token = await generateToken(user);
+          // Generate verification token
+          const token = await createVerificationToken(user.id);
 
-          // Set cookie
-          const cookieOptions = getSessionCookieOptions(ctx.req);
-          ctx.res.cookie('auth_token', token, {
-            ...cookieOptions,
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-          });
+          // Send verification email
+          const emailResult = await sendVerificationEmail(
+            user.email,
+            user.name,
+            token
+          );
+
+          if (!emailResult.success) {
+            console.error('Failed to send verification email:', emailResult.error);
+          }
 
           return {
             success: true,
+            requiresVerification: true,
             user: {
               id: user.id,
               name: user.name,
               email: user.email,
-              role: user.role,
             },
           };
         } catch (error: any) {
@@ -175,6 +179,74 @@ export const appRouter = router({
       await db.disable2FA(ctx.user.id);
       return { success: true };
     }),
+
+    verifyEmail: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const { verifyEmailToken } = await import("./db");
+          const { generateToken } = await import("./_core/auth");
+          
+          // Verify token and get user
+          const user = await verifyEmailToken(input.token);
+          
+          if (!user) {
+            throw new Error("Invalid or expired verification token");
+          }
+
+          // Generate JWT token and log user in
+          const authToken = await generateToken(user);
+
+          // Set cookie
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          ctx.res.cookie('auth_token', authToken, {
+            ...cookieOptions,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          });
+
+          return {
+            success: true,
+            user: {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role,
+            },
+          };
+        } catch (error: any) {
+          throw new Error(error.message || "Failed to verify email");
+        }
+      }),
+
+    resendVerification: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .mutation(async ({ input }) => {
+        try {
+          const { getUserByEmail, createVerificationToken } = await import("./db");
+          const { sendVerificationEmail } = await import("./emails/service");
+          
+          const user = await getUserByEmail(input.email);
+          
+          if (!user) {
+            // Don't reveal if email exists
+            return { success: true };
+          }
+          
+          if (user.email_verified) {
+            throw new Error("Email already verified");
+          }
+          
+          // Generate new token
+          const token = await createVerificationToken(user.id);
+          
+          // Send verification email
+          await sendVerificationEmail(user.email, user.name, token);
+          
+          return { success: true };
+        } catch (error: any) {
+          throw new Error(error.message || "Failed to resend verification email");
+        }
+      }),
 
     changePassword: protectedProcedure
       .input(z.object({
