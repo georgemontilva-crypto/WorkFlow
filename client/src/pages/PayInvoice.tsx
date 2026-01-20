@@ -26,7 +26,6 @@ interface InvoiceData {
   status: string;
   currency: string;
   payment_link?: string;
-  payment_proof?: string;
   clientName?: string;
   items: Array<{
     description: string;
@@ -313,14 +312,7 @@ export default function PayInvoice() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      {isPaymentSent && invoice.payment_proof ? (
-                        <div className="text-center py-4">
-                          <CheckCircle2 className="w-12 h-12 text-blue-500 mx-auto mb-3" />
-                          <p className="text-sm text-muted-foreground">
-                            Tu comprobante ha sido enviado y está siendo revisado.
-                          </p>
-                        </div>
-                      ) : uploadSuccess ? (
+                      {uploadSuccess || isPaymentSent ? (
                         <div className="text-center py-4">
                           <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-3" />
                           <p className="font-medium text-foreground mb-1">¡Comprobante Enviado!</p>
