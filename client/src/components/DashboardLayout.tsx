@@ -156,6 +156,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           'fixed lg:static inset-y-0 left-0 z-40 w-64 bg-card border-r border-border flex flex-col transition-transform duration-300 ease-in-out',
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
       >
         {/* Logo */}
         <div className="h-16 flex items-center gap-3 px-6 border-b border-border">
@@ -228,7 +229,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content with Fixed Header */}
       <main className="flex-1 overflow-hidden flex flex-col">
         {/* Fixed Header */}
-        <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 sm:px-6 flex-shrink-0">
+        <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 sm:px-6 flex-shrink-0" style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(4rem + env(safe-area-inset-top))' }}>
           <Button
             variant="ghost"
             size="icon"
