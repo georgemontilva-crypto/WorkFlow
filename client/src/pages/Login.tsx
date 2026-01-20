@@ -18,9 +18,15 @@ export default function Login() {
   const [error, setError] = useState('');
 
   const loginMutation = trpc.auth.login.useMutation({
-    onSuccess: () => {
-      // Redirect to dashboard after successful login
-      setLocation('/dashboard');
+    onSuccess: (data) => {
+      if (data.requires2FA) {
+        // Store temp token and redirect to 2FA verification
+        sessionStorage.setItem('2fa_temp_token', data.tempToken);
+        setLocation('/verify-2fa');
+      } else {
+        // Redirect to dashboard after successful login
+        setLocation('/dashboard');
+      }
     },
     onError: (error) => {
       setError(error.message);

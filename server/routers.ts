@@ -74,6 +74,23 @@ export const appRouter = router({
             throw new Error("Invalid email or password");
           }
 
+          // Check if 2FA is enabled
+          if (user.two_factor_enabled === 1) {
+            // Store temporary session data for 2FA verification
+            // We'll use a temporary token that expires in 5 minutes
+            const tempToken = Buffer.from(JSON.stringify({
+              userId: user.id,
+              email: user.email,
+              timestamp: Date.now(),
+            })).toString('base64');
+
+            return {
+              success: true,
+              requires2FA: true,
+              tempToken,
+            };
+          }
+
           // Send Login Alert Email
           try {
             const { sendEmail, getLoginAlertEmailTemplate } = await import("./_core/email");
@@ -109,6 +126,7 @@ export const appRouter = router({
 
           return {
             success: true,
+            requires2FA: false,
             user: {
               id: user.id,
               name: user.name,
@@ -179,6 +197,90 @@ export const appRouter = router({
       await db.disable2FA(ctx.user.id);
       return { success: true };
     }),
+
+    verify2FALogin: publicProcedure
+      .input(z.object({
+        tempToken: z.string(),
+        code: z.string().length(6),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        try {
+          const { verify } = await import('otplib');
+          const { generateToken } = await import('./_core/auth');
+
+          // Decode and verify temp token
+          let tempData;
+          try {
+            const decoded = Buffer.from(input.tempToken, 'base64').toString('utf-8');
+            tempData = JSON.parse(decoded);
+          } catch {
+            throw new Error('Invalid session token');
+          }
+
+          // Check if token is expired (5 minutes)
+          const tokenAge = Date.now() - tempData.timestamp;
+          if (tokenAge > 5 * 60 * 1000) {
+            throw new Error('Session expired. Please login again.');
+          }
+
+          // Get user and verify 2FA code
+          const user = await db.getUserById(tempData.userId);
+          
+          if (!user || !user.two_factor_secret || user.two_factor_enabled !== 1) {
+            throw new Error('2FA not configured');
+          }
+
+          const isValid = verify({ token: input.code, secret: user.two_factor_secret });
+          
+          if (!isValid) {
+            throw new Error('Invalid 2FA code');
+          }
+
+          // Send Login Alert Email
+          try {
+            const { sendEmail, getLoginAlertEmailTemplate } = await import('./_core/email');
+            const ip = ctx.req.headers['x-forwarded-for'] || ctx.req.socket.remoteAddress || 'Unknown IP';
+            const userAgent = ctx.req.headers['user-agent'] || 'Unknown Device';
+            
+            const emailHtml = getLoginAlertEmailTemplate(
+              user.name,
+              Array.isArray(ip) ? ip[0] : ip,
+              userAgent,
+              new Date()
+            );
+
+            sendEmail({
+              to: user.email,
+              subject: 'Nuevo Inicio de Sesión - WorkFlow',
+              html: emailHtml,
+            }).catch(err => console.error('[Auth] Failed to send login alert:', err));
+          } catch (error) {
+            console.error('[Auth] Error preparing login alert:', error);
+          }
+
+          // Generate JWT token
+          const token = await generateToken(user);
+
+          // Set cookie
+          const cookieOptions = getSessionCookieOptions(ctx.req);
+          ctx.res.cookie('auth_token', token, {
+            ...cookieOptions,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          });
+
+          return {
+            success: true,
+            user: {
+              id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role,
+            },
+          };
+        } catch (error: any) {
+          throw new Error(error.message || '2FA verification failed');
+        }
+      }),
 
     verifyEmail: publicProcedure
       .input(z.object({ token: z.string() }))
