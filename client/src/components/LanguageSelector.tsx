@@ -5,10 +5,10 @@
 
 import { Button } from '@/components/ui/button';
 import { Globe } from 'lucide-react';
-import { useLandingLanguage } from '@/contexts/LandingLanguageContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function LanguageSelector() {
-  const { language, setLanguage } = useLandingLanguage();
+  const { language, setLanguage } = useLanguage();
 
   return (
     <div className="flex items-center gap-2 border border-border rounded-lg p-1">
