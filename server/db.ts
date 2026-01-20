@@ -929,7 +929,18 @@ export async function addMarketFavorite(data: {
     throw new Error("This asset is already in your favorites");
   }
   
-  await db.insert(marketFavorites).values(data);
+  // Calcular la siguiente posición disponible
+  const maxPosition = await db
+    .select({ maxPos: sql<number>`COALESCE(MAX(position), -1)` })
+    .from(marketFavorites)
+    .where(eq(marketFavorites.user_id, data.user_id));
+  
+  const nextPosition = (maxPosition[0]?.maxPos ?? -1) + 1;
+  
+  await db.insert(marketFavorites).values({
+    ...data,
+    position: nextPosition
+  });
 }
 
 export async function removeMarketFavorite(user_id: number, symbol: string) {
@@ -963,9 +974,32 @@ export async function toggleDashboardWidget(user_id: number, symbol: string) {
   
   const newStatus = existing[0].is_dashboard_widget === 1 ? 0 : 1;
   
+  // Si se está activando (añadiendo al dashboard), calcular la siguiente posición
+  let updateData: any = { is_dashboard_widget: newStatus };
+  
+  if (newStatus === 1) {
+    // Calcular la máxima posición actual entre todos los widgets del dashboard
+    const maxDashboardPos = await db
+      .select({ maxPos: sql<number>`COALESCE(MAX(position), -1)` })
+      .from(marketFavorites)
+      .where(eq(marketFavorites.user_id, user_id))
+      .where(eq(marketFavorites.is_dashboard_widget, 1));
+    
+    const maxWidgetPos = await db
+      .select({ maxPos: sql<number>`COALESCE(MAX(position), -1)` })
+      .from(dashboardWidgets)
+      .where(eq(dashboardWidgets.user_id, user_id));
+    
+    const maxMarketPos = maxDashboardPos[0]?.maxPos ?? -1;
+    const maxDashPos = maxWidgetPos[0]?.maxPos ?? -1;
+    const nextPosition = Math.max(maxMarketPos, maxDashPos) + 1;
+    
+    updateData.position = nextPosition;
+  }
+  
   await db
     .update(marketFavorites)
-    .set({ is_dashboard_widget: newStatus })
+    .set(updateData)
     .where(eq(marketFavorites.user_id, user_id))
     .where(eq(marketFavorites.symbol, symbol));
     
@@ -1092,21 +1126,27 @@ export async function addDashboardWidget(data: {
     throw new Error("Database not available");
   }
   
-  // Get current max position
-  const existing = await db
-    .select()
+  // Calcular la máxima posición actual entre todos los widgets del dashboard
+  const maxDashboardPos = await db
+    .select({ maxPos: sql<number>`COALESCE(MAX(position), -1)` })
+    .from(marketFavorites)
+    .where(eq(marketFavorites.user_id, data.user_id))
+    .where(eq(marketFavorites.is_dashboard_widget, 1));
+  
+  const maxWidgetPos = await db
+    .select({ maxPos: sql<number>`COALESCE(MAX(position), -1)` })
     .from(dashboardWidgets)
     .where(eq(dashboardWidgets.user_id, data.user_id));
-    
-  const maxPosition = existing.length > 0 
-    ? Math.max(...existing.map(w => w.position || 0))
-    : -1;
+  
+  const maxMarketPos = maxDashboardPos[0]?.maxPos ?? -1;
+  const maxDashPos = maxWidgetPos[0]?.maxPos ?? -1;
+  const nextPosition = Math.max(maxMarketPos, maxDashPos) + 1;
   
   await db.insert(dashboardWidgets).values({
     user_id: data.user_id,
     widget_type: data.widget_type,
     widget_data: data.widget_data || null,
-    position: maxPosition + 1,
+    position: nextPosition,
   });
   
   return { success: true };
