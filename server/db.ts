@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { ENV } from "./_core/env";
 import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts, dashboardWidgets } from "../drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 // Initialize MySQL connection pool
