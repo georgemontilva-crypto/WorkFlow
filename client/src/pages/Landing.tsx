@@ -201,6 +201,13 @@ export default function Landing() {
               FAQ
             </a>
             <LanguageSelector />
+            <Button 
+              onClick={() => setLocation('/login')} 
+              variant="outline"
+              className="border-white text-white bg-black hover:bg-white hover:text-black transition-colors"
+            >
+              Login
+            </Button>
             <Button onClick={() => setLocation('/signup')} className="bg-primary text-primary-foreground hover:opacity-90">
               Start Free
             </Button>
@@ -248,17 +255,29 @@ export default function Landing() {
               >
                 FAQ
               </a>
-              <div className="flex items-center gap-3 pt-2 border-t border-border">
+              <div className="pt-2 border-t border-border space-y-3">
                 <LanguageSelector />
-                <Button 
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setLocation('/signup');
-                  }} 
-                  className="bg-primary text-primary-foreground hover:opacity-90 flex-1"
-                >
-                  Start Free
-                </Button>
+                <div className="flex items-center gap-3">
+                  <Button 
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setLocation('/login');
+                    }} 
+                    variant="outline"
+                    className="border-white text-white bg-black hover:bg-white hover:text-black transition-colors flex-1"
+                  >
+                    Login
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setLocation('/signup');
+                    }} 
+                    className="bg-primary text-primary-foreground hover:opacity-90 flex-1"
+                  >
+                    Start Free
+                  </Button>
+                </div>
               </div>
             </nav>
           </div>
