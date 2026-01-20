@@ -8,8 +8,7 @@ export function getPaymentProofNotificationTemplate(
   clientName: string,
   amount: string,
   currency: string,
-  dashboardLink: string,
-  proofBase64: string
+  dashboardLink: string
 ): string {
   return `
 <!DOCTYPE html>
@@ -28,9 +27,7 @@ export function getPaymentProofNotificationTemplate(
           <!-- Header with Logo -->
           <tr>
             <td style="padding: 40px 40px 20px; text-align: center;">
-              <div style="width: 70px; height: 70px; margin: 0 auto 20px; background-color: #0b0b0b; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);">
-                <img src="https://finwrk.app/icon-512.png" alt="Finwrk" style="width: 48px; height: 48px; display: block;" />
-              </div>
+              <h1 style="font-size: 32px; font-weight: 700; color: #ffffff; margin: 0;">Finwrk</h1>
             </td>
           </tr>
           
@@ -71,13 +68,7 @@ export function getPaymentProofNotificationTemplate(
                 </tr>
               </table>
               
-              <!-- Payment Proof Image -->
-              <div style="margin: 0 0 30px; text-align: center;">
-                <p style="margin: 0 0 16px; font-size: 14px; font-weight: 600; color: #ffffff;">Comprobante de Pago:</p>
-                <div style="background-color: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 16px; display: inline-block;">
-                  <img src="${proofBase64}" alt="Comprobante de Pago" style="max-width: 100%; height: auto; max-height: 400px; border-radius: 4px; display: block;" />
-                </div>
-              </div>
+              <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #a0a0a0; text-align: center;">📎 El comprobante de pago está adjunto en este email.</p>
               
               <!-- Action Button -->
               <table role="presentation" style="margin: 0 0 30px; width: 100%;">

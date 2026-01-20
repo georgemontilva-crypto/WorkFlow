@@ -8,6 +8,10 @@ interface EmailOptions {
   to: string;
   subject: string;
   html: string;
+  attachments?: Array<{
+    filename: string;
+    content: string; // base64 encoded
+  }>;
 }
 
 /**
@@ -38,6 +42,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
         to: options.to,
         subject: options.subject,
         html: options.html,
+        ...(options.attachments && { attachments: options.attachments }),
       }),
     });
 

@@ -928,15 +928,23 @@ export const appRouter = router({
                 client.name,
                 invoice.total.toString(),
                 invoice.currency || 'USD',
-                dashboardLink,
-                input.proof // Pass the proof to include in email
+                dashboardLink
               );
               
-              // Send email with proof image
+              // Extract base64 content (remove data:image/xxx;base64, prefix if present)
+              const base64Content = input.proof.includes('base64,') 
+                ? input.proof.split('base64,')[1] 
+                : input.proof;
+              
+              // Send email with proof as attachment
               await sendEmail({
                 to: user.email,
                 subject: `Comprobante de Pago Recibido - Factura ${invoice.invoice_number}`,
                 html: emailHtml,
+                attachments: [{
+                  filename: `comprobante-${invoice.invoice_number}.jpg`,
+                  content: base64Content,
+                }],
               });
               
               console.log('[uploadPaymentProof] Email sent successfully to:', user.email);
