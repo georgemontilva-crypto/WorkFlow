@@ -21,7 +21,8 @@ export function getPasswordResetEmailTemplate(name: string, resetLink: string): 
           <!-- Header with Logo -->
           <tr>
             <td style="padding: 40px 40px 20px; text-align: center; border-bottom: 1px solid #e5e5e5;">
-              <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #000000;">Finwrk</h1>
+              <img src="${process.env.APP_URL || 'https://finwrk.app'}/icon-512.png" alt="Finwrk" style="width: 60px; height: 60px; border-radius: 50%;" />
+              <h1 style="margin: 10px 0 0 0; font-size: 24px; font-weight: 700; color: #000000;">Finwrk</h1>
             </td>
           </tr>
           

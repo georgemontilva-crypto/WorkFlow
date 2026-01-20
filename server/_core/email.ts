@@ -34,7 +34,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
         "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        from: process.env.EMAIL_FROM || "WorkFlow <noreply@workflow.com>",
+        from: process.env.EMAIL_FROM || "Finwrk <noreply@finwrk.app>",
         to: options.to,
         subject: options.subject,
         html: options.html,
