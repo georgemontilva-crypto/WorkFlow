@@ -640,6 +640,21 @@ export async function createInvoice(data: any) {
   return { id: Number(result[0].insertId) };
 }
 
+export async function getInvoiceByPaymentToken(token: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select()
+    .from(invoices)
+    .where(eq(invoices.payment_token, token))
+    .limit(1);
+  
+  return result[0] || null;
+}
+
 
 export async function getClientsByUserId(user_id: number) {
   const db = await getDb();

@@ -571,13 +571,14 @@ export const appRouter = router({
         tax: z.string().optional(),
         total: z.string(),
         paid_amount: z.string().optional().default("0"),
-        status: z.enum(["draft", "sent", "paid", "overdue", "cancelled"]).default("draft"),
+        status: z.enum(["draft", "sent", "payment_sent", "paid", "overdue", "cancelled"]).default("draft"),
         items: z.array(z.object({
           description: z.string(),
           quantity: z.number(),
           unitPrice: z.number(),
           total: z.number(),
         })),
+        payment_link: z.string().optional(),
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -598,6 +599,10 @@ export const appRouter = router({
         const paid = parseFloat(paidAmount);
         const balance = (totalAmount - paid).toFixed(2);
         
+        // Generate unique payment token
+        const crypto = await import('crypto');
+        const paymentToken = crypto.randomBytes(32).toString('hex');
+        
         const result = await db.createInvoice({
           user_id: ctx.user.id,
           client_id: input.client_id,
@@ -611,6 +616,8 @@ export const appRouter = router({
           paid_amount: paidAmount,
           balance: balance,
           status: input.status,
+          payment_token: paymentToken,
+          payment_link: input.payment_link || null,
           notes: input.notes || null,
         });
         return { success: true, id: result.id };
@@ -625,7 +632,7 @@ export const appRouter = router({
         due_date: z.string().optional(),
         amount: z.string().optional(),
         paid_amount: z.string().optional(),
-        status: z.enum(["pending", "paid", "overdue", "cancelled", "archived"]).optional(),
+        status: z.enum(["draft", "sent", "payment_sent", "paid", "overdue", "cancelled"]).optional(),
         items: z.array(z.object({
           description: z.string(),
           quantity: z.number(),
@@ -637,25 +644,60 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
         const updateData: any = { ...data, updated_at: new Date() };
+        
+        // Convert dates
         if (data.issue_date) {
           updateData.issue_date = new Date(data.issue_date);
         }
         if (data.due_date) {
           updateData.due_date = new Date(data.due_date);
         }
-        // Calculate balance if paid_amount or amount is updated
-        if (data.paid_amount !== undefined || data.amount !== undefined) {
-          const invoice = await db.getInvoiceById(id, ctx.user.id);
-          if (invoice) {
-            const total = data.amount ? parseFloat(data.amount) : parseFloat(invoice.total);
-            const paid = data.paid_amount ? parseFloat(data.paid_amount) : parseFloat(invoice.paid_amount || "0");
-            updateData.balance = (total - paid).toFixed(2);
-            // Auto-update status if fully paid
-            if (paid >= total) {
-              updateData.status = "paid";
-            }
+        
+        // Serialize items if provided
+        if (data.items) {
+          updateData.items = JSON.stringify(data.items);
+        }
+        
+        // Get current invoice for calculations
+        const invoice = await db.getInvoiceById(id, ctx.user.id);
+        if (!invoice) {
+          throw new Error('Invoice not found');
+        }
+        
+        // Calculate totals if items are updated
+        if (data.items) {
+          const subtotal = data.items.reduce((sum, item) => sum + item.total, 0);
+          const tax = parseFloat(invoice.tax || "0");
+          const total = subtotal + tax;
+          
+          updateData.subtotal = subtotal.toFixed(2);
+          updateData.total = total.toFixed(2);
+        }
+        
+        // Calculate balance
+        const total = updateData.total ? parseFloat(updateData.total) : parseFloat(invoice.total);
+        const paid = data.paid_amount ? parseFloat(data.paid_amount) : parseFloat(invoice.paid_amount || "0");
+        updateData.balance = (total - paid).toFixed(2);
+        updateData.paid_amount = paid.toFixed(2);
+        
+        // Auto-update status based on payment
+        if (paid >= total && total > 0) {
+          updateData.status = "paid";
+        } else if (paid > 0 && paid < total) {
+          // Partial payment - keep current status or set to sent if was draft
+          if (invoice.status === 'draft') {
+            updateData.status = "sent";
           }
         }
+        
+        // Check if overdue
+        if (updateData.status !== 'paid' && updateData.status !== 'cancelled') {
+          const dueDate = data.due_date ? new Date(data.due_date) : new Date(invoice.due_date);
+          if (dueDate < new Date()) {
+            updateData.status = "overdue";
+          }
+        }
+        
         await db.updateInvoice(id, ctx.user.id, updateData);
         return { success: true };
       }),
@@ -777,6 +819,146 @@ export const appRouter = router({
           return { success: true, message: 'Invoice sent successfully' };
         } catch (error: any) {
           throw new Error(error.message || 'Failed to send invoice');
+        }
+      }),
+      
+    // Public endpoint to get invoice by payment token
+    getByPaymentToken: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .query(async ({ input }) => {
+        const invoice = await db.getInvoiceByPaymentToken(input.token);
+        if (!invoice) {
+          throw new Error('Invoice not found');
+        }
+        
+        // Get client info
+        const client = await db.getClientById(invoice.client_id, invoice.user_id);
+        
+        return {
+          ...invoice,
+          clientName: client?.name,
+          clientEmail: client?.email,
+          items: typeof invoice.items === 'string' ? JSON.parse(invoice.items) : invoice.items,
+        };
+      }),
+      
+    // Public endpoint to create Stripe payment intent
+    createPaymentIntent: publicProcedure
+      .input(z.object({ 
+        token: z.string(),
+        amount: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const stripe = await import('stripe');
+          const stripeClient = new stripe.default(process.env.STRIPE_SECRET_KEY || '', {
+            apiVersion: '2024-12-18.acacia',
+          });
+          
+          // Get invoice
+          const invoice = await db.getInvoiceByPaymentToken(input.token);
+          if (!invoice) {
+            throw new Error('Invoice not found');
+          }
+          
+          // Create payment intent
+          const paymentIntent = await stripeClient.paymentIntents.create({
+            amount: Math.round(input.amount * 100), // Convert to cents
+            currency: invoice.currency.toLowerCase(),
+            metadata: {
+              invoice_id: invoice.id.toString(),
+              payment_token: input.token,
+            },
+          });
+          
+          // Store payment intent ID
+          await db.updateInvoice(invoice.id, invoice.user_id, {
+            stripe_payment_intent_id: paymentIntent.id,
+          });
+          
+          return {
+            clientSecret: paymentIntent.client_secret,
+            paymentIntentId: paymentIntent.id,
+          };
+        } catch (error: any) {
+          throw new Error(error.message || 'Failed to create payment intent');
+        }
+      }),
+      
+    // Public endpoint to upload payment proof
+    uploadPaymentProof: publicProcedure
+      .input(z.object({
+        token: z.string(),
+        proof: z.string(), // base64 encoded file
+        comment: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          // Get invoice
+          const invoice = await db.getInvoiceByPaymentToken(input.token);
+          if (!invoice) {
+            throw new Error('Invoice not found');
+          }
+          
+          // Update invoice with proof and change status to payment_sent
+          await db.updateInvoice(invoice.id, invoice.user_id, {
+            payment_proof: input.proof,
+            payment_proof_uploaded_at: new Date(),
+            status: 'payment_sent',
+            notes: input.comment ? `${invoice.notes || ''}\n\nComentario del cliente: ${input.comment}` : invoice.notes,
+            updated_at: new Date(),
+          });
+          
+          return { success: true, message: 'Payment proof uploaded' };
+        } catch (error: any) {
+          throw new Error(error.message || 'Failed to upload payment proof');
+        }
+      }),
+      
+    // Public endpoint to confirm payment
+    confirmPayment: publicProcedure
+      .input(z.object({ 
+        token: z.string(),
+        paymentIntentId: z.string(),
+        amount: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const stripe = await import('stripe');
+          const stripeClient = new stripe.default(process.env.STRIPE_SECRET_KEY || '', {
+            apiVersion: '2024-12-18.acacia',
+          });
+          
+          // Verify payment intent
+          const paymentIntent = await stripeClient.paymentIntents.retrieve(input.paymentIntentId);
+          
+          if (paymentIntent.status !== 'succeeded') {
+            throw new Error('Payment not completed');
+          }
+          
+          // Get invoice
+          const invoice = await db.getInvoiceByPaymentToken(input.token);
+          if (!invoice) {
+            throw new Error('Invoice not found');
+          }
+          
+          // Update invoice with payment
+          const currentPaid = parseFloat(invoice.paid_amount || '0');
+          const newPaid = currentPaid + input.amount;
+          const total = parseFloat(invoice.total);
+          const balance = (total - newPaid).toFixed(2);
+          
+          await db.updateInvoice(invoice.id, invoice.user_id, {
+            paid_amount: newPaid.toFixed(2),
+            balance: balance,
+            status: newPaid >= total ? 'paid' : invoice.status,
+            payment_method: 'stripe',
+            updated_at: new Date(),
+          });
+          
+          return { success: true, message: 'Payment confirmed' };
+        } catch (error: any) {
+          throw new Error(error.message || 'Failed to confirm payment');
         }
       }),
   }),

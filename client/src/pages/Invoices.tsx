@@ -59,7 +59,7 @@ type Invoice = {
   subtotal: string;
   tax: string;
   total: string;
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+  status: 'draft' | 'sent' | 'payment_sent' | 'paid' | 'overdue' | 'cancelled';
   notes?: string | null;
   created_at: Date;
   updated_at: Date;
@@ -70,12 +70,13 @@ type InvoiceFormData = {
   client_id?: number;
   issue_date?: string;
   due_date?: string;
-  status?: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+  status?: 'draft' | 'sent' | 'payment_sent' | 'paid' | 'overdue' | 'cancelled';
   items?: InvoiceItem[];
   notes?: string;
   paid_amount?: string;
+  payment_link?: string;
 };
-import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User, FolderArchive, ArchiveRestore } from 'lucide-react';
+import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User, FolderArchive, ArchiveRestore, Link as LinkIcon, Copy, Eye } from 'lucide-react';
 import { format, parseISO, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -258,6 +259,7 @@ export default function Invoices() {
       paid_amount: formData.paid_amount || '0',
       status: formData.status || 'draft',
       items: formData.items!,
+      payment_link: formData.payment_link,
       notes: formData.notes,
     });
     setIsDialogOpen(false);
@@ -432,12 +434,14 @@ export default function Invoices() {
 
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; className: string; icon: any }> = {
-      pending: { label: 'Pendiente', className: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', icon: Clock },
+      draft: { label: 'Borrador', className: 'bg-gray-500/20 text-gray-400 border-gray-500/30', icon: FileText },
+      sent: { label: 'Enviada', className: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: Clock },
+      payment_sent: { label: 'Pago Enviado', className: 'bg-purple-500/20 text-purple-400 border-purple-500/30', icon: DollarSign },
       paid: { label: 'Pagada', className: 'bg-green-500/20 text-green-400 border-green-500/30', icon: CheckCircle2 },
       overdue: { label: 'Vencida', className: 'bg-destructive/20 text-destructive border-destructive/30', icon: AlertCircle },
       cancelled: { label: 'Cancelada', className: 'bg-muted text-muted-foreground border-border', icon: XCircle },
     };
-    return variants[status] || variants.pending;
+    return variants[status] || variants.sent;
   };
 
   const toggleCard = (invoiceId: number) => {
@@ -700,6 +704,20 @@ export default function Invoices() {
                   <p className="text-xs text-muted-foreground">Información adicional que aparecerá en el PDF</p>
                 </div>
 
+                {/* Payment Link */}
+                <div className="space-y-2">
+                  <Label htmlFor="payment_link" className="text-foreground font-semibold">Link de Pago (Opcional)</Label>
+                  <Input
+                    id="payment_link"
+                    type="url"
+                    value={formData.payment_link || ''}
+                    onChange={(e) => setFormData({ ...formData, payment_link: e.target.value })}
+                    className="bg-background border-border text-foreground h-11"
+                    placeholder="https://tu-link-de-pago.com"
+                  />
+                  <p className="text-xs text-muted-foreground">Link externo donde el cliente puede realizar el pago (Stripe, PayPal, wallet cripto, etc.)</p>
+                </div>
+
                 {/* Actions */}
                 <div className="flex justify-end gap-3 pt-4 border-t border-border">
                   <Button
@@ -917,7 +935,7 @@ export default function Invoices() {
                         </Badge>
                       </div>
 
-                      <div className="pt-3 border-t border-border">
+                      <div className="pt-3 border-t border-border space-y-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -927,6 +945,22 @@ export default function Invoices() {
                           <Download className="w-4 h-4 mr-2" />
                           Descargar PDF
                         </Button>
+                        
+                        {invoice.payment_token && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const paymentUrl = `${window.location.origin}/pay?token=${invoice.payment_token}`;
+                              navigator.clipboard.writeText(paymentUrl);
+                              toast.success('Link de pago copiado al portapapeles');
+                            }}
+                            className="w-full border-border text-foreground hover:bg-accent"
+                          >
+                            <Copy className="w-4 h-4 mr-2" />
+                            Copiar Link de Pago
+                          </Button>
+                        )}
                       </div>
                       </div>
                     )}
