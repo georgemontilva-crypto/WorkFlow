@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "./trpc";
+import { router, protectedProcedure } from "./_core/trpc";
 import * as chatDb from "./chat_db";
 import { generateAIResponse, shouldTriggerAI, generateWelcomeMessage } from "./ai_service";
 
