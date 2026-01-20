@@ -19,17 +19,8 @@ export const getVerificationEmailHtml = (verificationUrl: string, userName: stri
           
           <!-- Logo -->
           <tr>
-            <td align="center" style="padding: 0 0 40px 0;">
-              <img src="${process.env.APP_URL || 'https://finwrk.app'}/icon-512.png" alt="Finwrk" style="width: 100px; height: 100px; border-radius: 24px;" />
-            </td>
-          </tr>
-          
-          <!-- Title -->
-          <tr>
-            <td align="center" style="padding: 0 0 20px 0;">
-              <h1 style="margin: 0; font-size: 40px; font-weight: 700; color: #ffffff; line-height: 1.2;">
-                Welcome to Finwrk!
-              </h1>
+            <td align="center" style="padding: 0 0 50px 0;">
+              <img src="${process.env.APP_URL || 'https://finwrk.app'}/finwrk-logo.png" alt="Finwrk" style="height: 40px; width: auto;" />
             </td>
           </tr>
           
