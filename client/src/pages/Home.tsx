@@ -100,31 +100,20 @@ export default function Home() {
     })
   );
 
-  // Local state for widget order - unifica widgets normales y market widgets
+  // Local state for widget order
   const [localWidgets, setLocalWidgets] = useState<any[]>([]);
-
+  const [cryptoWidgets, setCryptoWidgets] = useState<any[]>([]);
+  const [normalWidgets, setNormalWidgets] = useState<any[]>([]);
+  
   useEffect(() => {
-    // Combinar dashboard widgets y market widgets en un solo array
-    const allWidgets = [];
+    const cryptos: any[] = [];
+    const normals: any[] = [];
     
-    // Añadir dashboard widgets
-    if (dashboardWidgets) {
-      dashboardWidgets.forEach(widget => {
-        allWidgets.push({
-          ...widget,
-          // Crear un ID único compuesto para drag & drop
-          dragId: `widget-${widget.id}`,
-          widgetSource: 'dashboard'
-        });
-      });
-    }
-    
-    // Añadir market widgets
+    // Añadir market widgets (criptos) - estos van arriba con drag & drop
     if (marketWidgets) {
       marketWidgets.forEach(market => {
-        allWidgets.push({
+        cryptos.push({
           ...market,
-          // Crear un ID único compuesto para drag & drop
           dragId: `market-${market.id}`,
           widget_type: 'market',
           symbol: market.symbol,
@@ -134,21 +123,26 @@ export default function Home() {
       });
     }
     
-    // Ordenar por position
-    allWidgets.sort((a, b) => {
-      const posA = a.position || 0;
-      const posB = b.position || 0;
-      if (posA === posB) {
-        // Si las posiciones son iguales, ordenar por widgetSource (dashboard primero)
-        if (a.widgetSource === 'dashboard' && b.widgetSource === 'market') return -1;
-        if (a.widgetSource === 'market' && b.widgetSource === 'dashboard') return 1;
-        // Si son del mismo tipo, ordenar por ID
-        return a.id - b.id;
-      }
-      return posA - posB;
-    });
+    // Añadir dashboard widgets (normales) - estos van abajo sin drag & drop
+    if (dashboardWidgets) {
+      dashboardWidgets.forEach(widget => {
+        normals.push({
+          ...widget,
+          dragId: `widget-${widget.id}`,
+          widgetSource: 'dashboard'
+        });
+      });
+    }
     
-    setLocalWidgets(allWidgets);
+    // Ordenar criptos por position
+    cryptos.sort((a, b) => (a.position || 0) - (b.position || 0));
+    
+    // Ordenar widgets normales por position
+    normals.sort((a, b) => (a.position || 0) - (b.position || 0));
+    
+    setCryptoWidgets(cryptos);
+    setNormalWidgets(normals);
+    setLocalWidgets(cryptos); // Solo las criptos tienen drag & drop
   }, [dashboardWidgets, marketWidgets]);
 
   // Calculate stats
@@ -476,26 +470,27 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Widgets Grid */}
-        {/* Sortable Widgets Grid */}
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={localWidgets.map(w => w.dragId)}
-            strategy={rectSortingStrategy}
+        {/* Crypto Widgets Grid (Sortable) */}
+        {cryptoWidgets.length > 0 && (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
-              {localWidgets?.map(widget => (
-                <SortableWidget key={widget.dragId} widget={widget}>
-                  {renderWidget(widget)}
-                </SortableWidget>
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+            <SortableContext
+              items={cryptoWidgets.map(w => w.dragId)}
+              strategy={rectSortingStrategy}
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+                {cryptoWidgets.map(widget => (
+                  <SortableWidget key={widget.dragId} widget={widget}>
+                    {renderWidget(widget)}
+                  </SortableWidget>
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        )}
 
         {/* Empty State */}
         {(!dashboardWidgets || dashboardWidgets.length === 0) && (!marketWidgets || marketWidgets.length === 0) && (
@@ -568,23 +563,24 @@ export default function Home() {
           </div>
         )}
 
-        {/* Savings Goals Section */}
-        {topSavingsGoals.length > 0 && (
+        {/* Widgets & Savings Goals Section */}
+        {(normalWidgets.length > 0 || topSavingsGoals.length > 0) && (
           <div className="mb-6 lg:mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-                <Target className="w-5 h-5 text-primary" />
-                {t.goals.title}
+                <BarChart3 className="w-5 h-5 text-primary" />
+                Resumen
               </h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setLocation('/savings')}
-              >
-                {t.dashboard.viewAll}
-              </Button>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Normal Widgets (sin drag & drop) */}
+              {normalWidgets.map(widget => (
+                <div key={widget.id}>
+                  {renderWidget(widget)}
+                </div>
+              ))}
+              
+              {/* Savings Goals */}
               {topSavingsGoals.map((goal) => {
                 const progress = (parseFloat(goal.current_amount.toString()) / parseFloat(goal.target_amount.toString())) * 100;
                 return (
