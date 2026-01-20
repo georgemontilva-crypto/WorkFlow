@@ -23,9 +23,7 @@ import Settings from "./pages/Settings";
 import Reminders from "./pages/Reminders";
 import Admin from "./pages/Admin";
 import Markets from "./pages/Markets";
-import SupportAdmin from "./pages/SupportAdmin";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { SupportChat } from "./components/SupportChat";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -81,11 +79,7 @@ function Router() {
           <Markets />
         </ProtectedRoute>
       </Route>
-      <Route path="/support-admin">
-        <ProtectedRoute>
-          <SupportAdmin />
-        </ProtectedRoute>
-      </Route>
+
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
@@ -100,7 +94,6 @@ function App() {
           <TooltipProvider>
             <Toaster />
             <Router />
-            <SupportChat />
           </TooltipProvider>
         </ThemeProvider>
       </LanguageProvider>
