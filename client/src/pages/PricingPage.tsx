@@ -6,12 +6,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Sparkles, Zap, Crown, Loader2 } from 'lucide-react';
+import { Check, Sparkles, Zap, Crown, Loader2, ArrowLeft } from 'lucide-react';
+import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 export default function PricingPage() {
+  const [, setLocation] = useLocation();
   const { data: subscription } = trpc.subscription.current.useQuery();
   const createCheckout = trpc.subscription.createCheckout.useMutation();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
@@ -98,6 +100,18 @@ export default function PricingPage() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
+      {/* Back Button */}
+      <div className="mb-6">
+        <Button
+          variant="ghost"
+          onClick={() => setLocation('/dashboard')}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Volver al Dashboard
+        </Button>
+      </div>
+      
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
