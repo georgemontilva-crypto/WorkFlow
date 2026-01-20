@@ -1191,8 +1191,16 @@ export async function updateDashboardWidgetsOrder(user_id: number, widgetIds: (n
         .set({ position: i })
         .where(eq(marketFavorites.id, numericId))
         .where(eq(marketFavorites.user_id, user_id));
+    } else if (typeof widgetId === 'string' && widgetId.startsWith('widget-')) {
+      // Widget normal con prefijo "widget-"
+      const numericId = parseInt(widgetId.replace('widget-', ''));
+      await db
+        .update(dashboardWidgets)
+        .set({ position: i })
+        .where(eq(dashboardWidgets.id, numericId))
+        .where(eq(dashboardWidgets.user_id, user_id));
     } else {
-      // Widget normal
+      // Widget normal sin prefijo (por compatibilidad)
       await db
         .update(dashboardWidgets)
         .set({ position: i })
