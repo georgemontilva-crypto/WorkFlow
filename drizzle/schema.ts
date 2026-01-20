@@ -274,3 +274,4 @@ export const verificationTokens = mysqlTable("verification_tokens", {
 
 export type VerificationToken = typeof verificationTokens.$inferSelect;
 export type InsertVerificationToken = typeof verificationTokens.$inferInsert;
+

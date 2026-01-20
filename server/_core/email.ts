@@ -105,45 +105,54 @@ export function getWelcomeEmailTemplate(userName: string, trialEndDate: Date): s
 export function getPasswordResetEmailTemplate(userName: string, resetLink: string): string {
   return `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: #000; color: #fff; padding: 30px; text-align: center; }
-    .content { background: #f9f9f9; padding: 30px; }
-    .button { display: inline-block; padding: 12px 24px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-    .warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
-    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Your Password - Finwrk</title>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Recuperación de Contraseña</h1>
-    </div>
-    <div class="content">
-      <h2>Hola ${userName},</h2>
-      <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta en WorkFlow.</p>
-      <p>Haz clic en el siguiente botón para crear una nueva contraseña:</p>
-      <a href="${resetLink}" class="button">Restablecer Contraseña</a>
-      <div class="warning">
-        <strong>⚠️ Importante:</strong> Este enlace es válido por 1 hora y solo puede usarse una vez.
-      </div>
-      <p>Si no solicitaste este cambio, puedes ignorar este correo de forma segura.</p>
-      <p style="color: #666; font-size: 12px; margin-top: 30px;">
-        Si el botón no funciona, copia y pega este enlace en tu navegador:<br>
-        ${resetLink}
-      </p>
-    </div>
-    <div class="footer">
-      <p>© ${new Date().getFullYear()} WorkFlow. Todos los derechos reservados.</p>
-    </div>
-  </div>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+          <tr>
+            <td style="padding: 40px 40px 20px; text-align: center; border-bottom: 1px solid #e5e5e5;">
+              <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #000000;">Finwrk</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 40px;">
+              <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 600; color: #000000;">Reset Your Password</h2>
+              <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #333333;">Hi ${userName},</p>
+              <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #333333;">We received a request to reset your password for your Finwrk account. Click the button below to create a new password:</p>
+              <table role="presentation" style="margin: 30px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="${resetLink}" style="display: inline-block; padding: 16px 32px; background-color: #000000; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600;">Reset Password</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin: 20px 0; font-size: 14px; line-height: 1.6; color: #666666;">Or copy and paste this link into your browser:</p>
+              <p style="margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: #0066cc; word-break: break-all;">${resetLink}</p>
+              <p style="margin: 20px 0 0; font-size: 14px; line-height: 1.6; color: #666666;">This link will expire in 1 hour for security reasons.</p>
+              <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e5e5;">
+              <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #999999;">If you didn't request a password reset, you can safely ignore this email. Your password will not be changed.</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px 40px; background-color: #f9f9f9; border-top: 1px solid #e5e5e5; text-align: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+              <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">© ${new Date().getFullYear()} Finwrk. All rights reserved.</p>
+              <p style="margin: 0; font-size: 12px; color: #999999;">Financial Manager for Freelancers</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
-  `;
+  `.trim();
 }
 
 export function getPaymentReminderEmailTemplate(
