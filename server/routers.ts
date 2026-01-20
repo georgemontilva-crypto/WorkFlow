@@ -909,19 +909,19 @@ export const appRouter = router({
             new_status: 'payment_sent'
           });
           
-          // Use raw SQL query to avoid Drizzle ORM type issues
-          const { getDb } = await import('./db');
-          const database = await getDb();
-          if (!database) {
-            throw new Error('Database not available');
-          }
-          
+          // Use MySQL2 pool directly to avoid Drizzle ORM issues
           try {
-            await database.execute(
-              `UPDATE invoices SET payment_proof = ?, status = ? WHERE id = ? AND user_id = ?`,
+            const mysql = await import('mysql2/promise');
+            const { ENV } = await import('./_core/env');
+            const pool = mysql.createPool({ uri: ENV.databaseUrl });
+            
+            const [result] = await pool.execute(
+              'UPDATE invoices SET payment_proof = ?, status = ? WHERE id = ? AND user_id = ?',
               [input.proof, 'payment_sent', invoice.id, invoice.user_id]
             );
-            console.log('[uploadPaymentProof] Update successful');
+            
+            await pool.end();
+            console.log('[uploadPaymentProof] Update successful:', result);
           } catch (sqlError: any) {
             console.error('[uploadPaymentProof] SQL Error:', sqlError);
             throw new Error(`Failed to update invoice: ${sqlError.message}`);
