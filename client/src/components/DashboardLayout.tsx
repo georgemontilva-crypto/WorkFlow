@@ -12,6 +12,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { PaymentNotifications } from '@/components/PaymentNotifications';
 import { WelcomeDialog } from '@/components/WelcomeDialog';
 import { AccessBlocker } from './AccessBlocker';
+import { PlanBadge } from '@/components/PlanBadge';
 
 import { differenceInDays, parseISO } from 'date-fns';
 import { useEffect, useState } from 'react';
@@ -240,6 +241,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </Button>
           
           <div className="flex-1" />
+          
+          {/* Plan Badge */}
+          <PlanBadge />
         </header>
 
         {/* Scrollable Content */}

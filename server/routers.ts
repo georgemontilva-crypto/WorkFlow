@@ -389,6 +389,18 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Check plan limits
+        const { getPlanLimit } = await import("./plans");
+        const clientLimit = getPlanLimit(ctx.user.subscription_plan as any, 'clients');
+        
+        if (clientLimit !== Infinity) {
+          const { getClientsByUserId } = await import("./db");
+          const existingClients = await getClientsByUserId(ctx.user.id);
+          if (existingClients.length >= clientLimit) {
+            throw new Error(`You've reached the limit of ${clientLimit} clients on the Free plan. Upgrade to Pro for unlimited clients.`);
+          }
+        }
+
         await db.createClient({
           ...input,
           next_payment_date: new Date(input.next_payment_date),
@@ -467,6 +479,18 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        // Check plan limits
+        const { getPlanLimit } = await import("./plans");
+        const invoiceLimit = getPlanLimit(ctx.user.subscription_plan as any, 'invoices');
+        
+        if (invoiceLimit !== Infinity) {
+          const { getInvoicesByUserId } = await import("./db");
+          const existingInvoices = await getInvoicesByUserId(ctx.user.id);
+          if (existingInvoices.length >= invoiceLimit) {
+            throw new Error(`You've reached the limit of ${invoiceLimit} invoices on the Free plan. Upgrade to Pro for unlimited invoices.`);
+          }
+        }
+
         const paidAmount = input.paid_amount || "0";
         const totalAmount = parseFloat(input.total);
         const paid = parseFloat(paidAmount);
@@ -1038,6 +1062,92 @@ export const appRouter = router({
         const { updateDashboardWidgetsOrder } = await import("./db");
         return await updateDashboardWidgetsOrder(ctx.user.id, input.widgetIds);
       }),
+  }),
+
+  // Subscription management
+  subscription: t.router({
+    // Get current subscription info
+    current: protectedProcedure.query(async ({ ctx }) => {
+      const { PLANS, getPlanById } = await import("./plans");
+      const plan = getPlanById(ctx.user.subscription_plan as any);
+      return {
+        plan: ctx.user.subscription_plan,
+        status: ctx.user.subscription_status,
+        endsAt: ctx.user.subscription_ends_at,
+        stripeCustomerId: ctx.user.stripe_customer_id,
+        stripeSubscriptionId: ctx.user.stripe_subscription_id,
+        planDetails: plan,
+      };
+    }),
+
+    // Create Stripe checkout session for upgrade
+    createCheckoutSession: protectedProcedure
+      .input(z.object({
+        planId: z.enum(["pro", "business"]),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const stripe = (await import("stripe")).default;
+        const stripeClient = new stripe(process.env.STRIPE_SECRET_KEY!);
+        const { getPlanById } = await import("./plans");
+        const plan = getPlanById(input.planId);
+
+        // Create or get Stripe customer
+        let customerId = ctx.user.stripe_customer_id;
+        if (!customerId) {
+          const customer = await stripeClient.customers.create({
+            email: ctx.user.email,
+            name: ctx.user.name,
+            metadata: {
+              user_id: ctx.user.id.toString(),
+            },
+          });
+          customerId = customer.id;
+
+          // Save customer ID
+          const { updateUser } = await import("./db");
+          await stripeClient.customers.update(customerId, {
+            metadata: { user_id: ctx.user.id.toString() },
+          });
+        }
+
+        // Create checkout session
+        const session = await stripeClient.checkout.sessions.create({
+          customer: customerId,
+          mode: "subscription",
+          payment_method_types: ["card"],
+          line_items: [
+            {
+              price: plan.stripePriceId,
+              quantity: 1,
+            },
+          ],
+          success_url: `${process.env.APP_URL}/dashboard?upgrade=success`,
+          cancel_url: `${process.env.APP_URL}/dashboard?upgrade=cancelled`,
+          metadata: {
+            user_id: ctx.user.id.toString(),
+            plan_id: input.planId,
+          },
+        });
+
+        return { sessionId: session.id, url: session.url };
+      }),
+
+    // Cancel subscription
+    cancel: protectedProcedure.mutation(async ({ ctx }) => {
+      if (!ctx.user.stripe_subscription_id) {
+        throw new Error("No active subscription found");
+      }
+
+      const stripe = (await import("stripe")).default;
+      const stripeClient = new stripe(process.env.STRIPE_SECRET_KEY!);
+
+      // Cancel at period end
+      await stripeClient.subscriptions.update(ctx.user.stripe_subscription_id, {
+        cancel_at_period_end: true,
+      });
+
+      return { success: true };
+    }),
   }),
 });
 

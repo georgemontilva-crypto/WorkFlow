@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
+import { Pricing } from '@/components/Pricing';
 
 export default function Landing() {
   const [, setLocation] = useLocation();
@@ -529,6 +530,9 @@ export default function Landing() {
           </Button>
         </div>
       </section>
+
+      {/* Pricing Section */}
+      <Pricing />
 
       {/* Footer */}
       <footer className="border-t border-border py-12 px-4">

@@ -28,8 +28,15 @@ export const users = mysqlTable("user", {
   trial_ends_at: timestamp("trial_ends_at"),
   /** Whether user has purchased lifetime access */
   has_lifetime_access: int("has_lifetime_access").notNull().default(0),
+  /** Subscription plan: free, pro, or business */
+  subscription_plan: mysqlEnum("subscription_plan", ["free", "pro", "business"]).notNull().default("free"),
+  /** Subscription status */
+  subscription_status: mysqlEnum("subscription_status", ["active", "cancelled", "past_due", "trialing"]).default("active"),
+  /** Subscription end date */
+  subscription_ends_at: timestamp("subscription_ends_at"),
   stripe_customer_id: varchar("stripe_customer_id", { length: 255 }),
   stripe_payment_id: varchar("stripe_payment_id", { length: 255 }),
+  stripe_subscription_id: varchar("stripe_subscription_id", { length: 255 }),
   /** Two-factor authentication secret (base32 encoded) */
   two_factor_secret: varchar("two_factor_secret", { length: 255 }),
   /** Whether 2FA is enabled for this user */
