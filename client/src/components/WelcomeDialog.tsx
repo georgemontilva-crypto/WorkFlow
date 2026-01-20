@@ -65,7 +65,7 @@ export function WelcomeDialog() {
         'Clientes y facturas ilimitados',
         'Multi-moneda (USD, COP, EUR, USDT)',
         'Links de pago por factura',
-        'Pagos con Stripe y cripto',
+        'Pagos cripto mediante custodia externa',
         'Reportes financieros y automatizaciones',
       ],
       footerNote: 'Tienes acceso completo a todas las funciones profesionales',

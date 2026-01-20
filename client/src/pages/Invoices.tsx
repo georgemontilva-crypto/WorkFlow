@@ -763,7 +763,7 @@ export default function Invoices() {
                     className="bg-background border-border text-foreground h-11"
                     placeholder="https://tu-link-de-pago.com"
                   />
-                  <p className="text-xs text-muted-foreground">Link externo donde el cliente puede realizar el pago (Stripe, PayPal, wallet cripto, etc.)</p>
+                  <p className="text-xs text-muted-foreground">Link externo donde el cliente puede realizar el pago (PayPal, wallet cripto, etc.)</p>
                 </div>
 
                 {/* Actions */}
