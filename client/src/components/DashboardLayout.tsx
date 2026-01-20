@@ -4,7 +4,7 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X, Sparkles, LogOut, Shield, Coins, History } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X, Sparkles, LogOut, Shield, Coins, Bug } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -121,7 +121,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Mercados', href: '/markets', icon: TrendingUp },
     { name: t.nav.goals, href: '/savings', icon: Target },
     { name: t.nav.reminders, href: '/reminders', icon: Bell },
-    { name: 'Actualizaciones', href: '/updates', icon: History },
     { name: t.nav.settings, href: '/settings', icon: Settings },
   ];
 
@@ -214,7 +213,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Logout Button */}
-        <div className="mx-3 mb-4">
+        <div className="mx-3 mb-3">
           <Button
             onClick={logout}
             variant="outline"
@@ -223,6 +222,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <LogOut className="w-4 h-4 mr-2" />
             {t.nav?.logout || 'Cerrar Sesión'}
           </Button>
+        </div>
+
+        {/* Updates Button */}
+        <div className="mx-3 mb-4">
+          <Link href="/updates">
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start",
+                location === '/updates'
+                  ? "bg-accent text-accent-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+              )}
+            >
+              <Bug className="w-4 h-4 mr-2" />
+              Actualizaciones
+            </Button>
+          </Link>
         </div>
 
         {/* Footer */}

@@ -792,15 +792,23 @@ export default function Invoices() {
               return (
                 <Card key={invoice.id} className="bg-card border-border hover:border-accent/50 transition-all h-fit">
                   <CardContent className="p-4">
-                    {/* Collapsed View - Invoice Summary */}
+                    {/* Collapsed View - Invoice Number, Client, Status */}
                     {!isExpanded ? (
-                      <div className="space-y-3">
-                        {/* Header Row: Invoice Number + Actions */}
-                        <div className="flex items-center justify-between gap-4">
+                      <div className="space-y-2">
+                        {/* Header Row: Invoice Number + Status Badge */}
+                        <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             <p className="font-semibold text-lg text-foreground truncate">{invoice.invoice_number}</p>
                             <p className="text-sm text-muted-foreground truncate">{getClientName(invoice.client_id)}</p>
                           </div>
+                          <Badge className={`${statusInfo.className} border px-2 py-1 text-xs flex items-center gap-1 flex-shrink-0`}>
+                            <StatusIcon className="w-3 h-3" />
+                            {statusInfo.label}
+                          </Badge>
+                        </div>
+                        
+                        {/* Action Buttons Row */}
+                        <div className="flex items-center justify-end gap-1 pt-2 border-t border-border">
                           <div className="flex items-center gap-1 flex-shrink-0">
                           <Button
                             variant="ghost"
@@ -864,29 +872,6 @@ export default function Invoices() {
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                          </div>
-                        </div>
-                        
-                        {/* Info Row: Due Date, Amount, Status */}
-                        <div className="grid grid-cols-3 gap-2 pt-3 border-t border-border">
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Vencimiento</p>
-                            <p className="text-sm font-medium text-foreground">
-                              {format(new Date(invoice.due_date), 'dd MMM', { locale: es })}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Monto</p>
-                            <p className="text-sm font-bold font-mono text-foreground">
-                              ${parseFloat(invoice.total).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Estado</p>
-                            <Badge className={`${statusInfo.className} border px-2 py-1 text-xs flex items-center gap-1 w-fit`}>
-                              <StatusIcon className="w-3 h-3" />
-                              {statusInfo.label}
-                            </Badge>
                           </div>
                         </div>
                       </div>
