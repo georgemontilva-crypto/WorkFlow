@@ -221,7 +221,23 @@ export default function Markets() {
 
   const handleSetWidget = (e: React.MouseEvent, asset: MarketAsset) => {
     e.stopPropagation();
-    toggleWidgetMutation.mutate({ symbol: asset.symbol });
+    
+    // Si no está en favoritos, añadirlo primero
+    if (!isFavorite(asset.symbol)) {
+      addFavoriteMutation.mutate(
+        { symbol: asset.symbol, type: asset.type },
+        {
+          onSuccess: () => {
+            // Después de añadir a favoritos, añadir al dashboard
+            toggleWidgetMutation.mutate({ symbol: asset.symbol });
+          }
+        }
+      );
+    } else {
+      // Si ya está en favoritos, solo toggle dashboard
+      toggleWidgetMutation.mutate({ symbol: asset.symbol });
+    }
+    
     // Persist custom asset
     if (![...cryptoData, ...MOCK_STOCKS, ...MOCK_FOREX, ...MOCK_COMMODITIES, ...customAssets].some(a => a.symbol === asset.symbol)) {
       setCustomAssets(prev => [...prev, asset]);
