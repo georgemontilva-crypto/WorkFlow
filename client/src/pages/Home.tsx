@@ -100,14 +100,32 @@ export default function Home() {
     })
   );
 
-  // Local state for widget order
+  // Local state for widget order - unifica widgets normales y market widgets
   const [localWidgets, setLocalWidgets] = useState<any[]>([]);
 
   useEffect(() => {
+    // Combinar dashboard widgets y market widgets en un solo array
+    const allWidgets = [];
+    
+    // Añadir dashboard widgets
     if (dashboardWidgets) {
-      setLocalWidgets(dashboardWidgets);
+      allWidgets.push(...dashboardWidgets);
     }
-  }, [dashboardWidgets]);
+    
+    // Añadir market widgets con un prefijo para identificarlos
+    if (marketWidgets) {
+      const marketWidgetsWithType = marketWidgets.map(market => ({
+        ...market,
+        id: `market-${market.id}`, // Prefijo para evitar conflictos de ID
+        widget_type: 'market',
+        symbol: market.symbol,
+        marketType: market.type,
+      }));
+      allWidgets.push(...marketWidgetsWithType);
+    }
+    
+    setLocalWidgets(allWidgets);
+  }, [dashboardWidgets, marketWidgets]);
 
   // Calculate stats
   const activeClients = clients?.filter(c => c.status === 'active').length || 0;
@@ -319,30 +337,12 @@ export default function Home() {
         );
 
       case 'market':
-        if (widget.widget_data) {
-          try {
-            const marketData = JSON.parse(widget.widget_data);
-            return (
-              <div key={widget.id} className="group relative">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2 z-10 bg-background/80 hover:bg-background"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveWidget(widget.id);
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-                <MarketWidget symbol={marketData.symbol} type={marketData.type} />
-              </div>
-            );
-          } catch (e) {
-            return null;
-          }
-        }
-        return null;
+        // Renderizar market widget con botón de remover
+        return (
+          <div key={widget.id} className="h-full">
+            <MarketWidget symbol={widget.symbol} type={widget.marketType} />
+          </div>
+        );
 
       default:
         return null;
@@ -467,17 +467,6 @@ export default function Home() {
             </div>
           </SortableContext>
         </DndContext>
-
-        {/* Market Widgets (non-sortable) */}
-        {marketWidgets && marketWidgets.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
-            {marketWidgets.map(market => (
-              <div key={`market-${market.id}`} className="group relative">
-                <MarketWidget symbol={market.symbol} type={market.type} />
-              </div>
-            ))}
-          </div>
-        )}
 
         {/* Empty State */}
         {(!dashboardWidgets || dashboardWidgets.length === 0) && (!marketWidgets || marketWidgets.length === 0) && (

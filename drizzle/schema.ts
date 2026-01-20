@@ -193,6 +193,7 @@ export const marketFavorites = mysqlTable("market_favorites", {
   symbol: varchar("symbol", { length: 20 }).notNull(),
   type: mysqlEnum("type", ["crypto", "stock", "forex", "commodity"]).notNull(),
   is_dashboard_widget: int("is_dashboard_widget").notNull().default(0),
+  position: int("position").notNull().default(0),
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
 

@@ -904,7 +904,7 @@ export async function getDashboardWidgets(user_id: number) {
     .from(marketFavorites)
     .where(eq(marketFavorites.user_id, user_id))
     .where(eq(marketFavorites.is_dashboard_widget, 1))
-    .orderBy(marketFavorites.created_at);
+    .orderBy(marketFavorites.position);
 }
 
 export async function addMarketFavorite(data: {
@@ -1132,7 +1132,7 @@ export async function removeDashboardWidget(user_id: number, widget_id: number) 
 /**
  * Update dashboard widgets order
  */
-export async function updateDashboardWidgetsOrder(user_id: number, widgetIds: number[]) {
+export async function updateDashboardWidgetsOrder(user_id: number, widgetIds: (number | string)[]) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
@@ -1140,11 +1140,25 @@ export async function updateDashboardWidgetsOrder(user_id: number, widgetIds: nu
   
   // Update position for each widget
   for (let i = 0; i < widgetIds.length; i++) {
-    await db
-      .update(dashboardWidgets)
-      .set({ position: i })
-      .where(eq(dashboardWidgets.id, widgetIds[i]))
-      .where(eq(dashboardWidgets.user_id, user_id));
+    const widgetId = widgetIds[i];
+    
+    // Si es un market widget (string con prefijo "market-"), extraer el ID numérico
+    if (typeof widgetId === 'string' && widgetId.startsWith('market-')) {
+      const numericId = parseInt(widgetId.replace('market-', ''));
+      // Actualizar en la tabla marketFavorites
+      await db
+        .update(marketFavorites)
+        .set({ position: i })
+        .where(eq(marketFavorites.id, numericId))
+        .where(eq(marketFavorites.user_id, user_id));
+    } else {
+      // Widget normal
+      await db
+        .update(dashboardWidgets)
+        .set({ position: i })
+        .where(eq(dashboardWidgets.id, widgetId as number))
+        .where(eq(dashboardWidgets.user_id, user_id));
+    }
   }
   
   return { success: true };

@@ -961,7 +961,7 @@ export const appRouter = router({
 
     // Update widgets order
     updateOrder: protectedProcedure
-      .input(z.object({ widgetIds: z.array(z.number()) }))
+      .input(z.object({ widgetIds: z.array(z.union([z.number(), z.string()])) }))
       .mutation(async ({ ctx, input }) => {
         const { updateDashboardWidgetsOrder } = await import("./db");
         return await updateDashboardWidgetsOrder(ctx.user.id, input.widgetIds);
