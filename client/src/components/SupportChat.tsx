@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, X, Send, User, Bot, Loader2, ArrowLeft } from 'lucide-react';
+import { MessageCircle, X, Send, User, ArrowLeft } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { trpc } from '../lib/trpc';
@@ -160,7 +160,7 @@ export function SupportChat() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Floating Button - Chat bubble style */}
       {!isOpen && (
         <Button
           onClick={handleOpen}
@@ -176,7 +176,7 @@ export function SupportChat() {
         </Button>
       )}
 
-      {/* Chat Window - WhatsApp Style */}
+      {/* Chat Window - WhatsApp Style with fixed header */}
       {isOpen && (
         <>
           {/* Overlay for mobile */}
@@ -185,9 +185,9 @@ export function SupportChat() {
             onClick={handleClose}
           />
           
-          {/* Chat Container */}
-          <div className="fixed inset-0 md:inset-auto md:bottom-6 md:right-6 md:w-96 md:h-[600px] md:rounded-lg shadow-2xl z-50 flex flex-col bg-background md:border">
-            {/* Header - Fixed at top (WhatsApp style) */}
+          {/* Chat Container - Using fixed positioning for mobile to handle keyboard */}
+          <div className="fixed top-0 left-0 right-0 bottom-0 md:top-auto md:left-auto md:bottom-6 md:right-6 md:w-96 md:h-[600px] md:rounded-lg shadow-2xl z-50 flex flex-col bg-background md:border">
+            {/* Header - Fixed at top (WhatsApp style) - This stays in place */}
             <div className="bg-primary text-primary-foreground px-4 py-3 flex items-center justify-between shrink-0 md:rounded-t-lg">
               <div className="flex items-center gap-3">
                 <Button 
@@ -199,8 +199,8 @@ export function SupportChat() {
                   <ArrowLeft className="w-5 h-5" />
                 </Button>
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-full bg-primary-foreground/20 flex items-center justify-center">
-                    <Bot className="w-5 h-5" />
+                  <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center p-1">
+                    <img src="/logo.png" alt="HiWork" className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-sm">Soporte</h3>
@@ -218,7 +218,7 @@ export function SupportChat() {
               </Button>
             </div>
 
-            {/* Messages Area - Scrollable (WhatsApp background pattern) */}
+            {/* Messages Area - Scrollable with flex-1 to fill space */}
             <div 
               className="flex-1 overflow-y-auto px-4 py-3 space-y-2"
               style={{
@@ -234,14 +234,8 @@ export function SupportChat() {
                   }`}
                 >
                   {msg.sender_type !== 'user' && (
-                    <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center mb-1 ${
-                      msg.sender_type === 'ai' ? 'bg-primary' : 'bg-blue-500'
-                    }`}>
-                      {msg.sender_type === 'ai' ? (
-                        <Bot className="w-4 h-4 text-white" />
-                      ) : (
-                        <User className="w-4 h-4 text-white" />
-                      )}
+                    <div className="flex-shrink-0 w-7 h-7 rounded-full bg-white flex items-center justify-center mb-1 p-1">
+                      <img src="/logo.png" alt="HiWork" className="w-full h-full object-contain" />
                     </div>
                   )}
                   <div
@@ -266,8 +260,8 @@ export function SupportChat() {
 
               {isAIResponding && (
                 <div className="flex gap-2 items-end">
-                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary flex items-center justify-center mb-1">
-                    <Bot className="w-4 h-4 text-white" />
+                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-white flex items-center justify-center mb-1 p-1">
+                    <img src="/logo.png" alt="HiWork" className="w-full h-full object-contain" />
                   </div>
                   <div className="bg-card border rounded-lg rounded-bl-none px-3 py-2 shadow-sm">
                     <div className="flex gap-1">
@@ -296,8 +290,8 @@ export function SupportChat() {
               </div>
             )}
 
-            {/* Input Area - Fixed at bottom (WhatsApp style) */}
-            <div className="px-4 py-3 border-t bg-background shrink-0">
+            {/* Input Area - Fixed at bottom, this moves up with keyboard */}
+            <div className="px-4 py-3 border-t bg-background shrink-0 safe-area-inset-bottom">
               <div className="flex gap-2 items-center">
                 <Input
                   ref={inputRef}
