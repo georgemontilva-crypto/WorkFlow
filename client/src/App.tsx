@@ -18,6 +18,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Verify2FA from "./pages/Verify2FA";
+import Updates from "./pages/Updates";
 import Home from "./pages/Home";
 import Clients from "./pages/Clients";
 import Invoices from "./pages/Invoices";
@@ -92,6 +93,11 @@ function Router() {
       <Route path="/pricing">
         <ProtectedRoute>
           <PricingPage />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/updates">
+        <ProtectedRoute>
+          <Updates />
         </ProtectedRoute>
       </Route>
 

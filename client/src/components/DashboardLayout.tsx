@@ -4,7 +4,7 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X, Sparkles, LogOut, Shield, Coins } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X, Sparkles, LogOut, Shield, Coins, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -121,6 +121,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Mercados', href: '/markets', icon: TrendingUp },
     { name: t.nav.goals, href: '/savings', icon: Target },
     { name: t.nav.reminders, href: '/reminders', icon: Bell },
+    { name: 'Actualizaciones', href: '/updates', icon: History },
     { name: t.nav.settings, href: '/settings', icon: Settings },
   ];
 
@@ -161,7 +162,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         {/* Logo */}
         <div className="h-16 flex items-center gap-3 px-6 border-b border-border">
-          <img src="/finwrk-logo.png" alt="Finwrk" className="h-8 sm:h-10 lg:h-12 w-auto object-contain" />
+          <img src="/finwrk-logo.png" alt="Finwrk" className="h-7 w-auto object-contain" />
         </div>
 
         {/* Navigation */}
@@ -227,7 +228,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Footer */}
         <div className="p-4 border-t border-border">
           <p className="text-xs text-muted-foreground text-center">
-            {t.nav.offlineMode}
+            Finwrk v1.0.0
           </p>
         </div>
       </aside>
