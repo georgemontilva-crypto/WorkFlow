@@ -951,7 +951,7 @@ export const appRouter = router({
                 }
               }
               
-              // Send email with proof as attachment
+              // Send email with proof as attachment and inline
               await sendEmail({
                 to: user.email,
                 subject: `Comprobante de Pago Recibido - Factura ${invoice.invoice_number}`,
@@ -960,6 +960,7 @@ export const appRouter = router({
                   filename: `comprobante-${invoice.invoice_number}.${extension}`,
                   content: base64Content,
                   contentType: contentType,
+                  contentId: 'payment-proof', // For inline display with cid:payment-proof
                 }],
               });
               

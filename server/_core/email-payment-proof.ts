@@ -68,9 +68,13 @@ export function getPaymentProofNotificationTemplate(
                 </tr>
               </table>
               
-              <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #a0a0a0; text-align: center;">📎 El comprobante de pago está adjunto en este email.</p>
+              <!-- Payment Proof Image -->
+              <div style="margin: 0 0 30px; text-align: center;">
+                <p style="margin: 0 0 16px; font-size: 14px; color: #a0a0a0; font-weight: 600;">📎 Comprobante de Pago:</p>
+                <img src="cid:payment-proof" alt="Comprobante de Pago" style="max-width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08);" />
+              </div>
               
-              <!-- Action Button -->
+              <!-- Dashboard Link -->
               <table role="presentation" style="margin: 0 0 30px; width: 100%;">
                 <tr>
                   <td align="center">

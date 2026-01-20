@@ -12,6 +12,7 @@ interface EmailOptions {
     filename: string;
     content: string; // base64 encoded
     contentType?: string;
+    contentId?: string; // For inline images (cid:xxx)
   }>;
 }
 
