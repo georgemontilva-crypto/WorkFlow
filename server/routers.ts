@@ -901,10 +901,31 @@ export const appRouter = router({
           }
           
           // Update invoice with proof and change status to payment_sent
-          await db.updateInvoice(invoice.id, invoice.user_id, {
-            payment_proof: input.proof,
-            status: 'payment_sent' as const,
+          console.log('[uploadPaymentProof] Updating invoice:', {
+            invoice_id: invoice.id,
+            user_id: invoice.user_id,
+            proof_length: input.proof?.length || 0,
+            current_status: invoice.status,
+            new_status: 'payment_sent'
           });
+          
+          // Use raw SQL query to avoid Drizzle ORM type issues
+          const { getDb } = await import('./db');
+          const database = await getDb();
+          if (!database) {
+            throw new Error('Database not available');
+          }
+          
+          try {
+            await database.execute(
+              `UPDATE invoices SET payment_proof = ?, status = ? WHERE id = ? AND user_id = ?`,
+              [input.proof, 'payment_sent', invoice.id, invoice.user_id]
+            );
+            console.log('[uploadPaymentProof] Update successful');
+          } catch (sqlError: any) {
+            console.error('[uploadPaymentProof] SQL Error:', sqlError);
+            throw new Error(`Failed to update invoice: ${sqlError.message}`);
+          }
           
           // Send notification email to user
           try {
