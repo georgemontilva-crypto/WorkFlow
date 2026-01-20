@@ -260,8 +260,8 @@ export function SupportChat() {
                   </Button>
                 )}
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center p-1">
-                    <img src="/logo.png" alt="HiWork" className="w-full h-full object-contain" />
+                  <div className="w-9 h-9 rounded-full bg-primary-foreground flex items-center justify-center overflow-hidden">
+                    <img src="/logo.png" alt="HiWork" className="w-full h-full object-cover scale-110" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-sm">
@@ -357,8 +357,8 @@ export function SupportChat() {
                       }`}
                     >
                       {((isAdmin && msg.sender_type !== 'agent') || (!isAdmin && msg.sender_type !== 'user')) && (
-                        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-white flex items-center justify-center mb-1 p-1">
-                          <img src="/logo.png" alt="HiWork" className="w-full h-full object-contain" />
+                        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-card flex items-center justify-center mb-1 overflow-hidden">
+                          <img src="/logo.png" alt="HiWork" className="w-full h-full object-cover scale-110" />
                         </div>
                       )}
                       <div
@@ -385,8 +385,8 @@ export function SupportChat() {
 
                   {isAIResponding && !isAdmin && (
                     <div className="flex gap-2 items-end">
-                      <div className="flex-shrink-0 w-7 h-7 rounded-full bg-white flex items-center justify-center mb-1 p-1">
-                        <img src="/logo.png" alt="HiWork" className="w-full h-full object-contain" />
+                      <div className="flex-shrink-0 w-7 h-7 rounded-full bg-card flex items-center justify-center mb-1 overflow-hidden">
+                        <img src="/logo.png" alt="HiWork" className="w-full h-full object-cover scale-110" />
                       </div>
                       <div className="bg-card border rounded-lg rounded-bl-none px-3 py-2 shadow-sm">
                         <div className="flex gap-1">
