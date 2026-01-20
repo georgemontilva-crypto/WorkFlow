@@ -1,7 +1,7 @@
 {
-  "name": "HiWork - Financial Manager",
-  "short_name": "HiWork",
-  "description": "Manage clients, invoices, finances and savings goals",
+  "name": "Finwrk - Financial Manager",
+  "short_name": "Finwrk",
+  "description": "Get paid. Stay in control. Professional invoicing and financial management",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",

@@ -182,9 +182,8 @@ export default function Landing() {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/hiwork-icon-new.png" alt="Finwrk" className="h-10 w-auto" />
-            <span className="text-2xl font-bold">Finwrk</span>
+          <div className="flex items-center">
+            <img src="/finwrk-logo.png" alt="Finwrk" className="h-10 w-auto" />
           </div>
           
           {/* Desktop Navigation */}
@@ -517,9 +516,8 @@ export default function Landing() {
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <img src="/hiwork-icon-new.png" alt="Finwrk" className="h-8 w-auto" />
-                <span className="text-xl font-bold">Finwrk</span>
+              <div className="flex items-center mb-4">
+                <img src="/finwrk-logo.png" alt="Finwrk" className="h-8 w-auto" />
               </div>
               <p className="text-sm text-muted-foreground">
                 Get paid. Stay in control.

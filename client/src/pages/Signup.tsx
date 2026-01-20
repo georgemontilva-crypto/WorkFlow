@@ -44,8 +44,8 @@ export default function Signup() {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src="/hiwork-icon-new.png" alt="HiWork" className="h-10 w-auto" />
+          <div className="flex items-center">
+            <img src="/finwrk-logo.png" alt="Finwrk" className="h-10 w-auto" />
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="text-xs sm:text-sm text-muted-foreground hidden sm:inline">Already have an account?</span>
