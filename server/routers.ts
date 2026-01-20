@@ -1065,7 +1065,7 @@ export const appRouter = router({
   }),
 
   // Subscription management
-  subscription: t.router({
+  subscription: router({
     // Get current subscription info
     current: protectedProcedure.query(async ({ ctx }) => {
       const { PLANS, getPlanById } = await import("./plans");
