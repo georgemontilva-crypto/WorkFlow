@@ -417,6 +417,34 @@ export default function Invoices() {
     doc.text('TOTAL:', 140, yPos);
     doc.text(`$${parseFloat(invoice.total).toFixed(2)}`, 190, yPos, { align: 'right' });
 
+    // Payment Button
+    if (invoice.payment_token) {
+      yPos += 25;
+      const paymentUrl = `${window.location.origin}/pay?token=${invoice.payment_token}`;
+      
+      // Draw button background
+      doc.setFillColor(0, 0, 0); // Black background
+      doc.roundedRect(70, yPos - 5, 70, 15, 3, 3, 'F');
+      
+      // Add clickable link to button
+      doc.link(70, yPos - 5, 70, 15, { url: paymentUrl });
+      
+      // Button text
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(255, 255, 255); // White text
+      doc.text('PAGAR AHORA', 105, yPos + 4, { align: 'center' });
+      doc.setTextColor(0, 0, 0); // Reset to black
+      
+      // Helper text below button
+      yPos += 20;
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 100, 100); // Gray
+      doc.text('Haz clic en el botón para realizar el pago de forma segura', 105, yPos, { align: 'center' });
+      doc.setTextColor(0, 0, 0); // Reset to black
+    }
+
     // Notes
     if (invoice.notes) {
       yPos += 20;
