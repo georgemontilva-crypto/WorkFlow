@@ -901,12 +901,42 @@ export const appRouter = router({
           }
           
           // Update invoice with proof and change status to payment_sent
-          const { sql } = await import('drizzle-orm');
           await db.updateInvoice(invoice.id, invoice.user_id, {
             payment_proof: input.proof,
-            payment_proof_uploaded_at: sql`NOW()`,
             status: 'payment_sent' as const,
           });
+          
+          // Send notification email to user
+          try {
+            const { sendEmail } = await import('./_core/email');
+            const { getPaymentProofNotificationTemplate } = await import('./_core/email-payment-proof');
+            
+            // Get user and client data
+            const user = await db.getUserById(invoice.user_id);
+            const client = await db.getClientById(invoice.client_id, invoice.user_id);
+            
+            if (user && client) {
+              const dashboardLink = `${process.env.APP_URL || 'http://localhost:3000'}/invoices`;
+              const emailHtml = getPaymentProofNotificationTemplate(
+                user.name,
+                invoice.invoice_number,
+                client.name,
+                invoice.total.toString(),
+                invoice.currency || 'USD',
+                dashboardLink
+              );
+              
+              // Send email asynchronously without blocking response
+              sendEmail({
+                to: user.email,
+                subject: `Payment Proof Received - Invoice ${invoice.invoice_number}`,
+                html: emailHtml,
+              }).catch(err => console.error('[Invoice] Failed to send payment proof notification:', err));
+            }
+          } catch (error) {
+            console.error('[Invoice] Error sending payment proof notification:', error);
+            // Don't throw error, notification failure shouldn't block the upload
+          }
           
           return { success: true, message: 'Payment proof uploaded' };
         } catch (error: any) {

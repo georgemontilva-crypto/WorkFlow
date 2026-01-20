@@ -1,0 +1,105 @@
+/**
+ * Payment Proof Notification Email Template
+ */
+
+export function getPaymentProofNotificationTemplate(
+  userName: string,
+  invoiceNumber: string,
+  clientName: string,
+  amount: string,
+  currency: string,
+  dashboardLink: string
+): string {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Proof Received - Finwrk</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #000000;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" style="width: 100%; max-width: 600px; background-color: #0b0b0b; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08);">
+          
+          <!-- Header with Logo -->
+          <tr>
+            <td style="padding: 40px 40px 20px; text-align: center;">
+              <div style="width: 70px; height: 70px; margin: 0 auto 20px; background-color: #0b0b0b; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);">
+                <img src="https://finwrk.app/icon-512.png" alt="Finwrk" style="width: 48px; height: 48px; display: block;" />
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Main Content -->
+          <tr>
+            <td style="padding: 0 40px 40px;">
+              <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 600; color: #ffffff; text-align: center;">Payment Proof Received</h2>
+              
+              <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #a0a0a0; text-align: center;">Hi ${userName},</p>
+              
+              <p style="margin: 0 0 30px; font-size: 16px; line-height: 1.6; color: #a0a0a0; text-align: center;">A client has uploaded a payment proof for one of your invoices.</p>
+              
+              <!-- Invoice Details Box -->
+              <table role="presentation" style="width: 100%; background-color: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; margin: 0 0 30px;">
+                <tr>
+                  <td style="padding: 24px;">
+                    <table role="presentation" style="width: 100%;">
+                      <tr>
+                        <td style="padding: 8px 0; font-size: 14px; color: #666666;">Invoice:</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #ffffff; text-align: right; font-weight: 600;">${invoiceNumber}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-size: 14px; color: #666666;">Client:</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #ffffff; text-align: right;">${clientName}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-size: 14px; color: #666666;">Amount:</td>
+                        <td style="padding: 8px 0; font-size: 16px; color: #ffffff; text-align: right; font-weight: 700;">${amount} ${currency}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-size: 14px; color: #666666;">Status:</td>
+                        <td style="padding: 8px 0; text-align: right;">
+                          <span style="display: inline-block; padding: 4px 12px; background-color: rgba(251, 191, 36, 0.1); color: #fbbf24; border-radius: 999px; font-size: 12px; font-weight: 600;">Payment Sent</span>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              
+              <!-- Action Button -->
+              <table role="presentation" style="margin: 0 0 30px; width: 100%;">
+                <tr>
+                  <td align="center">
+                    <a href="${dashboardLink}" style="display: inline-block; padding: 16px 32px; background-color: #ffffff; color: #000000; text-decoration: none; border-radius: 999px; font-size: 16px; font-weight: 600;">Review Payment Proof</a>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: #666666; text-align: center;">You can review the payment proof and mark the invoice as paid from your dashboard.</p>
+              
+              <hr style="margin: 30px 0; border: none; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+              
+              <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #666666; text-align: center;">This is an automated notification. Please review the payment proof before marking the invoice as paid.</p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px 40px; border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center;">
+              <p style="margin: 0 0 8px; font-size: 14px; color: #666666;">© ${new Date().getFullYear()} Finwrk. All rights reserved.</p>
+              <p style="margin: 0; font-size: 12px; color: #4a4a4a;">Financial Manager for Freelancers</p>
+            </td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+}
