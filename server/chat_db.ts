@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { getDb } from "./db";
 import { eq, desc, and, or, sql } from "drizzle-orm";
 import { supportTickets, supportMessages } from "../drizzle/schema";
 
@@ -6,6 +6,7 @@ import { supportTickets, supportMessages } from "../drizzle/schema";
  * Create a new support ticket
  */
 export async function createSupportTicket(userId: number, subject?: string) {
+  const db = await getDb();
   const [ticket] = await db.insert(supportTickets).values({
     user_id: userId,
     subject: subject || "Nuevo ticket de soporte",
@@ -21,6 +22,7 @@ export async function createSupportTicket(userId: number, subject?: string) {
  * Get all tickets for a user
  */
 export async function getUserTickets(userId: number) {
+  const db = await getDb();
   return await db
     .select()
     .from(supportTickets)
@@ -32,6 +34,7 @@ export async function getUserTickets(userId: number) {
  * Get a specific ticket by ID
  */
 export async function getTicketById(ticketId: number) {
+  const db = await getDb();
   const [ticket] = await db
     .select()
     .from(supportTickets)
@@ -44,6 +47,7 @@ export async function getTicketById(ticketId: number) {
  * Get all tickets (for admin panel)
  */
 export async function getAllTickets(status?: string) {
+  const db = await getDb();
   if (status) {
     return await db
       .select()
@@ -62,6 +66,7 @@ export async function getAllTickets(status?: string) {
  * Update ticket status
  */
 export async function updateTicketStatus(ticketId: number, status: string) {
+  const db = await getDb();
   await db
     .update(supportTickets)
     .set({ 
@@ -77,6 +82,7 @@ export async function updateTicketStatus(ticketId: number, status: string) {
  * Assign ticket to an agent
  */
 export async function assignTicket(ticketId: number, agentId: number) {
+  const db = await getDb();
   await db
     .update(supportTickets)
     .set({ 
@@ -91,6 +97,7 @@ export async function assignTicket(ticketId: number, agentId: number) {
  * Mark ticket as having unread messages for user or agent
  */
 export async function markTicketUnread(ticketId: number, forUser: boolean) {
+  const db = await getDb();
   if (forUser) {
     await db
       .update(supportTickets)
@@ -108,6 +115,7 @@ export async function markTicketUnread(ticketId: number, forUser: boolean) {
  * Mark ticket as read for user or agent
  */
 export async function markTicketRead(ticketId: number, forUser: boolean) {
+  const db = await getDb();
   if (forUser) {
     await db
       .update(supportTickets)
@@ -130,6 +138,7 @@ export async function addChatMessage(
   senderType: "user" | "agent" | "ai",
   message: string
 ) {
+  const db = await getDb();
   const [result] = await db.insert(supportMessages).values({
     ticket_id: ticketId,
     sender_id: senderId,
@@ -157,6 +166,7 @@ export async function addChatMessage(
  * Get all messages for a ticket
  */
 export async function getTicketMessages(ticketId: number) {
+  const db = await getDb();
   return await db
     .select()
     .from(supportMessages)
@@ -168,6 +178,7 @@ export async function getTicketMessages(ticketId: number) {
  * Mark messages as read
  */
 export async function markMessagesRead(ticketId: number) {
+  const db = await getDb();
   await db
     .update(supportMessages)
     .set({ is_read: 1 })
@@ -178,6 +189,7 @@ export async function markMessagesRead(ticketId: number) {
  * Get unread message count for user
  */
 export async function getUnreadCount(userId: number) {
+  const db = await getDb();
   const tickets = await db
     .select()
     .from(supportTickets)
