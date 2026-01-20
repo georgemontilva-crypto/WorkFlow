@@ -107,11 +107,13 @@ export default function Home() {
     // Combinar dashboard widgets y market widgets en un solo array
     const allWidgets = [];
     
-    // Añadir dashboard widgets
+    // Añadir dashboard widgets con prefijo "widget-" para consistencia
     if (dashboardWidgets) {
       dashboardWidgets.forEach(widget => {
         allWidgets.push({
           ...widget,
+          id: `widget-${widget.id}`, // Prefijo para consistencia con market widgets
+          originalId: widget.id, // Guardar el ID original para el backend
           globalPosition: widget.position,
           widgetSource: 'dashboard'
         });
@@ -124,6 +126,7 @@ export default function Home() {
         allWidgets.push({
           ...market,
           id: `market-${market.id}`,
+          originalId: market.id, // Guardar el ID original para el backend
           widget_type: 'market',
           symbol: market.symbol,
           marketType: market.type,
