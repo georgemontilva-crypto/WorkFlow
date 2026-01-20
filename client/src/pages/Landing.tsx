@@ -1,22 +1,27 @@
 /**
- * Landing Page - HiWork
- * Design Philosophy: Apple Minimalism - Elegante, limpio y profesional
- * Multilingual: English/Spanish
+ * Finwrk Landing Page
+ * Slogan: "Get paid. Stay in control."
  */
 
-import { Button } from '@/components/ui/button';
-import { Check, TrendingUp, FileText, Users, Target, Bell, Shield, Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { LandingLanguageProvider, useLandingLanguage } from '@/contexts/LandingLanguageContext';
-import { LanguageSelector } from '@/components/LanguageSelector';
+import { 
+  Users, FileText, TrendingUp, Target, Bell, Shield,
+  Check, X, Menu, Zap, Globe, Lock, Key, Database,
+  ArrowRight, Star, ChevronDown
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/_core/hooks/useAuth';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
-function LandingContent() {
-  const { t } = useLandingLanguage();
+export default function Landing() {
   const [, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated, loading } = useAuth();
+  const { t } = useLanguage();
 
   // Redirect to dashboard if already authenticated
   useEffect(() => {
@@ -27,36 +32,150 @@ function LandingContent() {
 
   const features = [
     {
-      icon: Users,
-      title: t.features.clients.title,
-      description: t.features.clients.description,
+      icon: FileText,
+      title: "Professional Invoicing",
+      description: "Create and send beautiful invoices in seconds"
     },
     {
-      icon: FileText,
-      title: t.features.invoices.title,
-      description: t.features.invoices.description,
+      icon: Users,
+      title: "Client Management",
+      description: "Organize all your clients and projects in one place"
+    },
+    {
+      icon: Globe,
+      title: "Multi-Currency & Crypto",
+      description: "Accept payments in fiat and cryptocurrency"
+    },
+    {
+      icon: Zap,
+      title: "Payment Links",
+      description: "Share custom payment links with your clients"
     },
     {
       icon: TrendingUp,
-      title: t.features.finances.title,
-      description: t.features.finances.description,
-    },
-    {
-      icon: Target,
-      title: t.features.goals.title,
-      description: t.features.goals.description,
+      title: "Financial Reports",
+      description: "Automated reports and insights"
     },
     {
       icon: Bell,
-      title: t.features.reminders.title,
-      description: t.features.reminders.description,
+      title: "Smart Reminders",
+      description: "Never miss a payment with automatic reminders"
+    }
+  ];
+
+  const securityFeatures = [
+    {
+      icon: Lock,
+      title: "Two-Factor Authentication",
+      description: "Extra layer of security for your account"
+    },
+    {
+      icon: Database,
+      title: "End-to-End Encryption",
+      description: "Your data is encrypted at rest and in transit"
+    },
+    {
+      icon: Key,
+      title: "External Wallet Custody",
+      description: "Crypto assets secured with industry standards"
     },
     {
       icon: Shield,
-      title: t.features.security.title,
-      description: t.features.security.description,
+      title: "Compliance Ready",
+      description: "Built to meet financial regulations"
     }
   ];
+
+  const plans = [
+    {
+      name: "Free",
+      price: "$0",
+      period: "/forever",
+      description: "Perfect for getting started",
+      features: [
+        { text: "Basic dashboard", included: true },
+        { text: "Up to 3 clients", included: true },
+        { text: "Maximum 5 invoices", included: true },
+        { text: "Crypto visualization", included: true },
+        { text: "Payment links", included: false },
+        { text: "Automations", included: false }
+      ],
+      cta: "Start Free",
+      highlighted: false
+    },
+    {
+      name: "Pro",
+      price: "$15",
+      period: "/month",
+      description: "For growing businesses",
+      features: [
+        { text: "Unlimited clients", included: true },
+        { text: "Unlimited invoices", included: true },
+        { text: "Multi-currency", included: true },
+        { text: "Payment links", included: true },
+        { text: "Crypto payments", included: true },
+        { text: "Automations", included: true },
+        { text: "Financial reports", included: true }
+      ],
+      cta: "Start Pro Trial",
+      highlighted: true
+    },
+    {
+      name: "Business",
+      price: "$29",
+      period: "/month",
+      description: "For teams and agencies",
+      features: [
+        { text: "Everything in Pro", included: true },
+        { text: "Multi-user accounts", included: true },
+        { text: "Roles & permissions", included: true },
+        { text: "Public API", included: true },
+        { text: "White label", included: true },
+        { text: "Priority support", included: true }
+      ],
+      cta: "Contact Sales",
+      highlighted: false
+    }
+  ];
+
+  const howItWorks = [
+    {
+      step: "1",
+      title: "Sign Up Free",
+      description: "Create your account in less than 60 seconds"
+    },
+    {
+      step: "2",
+      title: "Add Clients & Create Invoices",
+      description: "Set up your clients and start invoicing"
+    },
+    {
+      step: "3",
+      title: "Get Paid",
+      description: "Share payment links and receive payments instantly"
+    }
+  ];
+
+  const faqs = [
+    {
+      question: "Is Finwrk really free?",
+      answer: "Yes! Our Free plan is completely free forever with no credit card required."
+    },
+    {
+      question: "Can I accept cryptocurrency payments?",
+      answer: "Yes, Pro and Business plans support crypto payments with external custody for maximum security."
+    },
+    {
+      question: "Is my financial data secure?",
+      answer: "Absolutely. We use end-to-end encryption, 2FA, and follow industry best practices for data security."
+    },
+    {
+      question: "Can I upgrade or downgrade my plan?",
+      answer: "Yes, you can upgrade or downgrade at any time. Changes take effect immediately."
+    }
+  ];
+
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,23 +183,27 @@ function LandingContent() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/hiwork-icon-new.png" alt="HiWork" className="h-10 w-auto" />
+            <img src="/hiwork-icon-new.png" alt="Finwrk" className="h-10 w-auto" />
+            <span className="text-2xl font-bold">Finwrk</span>
           </div>
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              {t.nav.features}
-            </a>
-            <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              {t.nav.pricing}
+              Features
             </a>
             <a href="#security" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              {t.nav.security}
+              Security
+            </a>
+            <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Pricing
+            </a>
+            <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              FAQ
             </a>
             <LanguageSelector />
             <Button onClick={() => setLocation('/signup')} className="bg-primary text-primary-foreground hover:opacity-90">
-              {t.nav.startTrial}
+              Start Free
             </Button>
           </nav>
           
@@ -103,21 +226,28 @@ function LandingContent() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
               >
-                {t.nav.features}
-              </a>
-              <a 
-                href="#pricing" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
-              >
-                {t.nav.pricing}
+                Features
               </a>
               <a 
                 href="#security" 
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
               >
-                {t.nav.security}
+                Security
+              </a>
+              <a 
+                href="#pricing" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              >
+                Pricing
+              </a>
+              <a 
+                href="#faq" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              >
+                FAQ
               </a>
               <div className="flex items-center gap-3 pt-2 border-t border-border">
                 <LanguageSelector />
@@ -128,7 +258,7 @@ function LandingContent() {
                   }} 
                   className="bg-primary text-primary-foreground hover:opacity-90 flex-1"
                 >
-                  {t.nav.startTrial}
+                  Start Free
                 </Button>
               </div>
             </nav>
@@ -138,14 +268,18 @@ function LandingContent() {
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4">
-        <div className="container mx-auto max-w-4xl text-center">
+        <div className="container mx-auto max-w-5xl text-center">
+          <Badge className="mb-6 text-sm px-4 py-2">
+            ✨ Now accepting crypto payments
+          </Badge>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
-            {t.hero.title1}
+            Get paid.
             <br />
-            <span className="text-primary">{t.hero.title2}</span>
+            <span className="text-primary">Stay in control.</span>
           </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            {t.hero.subtitle}
+          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            Professional invoicing and financial management for freelancers and businesses. 
+            Accept payments in fiat and crypto with bank-level security.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button 
@@ -153,246 +287,274 @@ function LandingContent() {
               onClick={() => setLocation('/signup')}
               className="bg-primary text-primary-foreground hover:opacity-90 text-lg px-8 py-6"
             >
-              {t.hero.cta1}
+              Start Free <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button 
               size="lg" 
               variant="outline"
-              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
               className="text-lg px-8 py-6"
             >
-              {t.hero.cta2}
+              See How It Works
             </Button>
           </div>
-          <p className="text-sm text-muted-foreground mt-4">
-            {t.hero.noCreditCard}
+          <p className="text-sm text-muted-foreground mt-6">
+            No credit card required • Free forever plan available
           </p>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-card/30">
+      <section id="features" className="py-20 px-4 bg-accent/5">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              {t.features.title}
+              Everything you need to get paid
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              {t.features.subtitle}
+              Powerful features designed for modern businesses
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div 
-                key={index}
-                className="bg-card border border-border rounded-2xl p-8 hover:border-primary/50 transition-all duration-300"
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-primary" strokeWidth={1.5} />
-                </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
-              </div>
+              <Card key={index} className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                    <feature.icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Security Section */}
+      <section id="security" className="py-20 px-4">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <Badge className="mb-4">🔒 Security First</Badge>
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+              Bank-level security for your financial data
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Your security is our top priority. We implement industry-leading practices to keep your data safe.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {securityFeatures.map((feature, index) => (
+              <Card key={index} className="border-2">
+                <CardHeader>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center shrink-0">
+                      <feature.icon className="w-6 h-6 text-green-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-xl mb-2">{feature.title}</CardTitle>
+                      <p className="text-muted-foreground">{feature.description}</p>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4">
-        <div className="container mx-auto max-w-4xl">
+      <section id="pricing" className="py-20 px-4 bg-accent/5">
+        <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              {t.pricing.title}
+              Simple, transparent pricing
             </h2>
-            <p className="text-xl text-muted-foreground">
-              {t.pricing.subtitle}
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Start free, upgrade when you need more
             </p>
           </div>
-
-          <div className="bg-card border-2 border-primary rounded-3xl p-8 md:p-12 max-w-lg mx-auto">
-            <div className="text-center mb-8">
-              <div className="inline-block bg-primary/10 text-primary text-sm font-medium px-4 py-1 rounded-full mb-4">
-                {t.pricing.badge}
-              </div>
-              <div className="flex items-baseline justify-center gap-2 mb-2">
-                <span className="text-5xl md:text-6xl font-bold text-foreground">{t.pricing.price}</span>
-                <span className="text-xl text-muted-foreground">{t.pricing.currency}</span>
-              </div>
-              <p className="text-muted-foreground">{t.pricing.period}</p>
-            </div>
-
-            <div className="space-y-4 mb-8">
-              {t.pricing.benefits.map((benefit, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-3 h-3 text-primary" strokeWidth={3} />
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {plans.map((plan, index) => (
+              <Card 
+                key={index} 
+                className={`relative ${plan.highlighted ? 'border-primary border-2 shadow-xl scale-105' : 'border-2'}`}
+              >
+                {plan.highlighted && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <Badge className="bg-primary text-primary-foreground px-4 py-1">
+                      Most Popular
+                    </Badge>
                   </div>
-                  <span className="text-foreground">{benefit}</span>
-                </div>
-              ))}
-            </div>
-
-            <Button 
-              size="lg" 
-              onClick={() => setLocation('/signup')}
-              className="w-full bg-primary text-primary-foreground hover:opacity-90 text-lg py-6"
-            >
-              {t.pricing.cta}
-            </Button>
-            <p className="text-center text-sm text-muted-foreground mt-4">
-              {t.pricing.afterTrial}
-            </p>
+                )}
+                <CardHeader>
+                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                  <CardDescription>{plan.description}</CardDescription>
+                  <div className="mt-4">
+                    <span className="text-4xl font-bold">{plan.price}</span>
+                    <span className="text-muted-foreground">{plan.period}</span>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    className={`w-full mb-6 ${plan.highlighted ? 'bg-primary text-primary-foreground' : ''}`}
+                    variant={plan.highlighted ? 'default' : 'outline'}
+                    onClick={() => setLocation('/signup')}
+                  >
+                    {plan.cta}
+                  </Button>
+                  <ul className="space-y-3">
+                    {plan.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="flex items-start gap-3">
+                        {feature.included ? (
+                          <Check className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                        ) : (
+                          <X className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
+                        )}
+                        <span className={feature.included ? 'text-foreground' : 'text-muted-foreground'}>
+                          {feature.text}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Security Standards Section */}
-      <section id="security" className="py-20 px-4 bg-background">
-        <div className="container mx-auto max-w-6xl">
+      {/* How It Works Section */}
+      <section className="py-20 px-4">
+        <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              {t.security.title}
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+              Get started in minutes
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t.security.subtitle}
+            <p className="text-xl text-muted-foreground">
+              Three simple steps to start getting paid
             </p>
           </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* AES-256-GCM Encryption */}
-            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-primary" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {howItWorks.map((step, index) => (
+              <div key={index} className="text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-3xl font-bold text-primary mx-auto mb-4">
+                  {step.step}
+                </div>
+                <h3 className="text-xl font-bold mb-2">{step.title}</h3>
+                <p className="text-muted-foreground">{step.description}</p>
               </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                {t.security.encryption.title}
-              </h3>
-              <p className="text-muted-foreground text-sm">
-                {t.security.encryption.description}
-              </p>
-            </div>
-
-            {/* Bcrypt Password Hashing */}
-            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                {t.security.passwords.title}
-              </h3>
-              <p className="text-muted-foreground text-sm">
-                {t.security.passwords.description}
-              </p>
-            </div>
-
-            {/* JWT Tokens */}
-            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                {t.security.sessions.title}
-              </h3>
-              <p className="text-muted-foreground text-sm">
-                {t.security.sessions.description}
-              </p>
-            </div>
-
-            {/* HTTPS & TLS */}
-            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                {t.security.transport.title}
-              </h3>
-              <p className="text-muted-foreground text-sm">
-                {t.security.transport.description}
-              </p>
-            </div>
-
-            {/* Rate Limiting */}
-            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                {t.security.protection.title}
-              </h3>
-              <p className="text-muted-foreground text-sm">
-                {t.security.protection.description}
-              </p>
-            </div>
-
-            {/* Security Audits */}
-            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">
-                {t.security.audits.title}
-              </h3>
-              <p className="text-muted-foreground text-sm">
-                {t.security.audits.description}
-              </p>
-            </div>
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="faq" className="py-20 px-4 bg-accent/5">
+        <div className="container mx-auto max-w-3xl">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+              Frequently Asked Questions
+            </h2>
+          </div>
+          
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <Card key={index} className="border-2">
+                <CardHeader 
+                  className="cursor-pointer hover:bg-accent/50 transition-colors"
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                >
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">{faq.question}</CardTitle>
+                    <ChevronDown 
+                      className={`w-5 h-5 transition-transform ${openFaq === index ? 'rotate-180' : ''}`}
+                    />
+                  </div>
+                </CardHeader>
+                {openFaq === index && (
+                  <CardContent>
+                    <p className="text-muted-foreground">{faq.answer}</p>
+                  </CardContent>
+                )}
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-4">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            Ready to take control of your finances?
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8">
+            Join thousands of businesses using Finwrk to get paid faster
+          </p>
+          <Button 
+            size="lg" 
+            onClick={() => setLocation('/signup')}
+            className="bg-primary text-primary-foreground hover:opacity-90 text-lg px-8 py-6"
+          >
+            Start Free Today <ArrowRight className="ml-2 w-5 h-5" />
+          </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 border-t border-border">
+      <footer className="border-t border-border py-12 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
-              <img src="/hiwork-icon-new.png" alt="HiWork" className="h-12 w-auto mb-4" />
+              <div className="flex items-center gap-2 mb-4">
+                <img src="/hiwork-icon-new.png" alt="Finwrk" className="h-8 w-auto" />
+                <span className="text-xl font-bold">Finwrk</span>
+              </div>
               <p className="text-sm text-muted-foreground">
-                {t.footer.description}
+                Get paid. Stay in control.
               </p>
             </div>
             
             <div>
-              <h4 className="font-semibold text-foreground mb-4">{t.footer.product}</h4>
-              <ul className="space-y-2">
-                <li><a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t.nav.features}</a></li>
-                <li><a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t.nav.pricing}</a></li>
-                <li><a href="#security" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t.nav.security}</a></li>
+              <h3 className="font-semibold mb-4">Product</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#features" className="hover:text-foreground transition-colors">Features</a></li>
+                <li><a href="#security" className="hover:text-foreground transition-colors">Security</a></li>
+                <li><a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold text-foreground mb-4">{t.footer.legal}</h4>
-              <ul className="space-y-2">
-                <li><a href="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t.footer.terms}</a></li>
-                <li><a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">{t.footer.privacy}</a></li>
+              <h3 className="font-semibold mb-4">Company</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-foreground transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Blog</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Contact</a></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="font-semibold text-foreground mb-4">{t.footer.support}</h4>
-              <ul className="space-y-2">
-                <li><a href="mailto:support@hiwork.app" className="text-sm text-muted-foreground hover:text-foreground transition-colors">support@hiwork.app</a></li>
+              <h3 className="font-semibold mb-4">Legal</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-foreground transition-colors">Privacy</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Terms</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Security</a></li>
               </ul>
             </div>
           </div>
           
-          <div className="pt-8 border-t border-border text-center">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} HiWork. {t.footer.rights}
-            </p>
+          <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
+            <p>© 2026 Finwrk. All rights reserved.</p>
           </div>
         </div>
       </footer>
     </div>
-  );
-}
-
-export default function Landing() {
-  return (
-    <LandingLanguageProvider>
-      <LandingContent />
-    </LandingLanguageProvider>
   );
 }
