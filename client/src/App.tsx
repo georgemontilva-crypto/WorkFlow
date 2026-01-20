@@ -24,6 +24,7 @@ import Reminders from "./pages/Reminders";
 import Admin from "./pages/Admin";
 import Markets from "./pages/Markets";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { CrispChat } from "./components/CrispChat";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -94,6 +95,7 @@ function App() {
           <TooltipProvider>
             <Toaster />
             <Router />
+            <CrispChat />
           </TooltipProvider>
         </ThemeProvider>
       </LanguageProvider>

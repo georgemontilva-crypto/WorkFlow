@@ -12,7 +12,7 @@ import { useEffect } from 'react';
  * 5. Uncomment the component in App.tsx
  */
 
-const CRISP_WEBSITE_ID = 'YOUR_WEBSITE_ID'; // Replace with your Crisp Website ID
+const CRISP_WEBSITE_ID = 'df45aad0-50ab-4415-b389-eff534fd5a80';
 
 export function CrispChat() {
   useEffect(() => {
