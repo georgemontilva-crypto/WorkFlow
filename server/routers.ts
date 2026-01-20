@@ -901,9 +901,10 @@ export const appRouter = router({
           }
           
           // Update invoice with proof and change status to payment_sent
+          const { sql } = await import('drizzle-orm');
           await db.updateInvoice(invoice.id, invoice.user_id, {
             payment_proof: input.proof,
-            payment_proof_uploaded_at: new Date(),
+            payment_proof_uploaded_at: sql`NOW()`,
             status: 'payment_sent' as const,
           });
           
