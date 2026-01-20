@@ -34,7 +34,7 @@ export function PlanLimitDialog({
 
   const handleUpgrade = () => {
     onOpenChange(false);
-    setLocation('/settings?tab=subscription');
+    setLocation('/pricing');
   };
 
   const limitText = limitType === 'invoices' ? 'facturas' : 'clientes';
