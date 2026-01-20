@@ -8,7 +8,7 @@ import { useLocation } from 'wouter';
 import { 
   Users, FileText, TrendingUp, Target, Bell, Shield,
   Check, X, Menu, Zap, Globe, Lock, Key, Database,
-  ArrowRight, Star, ChevronDown
+  ArrowRight, Star, ChevronDown, Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -269,9 +269,10 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4">
         <div className="container mx-auto max-w-5xl text-center">
-          <Badge className="mb-6 text-sm px-4 py-2">
-            ✨ Now accepting crypto payments
-          </Badge>
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
+            <Sparkles className="w-4 h-4" />
+            <span>Now accepting crypto payments</span>
+          </div>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
             Get paid.
             <br />
@@ -338,7 +339,10 @@ export default function Landing() {
       <section id="security" className="py-20 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <Badge className="mb-4">🔒 Security First</Badge>
+            <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
+              <Shield className="w-4 h-4" />
+              <span>Security First</span>
+            </div>
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
               Bank-level security for your financial data
             </h2>
