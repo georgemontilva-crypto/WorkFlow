@@ -3,7 +3,7 @@
  */
 
 import { Resend } from 'resend';
-import { getVerificationEmailHtml, getVerificationEmailText } from './verification';
+import { getVerificationEmailHtml } from './verification';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -23,7 +23,6 @@ export async function sendVerificationEmail(
       to: [to],
       subject: 'Welcome to Finwrk - Verify your email',
       html: getVerificationEmailHtml(verificationUrl, userName),
-      text: getVerificationEmailText(verificationUrl, userName),
     });
 
     if (error) {
