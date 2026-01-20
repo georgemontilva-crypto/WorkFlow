@@ -107,6 +107,7 @@ export const invoices = mysqlTable("invoices", {
   payment_link: text("payment_link"),
   payment_proof: text("payment_proof"),
   payment_proof_uploaded_at: timestamp("payment_proof_uploaded_at"),
+  client_comment: text("client_comment"),
   notes: text("notes"),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),

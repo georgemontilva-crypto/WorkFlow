@@ -900,13 +900,12 @@ export const appRouter = router({
             throw new Error('Invoice not found');
           }
           
-          // Update invoice with proof and change status to payment_sent
+            // Update invoice with proof and change status to payment_sent
           await db.updateInvoice(invoice.id, invoice.user_id, {
             payment_proof: input.proof,
             payment_proof_uploaded_at: new Date(),
             status: 'payment_sent',
-            notes: input.comment ? `${invoice.notes || ''}\n\nComentario del cliente: ${input.comment}` : invoice.notes,
-            updated_at: new Date(),
+            client_comment: input.comment || null,
           });
           
           return { success: true, message: 'Payment proof uploaded' };
