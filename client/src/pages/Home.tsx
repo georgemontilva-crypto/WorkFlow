@@ -655,11 +655,11 @@ function SortableWidget({ widget, children }: { widget: any; children: React.Rea
       {...attributes}
       className="group relative"
     >
-      {/* Drag Handle - Always visible, larger, and easier to grab */}
+      {/* Drag Handle - Bottom right corner */}
       <button
         ref={setActivatorNodeRef}
         {...listeners}
-        className="absolute top-3 left-3 z-20 cursor-grab active:cursor-grabbing bg-background/90 hover:bg-background rounded-md p-2 backdrop-blur-sm border border-border shadow-sm transition-all hover:scale-110"
+        className="absolute bottom-3 right-3 z-20 cursor-grab active:cursor-grabbing bg-background/90 hover:bg-background rounded-md p-2 backdrop-blur-sm border border-border shadow-sm transition-all hover:scale-110"
         style={{ touchAction: 'none' }}
         onClick={(e) => e.stopPropagation()}
         aria-label="Arrastrar para reordenar"
