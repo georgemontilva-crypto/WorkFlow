@@ -656,6 +656,18 @@ export async function getInvoiceByPaymentToken(token: string) {
   return result[0] || null;
 }
 
+export async function updateInvoiceStatus(id: number, user_id: number, status: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(invoices)
+    .set({ status: status as any })
+    .where(eq(invoices.id, id));
+}
+
 
 export async function getClientsByUserId(user_id: number) {
   const db = await getDb();

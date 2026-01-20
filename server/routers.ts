@@ -900,8 +900,7 @@ export const appRouter = router({
             throw new Error('Invoice not found');
           }
           
-          // Update invoice with proof and change status to payment_sent
-          console.log('[uploadPaymentProof] Updating invoice:', {
+          console.log('[uploadPaymentProof] Processing payment proof:', {
             invoice_id: invoice.id,
             user_id: invoice.user_id,
             proof_length: input.proof?.length || 0,
@@ -909,25 +908,10 @@ export const appRouter = router({
             new_status: 'payment_sent'
           });
           
-          // Use MySQL2 pool directly to avoid Drizzle ORM issues
-          try {
-            const mysql = await import('mysql2/promise');
-            const { ENV } = await import('./_core/env');
-            const pool = mysql.createPool({ uri: ENV.databaseUrl });
-            
-            const [result] = await pool.execute(
-              'UPDATE invoices SET payment_proof = ?, status = ? WHERE id = ? AND user_id = ?',
-              [input.proof, 'payment_sent', invoice.id, invoice.user_id]
-            );
-            
-            await pool.end();
-            console.log('[uploadPaymentProof] Update successful:', result);
-          } catch (sqlError: any) {
-            console.error('[uploadPaymentProof] SQL Error:', sqlError);
-            throw new Error(`Failed to update invoice: ${sqlError.message}`);
-          }
+          // Update invoice status to payment_sent (without saving the proof)
+          await db.updateInvoiceStatus(invoice.id, invoice.user_id, 'payment_sent');
           
-          // Send notification email to user
+          // Send notification email to user with proof attached
           try {
             const { sendEmail } = await import('./_core/email');
             const { getPaymentProofNotificationTemplate } = await import('./_core/email-payment-proof');
@@ -944,22 +928,25 @@ export const appRouter = router({
                 client.name,
                 invoice.total.toString(),
                 invoice.currency || 'USD',
-                dashboardLink
+                dashboardLink,
+                input.proof // Pass the proof to include in email
               );
               
-              // Send email asynchronously without blocking response
-              sendEmail({
+              // Send email with proof image
+              await sendEmail({
                 to: user.email,
-                subject: `Payment Proof Received - Invoice ${invoice.invoice_number}`,
+                subject: `Comprobante de Pago Recibido - Factura ${invoice.invoice_number}`,
                 html: emailHtml,
-              }).catch(err => console.error('[Invoice] Failed to send payment proof notification:', err));
+              });
+              
+              console.log('[uploadPaymentProof] Email sent successfully to:', user.email);
             }
           } catch (error) {
             console.error('[Invoice] Error sending payment proof notification:', error);
-            // Don't throw error, notification failure shouldn't block the upload
+            throw new Error('Failed to send notification email');
           }
           
-          return { success: true, message: 'Payment proof uploaded' };
+          return { success: true, message: 'Payment proof uploaded and email sent' };
         } catch (error: any) {
           throw new Error(error.message || 'Failed to upload payment proof');
         }
