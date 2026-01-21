@@ -7,6 +7,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { startPriceMonitor } from "../services/priceMonitor";
+import { startRecurringInvoicesScheduler } from "./recurring-invoices-job";
 
 async function startServer() {
   const app = express();
@@ -58,6 +59,7 @@ async function startServer() {
     
     // Start background services
     startPriceMonitor();
+    startRecurringInvoicesScheduler();
   });
 }
 
