@@ -833,23 +833,34 @@ export const appRouter = router({
     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
     .header { background: #000; color: #fff; padding: 30px; text-align: center; }
     .content { background: #f9f9f9; padding: 30px; }
+    .button { display: inline-block; padding: 12px 30px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }
     .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Factura - WorkFlow</h1>
+      <h1>Factura - Finwrk</h1>
     </div>
     <div class="content">
       <h2>Hola ${client.name},</h2>
       <p>Adjunto encontrarás la factura <strong>${invoice.invoice_number}</strong>.</p>
-      <p><strong>Total:</strong> $${parseFloat(invoice.total as any).toFixed(2)}</p>
+      <p><strong>Total:</strong> ${invoice.currency} ${parseFloat(invoice.total as any).toFixed(2)}</p>
+      <p><strong>Fecha de emisión:</strong> ${new Date(invoice.issue_date).toLocaleDateString('es-ES')}</p>
       <p><strong>Fecha de vencimiento:</strong> ${new Date(invoice.due_date).toLocaleDateString('es-ES')}</p>
+      ${invoice.payment_token ? `
+      <div style="margin: 30px 0; padding: 20px; background: #fff; border-radius: 8px; text-align: center;">
+        <h3 style="margin: 0 0 15px 0; color: #000;">Ver Factura y Subir Comprobante</h3>
+        <p style="margin: 0 0 20px 0; color: #666;">Haz clic en el botón para ver los detalles de tu factura y subir tu comprobante de pago.</p>
+        <a href="${process.env.APP_URL || 'https://finwrk.app'}/invoice/${invoice.payment_token}" class="button">
+          Ver Factura
+        </a>
+      </div>
+      ` : ''}
       <p>Gracias por tu preferencia.</p>
     </div>
     <div class="footer">
-      <p>© ${new Date().getFullYear()} WorkFlow. Todos los derechos reservados.</p>
+      <p>© ${new Date().getFullYear()} Finwrk. Todos los derechos reservados.</p>
     </div>
   </div>
 </body>
@@ -858,8 +869,13 @@ export const appRouter = router({
           
           await sendEmail({
             to: client.email,
-            subject: `Factura ${invoice.invoice_number} - WorkFlow`,
+            subject: `Factura ${invoice.invoice_number} - Finwrk`,
             html: emailHtml,
+            attachments: [{
+              filename: `factura-${invoice.invoice_number}.pdf`,
+              content: pdfBase64,
+              encoding: 'base64',
+            }],
           });
           
           return { success: true, message: 'Invoice sent successfully' };
