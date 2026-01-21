@@ -144,7 +144,7 @@ export default function Finances() {
                 Nueva Transacción
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-popover border-border">
+            <DialogContent className="bg-popover border-border max-w-md">
               <DialogHeader>
                 <DialogTitle className="text-foreground">Registrar Transacción</DialogTitle>
               </DialogHeader>
