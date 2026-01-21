@@ -1841,6 +1841,14 @@ export const appRouter = router({
 
         return { success: true };
       }),
+
+    // Trigger manual processing of reminders (for testing)
+    triggerProcessing: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { triggerReminderProcessing } = await import("./cron/index");
+        await triggerReminderProcessing();
+        return { success: true, message: "Reminder processing triggered" };
+      }),
   }),
 });
 export type AppRouter = typeof appRouter;

@@ -3,6 +3,7 @@ import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 import { startRecurringInvoicesScheduler } from "./_core/recurring-invoices-job.js";
+import { startCronJobs } from "./cron/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,6 +32,9 @@ async function startServer() {
     
     // Start recurring invoices scheduler
     startRecurringInvoicesScheduler();
+    
+    // Start cron jobs (reminders processor)
+    startCronJobs();
   });
 }
 
