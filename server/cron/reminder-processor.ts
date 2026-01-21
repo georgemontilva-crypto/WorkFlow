@@ -58,11 +58,35 @@ export async function processReminders() {
       if (reminder.reminder_time) {
         const [hours, minutes] = reminder.reminder_time.split(':');
         reminderDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      } else {
+        // If no time specified, set to end of day
+        reminderDate.setHours(23, 59, 59, 999);
       }
 
-      // Check if reminder is past due
-      if (reminderDate < now) {
-        console.log(`[Cron] Reminder ${reminder.id} is past due, updating status to completed`);
+      // Calculate time difference in minutes
+      const minutesUntilReminder = Math.floor((reminderDate.getTime() - now.getTime()) / (1000 * 60));
+      const hoursUntilReminder = minutesUntilReminder / 60;
+      const daysUntilReminder = hoursUntilReminder / 24;
+
+      console.log(`[Cron] Reminder ${reminder.id}: ${minutesUntilReminder} minutes until due (${hoursUntilReminder.toFixed(2)} hours, ${daysUntilReminder.toFixed(2)} days)`);
+
+      // Check if we should send email notification BEFORE marking as completed
+      if (reminder.notify_email === 1 && reminder.email_sent === 0) {
+        // Send email if:
+        // 1. We're within the notification window (days before)
+        // 2. OR the reminder time has passed (send immediately before marking complete)
+        const shouldSendEmail = daysUntilReminder <= reminder.notify_days_before || minutesUntilReminder <= 0;
+        
+        if (shouldSendEmail) {
+          console.log(`[Cron] Sending email for reminder ${reminder.id} (${minutesUntilReminder} minutes until due)`);
+          await sendReminderEmail(reminder);
+        }
+      }
+
+      // Check if reminder is past due (after potentially sending email)
+      if (minutesUntilReminder <= -60) {
+        // Mark as completed if more than 1 hour past due
+        console.log(`[Cron] Reminder ${reminder.id} is past due (${Math.abs(minutesUntilReminder)} minutes ago), updating status to completed`);
         await db
           .update(reminders)
           .set({ 
@@ -70,18 +94,6 @@ export async function processReminders() {
             updated_at: new Date() 
           })
           .where(eq(reminders.id, reminder.id));
-        continue;
-      }
-
-      // Check if we should send email notification
-      if (reminder.notify_email === 1 && reminder.email_sent === 0) {
-        const daysUntilReminder = Math.ceil((reminderDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        
-        // Send email if we're within the notification window
-        if (daysUntilReminder <= reminder.notify_days_before) {
-          console.log(`[Cron] Sending email for reminder ${reminder.id} (${daysUntilReminder} days until due)`);
-          await sendReminderEmail(reminder);
-        }
       }
     }
 
