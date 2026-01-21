@@ -264,3 +264,63 @@
 .sidebar-item-active:hover {
   @apply border-primary text-primary bg-transparent;
 }
+
+
+/* Dashboard Stat Cards */
+.dashboard-stat-card {
+  @apply bg-card border border-border rounded-xl p-6 transition-all duration-200;
+  @apply hover:border-primary/30;
+}
+
+.dashboard-stat-number {
+  @apply text-3xl font-bold text-foreground mb-2;
+}
+
+.dashboard-stat-change {
+  @apply flex items-center gap-1 text-sm font-medium;
+}
+
+.dashboard-stat-change.positive {
+  @apply text-green-500;
+}
+
+.dashboard-stat-change.negative {
+  @apply text-red-500;
+}
+
+
+/* Dashboard Chart Cards */
+.dashboard-chart-card {
+  @apply bg-card border border-border rounded-xl p-6 transition-all duration-200;
+  @apply hover:border-primary/30;
+}
+
+.dashboard-chart-title {
+  @apply text-lg font-semibold text-foreground mb-1;
+}
+
+.dashboard-chart-subtitle {
+  @apply text-sm text-muted-foreground mb-4;
+}
+
+
+/* Resume Items */
+.resume-item {
+  @apply flex items-center justify-between py-2 border-b border-border last:border-0;
+}
+
+.resume-label {
+  @apply text-sm text-muted-foreground;
+}
+
+.resume-value {
+  @apply text-lg font-semibold;
+}
+
+.resume-value.primary {
+  @apply text-primary;
+}
+
+.resume-value.danger {
+  @apply text-red-500;
+}
