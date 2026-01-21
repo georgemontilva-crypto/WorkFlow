@@ -158,7 +158,10 @@ export default function Reminders() {
               <p className="text-sm text-gray-400">
                 {format(new Date(reminder.due_date), 'dd MMM yyyy', { locale: es })}
               </p>
-              <p className="text-base font-mono font-semibold text-white">
+            </div>
+            
+            <div className="text-right min-w-[120px]">
+              <p className="text-lg font-mono font-bold text-white">
                 ${parseFloat(reminder.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
               </p>
             </div>

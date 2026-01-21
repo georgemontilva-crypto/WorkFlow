@@ -584,7 +584,7 @@ export default function Invoices() {
 
         {/* New Invoice Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="bg-popover border-border max-w-[95vw] max-h-[92vh] overflow-y-auto w-[98vw]">
+          <DialogContent className="bg-popover border-border max-w-3xl max-h-[92vh] overflow-y-auto">
               <DialogHeader className="pb-4">
                 <DialogTitle className="text-foreground text-xl sm:text-2xl">{t.invoices.createInvoice}</DialogTitle>
                 <DialogDescription className="text-muted-foreground text-sm">
@@ -1262,7 +1262,7 @@ export default function Invoices() {
 
         {/* Client Selector Modal */}
         <Dialog open={showClientSelector} onOpenChange={setShowClientSelector}>
-          <DialogContent className="bg-popover border-border max-w-3xl max-h-[85vh] overflow-hidden w-[95vw] sm:w-full flex flex-col">
+          <DialogContent className="bg-popover border-border max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
             <DialogHeader className="pb-4">
               <DialogTitle className="text-foreground text-xl flex items-center gap-2">
                 <User className="w-5 h-5" />
@@ -1355,7 +1355,7 @@ export default function Invoices() {
 
         {/* Archived Invoices Dialog */}
         <Dialog open={showArchivedDialog} onOpenChange={setShowArchivedDialog}>
-          <DialogContent className="bg-popover border-border max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+          <DialogContent className="bg-popover border-border max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-foreground text-xl sm:text-2xl">Facturas Archivadas</DialogTitle>
               <DialogDescription className="text-muted-foreground text-sm">

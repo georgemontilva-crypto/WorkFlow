@@ -254,7 +254,7 @@ export default function Clients() {
                 {t.clients.newClient}
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-[#1C1C1C] border-white/10 max-w-6xl max-h-[90vh] overflow-y-auto w-[95vw] lg:w-[90vw]">
+            <DialogContent className="bg-[#1C1C1C] border-white/10 max-w-3xl max-h-[90vh] overflow-y-auto">
               <DialogHeader className="pb-4">
                 <DialogTitle className="text-white text-xl sm:text-2xl">
                   {editingClient ? t.clients.editClient : t.clients.addClient}

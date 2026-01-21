@@ -294,34 +294,53 @@ export default function Home() {
               <h3 className="dashboard-chart-title">Meta de Ahorros</h3>
               <div className="flex items-center justify-center h-48">
                 <div className="relative w-32 h-32">
-                  <svg className="w-full h-full -rotate-90">
-                    <circle
-                      cx="64"
-                      cy="64"
-                      r="56"
-                      stroke="oklch(0.22 0 0)"
-                      strokeWidth="12"
-                      fill="none"
-                    />
-                    <circle
-                      cx="64"
-                      cy="64"
-                      r="56"
-                      stroke="#FF9500"
-                      strokeWidth="12"
-                      fill="none"
-                      strokeDasharray={`${2 * Math.PI * 56}`}
-                      strokeDashoffset={`${2 * Math.PI * 56 * 0.55}`}
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-primary">45%</span>
-                  </div>
+                  {(() => {
+                    const activeGoals = savingsGoals?.filter(g => g.status === 'active') || [];
+                    const totalTarget = activeGoals.reduce((sum, g) => sum + parseFloat(g.target_amount.toString()), 0);
+                    const totalCurrent = activeGoals.reduce((sum, g) => sum + parseFloat(g.current_amount.toString()), 0);
+                    const progress = totalTarget > 0 ? (totalCurrent / totalTarget) : 0;
+                    const progressPercent = Math.min(Math.round(progress * 100), 100);
+                    const circumference = 2 * Math.PI * 56;
+                    const offset = circumference * (1 - progress);
+                    
+                    return (
+                      <>
+                        <svg className="w-full h-full -rotate-90">
+                          <circle
+                            cx="64"
+                            cy="64"
+                            r="56"
+                            stroke="oklch(0.22 0 0)"
+                            strokeWidth="12"
+                            fill="none"
+                          />
+                          <circle
+                            cx="64"
+                            cy="64"
+                            r="56"
+                            stroke="#FF9500"
+                            strokeWidth="12"
+                            fill="none"
+                            strokeDasharray={circumference}
+                            strokeDashoffset={offset}
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-2xl font-bold text-primary">{progressPercent}%</span>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
               <p className="text-center text-sm text-muted-foreground mt-4">
-                {formatCurrency(4500, 'USD')} de {formatCurrency(10000, 'USD')} ahorrados
+                {(() => {
+                  const activeGoals = savingsGoals?.filter(g => g.status === 'active') || [];
+                  const totalTarget = activeGoals.reduce((sum, g) => sum + parseFloat(g.target_amount.toString()), 0);
+                  const totalCurrent = activeGoals.reduce((sum, g) => sum + parseFloat(g.current_amount.toString()), 0);
+                  return `${formatCurrency(totalCurrent, 'USD')} de ${formatCurrency(totalTarget, 'USD')} ahorrados`;
+                })()}
               </p>
             </div>
 
