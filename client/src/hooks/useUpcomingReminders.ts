@@ -7,7 +7,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
-import { Bell } from 'lucide-react';
+import { Bell, AlertCircle, Clock, DollarSign, Users, Phone, User, Tag } from 'lucide-react';
 
 interface UpcomingReminder {
   id: number;
@@ -105,29 +105,31 @@ export function useUpcomingReminders() {
 
     // Mostrar notificación del navegador si está permitido
     if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('🔔 Recordatorio en 5 minutos', {
+      new Notification('Recordatorio en 5 minutos', {
         body: reminder.title,
         icon: '/hiwork-icon.png',
         tag: `reminder-${reminder.id}`,
       });
     }
 
-    // Mostrar toast con diseño personalizado
-    const priorityEmoji = {
-      high: '🔴',
-      medium: '🟡',
-      low: '🟢',
-    }[reminder.priority] || '🟡';
+    // Obtener icono según categoría
+    const CategoryIcon = {
+      meeting: Users,
+      payment: DollarSign,
+      deadline: Clock,
+      follow_up: Phone,
+      personal: User,
+      other: Tag,
+    }[reminder.category] || Tag;
 
-    const categoryEmoji = {
-      meeting: '👥',
-      payment: '💰',
-      deadline: '⏰',
-      follow_up: '📞',
-      personal: '👤',
-      other: '📌',
-    }[reminder.category] || '📌';
+    // Obtener color según prioridad
+    const priorityColor = {
+      high: 'text-red-500',
+      medium: 'text-yellow-500',
+      low: 'text-green-500',
+    }[reminder.priority] || 'text-yellow-500';
 
+    // Mostrar toast con diseño minimalista
     toast(
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0 p-2 bg-orange-500/20 rounded-lg">
@@ -135,8 +137,9 @@ export function useUpcomingReminders() {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
+            <CategoryIcon className={`w-4 h-4 ${priorityColor}`} />
             <span className="text-base font-semibold">
-              {priorityEmoji} {categoryEmoji} {reminder.title}
+              {reminder.title}
             </span>
           </div>
           {reminder.description && (
@@ -144,9 +147,10 @@ export function useUpcomingReminders() {
               {reminder.description}
             </p>
           )}
-          <p className="text-xs text-orange-600 font-medium">
-            ⏰ En 5 minutos
-          </p>
+          <div className="flex items-center gap-1 text-xs text-orange-600 font-medium">
+            <Clock className="w-3 h-3" />
+            <span>En 5 minutos</span>
+          </div>
         </div>
       </div>,
       {
