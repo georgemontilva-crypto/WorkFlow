@@ -574,7 +574,7 @@ export default function Invoices() {
                 }
                 setIsDialogOpen(true);
               }}
-              className="bg-primary text-primary-foreground hover:opacity-90"
+              className=""
             >
               <Plus className="w-4 h-4 mr-2" />
               Nueva Factura
@@ -908,7 +908,7 @@ export default function Invoices() {
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="button" className="bg-primary text-primary-foreground hover:opacity-90">
+                      <Button type="button">
                         <FileText className="w-4 h-4 mr-2" />
                         Crear Factura
                         <ChevronDown className="w-4 h-4 ml-2" />
@@ -1205,7 +1205,7 @@ export default function Invoices() {
               </AlertDialogCancel>
               <AlertDialogAction 
                 onClick={() => confirmStatusChange(true)}
-                className="bg-primary text-primary-foreground hover:opacity-90"
+                className=""
               >
                 Sí, agregar a Finanzas
               </AlertDialogAction>
@@ -1252,7 +1252,7 @@ export default function Invoices() {
               </AlertDialogCancel>
               <AlertDialogAction 
                 onClick={confirmPartialPayment}
-                className="bg-primary text-primary-foreground hover:opacity-90"
+                className=""
               >
                 Registrar Pago
               </AlertDialogAction>

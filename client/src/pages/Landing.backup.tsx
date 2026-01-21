@@ -79,7 +79,7 @@ function LandingContent() {
               {t.nav.security}
             </a>
             <LanguageSelector />
-            <Button onClick={() => setLocation('/signup')} className="bg-primary text-primary-foreground hover:opacity-90">
+            <Button onClick={() => setLocation('/signup')} className="">
               {t.nav.startTrial}
             </Button>
           </nav>

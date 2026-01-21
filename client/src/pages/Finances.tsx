@@ -139,7 +139,7 @@ export default function Finances() {
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:opacity-90">
+              <Button className="w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" />
                 Nueva Transacción
               </Button>
@@ -242,7 +242,7 @@ export default function Finances() {
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit" className="bg-primary text-primary-foreground hover:opacity-90">
+                  <Button type="submit">
                     Guardar
                   </Button>
                 </div>

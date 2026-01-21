@@ -209,7 +209,7 @@ export default function Landing() {
             >
               Login
             </Button>
-            <Button onClick={() => setLocation('/signup')} className="bg-primary text-primary-foreground hover:opacity-90">
+            <Button onClick={() => setLocation('/signup')} className="">
               Start Free
             </Button>
           </nav>

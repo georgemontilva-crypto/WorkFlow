@@ -249,7 +249,7 @@ export default function Clients() {
             }
           }}>
             <DialogTrigger asChild>
-              <Button className="bg-[#FF9500] text-black hover:bg-[#FFA500] font-semibold">
+              <Button>
                 <Plus className="w-4 h-4 mr-2" />
                 {t.clients.newClient}
               </Button>
@@ -427,8 +427,7 @@ export default function Clients() {
                     {t.common.cancel}
                   </Button>
                   <Button 
-                    type="submit" 
-                    className="bg-[#FF9500] text-black hover:bg-[#FFA500] font-semibold"
+                    type="submit"
                     disabled={createClient.isPending || updateClient.isPending}
                   >
                     {editingClient ? t.common.update : t.common.create}
@@ -563,7 +562,7 @@ export default function Clients() {
                 size="icon"
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
-                className="text-white hover:bg-white/5 disabled:opacity-30 bg-[#FF9500] text-black"
+                className="disabled:opacity-30"
               >
                 <ChevronRight className="w-5 h-5" />
               </Button>

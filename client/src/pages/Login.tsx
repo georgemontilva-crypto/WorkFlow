@@ -119,7 +119,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="w-full bg-primary text-primary-foreground hover:opacity-90"
+                className="w-full"
                 disabled={loginMutation.isPending}
               >
                 {loginMutation.isPending ? (

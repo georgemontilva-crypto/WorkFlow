@@ -130,7 +130,7 @@ export default function Verify2FA() {
 
               <Button
                 type="submit"
-                className="w-full bg-primary text-primary-foreground hover:opacity-90"
+                className="w-full"
                 disabled={verify2FAMutation.isPending || code.length !== 6}
               >
                 {verify2FAMutation.isPending ? (

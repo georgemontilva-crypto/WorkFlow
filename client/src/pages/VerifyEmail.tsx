@@ -105,7 +105,7 @@ export default function VerifyEmail() {
                 <div className="space-y-3">
                   <Button
                     onClick={() => setLocation('/signup')}
-                    className="w-full bg-primary text-primary-foreground hover:opacity-90"
+                    className="w-full"
                   >
                     Go to Sign Up
                   </Button>
