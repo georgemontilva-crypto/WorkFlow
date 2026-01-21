@@ -112,22 +112,44 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       return d >= 0 && d <= 5;
     }).length : 0;
 
-  // Base navigation items
-  const baseNavigation = [
-    { name: t.nav.dashboard, href: '/dashboard', icon: LayoutDashboard },
-    { name: t.nav.clients, href: '/clients', icon: Users },
-    { name: t.nav.invoices, href: '/invoices', icon: FileText },
-    { name: t.nav.finances, href: '/finances', icon: Coins },
-    { name: 'Mercados', href: '/markets', icon: TrendingUp },
-    { name: t.nav.goals, href: '/savings', icon: Target },
-    { name: t.nav.reminders, href: '/reminders', icon: Bell },
-    { name: t.nav.settings, href: '/settings', icon: Settings },
+  // Navigation organized by sections
+  const navigationSections = [
+    {
+      title: 'OPERACIONES',
+      items: [
+        { name: t.nav.dashboard, href: '/dashboard', icon: LayoutDashboard },
+        { name: t.nav.reminders, href: '/reminders', icon: Bell },
+      ]
+    },
+    {
+      title: 'GESTIÓN DE CLIENTES',
+      items: [
+        { name: t.nav.clients, href: '/clients', icon: Users },
+      ]
+    },
+    {
+      title: 'FINANZAS',
+      items: [
+        { name: t.nav.invoices, href: '/invoices', icon: FileText },
+        { name: t.nav.finances, href: '/finances', icon: Coins },
+        { name: t.nav.goals, href: '/savings', icon: Target },
+        { name: 'Mercados', href: '/markets', icon: TrendingUp },
+      ]
+    },
   ];
 
-  // Add admin link for super admins
-  const navigation = user?.role === 'super_admin'
-    ? [...baseNavigation, { name: 'Admin', href: '/admin', icon: Shield }]
-    : baseNavigation;
+  // Add admin section for super admins
+  if (user?.role === 'super_admin') {
+    navigationSections.push({
+      title: 'ADMINISTRACIÓN',
+      items: [
+        { name: 'Admin', href: '/admin', icon: Shield },
+      ]
+    });
+  }
+
+  // Settings at the bottom (separate)
+  const settingsItem = { name: t.nav.settings, href: '/settings', icon: Settings };
 
   // Handle upgrade action
   const handleUpgrade = () => {
@@ -165,26 +187,57 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
-          {navigation.map((item) => {
-            const isActive = location === item.href;
-            return (
-              <Link key={item.name} href={item.href}>
-                <a
-                  className={cn(
-                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 cursor-pointer',
-                    isActive
-                      ? 'bg-accent text-accent-foreground'
-                      : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
-                  )}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <item.icon className="w-5 h-5" strokeWidth={1.5} />
-                  {item.name}
-                </a>
-              </Link>
-            );
-          })}
+        <nav className="flex-1 px-3 py-4 overflow-y-auto">
+          {navigationSections.map((section, sectionIdx) => (
+            <div key={section.title} className={cn("mb-6", sectionIdx === 0 && "mt-2")}>
+              {/* Section Title */}
+              <div className="px-3 mb-2">
+                <h3 className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider">
+                  {section.title}
+                </h3>
+              </div>
+              {/* Section Items */}
+              <div className="space-y-0.5">
+                {section.items.map((item) => {
+                  const isActive = location === item.href;
+                  return (
+                    <Link key={item.name} href={item.href}>
+                      <a
+                        className={cn(
+                          'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 cursor-pointer',
+                          isActive
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                        )}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <item.icon className="w-5 h-5" strokeWidth={1.5} />
+                        {item.name}
+                      </a>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+          
+          {/* Settings - Separate at bottom */}
+          <div className="mt-auto pt-4 border-t border-border">
+            <Link href={settingsItem.href}>
+              <a
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150 cursor-pointer',
+                  location === settingsItem.href
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                )}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <settingsItem.icon className="w-5 h-5" strokeWidth={1.5} />
+                {settingsItem.name}
+              </a>
+            </Link>
+          </div>
         </nav>
 
         {/* Trial Status Indicator */}
