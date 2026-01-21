@@ -52,7 +52,7 @@ export default function EventCard({
         {/* Header con título y menú */}
         <div className="flex items-start justify-between mb-2">
           <h3 className="text-base font-semibold text-foreground">{title}</h3>
-          <Button variant="ghost" size="icon" className="h-6 w-6 -mr-2 -mt-1 text-muted-foreground hover:text-foreground">
+          <Button variant="ghost" size="icon" className="h-6 w-6 -mr-2 -mt-1 text-primary hover:text-primary/80">
             <MoreVertical className="w-4 h-4" />
           </Button>
         </div>

@@ -992,7 +992,7 @@ export default function Invoices() {
                           </Button>
                           <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-8 w-8">
+                            <Button variant="ghost" size="icon" className="text-primary hover:text-primary/80 h-8 w-8">
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -1067,7 +1067,7 @@ export default function Invoices() {
                             </Button>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-8 w-8">
+                                <Button variant="ghost" size="icon" className="text-primary hover:text-primary/80 h-8 w-8">
                                   <MoreVertical className="w-4 h-4" />
                                 </Button>
                               </DropdownMenuTrigger>

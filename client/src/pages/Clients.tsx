@@ -498,7 +498,7 @@ export default function Clients() {
                         <td className="p-4">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-white/5">
+                              <Button variant="ghost" size="icon" className="text-primary hover:text-primary/80 hover:bg-white/5">
                                 <MoreVertical className="w-4 h-4" />
                               </Button>
                             </DropdownMenuTrigger>

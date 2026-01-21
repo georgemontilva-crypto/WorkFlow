@@ -368,7 +368,7 @@ export default function Savings() {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="flex-shrink-0 text-white hover:bg-white/5">
+                        <Button variant="ghost" size="icon" className="flex-shrink-0 text-primary hover:text-primary/80 hover:bg-white/5">
                           <MoreVertical className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
