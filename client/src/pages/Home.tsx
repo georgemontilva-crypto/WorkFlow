@@ -7,7 +7,8 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { trpc } from '@/lib/trpc';
-import { Users, FileText, TrendingUp, TrendingDown, Plus, AlertCircle, Bell, Target, BarChart3, X, Sparkles } from 'lucide-react';
+import { Users, FileText, TrendingUp, TrendingDown, Plus, AlertCircle, Bell, Target, BarChart3, X, Sparkles, User } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useLocation } from 'wouter';
@@ -468,6 +469,55 @@ export default function Home() {
             </Button>
           </div>
         </div>
+
+        {/* Mi Cuenta Section */}
+        <Card className="mb-6 lg:mb-8 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="w-5 h-5" />
+              Mi Cuenta
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Nombre</p>
+                <p className="font-semibold">{user?.name || 'Usuario'}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Email</p>
+                <p className="font-semibold text-sm">{user?.email}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Plan Actual</p>
+                <div className="flex items-center gap-2">
+                  <Badge variant={user?.subscription_plan === 'free' ? 'secondary' : 'default'} className="capitalize">
+                    {user?.subscription_plan === 'free' && '✨ '}
+                    {user?.subscription_plan === 'pro' && '⚡ '}
+                    {user?.subscription_plan === 'business' && '👑 '}
+                    {user?.subscription_plan || 'Free'}
+                  </Badge>
+                  {user?.subscription_plan === 'free' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setLocation('/pricing')}
+                      className="h-7 text-xs"
+                    >
+                      Upgrade
+                    </Button>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Miembro desde</p>
+                <p className="font-semibold">
+                  {user?.created_at ? format(new Date(user.created_at), 'dd MMM yyyy', { locale: es }) : '-'}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Crypto Widgets Grid (Sortable) */}
         {cryptoWidgets.length > 0 && (

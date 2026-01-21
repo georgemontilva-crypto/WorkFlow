@@ -331,6 +331,12 @@ export default function Invoices() {
   };
 
   const handleArchive = async (invoice: Invoice) => {
+    // Check if user has Pro or Business plan
+    if (user?.subscription_plan === 'free') {
+      setShowLimitDialog(true);
+      return;
+    }
+    
     if (invoice.status !== 'paid') {
       toast.error('Solo se pueden archivar facturas pagadas');
       return;
