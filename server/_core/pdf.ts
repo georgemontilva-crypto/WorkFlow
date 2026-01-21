@@ -4,6 +4,7 @@
  */
 
 import type { Invoice } from "../../drizzle/schema";
+import jsPDF from 'jspdf';
 
 interface InvoiceItem {
   description: string;
@@ -26,10 +27,6 @@ interface InvoiceData extends Invoice {
  */
 export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<string> {
   try {
-    // Dynamic import of jsPDF
-    const jsPDFModule = await import('jspdf');
-    const jsPDF = jsPDFModule.default || jsPDFModule;
-    
     // Create new PDF document
     const doc = new jsPDF();
     
