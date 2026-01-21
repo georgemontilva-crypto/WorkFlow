@@ -1687,7 +1687,7 @@ export const appRouter = router({
         related_invoice_id: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        return await db.createReminder({
+        const reminder = await db.createReminder({
           user_id: ctx.user.id,
           title: input.title,
           description: input.description,
@@ -1700,6 +1700,37 @@ export const appRouter = router({
           related_client_id: input.related_client_id,
           related_invoice_id: input.related_invoice_id,
         });
+
+        // Schedule email notification if enabled
+        if (input.notify_email !== false) {
+          const { scheduleReminder } = await import("./queues/reminder-queue");
+          
+          // Calculate when to send notification
+          const reminderDate = new Date(input.reminder_date);
+          if (input.reminder_time) {
+            const [hours, minutes] = input.reminder_time.split(':');
+            reminderDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+          } else {
+            reminderDate.setHours(9, 0, 0, 0); // Default to 9 AM
+          }
+          
+          // Subtract notify_days_before
+          const daysBefore = input.notify_days_before || 0;
+          const sendAt = new Date(reminderDate.getTime() - (daysBefore * 24 * 60 * 60 * 1000));
+          
+          await scheduleReminder({
+            reminderId: reminder.id,
+            userId: ctx.user.id,
+            title: input.title,
+            description: input.description || null,
+            reminderDate: input.reminder_date,
+            reminderTime: input.reminder_time || null,
+            priority: input.priority || 'medium',
+            category: input.category || 'other',
+          }, sendAt);
+        }
+
+        return reminder;
       }),
 
     // Update a reminder
@@ -1718,16 +1749,52 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const { id, ...data } = input;
-        return await db.updateReminder(id, ctx.user.id, {
+        const reminder = await db.updateReminder(id, ctx.user.id, {
           ...data,
           reminder_date: data.reminder_date ? new Date(data.reminder_date) : undefined,
         });
+
+        // Reschedule if date/time changed and email notification is enabled
+        if ((data.reminder_date || data.reminder_time) && data.notify_email !== false) {
+          const { rescheduleReminder } = await import("./queues/reminder-queue");
+          const fullReminder = await db.getReminderById(id, ctx.user.id);
+          
+          if (fullReminder && fullReminder.notify_email === 1) {
+            const reminderDate = new Date(fullReminder.reminder_date);
+            if (fullReminder.reminder_time) {
+              const [hours, minutes] = fullReminder.reminder_time.split(':');
+              reminderDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+            } else {
+              reminderDate.setHours(9, 0, 0, 0);
+            }
+            
+            const daysBefore = fullReminder.notify_days_before || 0;
+            const sendAt = new Date(reminderDate.getTime() - (daysBefore * 24 * 60 * 60 * 1000));
+            
+            await rescheduleReminder({
+              reminderId: fullReminder.id,
+              userId: ctx.user.id,
+              title: fullReminder.title,
+              description: fullReminder.description,
+              reminderDate: fullReminder.reminder_date.toISOString(),
+              reminderTime: fullReminder.reminder_time,
+              priority: fullReminder.priority,
+              category: fullReminder.category,
+            }, sendAt);
+          }
+        }
+
+        return reminder;
       }),
 
     // Delete a reminder
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
+        // Cancel scheduled job if exists
+        const { cancelReminder } = await import("./queues/reminder-queue");
+        await cancelReminder(input.id);
+        
         return await db.deleteReminder(input.id, ctx.user.id);
       }),
 
