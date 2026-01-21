@@ -1,15 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Radeil Rounded Font */
-@font-face {
-  font-family: 'Radeil Rounded';
-  src: url('/fonts/RadeilRounded-Regular.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -51,81 +42,70 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Finwrk - Events Management Theme */
+/* Finwrk - Premium Dark Theme */
 :root {
-  /* Inspirado en Events Management Dashboard */
-  --radius: 1.25rem; /* 20px - Border radius consistente */
+  /* Colores exactos del proyecto de referencia */
+  --primary: #FF9500;
+  --primary-foreground: #FFFFFF;
+  --sidebar-primary: #FF8C00;
+  --sidebar-primary-foreground: #FFFFFF;
   
-  /* Colores principales del diseño Events Management */
-  --orange-primary: oklch(0.68 0.20 35); /* Naranja oscuro #FF6B35 */
-  --teal-card: oklch(0.45 0.08 200); /* Teal para cards #2C5F5F */
-  --green-card: oklch(0.40 0.06 140); /* Verde oscuro para cards #3A5A3A */
-  --blue-card: oklch(0.35 0.08 250); /* Azul oscuro para cards #2C3E5F */
-  --purple-card: oklch(0.45 0.15 290); /* Morado para cards #6B4C9A */
-  
-  /* Backgrounds - Estructura exacta del diseño */
-  --background: oklch(0 0 0); /* Negro puro #000000 */
-  --foreground: oklch(1 0 0); /* Blanco puro #FFFFFF */
-  
-  /* Card - Gris medio como en las tarjetas */
-  --card: oklch(0.18 0 0); /* Gris medio #2A2A2A */
-  --card-foreground: oklch(1 0 0); /* Blanco */
-  
-  /* Popover/Modal */
-  --popover: oklch(0.18 0 0 / 0.98); /* Gris medio casi sólido */
-  --popover-foreground: oklch(1 0 0); /* Blanco */
-  
-  /* Primary: Naranja oscuro */
-  --primary: #FF9500; /* Naranja #FF6B35 */
-  --primary-foreground: oklch(1 0 0); /* Blanco */
-  
-  /* Secondary: Gris claro para texto secundario */
-  --secondary: oklch(0.25 0 0); /* Gris oscuro */
-  --secondary-foreground: oklch(0.65 0 0); /* Gris claro #A0A0A0 */
-  
-  /* Muted: Gris para elementos deshabilitados */
-  --muted: oklch(0.22 0 0); /* Gris muted */
-  --muted-foreground: oklch(0.55 0 0); /* Gris medio #8A8A8A */
-  
-  /* Accent: Naranja oscuro (mismo que primary) */
-  --accent: oklch(0.68 0.20 35); /* Naranja #FF6B35 */
-  --accent-foreground: oklch(1 0 0); /* Blanco */
-  
-  /* Status colors */
-  --destructive: oklch(0.60 0.24 25); /* Rojo para Upcoming #E74C3C */
-  --destructive-foreground: oklch(1 0 0); /* Blanco */
-  
-  --success: oklch(0.65 0.18 145); /* Verde para Completed #4CAF50 */
-  --success-foreground: oklch(1 0 0); /* Blanco */
-  
-  --warning: oklch(0.75 0.18 80); /* Amarillo para On-going #FFC107 */
-  --warning-foreground: oklch(0.15 0 0); /* Negro */
-  
-  /* Borders: Muy sutiles */
-  --border: oklch(1 0 0 / 0.08); /* White 8% opacity */
-  --input: oklch(0.18 0 0); /* Gris medio */
-  --ring: oklch(0.68 0.20 35 / 0.5); /* Naranja ring */
-  
-  /* Chart colors - Multicolor como en el dashboard */
+  /* Charts */
   --chart-1: #FF9500;
   --chart-2: #FFA500;
   --chart-3: #FF8C00;
   --chart-4: #E68900;
-  --chart-5: #CC7700; /* Naranja */
-  --chart-2: oklch(0.65 0.18 145); /* Verde */
-  --chart-3: oklch(0.70 0.18 290); /* Morado */
-  --chart-4: oklch(0.68 0.18 200); /* Cyan */
-  --chart-5: oklch(0.75 0.18 80); /* Amarillo */
+  --chart-5: #CC7700;
   
-  /* Sidebar colors - Gris oscuro como en el diseño */
-  --sidebar: oklch(0.11 0 0); /* Gris muy oscuro #1C1C1C */
-  --sidebar-foreground: oklch(0.65 0 0); /* Gris claro */
-  --sidebar-primary: oklch(0.68 0.20 35); /* Naranja */
-  --sidebar-primary-foreground: oklch(1 0 0); /* Blanco */
-  --sidebar-accent: oklch(0.14 0 0); /* Gris oscuro para hover */
-  --sidebar-accent-foreground: oklch(0.75 0 0); /* Gris más claro */
-  --sidebar-border: oklch(1 0 0 / 0.06); /* Border sutil */
-  --sidebar-ring: oklch(0.68 0.20 35); /* Naranja ring */
+  /* Accent colors */
+  --accent-orange: #FF9500;
+  --accent-green: #2ECC71;
+  --accent-blue: #3498DB;
+  --accent-purple: #9B59B6;
+  
+  /* Border radius */
+  --radius: 0.75rem;
+  
+  /* Backgrounds */
+  --background: #0A0A0A;
+  --foreground: #F5F5F5;
+  
+  /* Card */
+  --card: #1A1A1A;
+  --card-foreground: #F5F5F5;
+  
+  /* Popover */
+  --popover: #1A1A1A;
+  --popover-foreground: #F5F5F5;
+  
+  /* Secondary */
+  --secondary: #2A2A2A;
+  --secondary-foreground: #E0E0E0;
+  
+  /* Muted */
+  --muted: #3A3A3A;
+  --muted-foreground: #A0A0A0;
+  
+  /* Accent */
+  --accent: #FF9500;
+  --accent-foreground: #FFFFFF;
+  
+  /* Destructive */
+  --destructive: #FF3B30;
+  --destructive-foreground: #FFFFFF;
+  
+  /* Borders */
+  --border: #333333;
+  --input: #2A2A2A;
+  --ring: #FF9500;
+  
+  /* Sidebar */
+  --sidebar: #1A1A1A;
+  --sidebar-foreground: #F5F5F5;
+  --sidebar-accent: #FF9500;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #333333;
+  --sidebar-ring: #FF9500;
 }
 
 @layer base {
@@ -133,12 +113,34 @@
     @apply border-border;
   }
   
+  html {
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
+  }
+  
+  h1 {
+    @apply text-4xl leading-tight;
+  }
+  
+  h2 {
+    @apply text-3xl leading-tight;
+  }
+  
+  h3 {
+    @apply text-2xl leading-snug;
+  }
+  
+  p {
+    @apply leading-relaxed;
   }
   
   button:not(:disabled),
@@ -155,6 +157,7 @@
 }
 
 @layer components {
+  /* Container */
   .container {
     width: 100%;
     margin-left: auto;
@@ -183,448 +186,7 @@
     }
   }
 
-  /* Glass Card - Gris medio como en el diseño */
-  .glass-card {
-    background: oklch(0.18 0 0); /* #2A2A2A */
-    border: 1px solid oklch(1 0 0 / 0.08);
-    box-shadow: 
-      0 4px 16px rgba(0, 0, 0, 0.4),
-      0 2px 8px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .glass-card:hover {
-    background: oklch(0.20 0 0);
-    border-color: oklch(1 0 0 / 0.12);
-    box-shadow: 
-      0 8px 24px rgba(0, 0, 0, 0.5),
-      0 4px 12px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
-  }
-  
-  /* Event Card - Tarjetas con colores de fondo como en On-going Events */
-  .event-card-teal {
-    background: oklch(0.45 0.08 200); /* Teal */
-    border: none;
-    border-radius: 1.25rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-  }
-  
-  .event-card-teal:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  }
-  
-  .event-card-green {
-    background: oklch(0.40 0.06 140); /* Verde oscuro */
-    border: none;
-    border-radius: 1.25rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-  }
-  
-  .event-card-green:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  }
-  
-  .event-card-blue {
-    background: oklch(0.35 0.08 250); /* Azul oscuro */
-    border: none;
-    border-radius: 1.25rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-  }
-  
-  .event-card-blue:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  }
-  
-  /* Dashboard Stat Cards - Colores vibrantes */
-  .stat-card-teal {
-    background: oklch(0.45 0.10 200);
-    border-radius: 1.25rem;
-    padding: 2rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  }
-  
-  .stat-card-blue {
-    background: oklch(0.40 0.12 250);
-    border-radius: 1.25rem;
-    padding: 2rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  }
-  
-  .stat-card-purple {
-    background: oklch(0.45 0.15 290);
-    border-radius: 1.25rem;
-    padding: 2rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Glass Modal */
-  .glass-modal {
-    background: oklch(0.18 0 0 / 0.98);
-    border: 1px solid oklch(1 0 0 / 0.10);
-    border-radius: 1.5rem;
-    box-shadow: 
-      0 20px 60px rgba(0, 0, 0, 0.6),
-      0 10px 30px rgba(0, 0, 0, 0.5);
-  }
-  
-  /* Table/List Container - Fondo gris como Events List */
-  .table-container {
-    background: oklch(0.18 0 0);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    border-radius: 1.25rem;
-    overflow: hidden;
-  }
-  
-  /* Table Row */
-  .table-row {
-    border-bottom: 1px solid oklch(1 0 0 / 0.06);
-    transition: background 0.2s ease;
-  }
-  
-  .table-row:hover {
-    background: oklch(0.20 0 0);
-  }
-  
-  /* Status Badge */
-  .badge-completed {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.375rem 0.875rem;
-    border-radius: 1rem;
-    background: oklch(0.65 0.18 145 / 0.15);
-    color: oklch(0.75 0.18 145);
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-  
-  .badge-ongoing {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.375rem 0.875rem;
-    border-radius: 1rem;
-    background: oklch(0.75 0.18 80 / 0.15);
-    color: oklch(0.80 0.18 80);
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-  
-  .badge-upcoming {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.375rem 0.875rem;
-    border-radius: 1rem;
-    background: oklch(0.60 0.24 25 / 0.15);
-    color: oklch(0.70 0.24 25);
-    font-size: 0.875rem;
-    font-weight: 500;
-  }
-  
-  /* Sidebar Item - Sin fondo sólido, solo borde y color */
-  .sidebar-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem 1rem;
-    border-left: 4px solid transparent;
-    color: oklch(0.65 0 0);
-    transition: all 0.2s ease;
-    text-decoration: none;
-  }
-  
-  .sidebar-item:hover {
-    background: oklch(0.14 0 0);
-    color: oklch(0.75 0 0);
-  }
-  
-  .sidebar-item-active {
-    border-left-color: oklch(0.68 0.20 35); /* Naranja */
-    color: oklch(0.68 0.20 35); /* Naranja */
-    background: transparent; /* Sin fondo sólido */
-  }
-  
-  .sidebar-item-active svg {
-    color: oklch(0.68 0.20 35); /* Icono naranja */
-  }
-  
-  /* Stat Number */
-  .stat-number {
-    font-size: 2.5rem;
-    font-weight: 700;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    font-feature-settings: "tnum";
-  }
-  
-  /* Icon Circle */
-  .icon-circle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    background: oklch(1 0 0 / 0.10);
-    transition: all 0.2s ease;
-  }
-  
-  .icon-circle:hover {
-    background: oklch(1 0 0 / 0.15);
-    transform: scale(1.05);
-  }
-
-  /* Custom Scrollbar - Naranja accent */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: oklch(0.68 0.20 35 / 0.5) transparent;
-  }
-
-  *::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  *::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  *::-webkit-scrollbar-thumb {
-    background: oklch(0.68 0.20 35 / 0.5);
-    border-radius: 4px;
-    transition: background 0.2s ease;
-  }
-
-  *::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.68 0.20 35 / 0.7);
-  }
-
-  *::-webkit-scrollbar-corner {
-    background: transparent;
-  }
-}
-
-/* Utilidades de bordes redondeados */
-@layer utilities {
-  .rounded-md {
-    border-radius: 1.25rem !important; /* 20px */
-  }
-  
-  .rounded-sm {
-    border-radius: 1rem !important; /* 16px */
-  }
-  
-  .rounded-lg {
-    border-radius: 1.5rem !important; /* 24px */
-  }
-  
-  .rounded-xl {
-    border-radius: 2rem !important; /* 32px */
-  }
-  
-  /* Text shadows */
-  .text-shadow-sm {
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-  }
-  
-  .text-shadow {
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
-  }
-  
-  .text-shadow-lg {
-    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
-  }
-}
-
-  /* Dashboard Layout Classes */
-  .dashboard-stat-card {
-    background: oklch(0.18 0 0);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    border-radius: 20px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px oklch(0 0 0 / 0.1);
-    transition: all 0.3s ease;
-  }
-
-  .dashboard-stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px oklch(0 0 0 / 0.15);
-  }
-
-  .dashboard-stat-number {
-    font-size: 2rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
-    margin: 0.5rem 0;
-  }
-
-  .dashboard-stat-change {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-  }
-
-  .dashboard-stat-change.positive {
-    color: oklch(0.65 0.18 145); /* Verde */
-  }
-
-  .dashboard-stat-change.negative {
-    color: oklch(0.60 0.24 25); /* Rojo */
-  }
-
-  /* Chart Container */
-  .dashboard-chart-card {
-    background: oklch(0.18 0 0);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    border-radius: 20px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px oklch(0 0 0 / 0.1);
-  }
-
-  .dashboard-chart-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-  }
-
-  .dashboard-chart-subtitle {
-    font-size: 0.875rem;
-    color: oklch(0.55 0 0);
-    margin-bottom: 1.5rem;
-  }
-
-  /* Eventos Próximos / Recordatorios */
-  .reminder-card {
-    background: oklch(0.18 0 0);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    border-radius: 20px;
-    padding: 1.5rem;
-    border-left-width: 4px;
-    transition: all 0.3s ease;
-  }
-
-  .reminder-card:hover {
-    transform: translateX(4px);
-    box-shadow: 0 4px 12px oklch(0 0 0 / 0.15);
-  }
-
-  .reminder-card.confirmed {
-    border-left-color: oklch(0.65 0.18 145); /* Verde */
-  }
-
-  .reminder-card.in-progress {
-    border-left-color: oklch(0.70 0.18 250); /* Azul */
-  }
-
-  .reminder-card.pending {
-    border-left-color: oklch(0.65 0.20 290); /* Morado */
-  }
-
-  .reminder-title {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-  }
-
-  .reminder-subtitle {
-    font-size: 0.875rem;
-    color: oklch(0.55 0 0);
-    margin-bottom: 0.75rem;
-  }
-
-  .reminder-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 0.875rem;
-    color: oklch(0.65 0 0);
-  }
-
-  /* Resume Card */
-  .resume-card {
-    background: oklch(0.18 0 0);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    border-radius: 20px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px oklch(0 0 0 / 0.1);
-  }
-
-  .resume-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid oklch(1 0 0 / 0.06);
-  }
-
-  .resume-item:last-child {
-    border-bottom: none;
-  }
-
-  .resume-label {
-    font-size: 0.9375rem;
-    color: oklch(0.75 0 0);
-  }
-
-  .resume-value {
-    font-size: 1.125rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .resume-value.primary {
-    color: oklch(0.68 0.20 35); /* Naranja */
-  }
-
-  .resume-value.warning {
-    color: oklch(0.75 0.18 80); /* Amarillo */
-  }
-
-  .resume-value.danger {
-    color: oklch(0.60 0.24 25); /* Rojo */
-  }
-
-  /* Glow effect from reference code */
-  .glow-effect {
-    box-shadow: 0 0 20px rgba(255, 149, 0, 0.15), 0 0 40px rgba(255, 165, 0, 0.1);
-    transition: all 0.3s ease;
-  }
-
-  .glow-effect:hover {
-    box-shadow: 0 0 30px rgba(255, 149, 0, 0.25), 0 0 60px rgba(255, 165, 0, 0.15);
-  }
-
-  /* Event Card Style - Exact from reference */
-  .card-event {
-    position: relative;
-    overflow: hidden;
-    border-radius: 1rem;
-    background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(26, 26, 26, 0.7) 100%);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-  }
-
-  .card-event:hover {
-    border-color: oklch(0.68 0.20 35 / 0.5);
-    box-shadow: 0 0 25px rgba(255, 149, 0, 0.2);
-  }
-
-  /* Category colors for events */
+  /* Category colors */
   .category-green {
     background: #2ECC71;
   }
@@ -637,322 +199,68 @@
     background: #9B59B6;
   }
 
-  /* Crypto card styles */
-  .crypto-card {
-    position: relative;
-    background: oklch(0.18 0 0);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
+  /* Animaciones suaves */
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
-  .crypto-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px oklch(0 0 0 / 0.15);
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
-  .crypto-card .remove-btn {
-    opacity: 0;
-    transition: opacity 0.2s ease;
+  .animate-slide-in {
+    animation: slideIn 0.5s ease-out;
   }
 
-  .crypto-card:hover .remove-btn {
-    opacity: 1;
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
   }
 
-  /* Horizontal scroll container */
-  .scroll-container {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    scrollbar-width: thin;
-    scrollbar-color: oklch(0.30 0 0) oklch(0.15 0 0);
+  /* Text gradient */
+  .text-gradient {
+    background: linear-gradient(135deg, #FF9500 0%, #FFA500 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  .scroll-container::-webkit-scrollbar {
-    height: 8px;
+  /* Orange accent text */
+  .text-accent-orange {
+    @apply text-primary;
   }
 
-  .scroll-container::-webkit-scrollbar-track {
-    background: oklch(0.15 0 0);
-    border-radius: 4px;
+  /* Smooth transitions */
+  .transition-smooth {
+    @apply transition-all duration-300 ease-out;
   }
-
-  .scroll-container::-webkit-scrollbar-thumb {
-    background: oklch(0.30 0 0);
-    border-radius: 4px;
-  }
-
-  .scroll-container::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.40 0 0);
-  }
-
-  /* Reminder Card */
-  .reminder-card {
-    background: oklch(0.18 0 0);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    border-radius: 20px;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-  }
-
-  .reminder-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px oklch(0 0 0 / 0.15);
-  }
-
-  /* Resume Card */
-  .resume-card {
-    background: oklch(0.18 0 0);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    border-radius: 20px;
-    padding: 1.5rem;
-  }
-
-  .resume-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid oklch(1 0 0 / 0.06);
-  }
-
-  .resume-item:last-child {
-    border-bottom: none;
-  }
-
-  /* Crypto Card */
-  .crypto-card {
-    background: oklch(0.18 0 0);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    border-radius: 20px;
-    padding: 1.5rem;
-    min-width: 280px;
-    transition: all 0.3s ease;
-    position: relative;
-  }
-
-  .crypto-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px oklch(0 0 0 / 0.2);
-    border-color: oklch(1 0 0 / 0.12);
-  }
-
-  .crypto-card .delete-btn {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  .crypto-card:hover .delete-btn {
-    opacity: 1;
-  }
-
-  /* Scroll Container */
-  .scroll-container {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding-bottom: 0.5rem;
-  }
-
-  /* Glow Effect */
-  .glow-effect {
-    box-shadow: 0 0 20px oklch(0.68 0.20 35 / 0.15);
-  }
-
-  /* Card Event (para EventCard component) */
-  .card-event {
-    background: linear-gradient(135deg, oklch(0.18 0 0 / 0.9) 0%, oklch(0.18 0 0 / 0.7) 100%);
-    backdrop-filter: blur(12px);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-    position: relative;
-  }
-
-  .card-event::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    border-radius: 1rem 0 0 1rem;
-  }
-
-  .card-event.category-green::before {
-    background: oklch(0.65 0.18 145); /* Verde */
-  }
-
-  .card-event.category-blue::before {
-    background: oklch(0.70 0.18 250); /* Azul */
-  }
-
-  .card-event.category-purple::before {
-    background: oklch(0.65 0.18 290); /* Morado */
-  }
-
-  .card-event:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px oklch(0 0 0 / 0.2);
-  }
-
-  /* Progress Bar */
-  .progress-bar-orange {
-    height: 8px;
-    background: linear-gradient(90deg, #FF9500 0%, #FFA500 100%);
-    border-radius: 999px;
-    transition: width 0.5s ease;
-  }
-
-  /* Savings Goal Card */
-  .savings-goal-card {
-    background: oklch(0.18 0 0);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 4px 12px oklch(0 0 0 / 0.1);
-  }
-
-  .savings-goal-card .progress-container {
-    background: oklch(0.12 0 0);
-    border-radius: 999px;
-    height: 8px;
-    overflow: hidden;
-    margin: 1rem 0;
-  }
-
-  .savings-goal-card .amount-missing {
-    background: oklch(0.12 0 0);
-    border-radius: 12px;
-    padding: 1rem 1.5rem;
-    margin-top: 1rem;
-  }
-
-/* ========================================
-   RECORDATORIOS / REMINDERS STYLES
-   ======================================== */
-
-/* Summary Cards con fondo de color completo */
-.reminder-summary-card {
-  padding: 1.5rem;
-  border-radius: 1.25rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px oklch(0 0 0 / 0.3);
 }
 
-.reminder-summary-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 20px oklch(0 0 0 / 0.4);
+
+/* Sidebar Navigation Items */
+.sidebar-item {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer;
+  @apply text-muted-foreground hover:text-foreground;
+  @apply border border-transparent;
+  @apply hover:border-border hover:bg-transparent;
 }
 
-.reminder-summary-overdue {
-  background: linear-gradient(135deg, #4A0E0E 0%, #7A1515 100%);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+/* Sidebar Item Active - Solo outline naranja, sin fondo */
+.sidebar-item-active {
+  @apply border-primary text-primary bg-transparent;
 }
 
-.reminder-summary-urgent {
-  background: linear-gradient(135deg, #4A3E0E 0%, #7A6515 100%);
-  border: 1px solid rgba(234, 179, 8, 0.3);
-}
-
-.reminder-summary-upcoming {
-  background: linear-gradient(135deg, #0E1F4A 0%, #15357A 100%);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-}
-
-/* Reminder List Item */
-.reminder-list-item {
-  background: oklch(0.18 0 0);
-  border-radius: 1.25rem;
-  padding: 1.25rem;
-  transition: all 0.3s ease;
-  border: 1px solid oklch(1 0 0 / 0.08);
-}
-
-.reminder-list-item:hover {
-  transform: translateY(-2px);
-  border-color: oklch(0.68 0.20 35 / 0.3);
-  box-shadow: 0 4px 12px oklch(0 0 0 / 0.15);
-}
-
-/* Reminder Badge */
-.reminder-badge {
-  padding: 0.375rem 0.875rem;
-  border-radius: 999px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border: 1px solid;
-}
-
-.reminder-badge.proximo {
-  background: oklch(0.70 0.18 250 / 0.15);
-  color: oklch(0.75 0.18 250);
-  border-color: oklch(0.70 0.18 250 / 0.3);
-}
-
-.reminder-badge.urgente {
-  background: oklch(0.75 0.18 80 / 0.15);
-  color: oklch(0.80 0.18 80);
-  border-color: oklch(0.75 0.18 80 / 0.3);
-}
-
-.reminder-badge.vencido {
-  background: oklch(0.60 0.24 25 / 0.15);
-  color: oklch(0.70 0.24 25);
-  border-color: oklch(0.60 0.24 25 / 0.3);
-}
-
-/* Tab Filter Buttons */
-.reminder-tab {
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  background: oklch(0.18 0 0);
-  border: 1px solid oklch(1 0 0 / 0.08);
-  color: oklch(0.65 0 0);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.reminder-tab:hover {
-  border-color: oklch(0.68 0.20 35 / 0.3);
-  color: oklch(0.85 0 0);
-}
-
-.reminder-tab.active {
-  background: oklch(0.68 0.20 35);
-  color: oklch(0.15 0 0);
-  border-color: oklch(0.68 0.20 35);
-}
-
-/* Reminder Icon Circle */
-.reminder-icon-circle {
-  width: 3rem;
-  height: 3rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.reminder-icon-circle.overdue {
-  background: oklch(0.60 0.24 25 / 0.15);
-}
-
-.reminder-icon-circle.urgent {
-  background: oklch(0.75 0.18 80 / 0.15);
-}
-
-.reminder-icon-circle.upcoming {
-  background: oklch(0.70 0.18 250 / 0.15);
+.sidebar-item-active:hover {
+  @apply border-primary text-primary bg-transparent;
 }

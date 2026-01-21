@@ -236,10 +236,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <Link key={item.href} href={item.href}>
                     <a
                       className={cn(
-                        'flex items-center gap-3 px-3 py-2.5 rounded-[15px] text-sm font-medium transition-all duration-200 cursor-pointer',
-                        location === item.href
-                          ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
-                          : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'
+                        'sidebar-item',
+                        location === item.href && 'sidebar-item-active'
                       )}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -314,7 +312,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content with Fixed Header */}
       <main className="flex-1 overflow-hidden flex flex-col">
         {/* Fixed Header */}
-        <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 sm:px-6 flex-shrink-0" style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(4rem + env(safe-area-inset-top))' }}>
+        <header className="h-16 bg-background border-b border-border flex items-center justify-between px-4 sm:px-6 flex-shrink-0" style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(4rem + env(safe-area-inset-top))' }}>
           <Button
             variant="ghost"
             size="icon"
