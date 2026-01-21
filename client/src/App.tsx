@@ -32,7 +32,6 @@ import Admin from "./pages/Admin";
 import Markets from "./pages/Markets";
 import PricingPage from "./pages/PricingPage";
 import CompanyProfile from "./pages/CompanyProfile";
-import MigratePage from "./pages/MigratePage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { CrispChat } from "./components/CrispChat";
 function Router() {
@@ -49,7 +48,6 @@ function Router() {
       <Route path="/verify-2fa" component={Verify2FA} />
       <Route path="/pay" component={PayInvoice} />
       <Route path="/invoice/:token" component={PublicInvoice} />
-      <Route path="/migrate" component={MigratePage} />
       
       {/* Protected routes - require authentication */}
       <Route path="/dashboard">
