@@ -1,6 +1,7 @@
 /**
  * Home Page - Dashboard Principal
  * Con EventCard adaptado y sistema de criptomonedas añadir/eliminar
+ * Layout adaptativo con CSS Grid
  */
 
 import { useState, useEffect } from 'react';
@@ -168,6 +169,15 @@ export default function Home() {
   const availableCryptos = AVAILABLE_CRYPTOS.filter(c => !selectedCryptos.includes(c.symbol));
   const canAddMoreCryptos = selectedCryptos.length < MAX_CRYPTOS;
 
+  // Savings goal calculations
+  const activeGoals = savingsGoals?.filter(g => g.status === 'active') || [];
+  const totalTarget = activeGoals.reduce((sum, g) => sum + parseFloat(g.target_amount.toString()), 0);
+  const totalCurrent = activeGoals.reduce((sum, g) => sum + parseFloat(g.current_amount.toString()), 0);
+  const progress = totalTarget > 0 ? (totalCurrent / totalTarget) : 0;
+  const progressPercent = Math.min(Math.round(progress * 100), 100);
+  const circumference = 2 * Math.PI * 56;
+  const offset = circumference * (1 - progress);
+
   return (
     <DashboardLayout>
       <div className="p-6 space-y-6">
@@ -194,7 +204,7 @@ export default function Home() {
             <h2 className="text-xl font-bold">Criptomonedas</h2>
           </div>
           
-          {/* Crypto Cards - Horizontal scroll */}
+          {/* Crypto Cards - Grid adaptativo */}
           <div className="scroll-container pb-2">
             {displayedCryptos.map((crypto) => (
               <CryptoCard
@@ -255,9 +265,9 @@ export default function Home() {
         </div>
         )}
 
-        {/* 4 Tarjetas Superiores */}
+        {/* Stats Cards - Grid adaptativo */}
         {isWidgetVisible('stats') && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="dashboard-adaptive-grid">
           {/* Total Balance */}
           <div className="dashboard-stat-card">
             <div className="flex items-center justify-between mb-2">
@@ -312,124 +322,99 @@ export default function Home() {
         </div>
         )}
 
-        {/* Grid de 2 Columnas */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Columna Izquierda - Gráficos (2/3) */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Ingresos Semanales */}
-            {isWidgetVisible('weeklyIncome') && (
-            <div className="dashboard-chart-card">
-              <h3 className="dashboard-chart-title">Ingresos Semanales</h3>
-              <p className="dashboard-chart-subtitle">Actividad de esta semana</p>
-              <div className="h-64 flex items-end justify-between gap-2">
-                {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day, i) => {
-                  const heights = [40, 25, 80, 60, 70, 65, 75];
-                  return (
-                    <div key={day} className="flex-1 flex flex-col items-center gap-2">
-                      <div 
-                        className="w-full bg-primary rounded-t-lg transition-all hover:bg-primary/80"
-                        style={{ height: `${heights[i]}%` }}
-                      />
-                      <span className="text-xs text-muted-foreground">{day}</span>
-                    </div>
-                  );
-                })}
-              </div>
+        {/* Main Widgets Grid - Layout adaptativo */}
+        <div className="dashboard-main-grid">
+          {/* Ingresos Semanales - Widget grande */}
+          {isWidgetVisible('weeklyIncome') && (
+          <div className="dashboard-chart-card dashboard-widget-large">
+            <h3 className="dashboard-chart-title">Ingresos Semanales</h3>
+            <p className="dashboard-chart-subtitle">Actividad de esta semana</p>
+            <div className="h-64 flex items-end justify-between gap-2">
+              {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day, i) => {
+                const heights = [40, 25, 80, 60, 70, 65, 75];
+                return (
+                  <div key={day} className="flex-1 flex flex-col items-center gap-2">
+                    <div 
+                      className="w-full bg-primary rounded-t-lg transition-all hover:bg-primary/80"
+                      style={{ height: `${heights[i]}%` }}
+                    />
+                    <span className="text-xs text-muted-foreground">{day}</span>
+                  </div>
+                );
+              })}
             </div>
-            )}
-
-            {/* Progreso de Ahorros */}
-            {isWidgetVisible('savingsProgress') && (
-            <div className="dashboard-chart-card">
-              <h3 className="dashboard-chart-title">Progreso de Ahorros</h3>
-              <p className="dashboard-chart-subtitle">Últimos 5 meses</p>
-              <div className="h-64 flex items-center justify-center">
-                <p className="text-muted-foreground">Gráfico de línea aquí</p>
-              </div>
-            </div>
-            )}
           </div>
+          )}
 
-          {/* Columna Derecha - Meta y Resumen (1/3) */}
-          <div className="space-y-6">
-            {/* Meta de Ahorros */}
-            {isWidgetVisible('savingsGoal') && (
-            <div className="dashboard-chart-card">
-              <h3 className="dashboard-chart-title">Meta de Ahorros</h3>
-              <div className="flex items-center justify-center h-48">
-                <div className="relative w-32 h-32">
-                  {(() => {
-                    const activeGoals = savingsGoals?.filter(g => g.status === 'active') || [];
-                    const totalTarget = activeGoals.reduce((sum, g) => sum + parseFloat(g.target_amount.toString()), 0);
-                    const totalCurrent = activeGoals.reduce((sum, g) => sum + parseFloat(g.current_amount.toString()), 0);
-                    const progress = totalTarget > 0 ? (totalCurrent / totalTarget) : 0;
-                    const progressPercent = Math.min(Math.round(progress * 100), 100);
-                    const circumference = 2 * Math.PI * 56;
-                    const offset = circumference * (1 - progress);
-                    
-                    return (
-                      <>
-                        <svg className="w-full h-full -rotate-90">
-                          <circle
-                            cx="64"
-                            cy="64"
-                            r="56"
-                            stroke="oklch(0.22 0 0)"
-                            strokeWidth="12"
-                            fill="none"
-                          />
-                          <circle
-                            cx="64"
-                            cy="64"
-                            r="56"
-                            stroke="#FF9500"
-                            strokeWidth="12"
-                            fill="none"
-                            strokeDasharray={circumference}
-                            strokeDashoffset={offset}
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-2xl font-bold text-primary">{progressPercent}%</span>
-                        </div>
-                      </>
-                    );
-                  })()}
-                </div>
-              </div>
-              <p className="text-center text-sm text-muted-foreground mt-4">
-                {(() => {
-                  const activeGoals = savingsGoals?.filter(g => g.status === 'active') || [];
-                  const totalTarget = activeGoals.reduce((sum, g) => sum + parseFloat(g.target_amount.toString()), 0);
-                  const totalCurrent = activeGoals.reduce((sum, g) => sum + parseFloat(g.current_amount.toString()), 0);
-                  return `${formatCurrency(totalCurrent, 'USD')} de ${formatCurrency(totalTarget, 'USD')} ahorrados`;
-                })()}
-              </p>
+          {/* Progreso de Ahorros - Widget grande */}
+          {isWidgetVisible('savingsProgress') && (
+          <div className="dashboard-chart-card dashboard-widget-large">
+            <h3 className="dashboard-chart-title">Progreso de Ahorros</h3>
+            <p className="dashboard-chart-subtitle">Últimos 5 meses</p>
+            <div className="h-64 flex items-center justify-center">
+              <p className="text-muted-foreground">Gráfico de línea aquí</p>
             </div>
-            )}
-
-            {/* Resumen */}
-            {isWidgetVisible('summary') && (
-            <div className="resume-card">
-              <h3 className="text-lg font-semibold mb-4">Resumen</h3>
-              <div className="space-y-1">
-                <div className="resume-item">
-                  <span className="resume-label">Transacciones</span>
-                  <span className="resume-value primary">{transactions?.length || 0}</span>
-                </div>
-                <div className="resume-item">
-                  <span className="resume-label">Clientes Activos</span>
-                  <span className="resume-value primary">{activeClients}</span>
-                </div>
-                <div className="resume-item">
-                  <span className="resume-label">Facturas Pendientes</span>
-                  <span className="resume-value danger">{pendingInvoices}</span>
-                </div>
-              </div>
-            </div>
-            )}
           </div>
+          )}
+
+          {/* Meta de Ahorros - Widget pequeño */}
+          {isWidgetVisible('savingsGoal') && (
+          <div className="dashboard-chart-card dashboard-widget-small">
+            <h3 className="dashboard-chart-title">Meta de Ahorros</h3>
+            <div className="flex items-center justify-center h-48">
+              <div className="relative w-32 h-32">
+                <svg className="w-full h-full -rotate-90">
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r="56"
+                    stroke="oklch(0.22 0 0)"
+                    strokeWidth="12"
+                    fill="none"
+                  />
+                  <circle
+                    cx="64"
+                    cy="64"
+                    r="56"
+                    stroke="#FF9500"
+                    strokeWidth="12"
+                    fill="none"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={offset}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-primary">{progressPercent}%</span>
+                </div>
+              </div>
+            </div>
+            <p className="text-center text-sm text-muted-foreground mt-4">
+              {formatCurrency(totalCurrent, 'USD')} de {formatCurrency(totalTarget, 'USD')} ahorrados
+            </p>
+          </div>
+          )}
+
+          {/* Resumen - Widget pequeño */}
+          {isWidgetVisible('summary') && (
+          <div className="dashboard-chart-card dashboard-widget-small">
+            <h3 className="text-lg font-semibold mb-4">Resumen</h3>
+            <div className="space-y-1">
+              <div className="resume-item">
+                <span className="resume-label">Transacciones</span>
+                <span className="resume-value primary">{transactions?.length || 0}</span>
+              </div>
+              <div className="resume-item">
+                <span className="resume-label">Clientes Activos</span>
+                <span className="resume-value primary">{activeClients}</span>
+              </div>
+              <div className="resume-item">
+                <span className="resume-label">Facturas Pendientes</span>
+                <span className="resume-value danger">{pendingInvoices}</span>
+              </div>
+            </div>
+          </div>
+          )}
         </div>
 
         {/* Eventos Próximos / Recordatorios */}
@@ -441,7 +426,7 @@ export default function Home() {
           </div>
           
           {events.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="dashboard-adaptive-grid">
               {events.map((event, idx) => (
                 <EventCard key={idx} {...event} />
               ))}

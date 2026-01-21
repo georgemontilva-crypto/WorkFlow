@@ -373,3 +373,49 @@
     grid-template-columns: repeat(5, 1fr);
   }
 }
+
+
+/* ===== DASHBOARD ADAPTIVE LAYOUT ===== */
+
+/* Grid adaptativo para stats cards (4 columnas que se adaptan) */
+.dashboard-adaptive-grid {
+  @apply grid gap-4;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* Grid principal para widgets grandes y pequeños */
+.dashboard-main-grid {
+  @apply grid gap-6;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* Widget grande - ocupa 2 columnas en pantallas grandes */
+.dashboard-widget-large {
+  @apply min-h-[320px];
+}
+
+@media (min-width: 1024px) {
+  .dashboard-main-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .dashboard-widget-large {
+    grid-column: span 2;
+  }
+}
+
+/* Widget pequeño - ocupa 1 columna */
+.dashboard-widget-small {
+  @apply min-h-[280px];
+}
+
+/* Cuando solo hay widgets pequeños, se distribuyen uniformemente */
+.dashboard-main-grid:has(.dashboard-widget-small:only-child) {
+  grid-template-columns: 1fr;
+}
+
+/* Resume Card */
+.resume-card {
+  @apply bg-card border border-border rounded-xl p-6 transition-all duration-200;
+  @apply hover:border-primary/30;
+}
