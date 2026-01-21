@@ -179,7 +179,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed lg:static inset-y-0 left-0 z-40 w-64 bg-black border-r border-white/10 flex flex-col transition-transform duration-300 ease-in-out lg:rounded-tr-[15px]',
+          'fixed lg:static inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-sidebar-border flex flex-col transition-transform duration-300 ease-in-out',
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
         style={{ paddingTop: 'env(safe-area-inset-top)' }}
@@ -207,10 +207,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <Link key={item.name} href={item.href}>
                       <a
                         className={cn(
-                          'flex items-center gap-3 px-3 py-2.5 rounded-[15px] text-sm font-medium transition-all duration-200 cursor-pointer',
-                          isActive
-                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/30'
-                            : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'
+                          'sidebar-item',
+                          isActive && 'sidebar-item-active'
                         )}
                         onClick={() => setIsMobileMenuOpen(false)}
                       >

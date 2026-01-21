@@ -51,74 +51,77 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Finwrk - Smart Finance Dashboard Theme */
+/* Finwrk - Events Management Theme */
 :root {
-  /* Inspirado en Smart Finance Dashboard de Behance */
-  --radius: 2rem; /* 32px - Esquinas muy redondeadas como en el diseño */
+  /* Inspirado en Events Management Dashboard */
+  --radius: 1.25rem; /* 20px - Border radius consistente */
   
-  /* Colores principales del diseño Smart Finance */
-  --cyan-start: oklch(0.78 0.18 195); /* Cyan vibrante #00D4FF */
-  --cyan-end: oklch(0.72 0.16 200); /* Cyan medio #00A8CC */
-  --coral-start: oklch(0.72 0.20 10); /* Coral/Rosa #FF6B9D */
-  --coral-end: oklch(0.68 0.22 15); /* Rosa más intenso #FF5E8F */
+  /* Colores principales del diseño Events Management */
+  --orange-primary: oklch(0.72 0.18 45); /* Naranja vibrante #FF8A3D */
+  --teal-card: oklch(0.45 0.08 200); /* Teal para cards #2C5F5F */
+  --green-card: oklch(0.40 0.06 140); /* Verde oscuro para cards #3A5A3A */
+  --blue-card: oklch(0.35 0.08 250); /* Azul oscuro para cards #2C3E5F */
+  --purple-card: oklch(0.45 0.15 290); /* Morado para cards #6B4C9A */
   
-  /* Dark Mode - Smart Finance Style */
-  --background: oklch(0.08 0 0); /* Deep black #121212 */
-  --foreground: oklch(1 0 0); /* Pure white #FFFFFF */
+  /* Backgrounds - Estructura exacta del diseño */
+  --background: oklch(0 0 0); /* Negro puro #000000 */
+  --foreground: oklch(1 0 0); /* Blanco puro #FFFFFF */
   
-  /* Card - Dark elevated como en el diseño */
-  --card: oklch(0.12 0 0); /* Dark card #1A1A1A */
-  --card-foreground: oklch(1 0 0); /* White */
+  /* Card - Gris medio como en las tarjetas */
+  --card: oklch(0.18 0 0); /* Gris medio #2A2A2A */
+  --card-foreground: oklch(1 0 0); /* Blanco */
   
-  /* Glassmorphism modal */
-  --popover: oklch(0.10 0 0 / 0.95); /* Dark glass modal */
-  --popover-foreground: oklch(1 0 0); /* White */
+  /* Popover/Modal */
+  --popover: oklch(0.18 0 0 / 0.98); /* Gris medio casi sólido */
+  --popover-foreground: oklch(1 0 0); /* Blanco */
   
-  /* Primary: Cyan vibrante del gradiente */
-  --primary: oklch(0.78 0.18 195); /* Cyan #00D4FF */
-  --primary-foreground: oklch(1 0 0); /* White */
+  /* Primary: Naranja como en el diseño */
+  --primary: oklch(0.72 0.18 45); /* Naranja #FF8A3D */
+  --primary-foreground: oklch(1 0 0); /* Blanco */
   
-  /* Secondary: Card color */
-  --secondary: oklch(0.15 0 0); /* Slightly lighter dark */
-  --secondary-foreground: oklch(1 0 0); /* White */
+  /* Secondary: Gris claro para texto secundario */
+  --secondary: oklch(0.25 0 0); /* Gris oscuro */
+  --secondary-foreground: oklch(0.65 0 0); /* Gris claro #A0A0A0 */
   
-  /* Muted: Subtle gray */
-  --muted: oklch(0.20 0 0); /* Muted dark */
-  --muted-foreground: oklch(0.62 0 0); /* Medium gray #9E9E9E */
+  /* Muted: Gris para elementos deshabilitados */
+  --muted: oklch(0.22 0 0); /* Gris muted */
+  --muted-foreground: oklch(0.55 0 0); /* Gris medio #8A8A8A */
   
-  /* Accent: Coral del gradiente */
-  --accent: oklch(0.72 0.20 10); /* Coral #FF6B9D */
-  --accent-foreground: oklch(1 0 0); /* White */
+  /* Accent: Naranja (mismo que primary) */
+  --accent: oklch(0.72 0.18 45); /* Naranja #FF8A3D */
+  --accent-foreground: oklch(1 0 0); /* Blanco */
   
-  /* Destructive: Red vibrante */
-  --destructive: oklch(0.58 0.24 25); /* Red #E74C3C */
-  --destructive-foreground: oklch(1 0 0); /* White */
+  /* Status colors */
+  --destructive: oklch(0.60 0.24 25); /* Rojo para Upcoming #E74C3C */
+  --destructive-foreground: oklch(1 0 0); /* Blanco */
   
-  /* Success: Cyan (mismo que primary) */
-  --success: oklch(0.78 0.18 195); /* Cyan #00D4FF */
-  --success-foreground: oklch(1 0 0); /* White */
+  --success: oklch(0.65 0.18 145); /* Verde para Completed #4CAF50 */
+  --success-foreground: oklch(1 0 0); /* Blanco */
+  
+  --warning: oklch(0.75 0.18 80); /* Amarillo para On-going #FFC107 */
+  --warning-foreground: oklch(0.15 0 0); /* Negro */
   
   /* Borders: Muy sutiles */
-  --border: oklch(1 0 0 / 0.06); /* White 6% opacity */
-  --input: oklch(0.12 0 0); /* Dark input */
-  --ring: oklch(0.78 0.18 195 / 0.5); /* Cyan ring */
+  --border: oklch(1 0 0 / 0.08); /* White 8% opacity */
+  --input: oklch(0.18 0 0); /* Gris medio */
+  --ring: oklch(0.72 0.18 45 / 0.5); /* Naranja ring */
   
-  /* Chart colors - Cyan spectrum */
-  --chart-1: oklch(0.78 0.18 195); /* Cyan bright */
-  --chart-2: oklch(0.72 0.16 200); /* Cyan medium */
-  --chart-3: oklch(0.66 0.14 205); /* Cyan dark */
-  --chart-4: oklch(0.60 0.12 210); /* Cyan darker */
-  --chart-5: oklch(0.54 0.10 215); /* Cyan darkest */
+  /* Chart colors - Multicolor como en el dashboard */
+  --chart-1: oklch(0.72 0.18 45); /* Naranja */
+  --chart-2: oklch(0.65 0.18 145); /* Verde */
+  --chart-3: oklch(0.70 0.18 290); /* Morado */
+  --chart-4: oklch(0.68 0.18 200); /* Cyan */
+  --chart-5: oklch(0.75 0.18 80); /* Amarillo */
   
-  /* Sidebar colors */
-  --sidebar: oklch(0.08 0 0 / 0.9); /* Dark sidebar */
-  --sidebar-foreground: oklch(1 0 0); /* White */
-  --sidebar-primary: oklch(0.78 0.18 195); /* Cyan */
-  --sidebar-primary-foreground: oklch(1 0 0); /* White */
-  --sidebar-accent: oklch(0.12 0 0); /* Dark accent */
-  --sidebar-accent-foreground: oklch(1 0 0); /* White */
-  --sidebar-border: oklch(1 0 0 / 0.06); /* Subtle border */
-  --sidebar-ring: oklch(0.78 0.18 195); /* Cyan ring */
+  /* Sidebar colors - Gris oscuro como en el diseño */
+  --sidebar: oklch(0.11 0 0); /* Gris muy oscuro #1C1C1C */
+  --sidebar-foreground: oklch(0.65 0 0); /* Gris claro */
+  --sidebar-primary: oklch(0.72 0.18 45); /* Naranja */
+  --sidebar-primary-foreground: oklch(1 0 0); /* Blanco */
+  --sidebar-accent: oklch(0.14 0 0); /* Gris oscuro para hover */
+  --sidebar-accent-foreground: oklch(0.75 0 0); /* Gris más claro */
+  --sidebar-border: oklch(1 0 0 / 0.06); /* Border sutil */
+  --sidebar-ring: oklch(0.72 0.18 45); /* Naranja ring */
 }
 
 @layer base {
@@ -176,112 +179,183 @@
     }
   }
 
-  /* Smart Finance Glass Card - Estilo exacto del diseño */
+  /* Glass Card - Gris medio como en el diseño */
   .glass-card {
-    background: oklch(0.12 0 0 / 0.7);
-    backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid oklch(1 0 0 / 0.06);
+    background: oklch(0.18 0 0); /* #2A2A2A */
+    border: 1px solid oklch(1 0 0 / 0.08);
     box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      0 4px 16px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      0 4px 16px rgba(0, 0, 0, 0.4),
+      0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .glass-card:hover {
-    background: oklch(0.14 0 0 / 0.8);
-    border-color: oklch(1 0 0 / 0.10);
+    background: oklch(0.20 0 0);
+    border-color: oklch(1 0 0 / 0.12);
     box-shadow: 
-      0 16px 48px rgba(0, 0, 0, 0.5),
-      0 8px 24px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
-    transform: translateY(-4px);
+      0 8px 24px rgba(0, 0, 0, 0.5),
+      0 4px 12px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
   }
   
-  /* Balance Card - Gradiente Cyan-Coral como en el diseño */
-  .balance-card {
-    background: linear-gradient(135deg, 
-      oklch(0.78 0.18 195) 0%,   /* Cyan start */
-      oklch(0.75 0.19 180) 50%,  /* Cyan-Coral transition */
-      oklch(0.72 0.20 10) 100%   /* Coral end */
-    );
+  /* Event Card - Tarjetas con colores de fondo como en On-going Events */
+  .event-card-teal {
+    background: oklch(0.45 0.08 200); /* Teal */
     border: none;
-    border-radius: 2rem; /* 32px */
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .event-card-teal:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  }
+  
+  .event-card-green {
+    background: oklch(0.40 0.06 140); /* Verde oscuro */
+    border: none;
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .event-card-green:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  }
+  
+  .event-card-blue {
+    background: oklch(0.35 0.08 250); /* Azul oscuro */
+    border: none;
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .event-card-blue:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  }
+  
+  /* Dashboard Stat Cards - Colores vibrantes */
+  .stat-card-teal {
+    background: oklch(0.45 0.10 200);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  .stat-card-blue {
+    background: oklch(0.40 0.12 250);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  .stat-card-purple {
+    background: oklch(0.45 0.15 290);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Glass Modal */
+  .glass-modal {
+    background: oklch(0.18 0 0 / 0.98);
+    border: 1px solid oklch(1 0 0 / 0.10);
+    border-radius: 1.5rem;
     box-shadow: 
-      0 20px 60px rgba(0, 212, 255, 0.25),
-      0 10px 30px rgba(255, 107, 157, 0.20),
-      0 4px 12px rgba(0, 0, 0, 0.4);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
+      0 20px 60px rgba(0, 0, 0, 0.6),
+      0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Table/List Container - Fondo gris como Events List */
+  .table-container {
+    background: oklch(0.18 0 0);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 1.25rem;
     overflow: hidden;
   }
   
-  .balance-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0) 100%
-    );
-    pointer-events: none;
+  /* Table Row */
+  .table-row {
+    border-bottom: 1px solid oklch(1 0 0 / 0.06);
+    transition: background 0.2s ease;
   }
   
-  .balance-card:hover {
-    box-shadow: 
-      0 24px 72px rgba(0, 212, 255, 0.35),
-      0 12px 36px rgba(255, 107, 157, 0.30),
-      0 6px 16px rgba(0, 0, 0, 0.5);
-    transform: translateY(-6px) scale(1.02);
+  .table-row:hover {
+    background: oklch(0.20 0 0);
   }
   
-  /* Dark Card - Estilo exacto del diseño */
-  .dark-card {
-    background: oklch(0.12 0 0); /* #1A1A1A */
-    border: 1px solid oklch(1 0 0 / 0.06);
-    border-radius: 2rem; /* 32px */
-    box-shadow: 
-      0 10px 40px rgba(0, 0, 0, 0.4),
-      0 4px 16px rgba(0, 0, 0, 0.3);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Status Badge */
+  .badge-completed {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 1rem;
+    background: oklch(0.65 0.18 145 / 0.15);
+    color: oklch(0.75 0.18 145);
+    font-size: 0.875rem;
+    font-weight: 500;
   }
   
-  .dark-card:hover {
+  .badge-ongoing {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 1rem;
+    background: oklch(0.75 0.18 80 / 0.15);
+    color: oklch(0.80 0.18 80);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .badge-upcoming {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 1rem;
+    background: oklch(0.60 0.24 25 / 0.15);
+    color: oklch(0.70 0.24 25);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  /* Sidebar Item - Sin fondo sólido, solo borde y color */
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-left: 4px solid transparent;
+    color: oklch(0.65 0 0);
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  
+  .sidebar-item:hover {
     background: oklch(0.14 0 0);
-    border-color: oklch(1 0 0 / 0.10);
-    box-shadow: 
-      0 16px 56px rgba(0, 0, 0, 0.5),
-      0 6px 24px rgba(0, 0, 0, 0.4);
-    transform: translateY(-4px);
+    color: oklch(0.75 0 0);
   }
   
-  /* Glass Modal - Para popups */
-  .glass-modal {
-    background: oklch(0.10 0 0 / 0.95);
-    backdrop-filter: blur(32px) saturate(180%);
-    border: 1px solid oklch(1 0 0 / 0.08);
-    border-radius: 2rem; /* 32px */
-    box-shadow: 
-      0 24px 80px rgba(0, 0, 0, 0.6),
-      0 12px 40px rgba(0, 0, 0, 0.5),
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  .sidebar-item-active {
+    border-left-color: oklch(0.72 0.18 45); /* Naranja */
+    color: oklch(0.72 0.18 45); /* Naranja */
+    background: transparent; /* Sin fondo sólido */
   }
   
-  /* Progress Bar - Cyan gradient */
-  .progress-bar-cyan {
-    background: linear-gradient(90deg, 
-      oklch(0.78 0.18 195),
-      oklch(0.72 0.16 200)
-    );
-    border-radius: 0.75rem; /* 12px */
-    height: 8px;
-    box-shadow: 0 2px 8px rgba(0, 212, 255, 0.4);
+  .sidebar-item-active svg {
+    color: oklch(0.72 0.18 45); /* Icono naranja */
   }
   
-  /* Stat Number - Tipografía grande para números */
+  /* Stat Number */
   .stat-number {
     font-size: 2.5rem;
     font-weight: 700;
@@ -290,17 +364,7 @@
     font-feature-settings: "tnum";
   }
   
-  /* Balance Number - Aún más grande */
-  .balance-number {
-    font-size: 3rem;
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
-    font-feature-settings: "tnum";
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Icon Circle - Círculos para iconos */
+  /* Icon Circle */
   .icon-circle {
     display: inline-flex;
     align-items: center;
@@ -308,57 +372,19 @@
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 50%;
-    background: oklch(1 0 0 / 0.08);
-    backdrop-filter: blur(8px);
-    transition: all 0.3s ease;
+    background: oklch(1 0 0 / 0.10);
+    transition: all 0.2s ease;
   }
   
   .icon-circle:hover {
-    background: oklch(1 0 0 / 0.12);
-    transform: scale(1.1);
-  }
-  
-  /* Transaction Item - Items de lista */
-  .transaction-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.25rem;
-    background: oklch(0.12 0 0 / 0.6);
-    border: 1px solid oklch(1 0 0 / 0.05);
-    border-radius: 1.5rem; /* 24px */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .transaction-item:hover {
-    background: oklch(0.14 0 0 / 0.8);
-    border-color: oklch(1 0 0 / 0.10);
-    transform: translateX(6px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  }
-  
-  /* Glow Effect - Cyan */
-  .glow-cyan {
-    box-shadow: 0 0 24px rgba(0, 212, 255, 0.4);
-  }
-  
-  .glow-cyan:hover {
-    box-shadow: 0 0 36px rgba(0, 212, 255, 0.6);
-  }
-  
-  /* Glow Effect - Coral */
-  .glow-coral {
-    box-shadow: 0 0 24px rgba(255, 107, 157, 0.4);
-  }
-  
-  .glow-coral:hover {
-    box-shadow: 0 0 36px rgba(255, 107, 157, 0.6);
+    background: oklch(1 0 0 / 0.15);
+    transform: scale(1.05);
   }
 
-  /* Custom Scrollbar - Cyan accent */
+  /* Custom Scrollbar - Naranja accent */
   * {
     scrollbar-width: thin;
-    scrollbar-color: oklch(0.78 0.18 195 / 0.5) transparent;
+    scrollbar-color: oklch(0.72 0.18 45 / 0.5) transparent;
   }
 
   *::-webkit-scrollbar {
@@ -371,13 +397,13 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background: oklch(0.78 0.18 195 / 0.5);
+    background: oklch(0.72 0.18 45 / 0.5);
     border-radius: 4px;
     transition: background 0.2s ease;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.78 0.18 195 / 0.7);
+    background: oklch(0.72 0.18 45 / 0.7);
   }
 
   *::-webkit-scrollbar-corner {
@@ -385,25 +411,25 @@
   }
 }
 
-/* Utilidades de bordes redondeados - Smart Finance Style */
+/* Utilidades de bordes redondeados */
 @layer utilities {
   .rounded-md {
-    border-radius: 1.5rem !important; /* 24px */
-  }
-  
-  .rounded-sm {
     border-radius: 1.25rem !important; /* 20px */
   }
   
+  .rounded-sm {
+    border-radius: 1rem !important; /* 16px */
+  }
+  
   .rounded-lg {
-    border-radius: 2rem !important; /* 32px */
+    border-radius: 1.5rem !important; /* 24px */
   }
   
   .rounded-xl {
-    border-radius: 2.5rem !important; /* 40px */
+    border-radius: 2rem !important; /* 32px */
   }
   
-  /* Text shadows para profundidad */
+  /* Text shadows */
   .text-shadow-sm {
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   }
@@ -414,20 +440,5 @@
   
   .text-shadow-lg {
     text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
-  }
-  
-  /* Gradientes utilitarios */
-  .gradient-cyan-coral {
-    background: linear-gradient(135deg, 
-      oklch(0.78 0.18 195) 0%,
-      oklch(0.72 0.20 10) 100%
-    );
-  }
-  
-  .gradient-cyan {
-    background: linear-gradient(135deg, 
-      oklch(0.78 0.18 195) 0%,
-      oklch(0.72 0.16 200) 100%
-    );
   }
 }
