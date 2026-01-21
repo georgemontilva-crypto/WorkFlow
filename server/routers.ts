@@ -580,10 +580,14 @@ export const appRouter = router({
         })),
         payment_link: z.string().optional(),
         notes: z.string().optional(),
+        // Recurring invoice fields
+        is_recurring: z.boolean().optional().default(false),
+        recurrence_frequency: z.enum(["monthly", "biweekly", "annual", "custom"]).optional(),
+        recurrence_interval: z.number().optional(), // For custom frequency
       }))
       .mutation(async ({ ctx, input }) => {
         // Check plan limits
-        const { getPlanLimit } = await import("./plans");
+        const { getPlanLimit, getPlanById } = await import("./plans");
         const invoiceLimit = getPlanLimit(ctx.user.subscription_plan as any, 'invoices');
         
         if (invoiceLimit !== Infinity) {
@@ -591,6 +595,16 @@ export const appRouter = router({
           const existingInvoices = await getInvoicesByUserId(ctx.user.id);
           if (existingInvoices.length >= invoiceLimit) {
             throw new Error(`You've reached the limit of ${invoiceLimit} invoices on the Free plan. Upgrade to Pro for unlimited invoices.`);
+          }
+        }
+        
+        // Check recurring invoice limits
+        if (input.is_recurring) {
+          const plan = getPlanById(ctx.user.subscription_plan as any);
+          const recurringLimit = plan.limits.recurringInvoices;
+          
+          if (recurringLimit === 0) {
+            throw new Error('Recurring invoices are only available in Pro and Business plans. Upgrade to unlock this feature.');
           }
         }
 
@@ -602,6 +616,17 @@ export const appRouter = router({
         // Generate unique payment token
         const crypto = await import('crypto');
         const paymentToken = crypto.randomBytes(32).toString('hex');
+        
+        // Calculate next generation date for recurring invoices
+        let nextGenerationDate = null;
+        if (input.is_recurring && input.recurrence_frequency) {
+          const { calculateNextGenerationDate } = await import('./_core/recurring-invoices.js');
+          nextGenerationDate = calculateNextGenerationDate(
+            new Date(),
+            input.recurrence_frequency,
+            input.recurrence_interval
+          );
+        }
         
         const result = await db.createInvoice({
           user_id: ctx.user.id,
@@ -619,6 +644,12 @@ export const appRouter = router({
           payment_token: paymentToken,
           payment_link: input.payment_link || null,
           notes: input.notes || null,
+          // Recurring fields
+          is_recurring: input.is_recurring || false,
+          recurrence_frequency: input.recurrence_frequency || null,
+          recurrence_interval: input.recurrence_interval || null,
+          next_generation_date: nextGenerationDate,
+          parent_invoice_id: null,
         });
         return { success: true, id: result.id };
       }),
@@ -1022,6 +1053,21 @@ export const appRouter = router({
         } catch (error: any) {
           throw new Error(error.message || 'Failed to confirm payment');
         }
+      }),
+    
+    // Get recurring invoice history
+    getRecurringHistory: protectedProcedure
+      .input(z.object({ parentInvoiceId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return await db.getRecurringInvoiceHistory(input.parentInvoiceId, ctx.user.id);
+      }),
+    
+    // Stop recurring invoice
+    stopRecurring: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.stopRecurringInvoice(input.id, ctx.user.id);
+        return { success: true };
       }),
   }),
 

@@ -1336,3 +1336,106 @@ export async function verifyEmailToken(token: string) {
     throw new Error("Failed to verify email token");
   }
 }
+
+/**
+ * Get all recurring invoices that need generation
+ */
+export async function getRecurringInvoicesDueForGeneration() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const today = new Date();
+  
+  return await db
+    .select()
+    .from(invoices)
+    .where(
+      sql`${invoices.is_recurring} = 1 
+          AND ${invoices.next_generation_date} IS NOT NULL 
+          AND ${invoices.next_generation_date} <= ${today}
+          AND ${invoices.status} != 'cancelled'`
+    );
+}
+
+/**
+ * Get recurring invoice template (parent invoice)
+ */
+export async function getRecurringInvoiceTemplate(id: number, user_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select()
+    .from(invoices)
+    .where(
+      sql`${invoices.id} = ${id} 
+          AND ${invoices.user_id} = ${user_id}
+          AND ${invoices.is_recurring} = 1`
+    )
+    .limit(1);
+
+  return result[0] || null;
+}
+
+/**
+ * Get all invoices generated from a recurring template
+ */
+export async function getRecurringInvoiceHistory(parentInvoiceId: number, user_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return await db
+    .select()
+    .from(invoices)
+    .where(
+      sql`${invoices.parent_invoice_id} = ${parentInvoiceId} 
+          AND ${invoices.user_id} = ${user_id}`
+    )
+    .orderBy(sql`${invoices.created_at} DESC`);
+}
+
+/**
+ * Update next generation date for recurring invoice
+ */
+export async function updateRecurringInvoiceNextDate(id: number, nextDate: Date) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(invoices)
+    .set({ 
+      next_generation_date: nextDate,
+      updated_at: new Date()
+    })
+    .where(eq(invoices.id, id));
+}
+
+/**
+ * Stop recurring invoice (mark as cancelled)
+ */
+export async function stopRecurringInvoice(id: number, user_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(invoices)
+    .set({ 
+      is_recurring: false,
+      next_generation_date: null,
+      status: 'cancelled',
+      updated_at: new Date()
+    })
+    .where(
+      sql`${invoices.id} = ${id} AND ${invoices.user_id} = ${user_id}`
+    );
+}

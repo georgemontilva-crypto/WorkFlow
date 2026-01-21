@@ -75,8 +75,13 @@ type InvoiceFormData = {
   notes?: string;
   paid_amount?: string;
   payment_link?: string;
+  // Recurring fields
+  is_recurring?: boolean;
+  recurrence_frequency?: 'monthly' | 'biweekly' | 'annual' | 'custom';
+  recurrence_interval?: number;
 };
-import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User, FolderArchive, ArchiveRestore, Link as LinkIcon, Copy, Eye } from 'lucide-react';
+import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User, FolderArchive, ArchiveRestore, Link as LinkIcon, Copy, Eye, Repeat } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { format, parseISO, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -267,6 +272,10 @@ export default function Invoices() {
       items: formData.items!,
       payment_link: formData.payment_link,
       notes: formData.notes,
+      // Recurring fields
+      is_recurring: formData.is_recurring,
+      recurrence_frequency: formData.recurrence_frequency,
+      recurrence_interval: formData.recurrence_interval,
     });
     setIsDialogOpen(false);
     setFormData({
@@ -764,6 +773,73 @@ export default function Invoices() {
                     placeholder="https://tu-link-de-pago.com"
                   />
                   <p className="text-xs text-muted-foreground">Link externo donde el cliente puede realizar el pago (PayPal, wallet cripto, etc.)</p>
+                </div>
+
+                {/* Recurring Invoice Section */}
+                <div className="space-y-4 p-4 border border-border rounded-lg bg-accent/5">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Repeat className="w-4 h-4 text-primary" />
+                        <Label htmlFor="is_recurring" className="text-foreground font-semibold cursor-pointer">
+                          Factura Recurrente
+                        </Label>
+                        <Badge variant="secondary" className="text-xs">Pro</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Genera automáticamente esta factura de forma periódica
+                      </p>
+                    </div>
+                    <Switch
+                      id="is_recurring"
+                      checked={formData.is_recurring || false}
+                      onCheckedChange={(checked) => setFormData({ ...formData, is_recurring: checked })}
+                    />
+                  </div>
+
+                  {formData.is_recurring && (
+                    <div className="space-y-3 pt-3 border-t border-border">
+                      <div className="space-y-2">
+                        <Label className="text-foreground font-semibold">Frecuencia</Label>
+                        <Select
+                          value={formData.recurrence_frequency || 'monthly'}
+                          onValueChange={(value: any) => setFormData({ ...formData, recurrence_frequency: value })}
+                        >
+                          <SelectTrigger className="bg-background border-border text-foreground h-11">
+                            <SelectValue placeholder="Selecciona frecuencia" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="monthly">Mensual</SelectItem>
+                            <SelectItem value="biweekly">Quincenal</SelectItem>
+                            <SelectItem value="annual">Anual</SelectItem>
+                            <SelectItem value="custom">Personalizado</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {formData.recurrence_frequency === 'custom' && (
+                        <div className="space-y-2">
+                          <Label htmlFor="recurrence_interval" className="text-foreground font-semibold">
+                            Cada cuántos días
+                          </Label>
+                          <Input
+                            id="recurrence_interval"
+                            type="number"
+                            min="1"
+                            value={formData.recurrence_interval || ''}
+                            onChange={(e) => setFormData({ ...formData, recurrence_interval: parseInt(e.target.value) })}
+                            className="bg-background border-border text-foreground h-11"
+                            placeholder="30"
+                          />
+                        </div>
+                      )}
+
+                      <div className="text-xs text-muted-foreground bg-blue-500/10 border border-blue-500/20 rounded p-3">
+                        <p className="font-medium text-blue-600 dark:text-blue-400 mb-1">ℹ️ Cómo funciona:</p>
+                        <p>Esta factura se generará automáticamente según la frecuencia seleccionada. Podrás ver el historial y detener la recurrencia cuando quieras.</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Actions */}

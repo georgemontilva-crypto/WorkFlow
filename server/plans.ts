@@ -12,6 +12,7 @@ export const PLANS = {
     limits: {
       clients: 3,
       invoices: 5,
+      recurringInvoices: 0, // No recurring invoices in free plan
       cryptoPayments: false,
       automations: false,
       multiCurrency: false,
@@ -38,6 +39,7 @@ export const PLANS = {
     limits: {
       clients: Infinity,
       invoices: Infinity,
+      recurringInvoices: Infinity, // Unlimited recurring invoices
       cryptoPayments: true,
       automations: true,
       multiCurrency: true,
@@ -49,6 +51,7 @@ export const PLANS = {
     features: [
       'Unlimited clients',
       'Unlimited invoices',
+      'Recurring invoices (auto-generate)',
       'Multi-currency (USD, COP, EUR, USDT)',
       'Payment links per invoice',
       'Crypto payments via external custody',
@@ -69,6 +72,7 @@ export const PLANS = {
     limits: {
       clients: Infinity,
       invoices: Infinity,
+      recurringInvoices: Infinity, // Unlimited recurring invoices
       cryptoPayments: true,
       automations: true,
       multiCurrency: true,
