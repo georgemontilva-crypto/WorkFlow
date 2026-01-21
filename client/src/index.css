@@ -51,56 +51,56 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Apple Minimalist Theme - Dark Mode (Default) */
+/* Finwrk Premium Theme - Dark Mode with Golden Accents */
 :root {
-  /* Design Philosophy: Apple Minimalism - Negro, grises y blanco */
+  /* Design Philosophy: Minimalismo Premium - Negro y dorado #AF8F6F */
   --radius: 0.5rem;
   
   /* Dark Mode Colors */
   --background: oklch(0 0 0); /* Pure black #000000 */
   --foreground: oklch(1 0 0); /* Pure white #ffffff */
   
-  --card: oklch(0.15 0 0); /* Dark grey #1a1a1a */
+  --card: oklch(0.12 0 0); /* Dark grey #1a1a1a */
   --card-foreground: oklch(1 0 0); /* White */
   
-  --popover: oklch(0.18 0 0); /* Slightly lighter #2a2a2a */
+  --popover: oklch(0.15 0 0); /* Slightly lighter #262626 */
   --popover-foreground: oklch(1 0 0); /* White */
   
-  --primary: oklch(1 0 0); /* White for primary actions */
-  --primary-foreground: oklch(0 0 0); /* Black text on white */
+  --primary: oklch(0.68 0.08 65); /* Golden #AF8F6F */
+  --primary-foreground: oklch(0 0 0); /* Black text on golden */
   
   --secondary: oklch(0.18 0 0); /* Dark grey #2a2a2a */
   --secondary-foreground: oklch(1 0 0); /* White */
   
-  --muted: oklch(0.22 0 0); /* Medium grey #3a3a3a */
-  --muted-foreground: oklch(0.65 0 0); /* Light grey #9ca3af */
+  --muted: oklch(0.20 0 0); /* Medium grey #333333 */
+  --muted-foreground: oklch(0.60 0 0); /* Light grey #999999 */
   
-  --accent: oklch(0.18 0 0); /* Dark grey #2a2a2a */
-  --accent-foreground: oklch(1 0 0); /* White */
+  --accent: oklch(0.68 0.08 65); /* Golden accent #AF8F6F */
+  --accent-foreground: oklch(0 0 0); /* Black */
   
   --destructive: oklch(0.55 0.22 25); /* Subtle red for errors */
   --destructive-foreground: oklch(1 0 0); /* White */
   
-  --border: oklch(0.22 0 0); /* #3a3a3a */
-  --input: oklch(0.22 0 0); /* #3a3a3a */
-  --ring: oklch(0.6 0 0); /* Grey ring #9ca3af */
+  --border: oklch(0.20 0 0); /* #333333 */
+  --input: oklch(0.15 0 0); /* #262626 */
+  --ring: oklch(0.68 0.08 65); /* Golden ring #AF8F6F */
   
-  /* Chart colors - Monochromatic greys */
-  --chart-1: oklch(0.45 0 0); /* #6b7280 */
-  --chart-2: oklch(0.55 0 0); /* #9ca3af */
-  --chart-3: oklch(0.65 0 0); /* #d1d5db */
-  --chart-4: oklch(0.75 0 0); /* #e5e7eb */
-  --chart-5: oklch(0.85 0 0); /* #f3f4f6 */
+  /* Chart colors - Golden tones */
+  --chart-1: oklch(0.68 0.08 65); /* #AF8F6F */
+  --chart-2: oklch(0.58 0.06 65); /* Darker golden */
+  --chart-3: oklch(0.78 0.10 65); /* Lighter golden */
+  --chart-4: oklch(0.50 0.05 65); /* Deep golden */
+  --chart-5: oklch(0.85 0.12 65); /* Pale golden */
   
   /* Sidebar colors */
-  --sidebar: oklch(0.15 0 0); /* #1a1a1a */
+  --sidebar: oklch(0.08 0 0); /* #141414 */
   --sidebar-foreground: oklch(1 0 0); /* White */
-  --sidebar-primary: oklch(0.18 0 0); /* #2a2a2a */
-  --sidebar-primary-foreground: oklch(1 0 0); /* White */
-  --sidebar-accent: oklch(0.18 0 0); /* #2a2a2a */
+  --sidebar-primary: oklch(0.68 0.08 65); /* Golden #AF8F6F */
+  --sidebar-primary-foreground: oklch(0 0 0); /* Black */
+  --sidebar-accent: oklch(0.15 0 0); /* #262626 */
   --sidebar-accent-foreground: oklch(1 0 0); /* White */
-  --sidebar-border: oklch(0.22 0 0); /* #3a3a3a */
-  --sidebar-ring: oklch(0.6 0 0); /* #9ca3af */
+  --sidebar-border: oklch(0.18 0 0); /* #2a2a2a */
+  --sidebar-ring: oklch(0.68 0.08 65); /* Golden */
 }
 
 /* Light Mode (Optional Alternative) */

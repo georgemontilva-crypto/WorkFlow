@@ -284,3 +284,32 @@ export const verificationTokens = mysqlTable("verification_tokens", {
 export type VerificationToken = typeof verificationTokens.$inferSelect;
 export type InsertVerificationToken = typeof verificationTokens.$inferInsert;
 
+
+/**
+ * Company Profiles table - stores business information for invoice customization
+ */
+export const companyProfiles = mysqlTable("company_profiles", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull().unique(), // One profile per user
+  company_name: varchar("company_name", { length: 255 }).notNull(),
+  logo_url: text("logo_url"), // URL to uploaded logo image
+  email: varchar("email", { length: 320 }).notNull(),
+  phone: varchar("phone", { length: 50 }),
+  website: varchar("website", { length: 255 }),
+  address: text("address"),
+  city: varchar("city", { length: 100 }),
+  state: varchar("state", { length: 100 }),
+  postal_code: varchar("postal_code", { length: 20 }),
+  country: varchar("country", { length: 100 }),
+  tax_id: varchar("tax_id", { length: 100 }), // RIF, NIT, Tax ID, etc.
+  bank_name: varchar("bank_name", { length: 255 }),
+  bank_account: varchar("bank_account", { length: 100 }),
+  bank_routing: varchar("bank_routing", { length: 100 }),
+  payment_instructions: text("payment_instructions"), // Custom payment instructions
+  invoice_footer: text("invoice_footer"), // Custom footer text for invoices
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type CompanyProfile = typeof companyProfiles.$inferSelect;
+export type InsertCompanyProfile = typeof companyProfiles.$inferInsert;

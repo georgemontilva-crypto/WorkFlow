@@ -1595,5 +1595,51 @@ export const appRouter = router({
       return { success: true };
     }),
    }),
+
+  // Company Profile Management
+  companyProfile: router({
+    // Get user's company profile
+    get: protectedProcedure.query(async ({ ctx }) => {
+      const profile = await db.getCompanyProfile(ctx.user.id);
+      return profile;
+    }),
+
+    // Create or update company profile
+    upsert: protectedProcedure
+      .input(z.object({
+        company_name: z.string().min(1, "Company name is required"),
+        logo_url: z.string().optional(),
+        email: z.string().email("Invalid email"),
+        phone: z.string().optional(),
+        website: z.string().optional(),
+        address: z.string().optional(),
+        city: z.string().optional(),
+        state: z.string().optional(),
+        postal_code: z.string().optional(),
+        country: z.string().optional(),
+        tax_id: z.string().optional(),
+        bank_name: z.string().optional(),
+        bank_account: z.string().optional(),
+        bank_routing: z.string().optional(),
+        payment_instructions: z.string().optional(),
+        invoice_footer: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const profile = await db.upsertCompanyProfile(ctx.user.id, input);
+        return profile;
+      }),
+
+    // Upload logo
+    uploadLogo: protectedProcedure
+      .input(z.object({
+        logo: z.string(), // base64 encoded image
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // TODO: Implement S3 upload or save to public folder
+        // For now, we'll save base64 directly
+        const profile = await db.updateCompanyProfileLogo(ctx.user.id, input.logo);
+        return profile;
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

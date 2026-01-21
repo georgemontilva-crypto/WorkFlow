@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { ENV } from "./_core/env";
-import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts, dashboardWidgets, verificationTokens } from "../drizzle/schema";
+import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts, dashboardWidgets, verificationTokens, companyProfiles } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
@@ -1438,4 +1438,66 @@ export async function stopRecurringInvoice(id: number, user_id: number) {
     .where(
       sql`${invoices.id} = ${id} AND ${invoices.user_id} = ${user_id}`
     );
+}
+
+/**
+ * Get company profile for a user
+ */
+export async function getCompanyProfile(userId: number) {
+  const dbInstance = await getDb();
+  const profiles = await dbInstance
+    .select()
+    .from(companyProfiles)
+    .where(eq(companyProfiles.user_id, userId))
+    .limit(1);
+  
+  return profiles[0] || null;
+}
+
+/**
+ * Create or update company profile
+ */
+export async function upsertCompanyProfile(userId: number, data: any) {
+  const dbInstance = await getDb();
+  
+  // Check if profile exists
+  const existing = await getCompanyProfile(userId);
+  
+  if (existing) {
+    // Update existing profile
+    await dbInstance
+      .update(companyProfiles)
+      .set({
+        ...data,
+        updated_at: new Date(),
+      })
+      .where(eq(companyProfiles.user_id, userId));
+    
+    return await getCompanyProfile(userId);
+  } else {
+    // Create new profile
+    await dbInstance.insert(companyProfiles).values({
+      user_id: userId,
+      ...data,
+    });
+    
+    return await getCompanyProfile(userId);
+  }
+}
+
+/**
+ * Update company profile logo
+ */
+export async function updateCompanyProfileLogo(userId: number, logoUrl: string) {
+  const dbInstance = await getDb();
+  
+  await dbInstance
+    .update(companyProfiles)
+    .set({
+      logo_url: logoUrl,
+      updated_at: new Date(),
+    })
+    .where(eq(companyProfiles.user_id, userId));
+  
+  return await getCompanyProfile(userId);
 }

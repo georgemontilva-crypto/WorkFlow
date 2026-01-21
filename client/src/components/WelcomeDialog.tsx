@@ -60,7 +60,7 @@ export function WelcomeDialog() {
       icon: Zap,
       title: '¡Bienvenido a Finwrk Pro!',
       subtitle: 'Estás listo para llevar tu negocio al siguiente nivel con todas las funciones profesionales.',
-      badge: '⚡ Plan Pro Activado',
+      badge: 'Plan Pro Activado',
       features: [
         'Clientes y facturas ilimitados',
         'Multi-moneda (USD, COP, EUR, USDT)',
@@ -74,7 +74,7 @@ export function WelcomeDialog() {
       icon: Crown,
       title: '¡Bienvenido a Finwrk Business!',
       subtitle: 'Tienes acceso al máximo nivel de Finwrk con funciones empresariales avanzadas.',
-      badge: '👑 Plan Business Activado',
+      badge: 'Plan Business Activado',
       features: [
         'Todo lo incluido en Pro',
         'API pública para integraciones',
