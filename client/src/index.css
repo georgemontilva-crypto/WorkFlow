@@ -57,7 +57,7 @@
   --radius: 1.25rem; /* 20px - Border radius consistente */
   
   /* Colores principales del diseño Events Management */
-  --orange-primary: oklch(0.72 0.18 45); /* Naranja vibrante #FF8A3D */
+  --orange-primary: oklch(0.68 0.20 35); /* Naranja oscuro #FF6B35 */
   --teal-card: oklch(0.45 0.08 200); /* Teal para cards #2C5F5F */
   --green-card: oklch(0.40 0.06 140); /* Verde oscuro para cards #3A5A3A */
   --blue-card: oklch(0.35 0.08 250); /* Azul oscuro para cards #2C3E5F */
@@ -75,8 +75,8 @@
   --popover: oklch(0.18 0 0 / 0.98); /* Gris medio casi sólido */
   --popover-foreground: oklch(1 0 0); /* Blanco */
   
-  /* Primary: Naranja como en el diseño */
-  --primary: oklch(0.72 0.18 45); /* Naranja #FF8A3D */
+  /* Primary: Naranja oscuro */
+  --primary: oklch(0.68 0.20 35); /* Naranja #FF6B35 */
   --primary-foreground: oklch(1 0 0); /* Blanco */
   
   /* Secondary: Gris claro para texto secundario */
@@ -87,8 +87,8 @@
   --muted: oklch(0.22 0 0); /* Gris muted */
   --muted-foreground: oklch(0.55 0 0); /* Gris medio #8A8A8A */
   
-  /* Accent: Naranja (mismo que primary) */
-  --accent: oklch(0.72 0.18 45); /* Naranja #FF8A3D */
+  /* Accent: Naranja oscuro (mismo que primary) */
+  --accent: oklch(0.68 0.20 35); /* Naranja #FF6B35 */
   --accent-foreground: oklch(1 0 0); /* Blanco */
   
   /* Status colors */
@@ -104,10 +104,10 @@
   /* Borders: Muy sutiles */
   --border: oklch(1 0 0 / 0.08); /* White 8% opacity */
   --input: oklch(0.18 0 0); /* Gris medio */
-  --ring: oklch(0.72 0.18 45 / 0.5); /* Naranja ring */
+  --ring: oklch(0.68 0.20 35 / 0.5); /* Naranja ring */
   
   /* Chart colors - Multicolor como en el dashboard */
-  --chart-1: oklch(0.72 0.18 45); /* Naranja */
+  --chart-1: oklch(0.68 0.20 35); /* Naranja */
   --chart-2: oklch(0.65 0.18 145); /* Verde */
   --chart-3: oklch(0.70 0.18 290); /* Morado */
   --chart-4: oklch(0.68 0.18 200); /* Cyan */
@@ -116,12 +116,12 @@
   /* Sidebar colors - Gris oscuro como en el diseño */
   --sidebar: oklch(0.11 0 0); /* Gris muy oscuro #1C1C1C */
   --sidebar-foreground: oklch(0.65 0 0); /* Gris claro */
-  --sidebar-primary: oklch(0.72 0.18 45); /* Naranja */
+  --sidebar-primary: oklch(0.68 0.20 35); /* Naranja */
   --sidebar-primary-foreground: oklch(1 0 0); /* Blanco */
   --sidebar-accent: oklch(0.14 0 0); /* Gris oscuro para hover */
   --sidebar-accent-foreground: oklch(0.75 0 0); /* Gris más claro */
   --sidebar-border: oklch(1 0 0 / 0.06); /* Border sutil */
-  --sidebar-ring: oklch(0.72 0.18 45); /* Naranja ring */
+  --sidebar-ring: oklch(0.68 0.20 35); /* Naranja ring */
 }
 
 @layer base {
@@ -346,13 +346,13 @@
   }
   
   .sidebar-item-active {
-    border-left-color: oklch(0.72 0.18 45); /* Naranja */
-    color: oklch(0.72 0.18 45); /* Naranja */
+    border-left-color: oklch(0.68 0.20 35); /* Naranja */
+    color: oklch(0.68 0.20 35); /* Naranja */
     background: transparent; /* Sin fondo sólido */
   }
   
   .sidebar-item-active svg {
-    color: oklch(0.72 0.18 45); /* Icono naranja */
+    color: oklch(0.68 0.20 35); /* Icono naranja */
   }
   
   /* Stat Number */
@@ -384,7 +384,7 @@
   /* Custom Scrollbar - Naranja accent */
   * {
     scrollbar-width: thin;
-    scrollbar-color: oklch(0.72 0.18 45 / 0.5) transparent;
+    scrollbar-color: oklch(0.68 0.20 35 / 0.5) transparent;
   }
 
   *::-webkit-scrollbar {
@@ -397,13 +397,13 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background: oklch(0.72 0.18 45 / 0.5);
+    background: oklch(0.68 0.20 35 / 0.5);
     border-radius: 4px;
     transition: background 0.2s ease;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.72 0.18 45 / 0.7);
+    background: oklch(0.68 0.20 35 / 0.7);
   }
 
   *::-webkit-scrollbar-corner {
