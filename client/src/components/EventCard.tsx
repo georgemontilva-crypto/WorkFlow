@@ -1,4 +1,4 @@
-import { MoreVertical } from 'lucide-react';
+
 
 interface EventCardProps {
   title: string;
@@ -29,32 +29,28 @@ export default function EventCard({
   attendees,
   status,
 }: EventCardProps) {
+  const borderColors = {
+    green: 'border-l-green-500',
+    blue: 'border-l-blue-500',
+    purple: 'border-l-purple-500',
+  };
+
   return (
-    <div className="card-event group">
-      {/* Category Badge */}
-      <div className="absolute top-4 right-4">
-        <button className="p-2 hover:bg-muted rounded-lg opacity-0 group-hover:opacity-100 transition-all">
-          <MoreVertical size={18} />
-        </button>
-      </div>
-
-      {/* Category Color Indicator - Left border */}
-      <div className={`absolute top-0 left-0 w-1 h-12 ${categoryColors[category]}`} />
-
+    <div className={`relative overflow-hidden rounded-2xl bg-[#2A2A2A] border-l-4 ${borderColors[category]} p-6 hover:bg-[#303030] transition-all duration-300`}>
       {/* Content */}
-      <div className="pl-4 space-y-3">
+      <div className="space-y-3">
         <div>
-          <h3 className="text-lg font-bold text-foreground">{title}</h3>
-          <p className="text-sm text-muted-foreground mt-1">{description}</p>
+          <h3 className="text-lg font-bold text-white">{title}</h3>
+          <p className="text-sm text-gray-400 mt-1">{description}</p>
         </div>
 
         {/* Meta Info */}
-        <div className="flex items-center justify-between pt-2 border-t border-border/30">
-          <div className="text-xs text-muted-foreground">
+        <div className="flex items-center justify-between pt-2">
+          <div className="text-xs text-gray-400 space-y-1">
             <p>{date}</p>
             <p>{attendees} asistentes</p>
           </div>
-          <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+          <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
             category === 'green' ? 'bg-green-500/20 text-green-400' :
             category === 'blue' ? 'bg-blue-500/20 text-blue-400' :
             'bg-purple-500/20 text-purple-400'
