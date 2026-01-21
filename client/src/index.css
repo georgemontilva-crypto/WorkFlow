@@ -371,23 +371,57 @@
   @apply opacity-100;
 }
 
-/* Scroll Container - Flexbox para crypto cards que ocupan 100% del ancho */
+/* Scroll Container - Deslizable en móvil, grid en desktop */
 .scroll-container {
-  @apply flex gap-4 w-full;
+  @apply flex gap-4 w-full overflow-x-auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Crypto cards se expanden para ocupar el espacio disponible */
+/* Crypto cards con ancho fijo en móvil */
 .scroll-container .crypto-card {
-  @apply flex-1 min-w-0;
+  @apply flex-shrink-0;
+  min-width: 280px;
+  scroll-snap-align: start;
+}
+
+/* En desktop, las cards ocupan el espacio disponible */
+@media (min-width: 640px) {
+  .scroll-container .crypto-card {
+    @apply flex-1 min-w-0;
+    min-width: auto;
+  }
 }
 
 
 /* ===== DASHBOARD ADAPTIVE LAYOUT ===== */
 
-/* Grid adaptativo para stats cards (4 columnas que se adaptan) */
+/* Grid adaptativo para stats cards - Deslizable en móvil, grid en desktop */
 .dashboard-adaptive-grid {
-  @apply grid gap-4;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  @apply flex gap-4 overflow-x-auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Stats cards con ancho fijo en móvil */
+.dashboard-adaptive-grid > * {
+  @apply flex-shrink-0;
+  min-width: 280px;
+  scroll-snap-align: start;
+}
+
+/* En desktop, usar grid */
+@media (min-width: 640px) {
+  .dashboard-adaptive-grid {
+    @apply grid overflow-x-visible;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    scroll-snap-type: none;
+  }
+  
+  .dashboard-adaptive-grid > * {
+    min-width: auto;
+    scroll-snap-align: none;
+  }
 }
 
 /* Grid principal para widgets grandes y pequeños */
