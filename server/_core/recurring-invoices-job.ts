@@ -36,6 +36,10 @@ export async function processRecurringInvoices() {
         }
         
         // Generate new invoice from template
+        // Generate unique payment token
+        const crypto = await import('crypto');
+        const paymentToken = crypto.randomBytes(32).toString('hex');
+        
         const newInvoiceData = {
           user_id: template.user_id,
           client_id: template.client_id,
@@ -50,6 +54,7 @@ export async function processRecurringInvoices() {
           paid_amount: '0',
           balance: template.total,
           status: 'sent' as const,
+          payment_token: paymentToken, // Unique token for public access
           payment_link: template.payment_link,
           notes: template.notes,
           is_recurring: false, // Generated invoices are not recurring themselves
