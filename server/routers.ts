@@ -1022,6 +1022,29 @@ export const appRouter = router({
           throw new Error(error.message || 'Failed to upload payment proof');
         }
       }),
+
+    // Public endpoint to get invoice by token
+    getByToken: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .query(async ({ input }) => {
+        const { getInvoiceByPaymentToken, getClientById } = await import("./db");
+        const invoice = await getInvoiceByPaymentToken(input.token);
+        
+        if (!invoice) {
+          throw new Error('Invoice not found');
+        }
+
+        // Get client info
+        const client = await getClientById(invoice.client_id, invoice.user_id);
+        
+        return {
+          ...invoice,
+          clientName: client?.name || 'Unknown',
+          clientEmail: client?.email || '',
+          clientPhone: client?.phone,
+          companyName: client?.company,
+        };
+      }),
       
     // Public endpoint to confirm payment
     confirmPayment: publicProcedure

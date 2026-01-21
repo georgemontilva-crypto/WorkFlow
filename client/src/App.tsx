@@ -20,6 +20,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Verify2FA from "./pages/Verify2FA";
 import Updates from "./pages/Updates";
 import PayInvoice from "./pages/PayInvoice";
+import PublicInvoice from "./pages/PublicInvoice";
 import Home from "./pages/Home";
 import Clients from "./pages/Clients";
 import Invoices from "./pages/Invoices";
@@ -45,6 +46,7 @@ function Router() {
       <Route path="/reset-password" component={ResetPassword} />
       <Route path="/verify-2fa" component={Verify2FA} />
       <Route path="/pay" component={PayInvoice} />
+      <Route path="/invoice/:token" component={PublicInvoice} />
       
       {/* Protected routes - require authentication */}
       <Route path="/dashboard">

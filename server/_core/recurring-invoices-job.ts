@@ -113,6 +113,16 @@ export async function processRecurringInvoices() {
       <p><strong>Fecha de emisión:</strong> ${new Date(invoice.issue_date).toLocaleDateString('es-ES')}</p>
       <p><strong>Fecha de vencimiento:</strong> ${new Date(invoice.due_date).toLocaleDateString('es-ES')}</p>
       <p>Adjunto encontrarás el PDF de tu factura.</p>
+      ${invoice.payment_token ? `
+      <div style="margin: 30px 0; padding: 20px; background: #fff; border-radius: 8px; text-align: center;">
+        <h3 style="margin: 0 0 15px 0; color: #000;">Ver Factura y Subir Comprobante</h3>
+        <p style="margin: 0 0 20px 0; color: #666;">Haz clic en el botón para ver los detalles de tu factura y subir tu comprobante de pago.</p>
+        <a href="${process.env.APP_URL || 'https://finwrk.app'}/invoice/${invoice.payment_token}" 
+           style="display: inline-block; padding: 12px 30px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600;">
+          Ver Factura
+        </a>
+      </div>
+      ` : ''}
       <p>Gracias por tu preferencia.</p>
     </div>
     <div class="footer">
