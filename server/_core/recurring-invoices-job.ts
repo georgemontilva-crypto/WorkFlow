@@ -58,8 +58,88 @@ export async function processRecurringInvoices() {
         
         // Create the new invoice
         const result = await createInvoice(newInvoiceData);
+        const newInvoiceId = result.id;
         
         console.log(`[Recurring Invoices Job] Generated invoice ${newInvoiceData.invoice_number} from template ${template.invoice_number}`);
+        
+        // Send invoice PDF to client automatically
+        try {
+          const { getInvoiceById, getClientById } = await import('../db');
+          const { generateInvoicePDF } = await import('./pdf');
+          const { sendEmail } = await import('./email');
+          
+          // Get full invoice and client data
+          const invoice = await getInvoiceById(newInvoiceId, template.user_id);
+          const client = await getClientById(template.client_id, template.user_id);
+          
+          if (invoice && client) {
+            // Prepare invoice data for PDF
+            const invoiceData = {
+              ...invoice,
+              clientName: client.name,
+              clientEmail: client.email,
+              clientPhone: client.phone,
+              companyName: client.company || undefined,
+              items: typeof invoice.items === 'string' ? JSON.parse(invoice.items) : invoice.items,
+            };
+            
+            // Generate PDF
+            const pdfBase64 = await generateInvoicePDF(invoiceData);
+            
+            // Send email with PDF attachment
+            const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #000; color: #fff; padding: 30px; text-align: center; }
+    .content { background: #f9f9f9; padding: 30px; }
+    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Nueva Factura - Finwrk</h1>
+    </div>
+    <div class="content">
+      <h2>Hola ${client.name},</h2>
+      <p>Se ha generado automáticamente tu factura recurrente.</p>
+      <p><strong>Número de factura:</strong> ${invoice.invoice_number}</p>
+      <p><strong>Total:</strong> ${invoice.currency} ${parseFloat(invoice.total as any).toFixed(2)}</p>
+      <p><strong>Fecha de emisión:</strong> ${new Date(invoice.issue_date).toLocaleDateString('es-ES')}</p>
+      <p><strong>Fecha de vencimiento:</strong> ${new Date(invoice.due_date).toLocaleDateString('es-ES')}</p>
+      <p>Adjunto encontrarás el PDF de tu factura.</p>
+      <p>Gracias por tu preferencia.</p>
+    </div>
+    <div class="footer">
+      <p>© ${new Date().getFullYear()} Finwrk. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</body>
+</html>
+            `;
+            
+            await sendEmail({
+              to: client.email,
+              subject: `Nueva Factura ${invoice.invoice_number} - Finwrk`,
+              html: emailHtml,
+              attachments: [{
+                filename: `factura-${invoice.invoice_number}.pdf`,
+                content: pdfBase64,
+                contentType: 'application/pdf',
+              }],
+            });
+            
+            console.log(`[Recurring Invoices Job] Invoice PDF sent to client: ${client.email}`);
+          }
+        } catch (emailError) {
+          console.error(`[Recurring Invoices Job] Failed to send invoice email:`, emailError);
+          // Don't throw - invoice was created successfully, just email failed
+        }
         
         // Calculate next generation date
         const nextDate = calculateNextGenerationDate(
