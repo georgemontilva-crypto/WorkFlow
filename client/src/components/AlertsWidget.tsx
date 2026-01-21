@@ -1,4 +1,4 @@
-import { AlertCircle, Calendar } from 'lucide-react';
+import { AlertCircle, Calendar, MoreVertical } from 'lucide-react';
 import { Link } from 'wouter';
 import { trpc } from '@/lib/trpc';
 
@@ -16,18 +16,18 @@ interface Reminder {
 export function AlertsWidget() {
   const { data: reminders, isLoading } = trpc.reminders.list.useQuery();
 
-  // Filter only pending reminders and take first 5
+  // Filter only pending reminders and take first 4
   const pendingReminders = (reminders || [])
     .filter((r: any) => r.status === 'pending')
-    .slice(0, 5);
+    .slice(0, 4);
 
   const getCategoryLabel = (category: string) => {
     switch (category) {
-      case 'payment': return 'Pago pendiente';
+      case 'payment': return 'Pago';
       case 'meeting': return 'Reunión';
       case 'deadline': return 'Fecha límite';
       case 'personal': return 'Personal';
-      default: return 'Recordatorio';
+      default: return 'Otro';
     }
   };
 
@@ -35,8 +35,31 @@ export function AlertsWidget() {
     const date = new Date(dateStr);
     return date.toLocaleDateString('es-ES', { 
       day: 'numeric', 
-      month: 'short'
+      month: 'short',
+      year: 'numeric'
     });
+  };
+
+  const getBorderColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return '#EF4444'; // Rojo
+      case 'medium': return '#EAB308'; // Amarillo
+      case 'low': return '#10B981'; // Verde
+      default: return '#3B82F6'; // Azul
+    }
+  };
+
+  const getStatusBadge = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return <span className="px-2 py-1 rounded-md text-xs font-medium bg-red-500/20 text-red-300">Alta</span>;
+      case 'medium':
+        return <span className="px-2 py-1 rounded-md text-xs font-medium bg-yellow-500/20 text-yellow-300">Media</span>;
+      case 'low':
+        return <span className="px-2 py-1 rounded-md text-xs font-medium bg-green-500/20 text-green-300">Baja</span>;
+      default:
+        return <span className="px-2 py-1 rounded-md text-xs font-medium bg-blue-500/20 text-blue-300">Normal</span>;
+    }
   };
 
   return (
@@ -49,32 +72,46 @@ export function AlertsWidget() {
         </Link>
       </div>
 
-      {/* Alerts List */}
-      <div className="space-y-1">
+      {/* Alerts List - Vertical Stack */}
+      <div className="space-y-3">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
           </div>
         ) : pendingReminders.length > 0 ? (
           pendingReminders.map((reminder: any) => (
-            <div key={reminder.id} className="alert-list-item">
-              {/* Alert Icon - Red circle with exclamation */}
-              <div className="alert-icon">
-                <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-              </div>
-              
+            <div 
+              key={reminder.id} 
+              className="relative bg-[#1C1C1C] rounded-lg p-4 border border-border/50 hover:border-primary/30 transition-all"
+              style={{ borderLeftWidth: '4px', borderLeftColor: getBorderColor(reminder.priority) }}
+            >
               {/* Content */}
-              <div className="alert-content">
-                <p className="alert-title">
+              <div className="space-y-2">
+                {/* Title */}
+                <h4 className="text-base font-semibold text-white leading-tight">
                   {reminder.title}
+                </h4>
+                
+                {/* Category/Description */}
+                <p className="text-sm text-muted-foreground">
+                  {reminder.description || getCategoryLabel(reminder.category)}
                 </p>
-                <p className="alert-subtitle">
-                  {getCategoryLabel(reminder.category)}
-                </p>
-                <p className="alert-meta">
-                  {formatDate(reminder.reminder_date)}
-                  {reminder.reminder_time && ` • ${reminder.reminder_time}`}
-                </p>
+                
+                {/* Divider */}
+                <div className="border-t border-border/30 my-2"></div>
+                
+                {/* Footer: Date and Badge */}
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-muted-foreground">
+                    {formatDate(reminder.reminder_date)}
+                    {reminder.reminder_time && (
+                      <span className="ml-2">
+                        {reminder.reminder_time}
+                      </span>
+                    )}
+                  </div>
+                  {getStatusBadge(reminder.priority)}
+                </div>
               </div>
             </div>
           ))

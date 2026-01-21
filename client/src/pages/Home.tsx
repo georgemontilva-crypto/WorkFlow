@@ -399,6 +399,13 @@ export default function Home() {
           </div>
           )}
 
+          {/* Alertas de Hoy - Widget pequeño */}
+          {isWidgetVisible('alerts') && (
+          <div className="dashboard-widget-small">
+            <AlertsWidget />
+          </div>
+          )}
+
           {/* Resumen - Widget pequeño */}
           {isWidgetVisible('summary') && (
           <div className="dashboard-chart-card dashboard-widget-small">
@@ -417,13 +424,6 @@ export default function Home() {
                 <span className="resume-value danger">{pendingInvoices}</span>
               </div>
             </div>
-          </div>
-          )}
-
-          {/* Alertas de Hoy - Widget pequeño */}
-          {isWidgetVisible('alerts') && (
-          <div className="dashboard-widget-small">
-            <AlertsWidget />
           </div>
           )}
         </div>
