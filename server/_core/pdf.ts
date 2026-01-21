@@ -13,12 +13,28 @@ interface InvoiceItem {
   total: number;
 }
 
+interface CompanyProfile {
+  company_name: string;
+  logo_url?: string;
+  email: string;
+  phone?: string;
+  website?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
+  country?: string;
+  tax_id?: string;
+  invoice_footer?: string;
+}
+
 interface InvoiceData extends Invoice {
   clientName: string;
   clientEmail: string;
   clientPhone?: string;
   companyName?: string;
   items: InvoiceItem[];
+  companyProfile?: CompanyProfile;
 }
 
 /**
@@ -46,8 +62,34 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<stri
       });
 
       // Header - Company Logo/Name
-      doc.fontSize(24).text('Finwrk', 50, 50);
-      doc.fontSize(10).fillColor('#666').text('Sistema de Gestión Empresarial', 50, 78);
+      const profile = invoiceData.companyProfile;
+      if (profile) {
+        doc.fontSize(20).fillColor('#AF8F6F').text(profile.company_name, 50, 50);
+        let yPos = 75;
+        if (profile.email) {
+          doc.fontSize(9).fillColor('#666').text(profile.email, 50, yPos);
+          yPos += 12;
+        }
+        if (profile.phone) {
+          doc.text(profile.phone, 50, yPos);
+          yPos += 12;
+        }
+        if (profile.address) {
+          doc.text(profile.address, 50, yPos);
+          yPos += 12;
+        }
+        if (profile.city || profile.state || profile.postal_code) {
+          const location = [profile.city, profile.state, profile.postal_code].filter(Boolean).join(', ');
+          doc.text(location, 50, yPos);
+          yPos += 12;
+        }
+        if (profile.tax_id) {
+          doc.text(`RIF/NIT: ${profile.tax_id}`, 50, yPos);
+        }
+      } else {
+        doc.fontSize(24).text('Finwrk', 50, 50);
+        doc.fontSize(10).fillColor('#666').text('Sistema de Gestión Empresarial', 50, 78);
+      }
       
       // Invoice Title
       doc.fontSize(20).fillColor('#000').text('FACTURA', 400, 50, { align: 'right' });
@@ -141,8 +183,9 @@ export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<stri
       
       // Footer
       doc.fontSize(8).fillColor('#999');
+      const footerText = invoiceData.companyProfile?.invoice_footer || 'Gracias por su preferencia';
       doc.text(
-        'Gracias por su preferencia',
+        footerText,
         50,
         doc.page.height - 50,
         { align: 'center', width: doc.page.width - 100 }

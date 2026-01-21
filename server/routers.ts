@@ -772,6 +772,9 @@ export const appRouter = router({
             throw new Error('Client not found');
           }
           
+          // Get company profile
+          const companyProfile = await db.getCompanyProfile(ctx.user.id);
+          
           // Prepare invoice data for PDF
           const invoiceData = {
             ...invoice,
@@ -780,6 +783,7 @@ export const appRouter = router({
             clientPhone: client.phone,
             companyName: client.company || undefined,
             items: typeof invoice.items === 'string' ? JSON.parse(invoice.items) : invoice.items,
+            companyProfile: companyProfile || undefined,
           };
           
           // Generate PDF
@@ -809,6 +813,9 @@ export const appRouter = router({
             throw new Error('Client not found');
           }
           
+          // Get company profile
+          const companyProfile = await db.getCompanyProfile(ctx.user.id);
+          
           // Prepare invoice data for PDF
           const invoiceData = {
             ...invoice,
@@ -817,6 +824,7 @@ export const appRouter = router({
             clientPhone: client.phone,
             companyName: client.company || undefined,
             items: typeof invoice.items === 'string' ? JSON.parse(invoice.items) : invoice.items,
+            companyProfile: companyProfile || undefined,
           };
           
           // Generate PDF
@@ -1043,7 +1051,7 @@ export const appRouter = router({
     getByToken: publicProcedure
       .input(z.object({ token: z.string() }))
       .query(async ({ input }) => {
-        const { getInvoiceByPaymentToken, getClientById } = await import("./db");
+        const { getInvoiceByPaymentToken, getClientById, getCompanyProfile } = await import("./db");
         const invoice = await getInvoiceByPaymentToken(input.token);
         
         if (!invoice) {
@@ -1053,12 +1061,16 @@ export const appRouter = router({
         // Get client info
         const client = await getClientById(invoice.client_id, invoice.user_id);
         
+        // Get company profile
+        const companyProfile = await getCompanyProfile(invoice.user_id);
+        
         return {
           ...invoice,
           clientName: client?.name || 'Unknown',
           clientEmail: client?.email || '',
           clientPhone: client?.phone,
           companyName: client?.company,
+          companyProfile: companyProfile || undefined,
         };
       }),
       
