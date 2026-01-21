@@ -793,7 +793,15 @@ export default function Invoices() {
                     <Switch
                       id="is_recurring"
                       checked={formData.is_recurring || false}
-                      onCheckedChange={(checked) => setFormData({ ...formData, is_recurring: checked })}
+                      onCheckedChange={(checked) => {
+                        // Check if user has Pro or Business plan
+                        if (user?.subscription_plan === 'free' && checked) {
+                          // Show upgrade modal
+                          setShowLimitDialog(true);
+                          return;
+                        }
+                        setFormData({ ...formData, is_recurring: checked });
+                      }}
                     />
                   </div>
 
