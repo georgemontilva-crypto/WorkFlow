@@ -3,7 +3,7 @@
  * Con EventCard adaptado y sistema de criptomonedas añadir/eliminar
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -52,6 +52,46 @@ export default function Home() {
   const [, setLocation] = useLocation();
   const [selectedCryptos, setSelectedCryptos] = useState<string[]>(['BTC', 'ETH', 'XRP']);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isWidgetConfigOpen, setIsWidgetConfigOpen] = useState(false);
+  
+  // Widget visibility state
+  const [visibleWidgets, setVisibleWidgets] = useState<string[]>(() => {
+    const saved = localStorage.getItem('dashboardWidgets');
+    return saved ? JSON.parse(saved) : [
+      'cryptos',
+      'stats',
+      'weeklyIncome',
+      'savingsProgress',
+      'savingsGoal',
+      'summary',
+      'events'
+    ];
+  });
+  
+  // Save to localStorage when widgets change
+  useEffect(() => {
+    localStorage.setItem('dashboardWidgets', JSON.stringify(visibleWidgets));
+  }, [visibleWidgets]);
+  
+  const toggleWidget = (widgetId: string) => {
+    setVisibleWidgets(prev => 
+      prev.includes(widgetId) 
+        ? prev.filter(id => id !== widgetId)
+        : [...prev, widgetId]
+    );
+  };
+  
+  const isWidgetVisible = (widgetId: string) => visibleWidgets.includes(widgetId);
+  
+  const AVAILABLE_WIDGETS = [
+    { id: 'cryptos', name: 'Criptomonedas', icon: DollarSign },
+    { id: 'stats', name: 'Estadísticas', icon: TrendingUp },
+    { id: 'weeklyIncome', name: 'Ingresos Semanales', icon: TrendingUp },
+    { id: 'savingsProgress', name: 'Progreso de Ahorros', icon: PiggyBank },
+    { id: 'savingsGoal', name: 'Meta de Ahorros', icon: PiggyBank },
+    { id: 'summary', name: 'Resumen', icon: Calendar },
+    { id: 'events', name: 'Eventos Próximos', icon: Calendar },
+  ];
   
   // Fetch data using tRPC
   const { data: clients } = trpc.clients.list.useQuery();
@@ -129,12 +169,23 @@ export default function Home() {
     <DashboardLayout>
       <div className="p-6 space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Gestión financiera integral y eventos</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Dashboard</h1>
+            <p className="text-muted-foreground mt-1">Gestión financiera integral y eventos</p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setIsWidgetConfigOpen(true)}
+            className="gap-2"
+          >
+            <Settings className="w-4 h-4" />
+            Configurar
+          </Button>
         </div>
 
         {/* Criptomonedas Section */}
+        {isWidgetVisible('cryptos') && (
         <div className="space-y-4">
           <div>
             <h2 className="text-xl font-bold">Criptomonedas</h2>
@@ -197,14 +248,16 @@ export default function Home() {
             </DialogContent>
           </Dialog>
         </div>
+        )}
 
         {/* 4 Tarjetas Superiores */}
+        {isWidgetVisible('stats') && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Total Balance */}
           <div className="dashboard-stat-card">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Total Balance</span>
-              <Wallet className="w-4 h-4 text-muted-foreground" />
+              <Wallet className="w-4 h-4 text-[#FF9500]" />
             </div>
             <div className="dashboard-stat-number">{formatCurrency(totalBalance, 'USD')}</div>
             <div className="dashboard-stat-change positive">
@@ -217,7 +270,7 @@ export default function Home() {
           <div className="dashboard-stat-card">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Ingresos</span>
-              <TrendingUp className="w-4 h-4 text-muted-foreground" />
+              <TrendingUp className="w-4 h-4 text-[#FF9500]" />
             </div>
             <div className="dashboard-stat-number">{formatCurrency(monthlyIncome, 'USD')}</div>
             <div className="dashboard-stat-change positive">
@@ -230,7 +283,7 @@ export default function Home() {
           <div className="dashboard-stat-card">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Gastos</span>
-              <TrendingDown className="w-4 h-4 text-muted-foreground" />
+              <TrendingDown className="w-4 h-4 text-[#FF9500]" />
             </div>
             <div className="dashboard-stat-number">{formatCurrency(monthlyExpenses, 'USD')}</div>
             <div className="dashboard-stat-change negative">
@@ -243,7 +296,7 @@ export default function Home() {
           <div className="dashboard-stat-card">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Ahorros</span>
-              <PiggyBank className="w-4 h-4 text-muted-foreground" />
+              <PiggyBank className="w-4 h-4 text-[#FF9500]" />
             </div>
             <div className="dashboard-stat-number">{formatCurrency(totalSavings, 'USD')}</div>
             <div className="dashboard-stat-change positive">
@@ -252,12 +305,14 @@ export default function Home() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Grid de 2 Columnas */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Columna Izquierda - Gráficos (2/3) */}
           <div className="lg:col-span-2 space-y-6">
             {/* Ingresos Semanales */}
+            {isWidgetVisible('weeklyIncome') && (
             <div className="dashboard-chart-card">
               <h3 className="dashboard-chart-title">Ingresos Semanales</h3>
               <p className="dashboard-chart-subtitle">Actividad de esta semana</p>
@@ -276,8 +331,10 @@ export default function Home() {
                 })}
               </div>
             </div>
+            )}
 
             {/* Progreso de Ahorros */}
+            {isWidgetVisible('savingsProgress') && (
             <div className="dashboard-chart-card">
               <h3 className="dashboard-chart-title">Progreso de Ahorros</h3>
               <p className="dashboard-chart-subtitle">Últimos 5 meses</p>
@@ -285,11 +342,13 @@ export default function Home() {
                 <p className="text-muted-foreground">Gráfico de línea aquí</p>
               </div>
             </div>
+            )}
           </div>
 
           {/* Columna Derecha - Meta y Resumen (1/3) */}
           <div className="space-y-6">
             {/* Meta de Ahorros */}
+            {isWidgetVisible('savingsGoal') && (
             <div className="dashboard-chart-card">
               <h3 className="dashboard-chart-title">Meta de Ahorros</h3>
               <div className="flex items-center justify-center h-48">
@@ -343,8 +402,10 @@ export default function Home() {
                 })()}
               </p>
             </div>
+            )}
 
             {/* Resumen */}
+            {isWidgetVisible('summary') && (
             <div className="resume-card">
               <h3 className="text-lg font-semibold mb-4">Resumen</h3>
               <div className="space-y-1">
@@ -362,10 +423,12 @@ export default function Home() {
                 </div>
               </div>
             </div>
+            )}
           </div>
         </div>
 
         {/* Eventos Próximos / Recordatorios */}
+        {isWidgetVisible('events') && (
         <div className="space-y-4">
           <div>
             <h2 className="text-2xl font-bold">Eventos Próximos</h2>
@@ -380,11 +443,54 @@ export default function Home() {
             </div>
           ) : (
             <div className="dashboard-chart-card text-center py-12">
-              <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <Calendar className="w-12 h-12 text-[#FF9500] mx-auto mb-4" />
               <p className="text-muted-foreground">No hay eventos próximos</p>
             </div>
           )}
         </div>
+        )}
+        
+        {/* Widget Configuration Dialog */}
+        <Dialog open={isWidgetConfigOpen} onOpenChange={setIsWidgetConfigOpen}>
+          <DialogContent className="bg-[#1C1C1C] border-white/10 max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-white">Configurar Widgets</DialogTitle>
+              <DialogDescription className="text-gray-400">
+                Selecciona qué widgets quieres mostrar en tu dashboard
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3 py-4">
+              {AVAILABLE_WIDGETS.map((widget) => {
+                const Icon = widget.icon;
+                return (
+                  <div
+                    key={widget.id}
+                    className="flex items-center justify-between p-3 rounded-lg bg-[#2A2A2A] hover:bg-[#303030] transition-colors cursor-pointer"
+                    onClick={() => toggleWidget(widget.id)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className="w-5 h-5 text-[#FF9500]" />
+                      <span className="text-white font-medium">{widget.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`w-10 h-6 rounded-full transition-colors ${
+                          isWidgetVisible(widget.id) ? 'bg-[#FF9500]' : 'bg-gray-600'
+                        } relative`}
+                      >
+                        <div
+                          className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                            isWidgetVisible(widget.id) ? 'translate-x-5' : 'translate-x-1'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );

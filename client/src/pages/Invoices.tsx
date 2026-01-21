@@ -944,7 +944,7 @@ export default function Invoices() {
           <Card className="bg-card border-border">
             <CardContent className="flex flex-col items-center justify-center py-16">
               <div className="w-32 h-32 rounded-full bg-accent/20 flex items-center justify-center mb-6">
-                <FileText className="w-16 h-16 text-muted-foreground" strokeWidth={1} />
+                <FileText className="w-16 h-16 text-[#FF9500]" strokeWidth={1} />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 {t.invoices.noInvoices}
@@ -1291,7 +1291,7 @@ export default function Invoices() {
               {!filteredClients || filteredClients.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mb-4">
-                    <User className="w-8 h-8 text-muted-foreground" strokeWidth={1} />
+                    <User className="w-8 h-8 text-[#FF9500]" strokeWidth={1} />
                   </div>
                   <p className="text-muted-foreground text-sm">
                     {clientSearch ? 'No se encontraron clientes con ese criterio' : 'No hay clientes registrados'}

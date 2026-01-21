@@ -201,7 +201,7 @@ export default function Reminders() {
                 <p className="text-4xl font-bold text-white">{overdueReminders.length}</p>
               </div>
               <div className="reminder-icon-circle overdue">
-                <AlertCircle className="w-6 h-6 text-red-400" />
+                <AlertCircle className="w-6 h-6 text-[#FF9500]" />
               </div>
             </div>
           </div>
@@ -213,7 +213,7 @@ export default function Reminders() {
                 <p className="text-4xl font-bold text-white">{urgentReminders.length}</p>
               </div>
               <div className="reminder-icon-circle urgent">
-                <Clock className="w-6 h-6 text-yellow-400" />
+                <Clock className="w-6 h-6 text-[#FF9500]" />
               </div>
             </div>
           </div>
@@ -225,7 +225,7 @@ export default function Reminders() {
                 <p className="text-4xl font-bold text-white">{upcomingReminders.length}</p>
               </div>
               <div className="reminder-icon-circle upcoming">
-                <CheckCircle2 className="w-6 h-6 text-blue-400" />
+                <CheckCircle2 className="w-6 h-6 text-[#FF9500]" />
               </div>
             </div>
           </div>
@@ -252,7 +252,7 @@ export default function Reminders() {
             {allReminders.length === 0 ? (
               <Card className="bg-[#2A2A2A] border-white/5">
                 <CardContent className="p-8 text-center">
-                  <CheckCircle2 className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                  <CheckCircle2 className="w-12 h-12 text-[#FF9500] mx-auto mb-4" />
                   <p className="text-gray-400">No hay recordatorios pendientes</p>
                 </CardContent>
               </Card>
@@ -267,7 +267,7 @@ export default function Reminders() {
             {overdueReminders.length === 0 ? (
               <Card className="bg-[#2A2A2A] border-white/5">
                 <CardContent className="p-8 text-center">
-                  <CheckCircle2 className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                  <CheckCircle2 className="w-12 h-12 text-[#FF9500] mx-auto mb-4" />
                   <p className="text-gray-400">No hay pagos vencidos</p>
                 </CardContent>
               </Card>
@@ -282,7 +282,7 @@ export default function Reminders() {
             {urgentReminders.length === 0 ? (
               <Card className="bg-[#2A2A2A] border-white/5">
                 <CardContent className="p-8 text-center">
-                  <CheckCircle2 className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                  <CheckCircle2 className="w-12 h-12 text-[#FF9500] mx-auto mb-4" />
                   <p className="text-gray-400">No hay pagos urgentes</p>
                 </CardContent>
               </Card>
@@ -297,7 +297,7 @@ export default function Reminders() {
             {upcomingReminders.length === 0 ? (
               <Card className="bg-[#2A2A2A] border-white/5">
                 <CardContent className="p-8 text-center">
-                  <CheckCircle2 className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                  <CheckCircle2 className="w-12 h-12 text-[#FF9500] mx-auto mb-4" />
                   <p className="text-gray-400">No hay pagos próximos</p>
                 </CardContent>
               </Card>

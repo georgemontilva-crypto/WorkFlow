@@ -328,7 +328,7 @@ export default function Savings() {
           <Card className="bg-[#2A2A2A] border-white/5">
             <CardContent className="flex flex-col items-center justify-center py-16">
               <div className="w-32 h-32 rounded-full bg-white/5 flex items-center justify-center mb-6">
-                <Target className="w-16 h-16 text-gray-500" strokeWidth={1} />
+                <Target className="w-16 h-16 text-[#FF9500]" strokeWidth={1} />
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">
                 No hay metas de ahorro aún
