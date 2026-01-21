@@ -361,17 +361,14 @@
   @apply opacity-100;
 }
 
-/* Scroll Container - Grid adaptativo para crypto cards (máximo 5) */
+/* Scroll Container - Flexbox para crypto cards que ocupan 100% del ancho */
 .scroll-container {
-  @apply grid gap-4;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  @apply flex gap-4 w-full;
 }
 
-/* Limitar a máximo 5 columnas */
-@media (min-width: 1920px) {
-  .scroll-container {
-    grid-template-columns: repeat(5, 1fr);
-  }
+/* Crypto cards se expanden para ocupar el espacio disponible */
+.scroll-container .crypto-card {
+  @apply flex-1 min-w-0;
 }
 
 
