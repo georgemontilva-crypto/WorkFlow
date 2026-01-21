@@ -76,7 +76,7 @@
   --popover-foreground: oklch(1 0 0); /* Blanco */
   
   /* Primary: Naranja oscuro */
-  --primary: oklch(0.68 0.20 35); /* Naranja #FF6B35 */
+  --primary: #FF9500; /* Naranja #FF6B35 */
   --primary-foreground: oklch(1 0 0); /* Blanco */
   
   /* Secondary: Gris claro para texto secundario */
@@ -107,7 +107,11 @@
   --ring: oklch(0.68 0.20 35 / 0.5); /* Naranja ring */
   
   /* Chart colors - Multicolor como en el dashboard */
-  --chart-1: oklch(0.68 0.20 35); /* Naranja */
+  --chart-1: #FF9500;
+  --chart-2: #FFA500;
+  --chart-3: #FF8C00;
+  --chart-4: #E68900;
+  --chart-5: #CC7700; /* Naranja */
   --chart-2: oklch(0.65 0.18 145); /* Verde */
   --chart-3: oklch(0.70 0.18 290); /* Morado */
   --chart-4: oklch(0.68 0.18 200); /* Cyan */
@@ -592,4 +596,95 @@
 
   .resume-value.danger {
     color: oklch(0.60 0.24 25); /* Rojo */
+  }
+
+  /* Glow effect from reference code */
+  .glow-effect {
+    box-shadow: 0 0 20px rgba(255, 149, 0, 0.15), 0 0 40px rgba(255, 165, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .glow-effect:hover {
+    box-shadow: 0 0 30px rgba(255, 149, 0, 0.25), 0 0 60px rgba(255, 165, 0, 0.15);
+  }
+
+  /* Event Card Style - Exact from reference */
+  .card-event {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(26, 26, 26, 0.7) 100%);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .card-event:hover {
+    border-color: oklch(0.68 0.20 35 / 0.5);
+    box-shadow: 0 0 25px rgba(255, 149, 0, 0.2);
+  }
+
+  /* Category colors for events */
+  .category-green {
+    background: #2ECC71;
+  }
+
+  .category-blue {
+    background: #3498DB;
+  }
+
+  .category-purple {
+    background: #9B59B6;
+  }
+
+  /* Crypto card styles */
+  .crypto-card {
+    position: relative;
+    background: oklch(0.18 0 0);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .crypto-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px oklch(0 0 0 / 0.15);
+  }
+
+  .crypto-card .remove-btn {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .crypto-card:hover .remove-btn {
+    opacity: 1;
+  }
+
+  /* Horizontal scroll container */
+  .scroll-container {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: oklch(0.30 0 0) oklch(0.15 0 0);
+  }
+
+  .scroll-container::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .scroll-container::-webkit-scrollbar-track {
+    background: oklch(0.15 0 0);
+    border-radius: 4px;
+  }
+
+  .scroll-container::-webkit-scrollbar-thumb {
+    background: oklch(0.30 0 0);
+    border-radius: 4px;
+  }
+
+  .scroll-container::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.40 0 0);
   }

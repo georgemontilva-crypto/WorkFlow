@@ -1,11 +1,24 @@
 /**
- * Home Page - Dashboard Principal Simplificado
- * Layout: 4 tarjetas superiores + grid 2 columnas + eventos próximos
+ * Home Page - Dashboard Principal
+ * Con EventCard adaptado y sistema de criptomonedas añadir/eliminar
  */
 
+import { useState } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import EventCard from '@/components/EventCard';
+import CryptoCard from '@/components/CryptoCard';
 import { trpc } from '@/lib/trpc';
 import { 
   TrendingUp, 
@@ -17,15 +30,28 @@ import {
   Plus,
   Calendar,
   Users,
-  FileText
 } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useLocation } from 'wouter';
 import { formatCurrency } from '@/lib/currency';
 
+// Available cryptocurrencies
+const AVAILABLE_CRYPTOS = [
+  { symbol: 'BTC', name: 'Bitcoin', price: 89818.03, change: -1.37 },
+  { symbol: 'ETH', name: 'Ethereum', price: 2988.00, change: -4.65 },
+  { symbol: 'XRP', name: 'Ripple', price: 1.92, change: -1.72 },
+  { symbol: 'SOL', name: 'Solana', price: 142.50, change: 3.25 },
+  { symbol: 'ADA', name: 'Cardano', price: 0.58, change: 2.10 },
+  { symbol: 'DOT', name: 'Polkadot', price: 7.32, change: -0.85 },
+  { symbol: 'MATIC', name: 'Polygon', price: 1.15, change: 1.45 },
+  { symbol: 'LINK', name: 'Chainlink', price: 18.92, change: 4.20 },
+];
+
 export default function Home() {
   const [, setLocation] = useLocation();
+  const [selectedCryptos, setSelectedCryptos] = useState<string[]>(['BTC', 'ETH', 'XRP']);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   
   // Fetch data using tRPC
   const { data: clients } = trpc.clients.list.useQuery();
@@ -65,8 +91,39 @@ export default function Home() {
   const upcomingPayments = clients?.filter(c => {
     if (!c.next_payment_date || c.status !== 'active') return false;
     const daysUntil = differenceInDays(new Date(c.next_payment_date), today);
-    return daysUntil >= 0 && daysUntil <= 7; // Próximos 7 días
+    return daysUntil >= 0 && daysUntil <= 7;
   }).slice(0, 3) || [];
+
+  // Convert to events format
+  const events = upcomingPayments.map((client, index) => {
+    const daysUntil = differenceInDays(new Date(client.next_payment_date!), today);
+    const category = daysUntil === 0 ? 'green' : daysUntil <= 3 ? 'blue' : 'purple';
+    const status = daysUntil === 0 ? 'Confirmado' : daysUntil <= 3 ? 'En Progreso' : 'Pendiente';
+    
+    return {
+      title: client.name,
+      description: 'Pago de facturación mensual',
+      category: category as 'green' | 'blue' | 'purple',
+      date: format(new Date(client.next_payment_date!), 'd MMM yyyy', { locale: es }),
+      attendees: index + 1,
+      status,
+    };
+  });
+
+  // Crypto functions
+  const addCrypto = (symbol: string) => {
+    if (!selectedCryptos.includes(symbol)) {
+      setSelectedCryptos([...selectedCryptos, symbol]);
+    }
+    setIsAddDialogOpen(false);
+  };
+
+  const removeCrypto = (symbol: string) => {
+    setSelectedCryptos(selectedCryptos.filter(s => s !== symbol));
+  };
+
+  const displayedCryptos = AVAILABLE_CRYPTOS.filter(c => selectedCryptos.includes(c.symbol));
+  const availableCryptos = AVAILABLE_CRYPTOS.filter(c => !selectedCryptos.includes(c.symbol));
 
   return (
     <DashboardLayout>
@@ -89,10 +146,76 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Criptomonedas Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">Criptomonedas</h2>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Añadir Cripto
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Añadir Criptomoneda</DialogTitle>
+                  <DialogDescription>
+                    Selecciona una criptomoneda para añadir al dashboard
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-3 py-4">
+                  {availableCryptos.length > 0 ? (
+                    availableCryptos.map((crypto) => (
+                      <Button
+                        key={crypto.symbol}
+                        variant="outline"
+                        className="justify-start h-auto py-3"
+                        onClick={() => addCrypto(crypto.symbol)}
+                      >
+                        <div className="flex items-center gap-3 w-full">
+                          <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                            <span className="text-primary font-bold">{crypto.symbol.slice(0, 2)}</span>
+                          </div>
+                          <div className="flex-1 text-left">
+                            <div className="font-semibold">{crypto.symbol}</div>
+                            <div className="text-sm text-muted-foreground">{crypto.name}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-bold">${crypto.price.toLocaleString()}</div>
+                            <div className={`text-sm ${crypto.change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                              {crypto.change >= 0 ? '+' : ''}{crypto.change}%
+                            </div>
+                          </div>
+                        </div>
+                      </Button>
+                    ))
+                  ) : (
+                    <p className="text-center text-muted-foreground py-8">
+                      Todas las criptomonedas ya están añadidas
+                    </p>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          
+          {/* Crypto Cards - Horizontal scroll */}
+          <div className="scroll-container pb-2">
+            {displayedCryptos.map((crypto) => (
+              <CryptoCard
+                key={crypto.symbol}
+                {...crypto}
+                onRemove={() => removeCrypto(crypto.symbol)}
+              />
+            ))}
+          </div>
+        </div>
+
         {/* 4 Tarjetas Superiores */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Total Balance */}
-          <div className="dashboard-stat-card">
+          <div className="dashboard-stat-card glow-effect">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Total Balance</span>
               <Wallet className="w-4 h-4 text-muted-foreground" />
@@ -105,7 +228,7 @@ export default function Home() {
           </div>
 
           {/* Ingresos */}
-          <div className="dashboard-stat-card">
+          <div className="dashboard-stat-card glow-effect">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Ingresos</span>
               <TrendingUp className="w-4 h-4 text-muted-foreground" />
@@ -118,7 +241,7 @@ export default function Home() {
           </div>
 
           {/* Gastos */}
-          <div className="dashboard-stat-card">
+          <div className="dashboard-stat-card glow-effect">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Gastos</span>
               <TrendingDown className="w-4 h-4 text-muted-foreground" />
@@ -131,7 +254,7 @@ export default function Home() {
           </div>
 
           {/* Ahorros */}
-          <div className="dashboard-stat-card">
+          <div className="dashboard-stat-card glow-effect">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Ahorros</span>
               <PiggyBank className="w-4 h-4 text-muted-foreground" />
@@ -149,11 +272,10 @@ export default function Home() {
           {/* Columna Izquierda - Gráficos (2/3) */}
           <div className="lg:col-span-2 space-y-6">
             {/* Ingresos Semanales */}
-            <div className="dashboard-chart-card">
+            <div className="dashboard-chart-card glow-effect">
               <h3 className="dashboard-chart-title">Ingresos Semanales</h3>
               <p className="dashboard-chart-subtitle">Actividad de esta semana</p>
               <div className="h-64 flex items-end justify-between gap-2">
-                {/* Placeholder para gráfico de barras */}
                 {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day, i) => {
                   const heights = [40, 25, 80, 60, 70, 65, 75];
                   return (
@@ -170,7 +292,7 @@ export default function Home() {
             </div>
 
             {/* Progreso de Ahorros */}
-            <div className="dashboard-chart-card">
+            <div className="dashboard-chart-card glow-effect">
               <h3 className="dashboard-chart-title">Progreso de Ahorros</h3>
               <p className="dashboard-chart-subtitle">Últimos 5 meses</p>
               <div className="h-64 flex items-center justify-center">
@@ -182,10 +304,9 @@ export default function Home() {
           {/* Columna Derecha - Meta y Resumen (1/3) */}
           <div className="space-y-6">
             {/* Meta de Ahorros */}
-            <div className="dashboard-chart-card">
+            <div className="dashboard-chart-card glow-effect">
               <h3 className="dashboard-chart-title">Meta de Ahorros</h3>
               <div className="flex items-center justify-center h-48">
-                {/* Gráfico circular placeholder */}
                 <div className="relative w-32 h-32">
                   <svg className="w-full h-full -rotate-90">
                     <circle
@@ -200,7 +321,7 @@ export default function Home() {
                       cx="64"
                       cy="64"
                       r="56"
-                      stroke="oklch(0.68 0.20 35)"
+                      stroke="#FF9500"
                       strokeWidth="12"
                       fill="none"
                       strokeDasharray={`${2 * Math.PI * 56}`}
@@ -209,7 +330,7 @@ export default function Home() {
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-2xl font-bold">45%</span>
+                    <span className="text-2xl font-bold text-primary">45%</span>
                   </div>
                 </div>
               </div>
@@ -219,7 +340,7 @@ export default function Home() {
             </div>
 
             {/* Resumen */}
-            <div className="resume-card">
+            <div className="resume-card glow-effect">
               <h3 className="text-lg font-semibold mb-4">Resumen</h3>
               <div className="space-y-1">
                 <div className="resume-item">
@@ -240,44 +361,20 @@ export default function Home() {
         </div>
 
         {/* Eventos Próximos / Recordatorios */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold">Eventos Próximos</h2>
-            <span className="text-sm text-muted-foreground">Gestión de eventos y reuniones</span>
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-2xl font-bold">Eventos Próximos</h2>
+            <p className="text-muted-foreground mt-1">Gestión de eventos y reuniones</p>
           </div>
           
-          {upcomingPayments.length > 0 ? (
+          {events.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {upcomingPayments.map((client, index) => {
-                const daysUntil = differenceInDays(new Date(client.next_payment_date!), today);
-                const statusClass = daysUntil === 0 ? 'confirmed' : daysUntil <= 3 ? 'in-progress' : 'pending';
-                const statusText = daysUntil === 0 ? 'Confirmado' : daysUntil <= 3 ? 'En Progreso' : 'Pendiente';
-                const statusColor = daysUntil === 0 ? 'bg-success' : daysUntil <= 3 ? 'bg-blue-500' : 'bg-purple-500';
-                
-                return (
-                  <div key={client.id} className={`reminder-card ${statusClass}`}>
-                    <h3 className="reminder-title">{client.name}</h3>
-                    <p className="reminder-subtitle">
-                      Pago de facturación mensual
-                    </p>
-                    <div className="reminder-meta">
-                      <div className="flex items-center gap-4 text-xs">
-                        <span>{format(new Date(client.next_payment_date!), 'd MMM yyyy', { locale: es })}</span>
-                        <span className="flex items-center gap-1">
-                          <Users className="w-3 h-3" />
-                          {index + 1} asistente{index !== 0 ? 's' : ''}
-                        </span>
-                      </div>
-                      <Badge className={`${statusColor} text-white text-xs px-2 py-0.5`}>
-                        {statusText}
-                      </Badge>
-                    </div>
-                  </div>
-                );
-              })}
+              {events.map((event, idx) => (
+                <EventCard key={idx} {...event} />
+              ))}
             </div>
           ) : (
-            <div className="dashboard-chart-card text-center py-12">
+            <div className="dashboard-chart-card glow-effect text-center py-12">
               <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">No hay eventos próximos</p>
             </div>
