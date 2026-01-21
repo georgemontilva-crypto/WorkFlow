@@ -51,117 +51,74 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Finwrk Premium Theme - Modern Fintech Design */
+/* Finwrk - Smart Finance Dashboard Theme */
 :root {
-  /* Design Philosophy: Premium Fintech - Deep shadows, glassmorphism, vibrant accents */
-  --radius: 1.5rem; /* 24px - más redondeado para look premium */
+  /* Inspirado en Smart Finance Dashboard de Behance */
+  --radius: 2rem; /* 32px - Esquinas muy redondeadas como en el diseño */
   
-  /* Dark Mode Premium - Rich blacks with depth */
-  --background: oklch(0.09 0 0); /* Rich black #171717 */
-  --foreground: oklch(0.98 0 0); /* Soft white #FAFAFA */
+  /* Colores principales del diseño Smart Finance */
+  --cyan-start: oklch(0.78 0.18 195); /* Cyan vibrante #00D4FF */
+  --cyan-end: oklch(0.72 0.16 200); /* Cyan medio #00A8CC */
+  --coral-start: oklch(0.72 0.20 10); /* Coral/Rosa #FF6B9D */
+  --coral-end: oklch(0.68 0.22 15); /* Rosa más intenso #FF5E8F */
   
-  /* Card - Dark with elevated shadow */
-  --card: oklch(0.14 0 0); /* Elevated dark #232323 */
-  --card-foreground: oklch(0.98 0 0); /* Soft white */
+  /* Dark Mode - Smart Finance Style */
+  --background: oklch(0.08 0 0); /* Deep black #121212 */
+  --foreground: oklch(1 0 0); /* Pure white #FFFFFF */
   
-  /* Glassmorphism popover - More pronounced */
-  --popover: oklch(0.12 0 0 / 0.92); /* Glass modal with depth */
-  --popover-foreground: oklch(0.98 0 0); /* Soft white */
+  /* Card - Dark elevated como en el diseño */
+  --card: oklch(0.12 0 0); /* Dark card #1A1A1A */
+  --card-foreground: oklch(1 0 0); /* White */
   
-  /* Primary: Vibrant blue accent (like the charts) */
-  --primary: oklch(0.72 0.15 240); /* Vibrant blue #5B9FFF */
-  --primary-foreground: oklch(0.98 0 0); /* White text */
+  /* Glassmorphism modal */
+  --popover: oklch(0.10 0 0 / 0.95); /* Dark glass modal */
+  --popover-foreground: oklch(1 0 0); /* White */
   
-  /* Secondary: Slightly lighter dark */
-  --secondary: oklch(0.18 0 0); /* Medium dark #2D2D2D */
-  --secondary-foreground: oklch(0.98 0 0); /* White */
+  /* Primary: Cyan vibrante del gradiente */
+  --primary: oklch(0.78 0.18 195); /* Cyan #00D4FF */
+  --primary-foreground: oklch(1 0 0); /* White */
+  
+  /* Secondary: Card color */
+  --secondary: oklch(0.15 0 0); /* Slightly lighter dark */
+  --secondary-foreground: oklch(1 0 0); /* White */
   
   /* Muted: Subtle gray */
-  --muted: oklch(0.25 0 0); /* Muted dark #404040 */
-  --muted-foreground: oklch(0.60 0 0); /* Medium gray #999999 */
+  --muted: oklch(0.20 0 0); /* Muted dark */
+  --muted-foreground: oklch(0.62 0 0); /* Medium gray #9E9E9E */
   
-  /* Accent: Bright highlight */
-  --accent: oklch(0.92 0 0); /* Bright white #EBEBEB */
-  --accent-foreground: oklch(0.12 0 0); /* Dark text */
+  /* Accent: Coral del gradiente */
+  --accent: oklch(0.72 0.20 10); /* Coral #FF6B9D */
+  --accent-foreground: oklch(1 0 0); /* White */
   
-  /* Destructive: Vibrant red */
-  --destructive: oklch(0.58 0.24 25); /* Vibrant red #E74C3C */
-  --destructive-foreground: oklch(0.98 0 0); /* White */
+  /* Destructive: Red vibrante */
+  --destructive: oklch(0.58 0.24 25); /* Red #E74C3C */
+  --destructive-foreground: oklch(1 0 0); /* White */
   
-  /* Success: Vibrant green */
-  --success: oklch(0.65 0.18 145); /* Vibrant green #4CAF50 */
-  --success-foreground: oklch(0.98 0 0); /* White */
+  /* Success: Cyan (mismo que primary) */
+  --success: oklch(0.78 0.18 195); /* Cyan #00D4FF */
+  --success-foreground: oklch(1 0 0); /* White */
   
-  /* Borders: Subtle with glow */
-  --border: oklch(0.98 0 0 / 0.08); /* Subtle white border */
-  --input: oklch(0.14 0 0); /* Dark input background */
-  --ring: oklch(0.72 0.15 240 / 0.5); /* Blue ring with transparency */
+  /* Borders: Muy sutiles */
+  --border: oklch(1 0 0 / 0.06); /* White 6% opacity */
+  --input: oklch(0.12 0 0); /* Dark input */
+  --ring: oklch(0.78 0.18 195 / 0.5); /* Cyan ring */
   
-  /* Chart colors - Vibrant blue spectrum */
-  --chart-1: oklch(0.72 0.15 240); /* Vibrant blue */
-  --chart-2: oklch(0.68 0.16 235); /* Medium blue */
-  --chart-3: oklch(0.64 0.14 230); /* Deep blue */
-  --chart-4: oklch(0.60 0.12 225); /* Darker blue */
-  --chart-5: oklch(0.56 0.10 220); /* Deepest blue */
+  /* Chart colors - Cyan spectrum */
+  --chart-1: oklch(0.78 0.18 195); /* Cyan bright */
+  --chart-2: oklch(0.72 0.16 200); /* Cyan medium */
+  --chart-3: oklch(0.66 0.14 205); /* Cyan dark */
+  --chart-4: oklch(0.60 0.12 210); /* Cyan darker */
+  --chart-5: oklch(0.54 0.10 215); /* Cyan darkest */
   
-  /* Sidebar colors - Elevated dark */
-  --sidebar: oklch(0.10 0 0 / 0.85); /* Dark sidebar with transparency */
-  --sidebar-foreground: oklch(0.98 0 0); /* White */
-  --sidebar-primary: oklch(0.72 0.15 240); /* Blue */
-  --sidebar-primary-foreground: oklch(0.98 0 0); /* White */
-  --sidebar-accent: oklch(0.14 0 0); /* Dark accent */
-  --sidebar-accent-foreground: oklch(0.98 0 0); /* White */
-  --sidebar-border: oklch(0.98 0 0 / 0.08); /* Subtle border */
-  --sidebar-ring: oklch(0.72 0.15 240); /* Blue ring */
-}
-
-/* Light Mode (Optional) */
-.light {
-  --background: oklch(0.98 0 0); /* Soft white */
-  --foreground: oklch(0.12 0 0); /* Dark text */
-  
-  --card: oklch(1 0 0); /* Pure white */
-  --card-foreground: oklch(0.12 0 0); /* Dark */
-  
-  --popover: oklch(0.99 0 0 / 0.95); /* White glass */
-  --popover-foreground: oklch(0.12 0 0); /* Dark */
-  
-  --primary: oklch(0.72 0.15 240); /* Blue */
-  --primary-foreground: oklch(0.98 0 0); /* White */
-  
-  --secondary: oklch(0.96 0 0); /* Light gray */
-  --secondary-foreground: oklch(0.12 0 0); /* Dark */
-  
-  --muted: oklch(0.94 0 0); /* Muted light */
-  --muted-foreground: oklch(0.45 0 0); /* Medium gray */
-  
-  --accent: oklch(0.12 0 0); /* Dark accent */
-  --accent-foreground: oklch(0.98 0 0); /* White */
-  
-  --destructive: oklch(0.58 0.24 25); /* Red */
-  --destructive-foreground: oklch(0.98 0 0); /* White */
-  
-  --success: oklch(0.65 0.18 145); /* Green */
-  --success-foreground: oklch(0.98 0 0); /* White */
-  
-  --border: oklch(0.12 0 0 / 0.08); /* Subtle border */
-  --input: oklch(0.96 0 0); /* Light input */
-  --ring: oklch(0.72 0.15 240 / 0.5); /* Blue ring */
-  
-  --chart-1: oklch(0.72 0.15 240);
-  --chart-2: oklch(0.68 0.16 235);
-  --chart-3: oklch(0.64 0.14 230);
-  --chart-4: oklch(0.60 0.12 225);
-  --chart-5: oklch(0.56 0.10 220);
-  
-  --sidebar: oklch(1 0 0 / 0.92);
-  --sidebar-foreground: oklch(0.12 0 0);
-  --sidebar-primary: oklch(0.72 0.15 240);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.96 0 0);
-  --sidebar-accent-foreground: oklch(0.12 0 0);
-  --sidebar-border: oklch(0.12 0 0 / 0.08);
-  --sidebar-ring: oklch(0.72 0.15 240);
+  /* Sidebar colors */
+  --sidebar: oklch(0.08 0 0 / 0.9); /* Dark sidebar */
+  --sidebar-foreground: oklch(1 0 0); /* White */
+  --sidebar-primary: oklch(0.78 0.18 195); /* Cyan */
+  --sidebar-primary-foreground: oklch(1 0 0); /* White */
+  --sidebar-accent: oklch(0.12 0 0); /* Dark accent */
+  --sidebar-accent-foreground: oklch(1 0 0); /* White */
+  --sidebar-border: oklch(1 0 0 / 0.06); /* Subtle border */
+  --sidebar-ring: oklch(0.78 0.18 195); /* Cyan ring */
 }
 
 @layer base {
@@ -172,7 +129,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -219,60 +176,189 @@
     }
   }
 
-  /* Premium Glass Card Effect */
+  /* Smart Finance Glass Card - Estilo exacto del diseño */
   .glass-card {
-    background: oklch(0.14 0 0 / 0.6);
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid oklch(0.98 0 0 / 0.08);
+    background: oklch(0.12 0 0 / 0.7);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid oklch(1 0 0 / 0.06);
     box-shadow: 
-      0 4px 6px -1px rgb(0 0 0 / 0.3),
-      0 2px 4px -2px rgb(0 0 0 / 0.3),
-      inset 0 1px 0 0 rgb(255 255 255 / 0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 4px 16px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .glass-card:hover {
-    background: oklch(0.16 0 0 / 0.7);
-    border-color: oklch(0.98 0 0 / 0.12);
+    background: oklch(0.14 0 0 / 0.8);
+    border-color: oklch(1 0 0 / 0.10);
     box-shadow: 
-      0 10px 15px -3px rgb(0 0 0 / 0.4),
-      0 4px 6px -4px rgb(0 0 0 / 0.4),
-      inset 0 1px 0 0 rgb(255 255 255 / 0.08);
-    transform: translateY(-2px);
+      0 16px 48px rgba(0, 0, 0, 0.5),
+      0 8px 24px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+    transform: translateY(-4px);
   }
   
-  /* Premium Glass Modal */
-  .glass-modal {
-    background: oklch(0.12 0 0 / 0.92);
-    backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid oklch(0.98 0 0 / 0.1);
+  /* Balance Card - Gradiente Cyan-Coral como en el diseño */
+  .balance-card {
+    background: linear-gradient(135deg, 
+      oklch(0.78 0.18 195) 0%,   /* Cyan start */
+      oklch(0.75 0.19 180) 50%,  /* Cyan-Coral transition */
+      oklch(0.72 0.20 10) 100%   /* Coral end */
+    );
+    border: none;
+    border-radius: 2rem; /* 32px */
     box-shadow: 
-      0 20px 25px -5px rgb(0 0 0 / 0.5),
-      0 8px 10px -6px rgb(0 0 0 / 0.5),
-      inset 0 1px 0 0 rgb(255 255 255 / 0.08);
+      0 20px 60px rgba(0, 212, 255, 0.25),
+      0 10px 30px rgba(255, 107, 157, 0.20),
+      0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
   }
   
-  /* Elevated Card - More depth */
-  .elevated-card {
+  .balance-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    pointer-events: none;
+  }
+  
+  .balance-card:hover {
+    box-shadow: 
+      0 24px 72px rgba(0, 212, 255, 0.35),
+      0 12px 36px rgba(255, 107, 157, 0.30),
+      0 6px 16px rgba(0, 0, 0, 0.5);
+    transform: translateY(-6px) scale(1.02);
+  }
+  
+  /* Dark Card - Estilo exacto del diseño */
+  .dark-card {
+    background: oklch(0.12 0 0); /* #1A1A1A */
+    border: 1px solid oklch(1 0 0 / 0.06);
+    border-radius: 2rem; /* 32px */
+    box-shadow: 
+      0 10px 40px rgba(0, 0, 0, 0.4),
+      0 4px 16px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .dark-card:hover {
     background: oklch(0.14 0 0);
-    border: 1px solid oklch(0.98 0 0 / 0.08);
+    border-color: oklch(1 0 0 / 0.10);
     box-shadow: 
-      0 10px 15px -3px rgb(0 0 0 / 0.4),
-      0 4px 6px -4px rgb(0 0 0 / 0.4);
+      0 16px 56px rgba(0, 0, 0, 0.5),
+      0 6px 24px rgba(0, 0, 0, 0.4);
+    transform: translateY(-4px);
+  }
+  
+  /* Glass Modal - Para popups */
+  .glass-modal {
+    background: oklch(0.10 0 0 / 0.95);
+    backdrop-filter: blur(32px) saturate(180%);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 2rem; /* 32px */
+    box-shadow: 
+      0 24px 80px rgba(0, 0, 0, 0.6),
+      0 12px 40px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  }
+  
+  /* Progress Bar - Cyan gradient */
+  .progress-bar-cyan {
+    background: linear-gradient(90deg, 
+      oklch(0.78 0.18 195),
+      oklch(0.72 0.16 200)
+    );
+    border-radius: 0.75rem; /* 12px */
+    height: 8px;
+    box-shadow: 0 2px 8px rgba(0, 212, 255, 0.4);
+  }
+  
+  /* Stat Number - Tipografía grande para números */
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    font-feature-settings: "tnum";
+  }
+  
+  /* Balance Number - Aún más grande */
+  .balance-number {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    font-feature-settings: "tnum";
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Icon Circle - Círculos para iconos */
+  .icon-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: oklch(1 0 0 / 0.08);
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+  }
+  
+  .icon-circle:hover {
+    background: oklch(1 0 0 / 0.12);
+    transform: scale(1.1);
+  }
+  
+  /* Transaction Item - Items de lista */
+  .transaction-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: oklch(0.12 0 0 / 0.6);
+    border: 1px solid oklch(1 0 0 / 0.05);
+    border-radius: 1.5rem; /* 24px */
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
-  .elevated-card:hover {
-    box-shadow: 
-      0 20px 25px -5px rgb(0 0 0 / 0.5),
-      0 8px 10px -6px rgb(0 0 0 / 0.5);
-    transform: translateY(-4px);
+  .transaction-item:hover {
+    background: oklch(0.14 0 0 / 0.8);
+    border-color: oklch(1 0 0 / 0.10);
+    transform: translateX(6px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Glow Effect - Cyan */
+  .glow-cyan {
+    box-shadow: 0 0 24px rgba(0, 212, 255, 0.4);
+  }
+  
+  .glow-cyan:hover {
+    box-shadow: 0 0 36px rgba(0, 212, 255, 0.6);
+  }
+  
+  /* Glow Effect - Coral */
+  .glow-coral {
+    box-shadow: 0 0 24px rgba(255, 107, 157, 0.4);
+  }
+  
+  .glow-coral:hover {
+    box-shadow: 0 0 36px rgba(255, 107, 157, 0.6);
   }
 
-  /* Custom Scrollbar - Premium with blue accent */
+  /* Custom Scrollbar - Cyan accent */
   * {
     scrollbar-width: thin;
-    scrollbar-color: oklch(0.72 0.15 240 / 0.4) transparent;
+    scrollbar-color: oklch(0.78 0.18 195 / 0.5) transparent;
   }
 
   *::-webkit-scrollbar {
@@ -285,91 +371,21 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background: oklch(0.72 0.15 240 / 0.4);
+    background: oklch(0.78 0.18 195 / 0.5);
     border-radius: 4px;
     transition: background 0.2s ease;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.72 0.15 240 / 0.6);
+    background: oklch(0.78 0.18 195 / 0.7);
   }
 
   *::-webkit-scrollbar-corner {
     background: transparent;
   }
-  
-  /* Icon Circle Background */
-  .icon-circle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 50%;
-    background: oklch(0.98 0 0 / 0.08);
-    backdrop-filter: blur(8px);
-    transition: all 0.2s ease;
-  }
-  
-  .icon-circle:hover {
-    background: oklch(0.98 0 0 / 0.12);
-    transform: scale(1.05);
-  }
-  
-  /* Stat Card - Premium look */
-  .stat-card {
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, 
-      oklch(0.72 0.15 240), 
-      oklch(0.68 0.16 235), 
-      oklch(0.64 0.14 230));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  .stat-card:hover::before {
-    opacity: 1;
-  }
-  
-  /* Transaction Item */
-  .transaction-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: oklch(0.14 0 0 / 0.5);
-    border: 1px solid oklch(0.98 0 0 / 0.06);
-    border-radius: 1rem;
-    transition: all 0.2s ease;
-  }
-  
-  .transaction-item:hover {
-    background: oklch(0.16 0 0 / 0.7);
-    border-color: oklch(0.98 0 0 / 0.1);
-    transform: translateX(4px);
-  }
-  
-  /* Glow Effect for important elements */
-  .glow-blue {
-    box-shadow: 0 0 20px oklch(0.72 0.15 240 / 0.3);
-  }
-  
-  .glow-blue:hover {
-    box-shadow: 0 0 30px oklch(0.72 0.15 240 / 0.5);
-  }
 }
 
-/* Forzar bordes redondeados premium */
+/* Utilidades de bordes redondeados - Smart Finance Style */
 @layer utilities {
   .rounded-md {
     border-radius: 1.5rem !important; /* 24px */
@@ -380,23 +396,38 @@
   }
   
   .rounded-lg {
-    border-radius: 1.75rem !important; /* 28px */
-  }
-  
-  .rounded-xl {
     border-radius: 2rem !important; /* 32px */
   }
   
-  /* Text shadows for depth */
+  .rounded-xl {
+    border-radius: 2.5rem !important; /* 40px */
+  }
+  
+  /* Text shadows para profundidad */
   .text-shadow-sm {
-    text-shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   }
   
   .text-shadow {
-    text-shadow: 0 2px 4px rgb(0 0 0 / 0.6);
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
   }
   
   .text-shadow-lg {
-    text-shadow: 0 4px 8px rgb(0 0 0 / 0.7);
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+  }
+  
+  /* Gradientes utilitarios */
+  .gradient-cyan-coral {
+    background: linear-gradient(135deg, 
+      oklch(0.78 0.18 195) 0%,
+      oklch(0.72 0.20 10) 100%
+    );
+  }
+  
+  .gradient-cyan {
+    background: linear-gradient(135deg, 
+      oklch(0.78 0.18 195) 0%,
+      oklch(0.72 0.16 200) 100%
+    );
   }
 }
