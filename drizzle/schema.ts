@@ -109,7 +109,7 @@ export const invoices = mysqlTable("invoices", {
   notes: text("notes"),
   // Recurring invoice fields
   is_recurring: boolean("is_recurring").notNull().default(false),
-  recurrence_frequency: mysqlEnum("recurrence_frequency", ["monthly", "biweekly", "annual", "custom"]),
+  recurrence_frequency: mysqlEnum("recurrence_frequency", ["every_minute", "monthly", "biweekly", "annual", "custom"]),
   recurrence_interval: int("recurrence_interval"), // For custom frequency (days)
   next_generation_date: timestamp("next_generation_date"),
   parent_invoice_id: int("parent_invoice_id"), // Reference to original recurring invoice
