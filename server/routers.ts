@@ -491,15 +491,17 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        // Check plan limits
-        const { getPlanLimit } = await import("./plans");
-        const clientLimit = getPlanLimit(ctx.user.subscription_plan as any, 'clients');
-        
-        if (clientLimit !== Infinity) {
+        // Check plan limits (skip for super admins)
+        if (ctx.user.role !== 'super_admin') {
+          const { getPlanLimit } = await import("./plans");
+          const clientLimit = getPlanLimit(ctx.user.subscription_plan as any, 'clients');
+          
+          if (clientLimit !== Infinity) {
           const { getClientsByUserId } = await import("./db");
           const existingClients = await getClientsByUserId(ctx.user.id);
-          if (existingClients.length >= clientLimit) {
-            throw new Error(`You've reached the limit of ${clientLimit} clients on the Free plan. Upgrade to Pro for unlimited clients.`);
+            if (existingClients.length >= clientLimit) {
+              throw new Error(`You've reached the limit of ${clientLimit} clients on the Free plan. Upgrade to Pro for unlimited clients.`);
+            }
           }
         }
 
@@ -586,25 +588,27 @@ export const appRouter = router({
         recurrence_interval: z.number().optional(), // For custom frequency
       }))
       .mutation(async ({ ctx, input }) => {
-        // Check plan limits
-        const { getPlanLimit, getPlanById } = await import("./plans");
-        const invoiceLimit = getPlanLimit(ctx.user.subscription_plan as any, 'invoices');
-        
-        if (invoiceLimit !== Infinity) {
-          const { getInvoicesByUserId } = await import("./db");
-          const existingInvoices = await getInvoicesByUserId(ctx.user.id);
-          if (existingInvoices.length >= invoiceLimit) {
-            throw new Error(`You've reached the limit of ${invoiceLimit} invoices on the Free plan. Upgrade to Pro for unlimited invoices.`);
-          }
-        }
-        
-        // Check recurring invoice limits
-        if (input.is_recurring) {
-          const plan = getPlanById(ctx.user.subscription_plan as any);
-          const recurringLimit = plan.limits.recurringInvoices;
+        // Check plan limits (skip for super admins)
+        if (ctx.user.role !== 'super_admin') {
+          const { getPlanLimit, getPlanById } = await import("./plans");
+          const invoiceLimit = getPlanLimit(ctx.user.subscription_plan as any, 'invoices');
           
-          if (recurringLimit === 0) {
-            throw new Error('Recurring invoices are only available in Pro and Business plans. Upgrade to unlock this feature.');
+          if (invoiceLimit !== Infinity) {
+            const { getInvoicesByUserId } = await import("./db");
+            const existingInvoices = await getInvoicesByUserId(ctx.user.id);
+            if (existingInvoices.length >= invoiceLimit) {
+              throw new Error(`You've reached the limit of ${invoiceLimit} invoices on the Free plan. Upgrade to Pro for unlimited invoices.`);
+            }
+          }
+          
+          // Check recurring invoice limits
+          if (input.is_recurring) {
+            const plan = getPlanById(ctx.user.subscription_plan as any);
+            const recurringLimit = plan.limits.recurringInvoices;
+            
+            if (recurringLimit === 0) {
+              throw new Error('Recurring invoices are only available in Pro and Business plans. Upgrade to unlock this feature.');
+            }
           }
         }
 

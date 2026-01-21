@@ -331,8 +331,8 @@ export default function Invoices() {
   };
 
   const handleArchive = async (invoice: Invoice) => {
-    // Check if user has Pro or Business plan
-    if (user?.subscription_plan === 'free') {
+    // Check if user has Pro or Business plan (skip for super admins)
+    if (user?.role !== 'super_admin' && user?.subscription_plan === 'free') {
       setShowLimitDialog(true);
       return;
     }
@@ -523,8 +523,8 @@ export default function Invoices() {
           <div className="flex gap-2 sm:gap-3">
             <Button
               onClick={() => {
-                // Check plan limits for Free users
-                if (user?.subscription_plan === 'free') {
+                // Check plan limits for Free users (skip for super admins)
+                if (user?.role !== 'super_admin' && user?.subscription_plan === 'free') {
                   const invoiceLimit = 5; // Free plan limit
                   const currentCount = invoices?.length || 0;
                   
@@ -800,8 +800,8 @@ export default function Invoices() {
                       id="is_recurring"
                       checked={formData.is_recurring || false}
                       onCheckedChange={(checked) => {
-                        // Check if user has Pro or Business plan
-                        if (user?.subscription_plan === 'free' && checked) {
+                        // Check if user has Pro or Business plan (skip for super admins)
+                        if (user?.role !== 'super_admin' && user?.subscription_plan === 'free' && checked) {
                           // Show upgrade modal
                           setShowLimitDialog(true);
                           return;
