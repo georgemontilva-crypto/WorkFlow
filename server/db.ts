@@ -1,7 +1,7 @@
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { ENV } from "./_core/env";
-import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts, dashboardWidgets, verificationTokens, companyProfiles } from "../drizzle/schema";
+import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts, dashboardWidgets, verificationTokens, companyProfiles, reminders } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
@@ -1500,4 +1500,195 @@ export async function updateCompanyProfileLogo(userId: number, logoUrl: string) 
     .where(eq(companyProfiles.user_id, userId));
   
   return await getCompanyProfile(userId);
+}
+
+
+// ============================================
+// Reminders Functions
+// ============================================
+
+import { desc, and, gte, lte } from "drizzle-orm";
+
+/**
+ * Get all reminders for a user
+ */
+export async function getRemindersByUserId(user_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  return await db
+    .select()
+    .from(reminders)
+    .where(eq(reminders.user_id, user_id))
+    .orderBy(desc(reminders.reminder_date));
+}
+
+/**
+ * Get a single reminder by ID
+ */
+export async function getReminderById(id: number, user_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select()
+    .from(reminders)
+    .where(and(eq(reminders.id, id), eq(reminders.user_id, user_id)))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+/**
+ * Create a new reminder
+ */
+export async function createReminder(data: {
+  user_id: number;
+  title: string;
+  description?: string;
+  reminder_date: Date;
+  reminder_time?: string;
+  category?: "payment" | "meeting" | "deadline" | "personal" | "other";
+  priority?: "low" | "medium" | "high";
+  notify_email?: boolean;
+  notify_days_before?: number;
+  related_client_id?: number;
+  related_invoice_id?: number;
+}) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db.insert(reminders).values({
+    user_id: data.user_id,
+    title: data.title,
+    description: data.description || null,
+    reminder_date: data.reminder_date,
+    reminder_time: data.reminder_time || null,
+    category: data.category || "other",
+    priority: data.priority || "medium",
+    status: "pending",
+    notify_email: data.notify_email !== false ? 1 : 0,
+    notify_days_before: data.notify_days_before || 1,
+    email_sent: 0,
+    calendar_exported: 0,
+    related_client_id: data.related_client_id || null,
+    related_invoice_id: data.related_invoice_id || null,
+    created_at: new Date(),
+    updated_at: new Date(),
+  });
+
+  // Get the created reminder
+  const result = await db
+    .select()
+    .from(reminders)
+    .where(eq(reminders.user_id, data.user_id))
+    .orderBy(desc(reminders.id))
+    .limit(1);
+
+  return result[0];
+}
+
+/**
+ * Update a reminder
+ */
+export async function updateReminder(id: number, user_id: number, data: {
+  title?: string;
+  description?: string;
+  reminder_date?: Date;
+  reminder_time?: string;
+  category?: "payment" | "meeting" | "deadline" | "personal" | "other";
+  priority?: "low" | "medium" | "high";
+  status?: "pending" | "completed" | "cancelled";
+  notify_email?: boolean;
+  notify_days_before?: number;
+}) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Verify ownership
+  const existing = await getReminderById(id, user_id);
+  if (!existing) {
+    throw new Error("Reminder not found or access denied");
+  }
+
+  const updateData: any = {
+    updated_at: new Date(),
+  };
+
+  if (data.title !== undefined) updateData.title = data.title;
+  if (data.description !== undefined) updateData.description = data.description;
+  if (data.reminder_date !== undefined) updateData.reminder_date = data.reminder_date;
+  if (data.reminder_time !== undefined) updateData.reminder_time = data.reminder_time;
+  if (data.category !== undefined) updateData.category = data.category;
+  if (data.priority !== undefined) updateData.priority = data.priority;
+  if (data.status !== undefined) updateData.status = data.status;
+  if (data.notify_email !== undefined) updateData.notify_email = data.notify_email ? 1 : 0;
+  if (data.notify_days_before !== undefined) updateData.notify_days_before = data.notify_days_before;
+
+  await db
+    .update(reminders)
+    .set(updateData)
+    .where(and(eq(reminders.id, id), eq(reminders.user_id, user_id)));
+
+  return await getReminderById(id, user_id);
+}
+
+/**
+ * Delete a reminder
+ */
+export async function deleteReminder(id: number, user_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Verify ownership
+  const existing = await getReminderById(id, user_id);
+  if (!existing) {
+    throw new Error("Reminder not found or access denied");
+  }
+
+  await db
+    .delete(reminders)
+    .where(and(eq(reminders.id, id), eq(reminders.user_id, user_id)));
+
+  return { success: true };
+}
+
+/**
+ * Mark reminder as calendar exported
+ */
+export async function markReminderCalendarExported(id: number, user_id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(reminders)
+    .set({ calendar_exported: 1, updated_at: new Date() })
+    .where(and(eq(reminders.id, id), eq(reminders.user_id, user_id)));
+}
+
+/**
+ * Mark reminder email as sent
+ */
+export async function markReminderEmailSent(id: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(reminders)
+    .set({ email_sent: 1, updated_at: new Date() })
+    .where(eq(reminders.id, id));
 }

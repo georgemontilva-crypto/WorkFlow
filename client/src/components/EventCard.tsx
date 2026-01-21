@@ -1,4 +1,5 @@
-
+import { MoreVertical } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface EventCardProps {
   title: string;
@@ -7,13 +8,9 @@ interface EventCardProps {
   date: string;
   attendees: number;
   status: string;
+  onExportCalendar?: () => void;
+  onSendEmail?: () => void;
 }
-
-const categoryColors = {
-  green: 'category-green',
-  blue: 'category-blue',
-  purple: 'category-purple',
-};
 
 const categoryNames = {
   green: 'Confirmado',
@@ -28,33 +25,48 @@ export default function EventCard({
   date,
   attendees,
   status,
+  onExportCalendar,
+  onSendEmail,
 }: EventCardProps) {
+  // Colores del borde lateral según categoría
   const borderColors = {
-    green: 'border-l-green-500',
-    blue: 'border-l-blue-500',
-    purple: 'border-l-purple-500',
+    green: '#2ECC71',
+    blue: '#3498DB',
+    purple: '#9B59B6',
+  };
+
+  // Colores del badge de estado
+  const badgeStyles = {
+    green: 'bg-green-500 text-white',
+    blue: 'border border-blue-500 text-blue-500 bg-transparent',
+    purple: 'border border-purple-500 text-purple-500 bg-transparent',
   };
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl bg-[#2A2A2A] border-l-4 ${borderColors[category]} p-6 hover:bg-[#303030] transition-all duration-300`}>
+    <div 
+      className="relative overflow-hidden rounded-xl bg-card border border-border transition-all duration-200 hover:border-primary/30"
+      style={{ borderLeftWidth: '4px', borderLeftColor: borderColors[category] }}
+    >
       {/* Content */}
-      <div className="space-y-3">
-        <div>
-          <h3 className="text-lg font-bold text-white">{title}</h3>
-          <p className="text-sm text-gray-400 mt-1">{description}</p>
+      <div className="p-5">
+        {/* Header con título y menú */}
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="text-base font-semibold text-foreground">{title}</h3>
+          <Button variant="ghost" size="icon" className="h-6 w-6 -mr-2 -mt-1 text-muted-foreground hover:text-foreground">
+            <MoreVertical className="w-4 h-4" />
+          </Button>
         </div>
+        
+        {/* Descripción */}
+        <p className="text-sm text-muted-foreground mb-4">{description}</p>
 
-        {/* Meta Info */}
-        <div className="flex items-center justify-between pt-2">
-          <div className="text-xs text-gray-400 space-y-1">
+        {/* Footer con fecha, asistentes y badge */}
+        <div className="flex items-center justify-between">
+          <div className="text-xs text-muted-foreground space-y-0.5">
             <p>{date}</p>
             <p>{attendees} asistentes</p>
           </div>
-          <span className={`text-xs font-semibold px-3 py-1 rounded-full ${
-            category === 'green' ? 'bg-green-500/20 text-green-400' :
-            category === 'blue' ? 'bg-blue-500/20 text-blue-400' :
-            'bg-purple-500/20 text-purple-400'
-          }`}>
+          <span className={`text-xs font-medium px-3 py-1 rounded-full ${badgeStyles[category]}`}>
             {categoryNames[category]}
           </span>
         </div>

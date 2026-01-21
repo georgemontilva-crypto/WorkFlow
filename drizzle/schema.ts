@@ -313,3 +313,30 @@ export const companyProfiles = mysqlTable("company_profiles", {
 
 export type CompanyProfile = typeof companyProfiles.$inferSelect;
 export type InsertCompanyProfile = typeof companyProfiles.$inferInsert;
+
+
+/**
+ * Custom Reminders table - stores user-created reminders/events
+ */
+export const reminders = mysqlTable("reminders", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  reminder_date: timestamp("reminder_date").notNull(),
+  reminder_time: varchar("reminder_time", { length: 10 }), // HH:MM format
+  category: mysqlEnum("category", ["payment", "meeting", "deadline", "personal", "other"]).notNull().default("other"),
+  priority: mysqlEnum("priority", ["low", "medium", "high"]).notNull().default("medium"),
+  status: mysqlEnum("status", ["pending", "completed", "cancelled"]).notNull().default("pending"),
+  notify_email: int("notify_email").notNull().default(1), // Send email notification
+  notify_days_before: int("notify_days_before").notNull().default(1), // Days before to send notification
+  email_sent: int("email_sent").notNull().default(0), // Whether email has been sent
+  calendar_exported: int("calendar_exported").notNull().default(0), // Whether exported to calendar
+  related_client_id: int("related_client_id"), // Optional link to client
+  related_invoice_id: int("related_invoice_id"), // Optional link to invoice
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type Reminder = typeof reminders.$inferSelect;
+export type InsertReminder = typeof reminders.$inferInsert;

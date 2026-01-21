@@ -1653,5 +1653,194 @@ export const appRouter = router({
         return profile;
       }),
   }),
+
+  // Custom Reminders Management
+  reminders: router({
+    // List all reminders for the user
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return await db.getRemindersByUserId(ctx.user.id);
+    }),
+
+    // Get a single reminder
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const reminder = await db.getReminderById(input.id, ctx.user.id);
+        if (!reminder) {
+          throw new Error("Reminder not found");
+        }
+        return reminder;
+      }),
+
+    // Create a new reminder
+    create: protectedProcedure
+      .input(z.object({
+        title: z.string().min(1, "Title is required"),
+        description: z.string().optional(),
+        reminder_date: z.string(), // ISO date string
+        reminder_time: z.string().optional(),
+        category: z.enum(["payment", "meeting", "deadline", "personal", "other"]).optional(),
+        priority: z.enum(["low", "medium", "high"]).optional(),
+        notify_email: z.boolean().optional(),
+        notify_days_before: z.number().optional(),
+        related_client_id: z.number().optional(),
+        related_invoice_id: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.createReminder({
+          user_id: ctx.user.id,
+          title: input.title,
+          description: input.description,
+          reminder_date: new Date(input.reminder_date),
+          reminder_time: input.reminder_time,
+          category: input.category,
+          priority: input.priority,
+          notify_email: input.notify_email,
+          notify_days_before: input.notify_days_before,
+          related_client_id: input.related_client_id,
+          related_invoice_id: input.related_invoice_id,
+        });
+      }),
+
+    // Update a reminder
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        reminder_date: z.string().optional(),
+        reminder_time: z.string().optional(),
+        category: z.enum(["payment", "meeting", "deadline", "personal", "other"]).optional(),
+        priority: z.enum(["low", "medium", "high"]).optional(),
+        status: z.enum(["pending", "completed", "cancelled"]).optional(),
+        notify_email: z.boolean().optional(),
+        notify_days_before: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { id, ...data } = input;
+        return await db.updateReminder(id, ctx.user.id, {
+          ...data,
+          reminder_date: data.reminder_date ? new Date(data.reminder_date) : undefined,
+        });
+      }),
+
+    // Delete a reminder
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.deleteReminder(input.id, ctx.user.id);
+      }),
+
+    // Mark as completed
+    complete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        return await db.updateReminder(input.id, ctx.user.id, { status: "completed" });
+      }),
+
+    // Export to calendar (generate .ics file content)
+    exportCalendar: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const reminder = await db.getReminderById(input.id, ctx.user.id);
+        if (!reminder) {
+          throw new Error("Reminder not found");
+        }
+
+        // Generate ICS content
+        const startDate = new Date(reminder.reminder_date);
+        if (reminder.reminder_time) {
+          const [hours, minutes] = reminder.reminder_time.split(':').map(Number);
+          startDate.setHours(hours, minutes, 0, 0);
+        }
+        const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour duration
+
+        const formatICSDate = (date: Date) => {
+          return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        };
+
+        const icsContent = [
+          'BEGIN:VCALENDAR',
+          'VERSION:2.0',
+          'PRODID:-//Finwrk//Reminders//EN',
+          'CALSCALE:GREGORIAN',
+          'METHOD:PUBLISH',
+          'BEGIN:VEVENT',
+          `UID:${reminder.id}@finwrk.app`,
+          `DTSTAMP:${formatICSDate(new Date())}`,
+          `DTSTART:${formatICSDate(startDate)}`,
+          `DTEND:${formatICSDate(endDate)}`,
+          `SUMMARY:${reminder.title}`,
+          `DESCRIPTION:${reminder.description || ''}`,
+          'BEGIN:VALARM',
+          'TRIGGER:-P1D',
+          'ACTION:DISPLAY',
+          `DESCRIPTION:Recordatorio: ${reminder.title}`,
+          'END:VALARM',
+          'END:VEVENT',
+          'END:VCALENDAR',
+        ].join('\r\n');
+
+        // Mark as exported
+        await db.markReminderCalendarExported(input.id, ctx.user.id);
+
+        return {
+          filename: `reminder-${reminder.id}.ics`,
+          content: icsContent,
+        };
+      }),
+
+    // Send email notification
+    sendEmailNotification: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const reminder = await db.getReminderById(input.id, ctx.user.id);
+        if (!reminder) {
+          throw new Error("Reminder not found");
+        }
+
+        const { sendEmail } = await import("./_core/email");
+        const user = await db.getUserById(ctx.user.id);
+
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        const reminderDate = new Date(reminder.reminder_date);
+        const formattedDate = reminderDate.toLocaleDateString('es-ES', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+
+        const emailHtml = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <div style="background: linear-gradient(135deg, #FF9500 0%, #FF6B00 100%); padding: 30px; text-align: center;">
+              <h1 style="color: white; margin: 0;">Recordatorio</h1>
+            </div>
+            <div style="padding: 30px; background: #1A1A1A; color: #F5F5F5;">
+              <h2 style="color: #FF9500; margin-top: 0;">${reminder.title}</h2>
+              ${reminder.description ? `<p style="color: #A0A0A0;">${reminder.description}</p>` : ''}
+              <div style="background: #2A2A2A; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <p style="margin: 0;"><strong>Fecha:</strong> ${formattedDate}</p>
+                ${reminder.reminder_time ? `<p style="margin: 10px 0 0;"><strong>Hora:</strong> ${reminder.reminder_time}</p>` : ''}
+              </div>
+              <p style="color: #A0A0A0; font-size: 12px;">Este es un recordatorio automático de Finwrk.</p>
+            </div>
+          </div>
+        `;
+
+        await sendEmail({
+          to: user.email,
+          subject: `Recordatorio: ${reminder.title}`,
+          html: emailHtml,
+        });
+
+        await db.markReminderEmailSent(input.id);
+
+        return { success: true };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
