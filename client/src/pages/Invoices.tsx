@@ -584,7 +584,7 @@ export default function Invoices() {
 
         {/* New Invoice Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="bg-popover border-border max-w-6xl max-h-[92vh] overflow-y-auto w-[98vw] lg:w-[90vw]">
+          <DialogContent className="bg-popover border-border max-w-7xl max-h-[92vh] overflow-y-auto w-[98vw] lg:w-[95vw]">
               <DialogHeader className="pb-4">
                 <DialogTitle className="text-foreground text-xl sm:text-2xl">{t.invoices.createInvoice}</DialogTitle>
                 <DialogDescription className="text-muted-foreground text-sm">

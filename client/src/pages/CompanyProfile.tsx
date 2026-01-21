@@ -119,7 +119,7 @@ export default function CompanyProfile() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
             <Building2 className="w-8 h-8" />
@@ -231,7 +231,7 @@ export default function CompanyProfile() {
                   onChange={(e) => handleChange('address', e.target.value)}
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="city">Ciudad</Label>
                   <Input
@@ -256,14 +256,14 @@ export default function CompanyProfile() {
                     onChange={(e) => handleChange('postal_code', e.target.value)}
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="country">País</Label>
-                <Input
-                  id="country"
-                  value={formData.country}
-                  onChange={(e) => handleChange('country', e.target.value)}
-                />
+                <div className="space-y-2">
+                  <Label htmlFor="country">País</Label>
+                  <Input
+                    id="country"
+                    value={formData.country}
+                    onChange={(e) => handleChange('country', e.target.value)}
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -274,16 +274,16 @@ export default function CompanyProfile() {
               <CardTitle>Información Fiscal y Bancaria</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="tax_id">RIF / NIT / Tax ID</Label>
-                <Input
-                  id="tax_id"
-                  value={formData.tax_id}
-                  onChange={(e) => handleChange('tax_id', e.target.value)}
-                  placeholder="J-12345678-9"
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="tax_id">RIF / NIT / Tax ID</Label>
+                  <Input
+                    id="tax_id"
+                    value={formData.tax_id}
+                    onChange={(e) => handleChange('tax_id', e.target.value)}
+                    placeholder="J-12345678-9"
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="bank_name">Banco</Label>
                   <Input

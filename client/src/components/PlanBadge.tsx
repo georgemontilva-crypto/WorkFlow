@@ -40,6 +40,11 @@ export function PlanBadge() {
   const config = planConfig[subscription.plan as keyof typeof planConfig];
   const Icon = config.icon;
 
+  // Don't show plan badge for Pro/Business users
+  if (subscription.plan === 'pro' || subscription.plan === 'business') {
+    return null;
+  }
+
   return (
     <div className="space-y-2">
       {/* Current Plan Display */}
@@ -63,21 +68,6 @@ export function PlanBadge() {
           }}
         >
           Upgrade a Pro
-        </Button>
-      )}
-      
-      {/* Upgrade Button for Pro users */}
-      {subscription.plan === 'pro' && (
-        <Button
-          size="sm"
-          variant="outline"
-          className="w-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-white transition-colors font-semibold"
-          onClick={() => {
-            // Navigate to pricing page within the app
-            window.location.href = '/pricing';
-          }}
-        >
-          Upgrade a Business
         </Button>
       )}
     </div>
