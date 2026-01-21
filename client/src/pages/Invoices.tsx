@@ -122,12 +122,22 @@ export default function Invoices() {
   const createInvoice = trpc.invoices.create.useMutation({
     onSuccess: () => {
       utils.invoices.list.invalidate();
-      toast.success('Factura creada exitosamente');
     },
     onError: () => {
       toast.error('Error al crear la factura');
     },
   });
+  
+  const sendByEmail = trpc.invoices.sendByEmail.useMutation({
+    onSuccess: () => {
+      toast.success('Email enviado exitosamente');
+    },
+    onError: () => {
+      toast.error('Error al enviar el email');
+    },
+  });
+  
+  const generatePDF = trpc.invoices.generatePDF.useMutation();
   
   const updateInvoice = trpc.invoices.update.useMutation({
     onSuccess: () => {
