@@ -1540,7 +1540,15 @@ export const appRouter = router({
 
       return { success: true };
     }),
+   }),
+  
+  // Testing endpoints
+  testing: router({
+    generateRecurringInvoices: protectedProcedure.mutation(async ({ ctx }) => {
+      const { generateRecurringInvoices } = await import("./_core/recurring-invoices-job");
+      const result = await generateRecurringInvoices();
+      return result;
+    }),
   }),
 });
-
 export type AppRouter = typeof appRouter;
