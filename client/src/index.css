@@ -442,3 +442,154 @@
     text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
   }
 }
+
+  /* Dashboard Layout Classes */
+  .dashboard-stat-card {
+    background: oklch(0.18 0 0);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px oklch(0 0 0 / 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .dashboard-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px oklch(0 0 0 / 0.15);
+  }
+
+  .dashboard-stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    margin: 0.5rem 0;
+  }
+
+  .dashboard-stat-change {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .dashboard-stat-change.positive {
+    color: oklch(0.65 0.18 145); /* Verde */
+  }
+
+  .dashboard-stat-change.negative {
+    color: oklch(0.60 0.24 25); /* Rojo */
+  }
+
+  /* Chart Container */
+  .dashboard-chart-card {
+    background: oklch(0.18 0 0);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px oklch(0 0 0 / 0.1);
+  }
+
+  .dashboard-chart-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .dashboard-chart-subtitle {
+    font-size: 0.875rem;
+    color: oklch(0.55 0 0);
+    margin-bottom: 1.5rem;
+  }
+
+  /* Eventos Próximos / Recordatorios */
+  .reminder-card {
+    background: oklch(0.18 0 0);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 20px;
+    padding: 1.5rem;
+    border-left-width: 4px;
+    transition: all 0.3s ease;
+  }
+
+  .reminder-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px oklch(0 0 0 / 0.15);
+  }
+
+  .reminder-card.confirmed {
+    border-left-color: oklch(0.65 0.18 145); /* Verde */
+  }
+
+  .reminder-card.in-progress {
+    border-left-color: oklch(0.70 0.18 250); /* Azul */
+  }
+
+  .reminder-card.pending {
+    border-left-color: oklch(0.65 0.20 290); /* Morado */
+  }
+
+  .reminder-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .reminder-subtitle {
+    font-size: 0.875rem;
+    color: oklch(0.55 0 0);
+    margin-bottom: 0.75rem;
+  }
+
+  .reminder-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: oklch(0.65 0 0);
+  }
+
+  /* Resume Card */
+  .resume-card {
+    background: oklch(0.18 0 0);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px oklch(0 0 0 / 0.1);
+  }
+
+  .resume-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid oklch(1 0 0 / 0.06);
+  }
+
+  .resume-item:last-child {
+    border-bottom: none;
+  }
+
+  .resume-label {
+    font-size: 0.9375rem;
+    color: oklch(0.75 0 0);
+  }
+
+  .resume-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .resume-value.primary {
+    color: oklch(0.68 0.20 35); /* Naranja */
+  }
+
+  .resume-value.warning {
+    color: oklch(0.75 0.18 80); /* Amarillo */
+  }
+
+  .resume-value.danger {
+    color: oklch(0.60 0.24 25); /* Rojo */
+  }
