@@ -54,16 +54,16 @@
 /* Finwrk Premium Theme - Dark Mode with Golden Accents */
 :root {
   /* Design Philosophy: Minimalismo Premium - Negro y dorado #AF8F6F */
-  --radius: 0.5rem;
+  --radius: 1.25rem; /* 20px rounded corners */
   
   /* Dark Mode Colors */
   --background: oklch(0 0 0); /* Pure black #000000 */
   --foreground: oklch(1 0 0); /* Pure white #ffffff */
   
-  --card: oklch(0.12 0 0); /* Dark grey #1a1a1a */
+  --card: oklch(0.05 0 0 / 0.5); /* Glass effect - semi-transparent */
   --card-foreground: oklch(1 0 0); /* White */
   
-  --popover: oklch(0.15 0 0); /* Slightly lighter #262626 */
+  --popover: oklch(0.08 0 0 / 0.8); /* Glass modal - more opaque */
   --popover-foreground: oklch(1 0 0); /* White */
   
   --primary: oklch(0.68 0.08 65); /* Golden #AF8F6F */
@@ -81,7 +81,7 @@
   --destructive: oklch(0.55 0.22 25); /* Subtle red for errors */
   --destructive-foreground: oklch(1 0 0); /* White */
   
-  --border: oklch(0.20 0 0); /* #333333 */
+  --border: oklch(1 0 0 / 0.1); /* Glass border - white with 10% opacity */
   --input: oklch(0.15 0 0); /* #262626 */
   --ring: oklch(0.68 0.08 65); /* Golden ring #AF8F6F */
   
@@ -93,7 +93,7 @@
   --chart-5: oklch(0.85 0.12 65); /* Pale golden */
   
   /* Sidebar colors */
-  --sidebar: oklch(0.08 0 0); /* #141414 */
+  --sidebar: oklch(0.05 0 0 / 0.6); /* Glass sidebar */
   --sidebar-foreground: oklch(1 0 0); /* White */
   --sidebar-primary: oklch(0.68 0.08 65); /* Golden #AF8F6F */
   --sidebar-primary-foreground: oklch(0 0 0); /* Black */
@@ -226,5 +226,26 @@
 
   *::-webkit-scrollbar-corner {
     background: transparent;
+  }
+
+  /* Glassmorphism Utilities */
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-[20px] shadow-2xl shadow-black/50;
+  }
+
+  .glass-modal {
+    @apply bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[20px] shadow-2xl shadow-black/70;
+  }
+
+  .glass-hover {
+    @apply transition-all duration-200 hover:bg-white/10 hover:border-white/20;
+  }
+
+  .glass-button {
+    @apply bg-transparent border border-white/20 backdrop-blur-sm rounded-[20px] transition-all duration-200 hover:bg-white/10 hover:border-primary/50;
   }
 }
