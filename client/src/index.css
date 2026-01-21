@@ -423,6 +423,16 @@
 /* Reminder Summary Cards - Full color backgrounds */
 .reminder-summary-card {
   @apply relative rounded-xl p-6 transition-all duration-200;
+  min-width: 280px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 640px) {
+  .reminder-summary-card {
+    min-width: auto;
+    flex-shrink: 1;
+  }
 }
 
 .reminder-summary-overdue {

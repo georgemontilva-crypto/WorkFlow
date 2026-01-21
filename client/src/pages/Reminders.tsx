@@ -439,9 +439,18 @@ export default function Reminders() {
             }
           }}>
             <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90 text-black font-semibold">
+              {/* Botón completo en desktop, icono flotante en móvil */}
+              <Button className="bg-primary hover:bg-primary/90 text-black font-semibold hidden sm:flex">
                 <Plus className="w-4 h-4 mr-2" />
                 Nuevo Recordatorio
+              </Button>
+            </DialogTrigger>
+            <DialogTrigger asChild>
+              <Button 
+                className="sm:hidden fixed bottom-6 right-6 w-14 h-14 rounded-full bg-primary hover:bg-primary/90 text-black shadow-lg z-50 p-0 flex items-center justify-center"
+                aria-label="Nuevo Recordatorio"
+              >
+                <Plus className="w-6 h-6" />
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-card border-border max-w-md">
@@ -580,7 +589,7 @@ export default function Reminders() {
         </div>
 
         {/* Summary Stats - Con fondo de color completo */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div className="flex sm:grid sm:grid-cols-3 gap-4 mb-8 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2">
           <div className="reminder-summary-card reminder-summary-overdue">
             <div className="flex items-center justify-between">
               <div>
