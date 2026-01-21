@@ -1,10 +1,10 @@
 /**
  * PDF Generation Module
- * Handles PDF generation for invoices using jsPDF
+ * Handles PDF generation for invoices using PDFKit
  */
 
 import type { Invoice } from "../../drizzle/schema";
-import jsPDF from 'jspdf';
+import PDFDocument from 'pdfkit';
 
 interface InvoiceItem {
   description: string;
@@ -26,157 +26,134 @@ interface InvoiceData extends Invoice {
  * Returns base64 encoded PDF
  */
 export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<string> {
-  try {
-    // Create new PDF document
-    const doc = new jsPDF();
-    
-    // Set font
-    doc.setFont('helvetica');
-    
-    // Header - Company Logo/Name
-    doc.setFontSize(24);
-    doc.setTextColor(0, 0, 0);
-    doc.text('WorkFlow', 20, 20);
-    
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text('Sistema de Gestión Empresarial', 20, 27);
-    
-    // Invoice Title
-    doc.setFontSize(20);
-    doc.setTextColor(0, 0, 0);
-    doc.text('FACTURA', 150, 20);
-    
-    // Invoice Number and Date
-    doc.setFontSize(10);
-    doc.text(`No. ${invoiceData.invoice_number}`, 150, 28);
-    doc.text(`Fecha: ${new Date(invoiceData.issue_date).toLocaleDateString('es-ES')}`, 150, 34);
-    doc.text(`Vencimiento: ${new Date(invoiceData.due_date).toLocaleDateString('es-ES')}`, 150, 40);
-    
-    // Line separator
-    doc.setDrawColor(200, 200, 200);
-    doc.line(20, 45, 190, 45);
-    
-    // Client Information
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.text('Cliente:', 20, 55);
-    
-    doc.setFontSize(10);
-    doc.text(invoiceData.clientName, 20, 62);
-    if (invoiceData.companyName) {
-      doc.text(invoiceData.companyName, 20, 68);
-    }
-    doc.text(invoiceData.clientEmail, 20, invoiceData.companyName ? 74 : 68);
-    if (invoiceData.clientPhone) {
-      doc.text(invoiceData.clientPhone, 20, invoiceData.companyName ? 80 : 74);
-    }
-    
-    // Items Table Header
-    const tableTop = invoiceData.companyName && invoiceData.clientPhone ? 95 : 85;
-    
-    doc.setFillColor(240, 240, 240);
-    doc.rect(20, tableTop, 170, 8, 'F');
-    
-    doc.setFontSize(10);
-    doc.setTextColor(0, 0, 0);
-    doc.text('Descripción', 22, tableTop + 5);
-    doc.text('Cantidad', 120, tableTop + 5);
-    doc.text('Precio Unit.', 145, tableTop + 5);
-    doc.text('Total', 175, tableTop + 5);
-    
-    // Items
-    let currentY = tableTop + 15;
-    const items: InvoiceItem[] = typeof invoiceData.items === 'string' 
-      ? JSON.parse(invoiceData.items) 
-      : invoiceData.items;
-    
-    items.forEach((item: InvoiceItem) => {
-      doc.setFontSize(9);
-      doc.text(item.description.substring(0, 40), 22, currentY);
-      doc.text(item.quantity.toString(), 125, currentY);
-      doc.text(`$${item.unitPrice.toFixed(2)}`, 145, currentY);
-      doc.text(`$${item.total.toFixed(2)}`, 175, currentY);
-      currentY += 7;
-    });
-    
-    // Line separator before totals
-    doc.setDrawColor(200, 200, 200);
-    doc.line(120, currentY + 5, 190, currentY + 5);
-    
-    // Totals
-    currentY += 12;
-    doc.setFontSize(10);
-    doc.text('Subtotal:', 145, currentY);
-    doc.text(`$${parseFloat(invoiceData.subtotal as any).toFixed(2)}`, 175, currentY);
-    
-    currentY += 7;
-    doc.text('Impuestos:', 145, currentY);
-    doc.text(`$${parseFloat(invoiceData.tax as any).toFixed(2)}`, 175, currentY);
-    
-    currentY += 7;
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Total:', 145, currentY);
-    doc.text(`$${parseFloat(invoiceData.total as any).toFixed(2)}`, 175, currentY);
-    
-    // Payment Status
-    currentY += 10;
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    
-    const statusColors: Record<string, [number, number, number]> = {
-      paid: [34, 197, 94],
-      draft: [156, 163, 175],
-      sent: [59, 130, 246],
-      overdue: [239, 68, 68],
-      cancelled: [107, 114, 128],
-    };
-    
-    const statusLabels: Record<string, string> = {
-      paid: 'PAGADA',
-      draft: 'BORRADOR',
-      sent: 'ENVIADA',
-      overdue: 'VENCIDA',
-      cancelled: 'CANCELADA',
-    };
-    
-    const color = statusColors[invoiceData.status] || [0, 0, 0];
-    doc.setTextColor(color[0], color[1], color[2]);
-    doc.text(`Estado: ${statusLabels[invoiceData.status] || invoiceData.status.toUpperCase()}`, 20, currentY);
-    
-    // Notes (if any)
-    if (invoiceData.notes) {
-      currentY += 10;
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(9);
-      doc.text('Notas:', 20, currentY);
-      currentY += 5;
-      const splitNotes = doc.splitTextToSize(invoiceData.notes, 170);
-      doc.text(splitNotes, 20, currentY);
-    }
-    
-    // Footer
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.text('Gracias por su preferencia', 105, 280, { align: 'center' });
-    doc.text('WorkFlow - Sistema de Gestión Empresarial', 105, 285, { align: 'center' });
-    
-    // Generate base64 string
-    const pdfBase64 = doc.output('datauristring');
-    return pdfBase64;
-  } catch (error) {
-    console.error('[PDF] Error generating invoice PDF:', error);
-    throw new Error('Failed to generate PDF');
-  }
-}
+  return new Promise((resolve, reject) => {
+    try {
+      // Create PDF document
+      const doc = new PDFDocument({ margin: 50 });
+      
+      // Buffer to store PDF data
+      const chunks: Buffer[] = [];
+      
+      doc.on('data', (chunk) => chunks.push(chunk));
+      doc.on('end', () => {
+        const pdfBuffer = Buffer.concat(chunks);
+        const base64 = pdfBuffer.toString('base64');
+        resolve(base64);
+      });
+      doc.on('error', (error) => {
+        console.error('[PDF] Error in PDF stream:', error);
+        reject(new Error('Failed to generate PDF'));
+      });
 
-/**
- * Generate PDF buffer for download
- */
-export async function generateInvoicePDFBuffer(invoiceData: InvoiceData): Promise<Buffer> {
-  const base64PDF = await generateInvoicePDF(invoiceData);
-  // Remove data URI prefix
-  const base64Data = base64PDF.split(',')[1];
-  return Buffer.from(base64Data, 'base64');
+      // Header - Company Logo/Name
+      doc.fontSize(24).text('Finwrk', 50, 50);
+      doc.fontSize(10).fillColor('#666').text('Sistema de Gestión Empresarial', 50, 78);
+      
+      // Invoice Title
+      doc.fontSize(20).fillColor('#000').text('FACTURA', 400, 50, { align: 'right' });
+      
+      // Invoice Number and Date
+      doc.fontSize(10).fillColor('#666');
+      doc.text(`Factura #: ${invoiceData.invoice_number}`, 400, 75, { align: 'right' });
+      doc.text(`Fecha: ${new Date(invoiceData.issue_date).toLocaleDateString('es-ES')}`, 400, 90, { align: 'right' });
+      doc.text(`Vencimiento: ${new Date(invoiceData.due_date).toLocaleDateString('es-ES')}`, 400, 105, { align: 'right' });
+      
+      // Client Information
+      doc.fontSize(12).fillColor('#000').text('Facturar a:', 50, 140);
+      doc.fontSize(10).fillColor('#333');
+      doc.text(invoiceData.clientName, 50, 160);
+      if (invoiceData.companyName) {
+        doc.text(invoiceData.companyName, 50, 175);
+      }
+      doc.text(invoiceData.clientEmail, 50, invoiceData.companyName ? 190 : 175);
+      if (invoiceData.clientPhone) {
+        doc.text(invoiceData.clientPhone, 50, invoiceData.companyName ? 205 : 190);
+      }
+      
+      // Items Table
+      const tableTop = 260;
+      const tableHeaders = ['Descripción', 'Cantidad', 'Precio Unit.', 'Total'];
+      const columnWidths = [250, 80, 100, 100];
+      const columnPositions = [50, 300, 380, 480];
+      
+      // Table Header
+      doc.fontSize(10).fillColor('#000').font('Helvetica-Bold');
+      tableHeaders.forEach((header, i) => {
+        doc.text(header, columnPositions[i], tableTop);
+      });
+      
+      // Table Header Line
+      doc.moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+      
+      // Table Rows
+      doc.font('Helvetica').fontSize(9).fillColor('#333');
+      let yPosition = tableTop + 25;
+      
+      invoiceData.items.forEach((item) => {
+        doc.text(item.description, columnPositions[0], yPosition, { width: 240 });
+        doc.text(item.quantity.toString(), columnPositions[1], yPosition);
+        doc.text(`$${item.unitPrice.toFixed(2)}`, columnPositions[2], yPosition);
+        doc.text(`$${item.total.toFixed(2)}`, columnPositions[3], yPosition);
+        yPosition += 25;
+      });
+      
+      // Totals
+      yPosition += 20;
+      doc.moveTo(50, yPosition).lineTo(550, yPosition).stroke();
+      yPosition += 15;
+      
+      const subtotal = parseFloat(invoiceData.subtotal);
+      const tax = parseFloat(invoiceData.tax);
+      const total = parseFloat(invoiceData.total);
+      
+      doc.fontSize(10).fillColor('#666');
+      doc.text('Subtotal:', 380, yPosition);
+      doc.text(`$${subtotal.toFixed(2)}`, 480, yPosition, { align: 'right' });
+      
+      yPosition += 20;
+      doc.text('Impuestos:', 380, yPosition);
+      doc.text(`$${tax.toFixed(2)}`, 480, yPosition, { align: 'right' });
+      
+      yPosition += 20;
+      doc.fontSize(12).fillColor('#000').font('Helvetica-Bold');
+      doc.text('TOTAL:', 380, yPosition);
+      doc.text(`$${total.toFixed(2)}`, 480, yPosition, { align: 'right' });
+      
+      // Payment Link
+      if (invoiceData.payment_link) {
+        yPosition += 40;
+        doc.fontSize(10).fillColor('#666').font('Helvetica');
+        doc.text('Link de Pago:', 50, yPosition);
+        doc.fillColor('#0066cc').text(invoiceData.payment_link, 50, yPosition + 15, {
+          link: invoiceData.payment_link,
+          underline: true
+        });
+      }
+      
+      // Notes
+      if (invoiceData.notes) {
+        yPosition += 60;
+        doc.fontSize(10).fillColor('#666').font('Helvetica-Bold');
+        doc.text('Notas:', 50, yPosition);
+        doc.font('Helvetica').fillColor('#333');
+        doc.text(invoiceData.notes, 50, yPosition + 15, { width: 500 });
+      }
+      
+      // Footer
+      doc.fontSize(8).fillColor('#999');
+      doc.text(
+        'Gracias por su preferencia',
+        50,
+        doc.page.height - 50,
+        { align: 'center', width: doc.page.width - 100 }
+      );
+      
+      // Finalize PDF
+      doc.end();
+      
+    } catch (error) {
+      console.error('[PDF] Error generating invoice PDF:', error);
+      reject(new Error('Failed to generate PDF'));
+    }
+  });
 }
