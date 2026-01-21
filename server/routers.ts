@@ -406,15 +406,26 @@ export const appRouter = router({
           
           // Send email
           const emailHtml = getPasswordResetEmailTemplate(user.name, resetLink);
-          await sendEmail({
+          console.log('[Auth] Sending password reset email to:', user.email);
+          console.log('[Auth] Reset link:', resetLink);
+          
+          const emailSent = await sendEmail({
             to: user.email,
-            subject: "Recuperación de Contraseña - WorkFlow",
+            subject: "Recuperación de Contraseña - Finwrk",
             html: emailHtml,
           });
+          
+          if (!emailSent) {
+            console.error('[Auth] Failed to send password reset email');
+            // Still return success to prevent email enumeration
+          } else {
+            console.log('[Auth] Password reset email sent successfully');
+          }
           
           return { success: true, message: "If the email exists, a reset link has been sent" };
         } catch (error: any) {
           console.error("[Auth] Password reset request failed:", error);
+          console.error("[Auth] Error details:", error.stack);
           return { success: true, message: "If the email exists, a reset link has been sent" };
         }
       }),
@@ -584,7 +595,7 @@ export const appRouter = router({
         notes: z.string().optional(),
         // Recurring invoice fields
         is_recurring: z.boolean().optional().default(false),
-        recurrence_frequency: z.enum(["monthly", "biweekly", "annual", "custom"]).optional(),
+        recurrence_frequency: z.enum(["every_minute", "monthly", "biweekly", "annual", "custom"]).optional(),
         recurrence_interval: z.number().optional(), // For custom frequency
       }))
       .mutation(async ({ ctx, input }) => {

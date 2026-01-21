@@ -5,7 +5,7 @@
 
 import { addDays, addMonths, addYears } from 'date-fns';
 
-export type RecurrenceFrequency = 'monthly' | 'biweekly' | 'annual' | 'custom';
+export type RecurrenceFrequency = 'every_minute' | 'monthly' | 'biweekly' | 'annual' | 'custom';
 
 /**
  * Calculate next generation date based on frequency
@@ -16,6 +16,11 @@ export function calculateNextGenerationDate(
   customInterval?: number
 ): Date {
   switch (frequency) {
+    case 'every_minute':
+      // For testing: add 1 minute
+      const nextMinute = new Date(currentDate);
+      nextMinute.setMinutes(nextMinute.getMinutes() + 1);
+      return nextMinute;
     case 'monthly':
       return addMonths(currentDate, 1);
     case 'biweekly':
@@ -36,13 +41,11 @@ export function calculateNextGenerationDate(
  * Check if an invoice should be generated today
  */
 export function shouldGenerateInvoice(nextGenerationDate: Date): boolean {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
+  const now = new Date();
   const targetDate = new Date(nextGenerationDate);
-  targetDate.setHours(0, 0, 0, 0);
   
-  return targetDate <= today;
+  // Compare with full timestamp (includes minutes for testing)
+  return targetDate <= now;
 }
 
 /**

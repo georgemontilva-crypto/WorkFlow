@@ -95,12 +95,14 @@ export function startRecurringInvoicesScheduler() {
   // Run immediately on startup (for testing)
   processRecurringInvoices().catch(console.error);
   
-  // Schedule to run daily at midnight
-  const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+  // Schedule to run every minute (for testing)
+  // TODO: Change back to 24 hours in production
+  const ONE_MINUTE = 60 * 1000;
+  // const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
   
   setInterval(() => {
     processRecurringInvoices().catch(console.error);
-  }, TWENTY_FOUR_HOURS);
+  }, ONE_MINUTE);
   
-  console.log('[Recurring Invoices Scheduler] Started - will run every 24 hours');
+  console.log('[Recurring Invoices Scheduler] Started - will run every 1 minute (TESTING MODE)');
 }

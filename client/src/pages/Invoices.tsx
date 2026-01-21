@@ -77,7 +77,7 @@ type InvoiceFormData = {
   payment_link?: string;
   // Recurring fields
   is_recurring?: boolean;
-  recurrence_frequency?: 'monthly' | 'biweekly' | 'annual' | 'custom';
+  recurrence_frequency?: 'every_minute' | 'monthly' | 'biweekly' | 'annual' | 'custom';
   recurrence_interval?: number;
 };
 import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User, FolderArchive, ArchiveRestore, Link as LinkIcon, Copy, Eye, Repeat } from 'lucide-react';
@@ -823,6 +823,7 @@ export default function Invoices() {
                             <SelectValue placeholder="Selecciona frecuencia" />
                           </SelectTrigger>
                           <SelectContent>
+                            <SelectItem value="every_minute">🧪 Cada minuto (Testing)</SelectItem>
                             <SelectItem value="monthly">Mensual</SelectItem>
                             <SelectItem value="biweekly">Quincenal</SelectItem>
                             <SelectItem value="annual">Anual</SelectItem>
