@@ -327,7 +327,7 @@ export default function Reminders() {
     const isCustom = reminder.type === 'custom';
 
     return (
-      <div className="reminder-list-item">
+      <div className="reminder-list-item" data-status={reminder.status}>
         <div className="flex items-center justify-between gap-4">
           {/* Left Section */}
           <div className="flex items-center gap-4 flex-1 min-w-0">

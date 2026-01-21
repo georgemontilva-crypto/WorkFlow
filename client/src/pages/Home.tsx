@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import EventCard from '@/components/EventCard';
 import CryptoCard from '@/components/CryptoCard';
+import { AlertsWidget } from '@/components/AlertsWidget';
 import { trpc } from '@/lib/trpc';
 import { 
   TrendingUp, 
@@ -31,6 +32,7 @@ import {
   Plus,
   Calendar,
   Users,
+  Bell,
 } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -65,7 +67,8 @@ export default function Home() {
       'savingsProgress',
       'savingsGoal',
       'summary',
-      'events'
+      'events',
+      'alerts'
     ];
   });
   
@@ -92,6 +95,7 @@ export default function Home() {
     { id: 'savingsGoal', name: 'Meta de Ahorros', icon: PiggyBank },
     { id: 'summary', name: 'Resumen', icon: Calendar },
     { id: 'events', name: 'Eventos Próximos', icon: Calendar },
+    { id: 'alerts', name: 'Alertas de Hoy', icon: Bell },
   ];
   
   // Fetch data using tRPC
@@ -413,6 +417,13 @@ export default function Home() {
                 <span className="resume-value danger">{pendingInvoices}</span>
               </div>
             </div>
+          </div>
+          )}
+
+          {/* Alertas de Hoy - Widget pequeño */}
+          {isWidgetVisible('alerts') && (
+          <div className="dashboard-widget-small">
+            <AlertsWidget />
           </div>
           )}
         </div>

@@ -416,3 +416,119 @@
   @apply bg-card border border-border rounded-xl p-6 transition-all duration-200;
   @apply hover:border-primary/30;
 }
+
+
+/* ===== REMINDERS PAGE STYLES ===== */
+
+/* Reminder Summary Cards - Full color backgrounds */
+.reminder-summary-card {
+  @apply relative rounded-xl p-6 transition-all duration-200;
+}
+
+.reminder-summary-overdue {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.05) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.reminder-summary-urgent {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.15) 0%, rgba(234, 179, 8, 0.05) 100%);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.reminder-summary-upcoming {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Reminder Icon Circle */
+.reminder-icon-circle {
+  @apply w-12 h-12 rounded-full flex items-center justify-center;
+}
+
+.reminder-icon-circle.overdue {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.reminder-icon-circle.urgent {
+  background: rgba(234, 179, 8, 0.2);
+}
+
+.reminder-icon-circle.upcoming {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+/* Reminder List Item - Card style with left border */
+.reminder-list-item {
+  @apply relative overflow-hidden rounded-xl bg-card border border-border/50 p-5;
+  @apply transition-all duration-200 hover:border-primary/30;
+  border-left-width: 4px;
+  border-left-color: #9B59B6;
+}
+
+.reminder-list-item[data-status="overdue"] {
+  border-left-color: #EF4444;
+}
+
+.reminder-list-item[data-status="urgent"] {
+  border-left-color: #EAB308;
+}
+
+.reminder-list-item[data-status="upcoming"] {
+  border-left-color: #3B82F6;
+}
+
+/* Reminder Badges */
+.reminder-badge {
+  @apply text-xs font-medium px-2 py-1 rounded-full;
+}
+
+.reminder-badge.vencido {
+  @apply bg-red-500/20 text-red-400 border border-red-500/30;
+}
+
+.reminder-badge.urgente {
+  @apply bg-yellow-500/20 text-yellow-400 border border-yellow-500/30;
+}
+
+.reminder-badge.proximo {
+  @apply bg-blue-500/20 text-blue-400 border border-blue-500/30;
+}
+
+/* Reminder Tabs */
+.reminder-tab {
+  @apply text-sm font-medium py-2 px-4 rounded-lg transition-all;
+  @apply data-[state=active]:bg-primary data-[state=active]:text-black;
+  @apply data-[state=inactive]:text-muted-foreground data-[state=inactive]:hover:text-foreground;
+}
+
+/* ===== ALERTS WIDGET (Dashboard) ===== */
+
+/* Alert list item - compact style */
+.alert-list-item {
+  @apply flex items-start gap-3 py-3 border-b border-border/30 last:border-0;
+}
+
+.alert-icon {
+  @apply w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0;
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.alert-icon svg {
+  @apply w-3.5 h-3.5 text-red-500;
+}
+
+.alert-content {
+  @apply flex-1 min-w-0;
+}
+
+.alert-title {
+  @apply text-sm font-medium text-foreground leading-tight;
+}
+
+.alert-subtitle {
+  @apply text-xs text-muted-foreground mt-0.5;
+}
+
+.alert-meta {
+  @apply text-xs text-muted-foreground/60 mt-0.5;
+}
