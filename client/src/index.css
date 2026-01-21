@@ -51,110 +51,110 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Finwrk Banking Theme - Inspired by Modern Banking UI/UX */
+/* Finwrk Minimalist Theme - Black, White & Gray Only */
 :root {
-  /* Design Philosophy: Modern Banking - Green Gradients & Neon Yellow CTAs */
-  --radius: 1.375rem; /* 22px rounded corners - más suave y moderno */
+  /* Design Philosophy: Ultra Minimalism - Monochrome Elegance */
+  --radius: 1.375rem; /* 22px rounded corners */
   
-  /* Dark Mode Colors - Banking Inspired */
+  /* Monochrome Dark Mode - Pure Black, White & Grays */
   --background: oklch(0.06 0 0); /* Deep black #0F0F0F */
-  --foreground: oklch(1 0 0); /* Pure white #ffffff */
+  --foreground: oklch(1 0 0); /* Pure white #FFFFFF */
   
-  /* Card with subtle green tint */
-  --card: oklch(0.15 0.02 160 / 0.4); /* Dark with green hint and transparency */
+  /* Card - Dark gray with transparency */
+  --card: oklch(0.12 0 0 / 0.4); /* Dark gray with transparency */
   --card-foreground: oklch(1 0 0); /* White */
   
   /* Glassmorphism popover */
-  --popover: oklch(0.08 0 0 / 0.85); /* Glass modal - more opaque */
+  --popover: oklch(0.08 0 0 / 0.85); /* Glass modal - dark */
   --popover-foreground: oklch(1 0 0); /* White */
   
-  /* Primary: Green gradient base */
-  --primary: oklch(0.65 0.15 155); /* Teal Green #3A9B8E */
-  --primary-foreground: oklch(1 0 0); /* White text on green */
+  /* Primary: Light Gray instead of green */
+  --primary: oklch(0.85 0 0); /* Light gray #D9D9D9 */
+  --primary-foreground: oklch(0.10 0 0); /* Almost black for contrast */
   
-  /* Secondary: Darker green */
-  --secondary: oklch(0.20 0.03 160); /* Dark charcoal with green tint */
+  /* Secondary: Medium gray */
+  --secondary: oklch(0.20 0 0); /* Dark charcoal */
   --secondary-foreground: oklch(1 0 0); /* White */
   
-  /* Muted: Subtle gray-green */
-  --muted: oklch(0.22 0.02 160); /* Muted green-gray */
+  /* Muted: Subtle gray */
+  --muted: oklch(0.22 0 0); /* Muted gray */
   --muted-foreground: oklch(0.62 0 0); /* Light grey #9E9E9E */
   
-  /* Accent: Neon Yellow for CTAs */
-  --accent: oklch(0.92 0.18 105); /* Neon Yellow #CDDC39 */
-  --accent-foreground: oklch(0.10 0 0); /* Almost black for contrast */
+  /* Accent: White for highlights */
+  --accent: oklch(0.95 0 0); /* Almost white #F2F2F2 */
+  --accent-foreground: oklch(0.10 0 0); /* Almost black */
   
-  /* Destructive: Subtle red */
+  /* Destructive: Subtle red (keep for errors) */
   --destructive: oklch(0.55 0.22 25); /* Subtle red for errors */
   --destructive-foreground: oklch(1 0 0); /* White */
   
-  /* Borders: Glass effect with green tint */
+  /* Borders: Glass effect with white tint */
   --border: oklch(1 0 0 / 0.12); /* Glass border - white with 12% opacity */
-  --input: oklch(0.12 0.02 160); /* Dark input with green tint */
-  --ring: oklch(0.65 0.15 155); /* Green ring for focus */
+  --input: oklch(0.12 0 0); /* Dark input */
+  --ring: oklch(0.85 0 0); /* Light gray ring for focus */
   
-  /* Chart colors - Green gradient spectrum */
-  --chart-1: oklch(0.65 0.15 155); /* Teal Green #3A9B8E */
-  --chart-2: oklch(0.72 0.16 145); /* Medium Green #4CAF50 */
-  --chart-3: oklch(0.80 0.17 135); /* Light Green #8BC34A */
-  --chart-4: oklch(0.88 0.18 125); /* Lime Green #9CCC65 */
-  --chart-5: oklch(0.92 0.18 105); /* Neon Yellow #CDDC39 */
+  /* Chart colors - Grayscale spectrum */
+  --chart-1: oklch(0.85 0 0); /* Light gray */
+  --chart-2: oklch(0.70 0 0); /* Medium-light gray */
+  --chart-3: oklch(0.55 0 0); /* Medium gray */
+  --chart-4: oklch(0.40 0 0); /* Medium-dark gray */
+  --chart-5: oklch(0.25 0 0); /* Dark gray */
   
-  /* Sidebar colors - Glass with green tint */
-  --sidebar: oklch(0.05 0.01 160 / 0.7); /* Glass sidebar with green tint */
+  /* Sidebar colors - Glass with gray tint */
+  --sidebar: oklch(0.05 0 0 / 0.7); /* Glass sidebar */
   --sidebar-foreground: oklch(1 0 0); /* White */
-  --sidebar-primary: oklch(0.65 0.15 155); /* Teal Green */
-  --sidebar-primary-foreground: oklch(1 0 0); /* White */
-  --sidebar-accent: oklch(0.12 0.02 160); /* Dark with green tint */
+  --sidebar-primary: oklch(0.85 0 0); /* Light gray */
+  --sidebar-primary-foreground: oklch(0.10 0 0); /* Almost black */
+  --sidebar-accent: oklch(0.12 0 0); /* Dark gray */
   --sidebar-accent-foreground: oklch(1 0 0); /* White */
-  --sidebar-border: oklch(0.15 0.02 160); /* Subtle green-tinted border */
-  --sidebar-ring: oklch(0.65 0.15 155); /* Green ring */
+  --sidebar-border: oklch(0.15 0 0); /* Subtle gray border */
+  --sidebar-ring: oklch(0.85 0 0); /* Light gray ring */
 }
 
 /* Light Mode (Optional Alternative) */
 .light {
-  --background: oklch(1 0 0); /* Pure white #ffffff */
+  --background: oklch(1 0 0); /* Pure white #FFFFFF */
   --foreground: oklch(0 0 0); /* Pure black #000000 */
   
-  --card: oklch(0.98 0 0); /* Light grey #f9fafb */
+  --card: oklch(0.98 0 0); /* Light grey #F9FAFB */
   --card-foreground: oklch(0 0 0); /* Black */
   
-  --popover: oklch(0.96 0 0); /* #f3f4f6 */
+  --popover: oklch(0.96 0 0); /* #F3F4F6 */
   --popover-foreground: oklch(0 0 0); /* Black */
   
-  --primary: oklch(0.65 0.15 155); /* Teal Green */
-  --primary-foreground: oklch(1 0 0); /* White text on green */
+  --primary: oklch(0.20 0 0); /* Dark gray */
+  --primary-foreground: oklch(1 0 0); /* White text on dark */
   
-  --secondary: oklch(0.96 0 0); /* #f3f4f6 */
+  --secondary: oklch(0.96 0 0); /* #F3F4F6 */
   --secondary-foreground: oklch(0 0 0); /* Black */
   
-  --muted: oklch(0.92 0 0); /* #e5e7eb */
-  --muted-foreground: oklch(0.35 0 0); /* #4b5563 */
+  --muted: oklch(0.92 0 0); /* #E5E7EB */
+  --muted-foreground: oklch(0.35 0 0); /* #4B5563 */
   
-  --accent: oklch(0.92 0.18 105); /* Neon Yellow */
-  --accent-foreground: oklch(0.10 0 0); /* Almost black */
+  --accent: oklch(0.10 0 0); /* Almost black */
+  --accent-foreground: oklch(1 0 0); /* White */
   
   --destructive: oklch(0.55 0.22 25); /* Red */
   --destructive-foreground: oklch(1 0 0); /* White */
   
-  --border: oklch(0.92 0 0); /* #e5e7eb */
-  --input: oklch(0.92 0 0); /* #e5e7eb */
-  --ring: oklch(0.65 0.15 155); /* Green ring */
+  --border: oklch(0.92 0 0); /* #E5E7EB */
+  --input: oklch(0.92 0 0); /* #E5E7EB */
+  --ring: oklch(0.20 0 0); /* Dark gray ring */
   
-  --chart-1: oklch(0.65 0.15 155);
-  --chart-2: oklch(0.72 0.16 145);
-  --chart-3: oklch(0.80 0.17 135);
-  --chart-4: oklch(0.88 0.18 125);
-  --chart-5: oklch(0.92 0.18 105);
+  --chart-1: oklch(0.25 0 0);
+  --chart-2: oklch(0.40 0 0);
+  --chart-3: oklch(0.55 0 0);
+  --chart-4: oklch(0.70 0 0);
+  --chart-5: oklch(0.85 0 0);
   
   --sidebar: oklch(0.98 0 0);
   --sidebar-foreground: oklch(0 0 0);
-  --sidebar-primary: oklch(0.65 0.15 155);
+  --sidebar-primary: oklch(0.20 0 0);
   --sidebar-primary-foreground: oklch(1 0 0);
   --sidebar-accent: oklch(0.96 0 0);
   --sidebar-accent-foreground: oklch(0 0 0);
   --sidebar-border: oklch(0.92 0 0);
-  --sidebar-ring: oklch(0.65 0.15 155);
+  --sidebar-ring: oklch(0.20 0 0);
 }
 
 @layer base {
@@ -207,10 +207,10 @@
     }
   }
 
-  /* Custom Scrollbar - Discrete and Minimal with Green Accent */
+  /* Custom Scrollbar - Discrete and Minimal with Gray Accent */
   * {
     scrollbar-width: thin;
-    scrollbar-color: oklch(var(--primary) / 0.3) transparent;
+    scrollbar-color: oklch(0.85 0 0 / 0.3) transparent;
   }
 
   *::-webkit-scrollbar {
@@ -223,13 +223,13 @@
   }
 
   *::-webkit-scrollbar-thumb {
-    background: oklch(var(--primary) / 0.3);
+    background: oklch(0.85 0 0 / 0.3);
     border-radius: 3px;
     transition: background 0.2s ease;
   }
 
   *::-webkit-scrollbar-thumb:hover {
-    background: oklch(var(--primary) / 0.5);
+    background: oklch(0.85 0 0 / 0.5);
   }
 
   *::-webkit-scrollbar-corner {
