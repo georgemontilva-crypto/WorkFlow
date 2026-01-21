@@ -38,6 +38,7 @@ import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useLocation } from 'wouter';
 import { formatCurrency } from '@/lib/currency';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Available cryptocurrencies
 const AVAILABLE_CRYPTOS = [
@@ -130,6 +131,36 @@ export default function Home() {
   const totalSavings = savingsGoals
     ?.filter(g => g.status === 'active')
     .reduce((sum, g) => sum + parseFloat(g.current_amount.toString()), 0) || 0;
+
+  // Calculate monthly savings trend for the last 6 months
+  const monthlySavingsData = [];
+  for (let i = 5; i >= 0; i--) {
+    const targetDate = new Date();
+    targetDate.setMonth(targetDate.getMonth() - i);
+    const month = targetDate.getMonth();
+    const year = targetDate.getFullYear();
+    
+    const monthIncome = transactions
+      ?.filter(t => {
+        const date = new Date(t.date);
+        return t.type === 'income' && date.getMonth() === month && date.getFullYear() === year;
+      })
+      .reduce((sum, t) => sum + parseFloat(t.amount.toString()), 0) || 0;
+    
+    const monthExpenses = transactions
+      ?.filter(t => {
+        const date = new Date(t.date);
+        return t.type === 'expense' && date.getMonth() === month && date.getFullYear() === year;
+      })
+      .reduce((sum, t) => sum + parseFloat(t.amount.toString()), 0) || 0;
+    
+    const savings = monthIncome - monthExpenses;
+    
+    monthlySavingsData.push({
+      month: targetDate.toLocaleDateString('es-ES', { month: 'short' }),
+      amount: savings > 0 ? savings : 0
+    });
+  }
 
   // Get reminders (eventos próximos)
   const today = new Date();
@@ -354,9 +385,40 @@ export default function Home() {
           {isWidgetVisible('savingsProgress') && (
           <div className="dashboard-chart-card dashboard-widget-large">
             <h3 className="dashboard-chart-title">Progreso de Ahorros</h3>
-            <p className="dashboard-chart-subtitle">Últimos 5 meses</p>
-            <div className="h-64 flex items-center justify-center">
-              <p className="text-muted-foreground">Gráfico de línea aquí</p>
+            <p className="dashboard-chart-subtitle">Tendencia Mensual</p>
+            <div className="h-64 mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={monthlySavingsData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#333" opacity={0.3} />
+                  <XAxis 
+                    dataKey="month" 
+                    stroke="#888"
+                    tick={{ fill: '#888', fontSize: 12 }}
+                  />
+                  <YAxis 
+                    stroke="#888"
+                    tick={{ fill: '#888', fontSize: 12 }}
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: '#1A1A1A', 
+                      border: '1px solid #333',
+                      borderRadius: '8px',
+                      color: '#fff'
+                    }}
+                    formatter={(value: any) => [`$${value.toLocaleString()}`, 'Ahorros']}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="amount" 
+                    stroke="#FF9500" 
+                    strokeWidth={2}
+                    dot={{ fill: '#FF9500', r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
           )}
