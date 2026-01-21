@@ -62,9 +62,9 @@ export default function PublicInvoice() {
       reader.onloadend = async () => {
         const base64 = reader.result as string;
         await uploadProof.mutateAsync({
-          id: invoice.id,
+          token: token!,
           proof: base64.split(',')[1], // Remove data:image/...;base64, prefix
-          filename: selectedFile.name,
+          comment: selectedFile.name, // Send filename as comment
         });
         setUploading(false);
       };
