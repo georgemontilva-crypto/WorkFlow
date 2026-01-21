@@ -4,10 +4,10 @@
  * y muestra notificaciones flotantes
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, createElement } from 'react';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
-import { Bell, AlertCircle, Clock, DollarSign, Users, Phone, User, Tag } from 'lucide-react';
+import { Bell, Clock, DollarSign, Users, Phone, User, Tag } from 'lucide-react';
 
 interface UpcomingReminder {
   id: number;
@@ -129,36 +129,44 @@ export function useUpcomingReminders() {
       low: 'text-green-500',
     }[reminder.priority] || 'text-yellow-500';
 
-    // Mostrar toast con diseño minimalista
-    toast(
-      <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 p-2 bg-orange-500/20 rounded-lg">
-          <Bell className="w-5 h-5 text-orange-500" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <CategoryIcon className={`w-4 h-4 ${priorityColor}`} />
-            <span className="text-base font-semibold">
-              {reminder.title}
-            </span>
-          </div>
-          {reminder.description && (
-            <p className="text-sm text-muted-foreground mb-2">
-              {reminder.description}
-            </p>
-          )}
-          <div className="flex items-center gap-1 text-xs text-orange-600 font-medium">
-            <Clock className="w-3 h-3" />
-            <span>En 5 minutos</span>
-          </div>
-        </div>
-      </div>,
-      {
-        duration: 10000, // 10 segundos
-        position: 'bottom-right',
-        className: 'border-2 border-orange-500 shadow-lg',
-      }
+    // Crear el contenido del toast usando createElement
+    const toastContent = createElement(
+      'div',
+      { className: 'flex items-start gap-3' },
+      createElement(
+        'div',
+        { className: 'flex-shrink-0 p-2 bg-orange-500/20 rounded-lg' },
+        createElement(Bell, { className: 'w-5 h-5 text-orange-500' })
+      ),
+      createElement(
+        'div',
+        { className: 'flex-1 min-w-0' },
+        createElement(
+          'div',
+          { className: 'flex items-center gap-2 mb-1' },
+          createElement(CategoryIcon, { className: `w-4 h-4 ${priorityColor}` }),
+          createElement('span', { className: 'text-base font-semibold' }, reminder.title)
+        ),
+        reminder.description && createElement(
+          'p',
+          { className: 'text-sm text-muted-foreground mb-2' },
+          reminder.description
+        ),
+        createElement(
+          'div',
+          { className: 'flex items-center gap-1 text-xs text-orange-600 font-medium' },
+          createElement(Clock, { className: 'w-3 h-3' }),
+          createElement('span', null, 'En 5 minutos')
+        )
+      )
     );
+
+    // Mostrar toast
+    toast(toastContent, {
+      duration: 10000, // 10 segundos
+      position: 'bottom-right',
+      className: 'border-2 border-orange-500 shadow-lg',
+    });
   };
 
   // Solicitar permiso para notificaciones del navegador
