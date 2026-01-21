@@ -133,13 +133,13 @@ export default function CompanyProfile() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Logo Section */}
           <Card>
-            <CardHeader>
-              <CardTitle>Logo de la Empresa</CardTitle>
+            <CardHeader className="py-6">
+              <CardTitle className="text-lg">Logo de la Empresa</CardTitle>
               <CardDescription>
                 Sube el logo que aparecerá en tus facturas (máximo 2MB)
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 py-6">
               <div className="flex items-center gap-6">
                 <div className="w-32 h-32 border-2 border-border rounded-lg flex items-center justify-center bg-card overflow-hidden">
                   {logoPreview ? (
@@ -172,10 +172,10 @@ export default function CompanyProfile() {
 
           {/* Basic Information */}
           <Card>
-            <CardHeader>
-              <CardTitle>Información Básica</CardTitle>
+            <CardHeader className="py-6">
+              <CardTitle className="text-lg">Información Básica</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 py-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="company_name">Nombre de la Empresa *</Label>
@@ -219,10 +219,10 @@ export default function CompanyProfile() {
 
           {/* Address */}
           <Card>
-            <CardHeader>
-              <CardTitle>Dirección</CardTitle>
+            <CardHeader className="py-6">
+              <CardTitle className="text-lg">Dirección</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 py-6">
               <div className="space-y-2">
                 <Label htmlFor="address">Dirección</Label>
                 <Input
@@ -270,10 +270,10 @@ export default function CompanyProfile() {
 
           {/* Tax & Banking */}
           <Card>
-            <CardHeader>
-              <CardTitle>Información Fiscal y Bancaria</CardTitle>
+            <CardHeader className="py-6">
+              <CardTitle className="text-lg">Información Fiscal y Bancaria</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 py-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="tax_id">RIF / NIT / Tax ID</Label>
@@ -314,10 +314,10 @@ export default function CompanyProfile() {
 
           {/* Custom Text */}
           <Card>
-            <CardHeader>
-              <CardTitle>Personalización de Facturas</CardTitle>
+            <CardHeader className="py-6">
+              <CardTitle className="text-lg">Personalización de Facturas</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 py-6">
               <div className="space-y-2">
                 <Label htmlFor="payment_instructions">Instrucciones de Pago</Label>
                 <Textarea
