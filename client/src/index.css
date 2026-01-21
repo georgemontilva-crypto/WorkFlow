@@ -360,3 +360,27 @@
 .crypto-card:hover .remove-btn {
   @apply opacity-100;
 }
+
+/* Scroll Container - Horizontal layout for crypto cards */
+.scroll-container {
+  @apply flex gap-4 overflow-x-auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 149, 0, 0.3) transparent;
+}
+
+.scroll-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 149, 0, 0.3);
+  border-radius: 3px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 149, 0, 0.5);
+}
