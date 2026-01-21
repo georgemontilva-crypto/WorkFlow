@@ -421,21 +421,22 @@ export default function Markets() {
               <BarChart3 className="w-6 h-6 text-primary" />
             </div>
             <h1 className="text-2xl font-bold">Mercados</h1>
-          </div>
-          
-          <div className="flex items-center gap-2 ml-11">
-            {favoriteCount > 0 && (
-              <Badge variant="outline">
-                <Star className="w-3 h-3 mr-1 fill-current" />
-                {favoriteCount} favoritos
-              </Badge>
-            )}
-            {priceAlerts && priceAlerts.length > 0 && (
-              <Badge variant="outline" className="cursor-pointer hover:bg-white/5" onClick={() => document.getElementById('alerts-section')?.scrollIntoView({ behavior: 'smooth' })}>
-                <Bell className="w-3 h-3 mr-1 text-blue-500" />
-                {priceAlerts.length} alertas
-              </Badge>
-            )}
+            
+            {/* Badges al lado del título */}
+            <div className="flex items-center gap-2">
+              {favoriteCount > 0 && (
+                <Badge variant="outline">
+                  <Star className="w-3 h-3 mr-1 fill-current" />
+                  {favoriteCount} favoritos
+                </Badge>
+              )}
+              {priceAlerts && priceAlerts.length > 0 && (
+                <Badge variant="outline" className="cursor-pointer hover:bg-white/5" onClick={() => document.getElementById('alerts-section')?.scrollIntoView({ behavior: 'smooth' })}>
+                  <Bell className="w-3 h-3 mr-1 text-blue-500" />
+                  {priceAlerts.length} alertas
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
 
