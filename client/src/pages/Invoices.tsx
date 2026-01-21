@@ -80,7 +80,7 @@ type InvoiceFormData = {
   recurrence_frequency?: 'every_minute' | 'monthly' | 'biweekly' | 'annual' | 'custom';
   recurrence_interval?: number;
 };
-import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User, FolderArchive, ArchiveRestore, Link as LinkIcon, Copy, Eye, Repeat } from 'lucide-react';
+import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User, FolderArchive, ArchiveRestore, Link as LinkIcon, Copy, Eye, Repeat, Mail } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { format, parseISO, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -246,7 +246,7 @@ export default function Invoices() {
     return (formData.items || []).reduce((sum, item) => sum + item.total, 0);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, action: 'create_only' | 'create_and_send' | 'download' | 'copy_link' = 'create_only') => {
     e.preventDefault();
 
     if (!formData.client_id || !formData.items || formData.items.length === 0) {
@@ -259,7 +259,7 @@ export default function Invoices() {
     const tax = subtotal * 0; // 0% tax, can be changed
     const total = subtotal + tax;
 
-    await createInvoice.mutateAsync({
+    const result = await createInvoice.mutateAsync({
       client_id: formData.client_id!,
       invoice_number,
       issue_date: formData.issue_date!,
@@ -277,6 +277,35 @@ export default function Invoices() {
       recurrence_frequency: formData.recurrence_frequency,
       recurrence_interval: formData.recurrence_interval,
     });
+
+    // Handle different actions
+    if (action === 'create_and_send' && result?.id) {
+      try {
+        await sendByEmail.mutateAsync({ id: result.id });
+        toast.success('Factura creada y enviada al cliente');
+      } catch (error) {
+        toast.error('Factura creada pero falló el envío del email');
+      }
+    } else if (action === 'download' && result?.id) {
+      try {
+        const pdfResult = await generatePDF.mutateAsync({ id: result.id });
+        if (pdfResult?.pdf) {
+          const link = document.createElement('a');
+          link.href = `data:application/pdf;base64,${pdfResult.pdf}`;
+          link.download = `factura-${invoice_number}.pdf`;
+          link.click();
+          toast.success('Factura creada y PDF descargado');
+        }
+      } catch (error) {
+        toast.error('Factura creada pero falló la descarga del PDF');
+      }
+    } else if (action === 'copy_link' && formData.payment_link) {
+      navigator.clipboard.writeText(formData.payment_link);
+      toast.success('Factura creada y link de pago copiado');
+    } else {
+      toast.success('Factura creada exitosamente');
+    }
+
     setIsDialogOpen(false);
     setFormData({
       client_id: 0,
@@ -545,7 +574,7 @@ export default function Invoices() {
 
         {/* New Invoice Dialog */}
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="bg-popover border-border max-w-4xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
+          <DialogContent className="bg-popover border-border max-w-6xl max-h-[92vh] overflow-y-auto w-[98vw] lg:w-[90vw]">
               <DialogHeader className="pb-4">
                 <DialogTitle className="text-foreground text-xl sm:text-2xl">{t.invoices.createInvoice}</DialogTitle>
                 <DialogDescription className="text-muted-foreground text-sm">
@@ -858,7 +887,7 @@ export default function Invoices() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex justify-end gap-3 pt-4 border-t border-border">
+                <div className="flex justify-end gap-3 pt-6 border-t border-border">
                   <Button
                     type="button"
                     variant="outline"
@@ -867,10 +896,34 @@ export default function Invoices() {
                   >
                     {t.common.cancel}
                   </Button>
-                  <Button type="submit" className="bg-primary text-primary-foreground hover:opacity-90">
-                    <FileText className="w-4 h-4 mr-2" />
-                    Crear Factura
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button type="button" className="bg-primary text-primary-foreground hover:opacity-90">
+                        <FileText className="w-4 h-4 mr-2" />
+                        Crear Factura
+                        <ChevronDown className="w-4 h-4 ml-2" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                      <DropdownMenuItem onClick={(e) => { e.preventDefault(); handleSubmit(e as any, 'create_and_send'); }}>
+                        <Mail className="w-4 h-4 mr-2" />
+                        Crear y Enviar al Cliente
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={(e) => { e.preventDefault(); handleSubmit(e as any, 'download'); }}>
+                        <Download className="w-4 h-4 mr-2" />
+                        Crear y Descargar PDF
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={(e) => { e.preventDefault(); handleSubmit(e as any, 'copy_link'); }}>
+                        <LinkIcon className="w-4 h-4 mr-2" />
+                        Crear y Copiar Link de Pago
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={(e) => { e.preventDefault(); handleSubmit(e as any, 'create_only'); }}>
+                        <FileText className="w-4 h-4 mr-2" />
+                        Solo Crear Factura
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </form>
             </DialogContent>
