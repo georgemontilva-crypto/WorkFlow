@@ -632,7 +632,7 @@ export default function Reminders() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="all" className="space-y-3">
+          <TabsContent value="all" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {allReminders.length === 0 ? (
               <Card className="bg-[#2A2A2A] border-white/5">
                 <CardContent className="p-8 text-center">
@@ -654,7 +654,7 @@ export default function Reminders() {
             )}
           </TabsContent>
 
-          <TabsContent value="overdue" className="space-y-3">
+          <TabsContent value="overdue" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {overdueReminders.length === 0 ? (
               <Card className="bg-[#2A2A2A] border-white/5">
                 <CardContent className="p-8 text-center">
@@ -669,7 +669,7 @@ export default function Reminders() {
             )}
           </TabsContent>
 
-          <TabsContent value="urgent" className="space-y-3">
+          <TabsContent value="urgent" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {urgentReminders.length === 0 ? (
               <Card className="bg-[#2A2A2A] border-white/5">
                 <CardContent className="p-8 text-center">
@@ -684,7 +684,7 @@ export default function Reminders() {
             )}
           </TabsContent>
 
-          <TabsContent value="upcoming" className="space-y-3">
+          <TabsContent value="upcoming" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {upcomingReminders.length === 0 ? (
               <Card className="bg-[#2A2A2A] border-white/5">
                 <CardContent className="p-8 text-center">
