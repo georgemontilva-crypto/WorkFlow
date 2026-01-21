@@ -326,91 +326,94 @@ export default function Reminders() {
     const Icon = config.icon;
     const isCustom = reminder.type === 'custom';
 
+    // Get priority label and color
+    const getPriorityConfig = (priority: string) => {
+      switch (priority) {
+        case 'high':
+          return { label: 'Alta', class: 'bg-red-500/20 text-red-400 border-red-500/30' };
+        case 'medium':
+          return { label: 'Media', class: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' };
+        case 'low':
+          return { label: 'Baja', class: 'bg-green-500/20 text-green-400 border-green-500/30' };
+        default:
+          return { label: 'Media', class: 'bg-gray-500/20 text-gray-400 border-gray-500/30' };
+      }
+    };
+
+    const priorityConfig = getPriorityConfig(reminder.priority || 'medium');
+
     return (
       <div className="reminder-list-item" data-status={reminder.status}>
-        <div className="flex items-center justify-between gap-4">
-          {/* Left Section */}
-          <div className="flex items-center gap-4 flex-1 min-w-0">
-            <div className="flex items-center gap-3">
-              <Badge className={config.badgeClass}>
-                {config.label}
-              </Badge>
-              <Badge variant="outline" className="text-xs border-white/10">
-                {reminder.type === 'client' ? 'Cliente' : reminder.type === 'invoice' ? 'Factura' : getCategoryLabel(reminder.category || 'other')}
-              </Badge>
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <h3 className="text-base font-semibold text-white truncate">
-                {reminder.clientName}
-              </h3>
-              {(reminder.company || reminder.description) && (
-                <p className="text-sm text-gray-400 truncate">{reminder.company || reminder.description}</p>
-              )}
-            </div>
+        {/* Header with menu */}
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1 min-w-0">
+            {/* Title */}
+            <h3 className="text-lg font-semibold text-white mb-1">
+              {reminder.clientName}
+            </h3>
+            {/* Description */}
+            <p className="text-sm text-gray-400">
+              {reminder.company || reminder.description || getCategoryLabel(reminder.category || 'other')}
+            </p>
           </div>
+          
+          {/* Menu button */}
+          {isCustom && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary/80 -mr-2">
+                  <MoreVertical className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-card border-border">
+                <DropdownMenuItem onClick={() => handleEdit(customReminders?.find((r: any) => r.id === reminder.id))}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => exportCalendarMutation.mutate({ id: reminder.id })}>
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Exportar a Calendario
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => sendEmailMutation.mutate({ id: reminder.id })}>
+                  <Mail className="w-4 h-4 mr-2" />
+                  Enviar Notificación
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => completeReminderMutation.mutate({ id: reminder.id })}>
+                  <CheckCircle2 className="w-4 h-4 mr-2" />
+                  Marcar Completado
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => deleteReminderMutation.mutate({ id: reminder.id })}
+                  className="text-red-400"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Eliminar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
 
-          {/* Right Section */}
-          <div className="flex items-center gap-6">
-            <div className="text-right">
-              <p className="text-sm text-gray-400">
-                {format(new Date(reminder.due_date), 'dd MMM yyyy', { locale: es })}
-              </p>
-            </div>
-            
-            {reminder.type !== 'custom' && (
-              <div className="text-right min-w-[120px]">
-                <p className="text-lg font-mono font-bold text-white">
-                  ${parseFloat(reminder.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                </p>
-              </div>
+        {/* Divider */}
+        <div className="border-t border-gray-700/30 my-3"></div>
+
+        {/* Footer: Date/Time + Priority Badge */}
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-gray-400">
+            <span>{format(new Date(reminder.due_date), 'dd MMM yyyy', { locale: es })}</span>
+            {reminder.reminderTime && (
+              <span className="ml-2">{reminder.reminderTime}</span>
             )}
-            
-            {isCustom ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-primary hover:text-primary/80">
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-card border-border">
-                  <DropdownMenuItem onClick={() => handleEdit(customReminders?.find((r: any) => r.id === reminder.id))}>
-                    <Edit className="w-4 h-4 mr-2" />
-                    Editar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => exportCalendarMutation.mutate({ id: reminder.id })}>
-                    <Calendar className="w-4 h-4 mr-2" />
-                    Exportar a Calendario
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => sendEmailMutation.mutate({ id: reminder.id })}>
-                    <Mail className="w-4 h-4 mr-2" />
-                    Enviar Notificación
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => completeReminderMutation.mutate({ id: reminder.id })}>
-                    <CheckCircle2 className="w-4 h-4 mr-2" />
-                    Marcar Completado
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={() => deleteReminderMutation.mutate({ id: reminder.id })}
-                    className="text-red-400"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Eliminar
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setLocation(reminder.type === 'client' ? '/clients' : '/invoices')}
-                className="bg-transparent border-white/10 text-white hover:bg-white/5"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                Ver
-              </Button>
+            {reminder.type !== 'custom' && reminder.amount && (
+              <span className="ml-3 font-mono font-semibold text-white">
+                ${parseFloat(reminder.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+              </span>
             )}
           </div>
+          
+          <Badge className={`text-xs font-medium px-2 py-1 ${priorityConfig.class}`}>
+            {priorityConfig.label}
+          </Badge>
         </div>
       </div>
     );
