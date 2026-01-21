@@ -157,4 +157,11 @@ function getPriorityLabel(priority: string): string {
   }
 }
 
-console.log('[Worker] Reminder worker initialized and ready to process jobs');
+/**
+ * Initialize the reminder worker
+ * This function should be called once when the server starts
+ */
+export function initializeReminderWorker() {
+  console.log('[Worker] Reminder worker initialized and ready to process jobs');
+  return true;
+}

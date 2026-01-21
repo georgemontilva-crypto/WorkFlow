@@ -8,6 +8,8 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { startPriceMonitor } from "../services/priceMonitor";
 import { startRecurringInvoicesScheduler } from "./recurring-invoices-job";
+import { testRedisConnection } from "../config/redis";
+import { initializeReminderWorker } from "../workers/reminder-worker";
 
 async function startServer() {
   const app = express();
@@ -60,6 +62,20 @@ async function startServer() {
     // Start background services
     startPriceMonitor();
     startRecurringInvoicesScheduler();
+    
+    // Initialize reminder worker with Redis
+    testRedisConnection().then((connected) => {
+      if (connected) {
+        initializeReminderWorker();
+        console.log('[Server] ✅ Reminder worker initialized');
+      } else {
+        console.error('[Server] ⚠️  WARNING: Redis connection failed!');
+        console.error('[Server] ⚠️  Reminders will NOT work without Redis.');
+        console.error('[Server] 💡 Please configure REDIS_URL in Railway environment variables.');
+      }
+    }).catch((err) => {
+      console.error('[Server] ❌ Failed to initialize reminder worker:', err);
+    });
   });
 }
 
