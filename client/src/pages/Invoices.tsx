@@ -137,7 +137,7 @@ export default function Invoices() {
     },
   });
   
-  const generatePDF = trpc.invoices.generatePDF.useMutation();
+  const generatePDFMutation = trpc.invoices.generatePDF.useMutation();
   
   const updateInvoice = trpc.invoices.update.useMutation({
     onSuccess: () => {
@@ -298,7 +298,7 @@ export default function Invoices() {
       }
     } else if (action === 'download' && result?.id) {
       try {
-        const pdfResult = await generatePDF.mutateAsync({ id: result.id });
+        const pdfResult = await generatePDFMutation.mutateAsync({ id: result.id });
         if (pdfResult?.pdf) {
           const link = document.createElement('a');
           link.href = `data:application/pdf;base64,${pdfResult.pdf}`;
