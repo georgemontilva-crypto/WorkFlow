@@ -1,6 +1,6 @@
 /**
  * Savings Page - Metas de Ahorro
- * Design Philosophy: Apple Minimalism - Responsive mobile-first
+ * Design Philosophy: Modern Fintech - Clean cards with orange progress bars
  */
 
 import DashboardLayout from '@/components/DashboardLayout';
@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
 import {
   Dialog,
   DialogContent,
@@ -190,8 +189,8 @@ export default function Savings() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Metas de Ahorro</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Metas de Ahorro</h1>
+            <p className="text-sm sm:text-base text-gray-400">
               Define y alcanza tus objetivos financieros
             </p>
           </div>
@@ -203,40 +202,41 @@ export default function Savings() {
                 name: '',
                 target_amount: '',
                 current_amount: '',
+                currency: 'USD',
                 target_date: '',
                 status: 'active',
               });
             }
           }}>
             <DialogTrigger asChild>
-              <Button className="bg-primary text-primary-foreground hover:opacity-90">
+              <Button className="bg-[#FF9500] text-black hover:bg-[#FFA500] font-semibold">
                 <Plus className="w-4 h-4 mr-2" />
                 Nueva Meta
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-popover border-border max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogContent className="bg-[#1C1C1C] border-white/10 max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle className="text-foreground text-2xl">
+                <DialogTitle className="text-white text-2xl">
                   {editingGoal ? 'Editar Meta de Ahorro' : 'Nueva Meta de Ahorro'}
                 </DialogTitle>
-                <DialogDescription className="text-muted-foreground">
+                <DialogDescription className="text-gray-400">
                   {editingGoal ? 'Actualiza los detalles de tu meta' : 'Define un nuevo objetivo financiero'}
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-foreground font-semibold">
-                    Nombre de la Meta <span className="text-destructive">*</span>
+                  <Label htmlFor="name" className="text-white font-semibold">
+                    Nombre de la Meta <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="bg-background border-border text-foreground h-11"
+                    className="bg-[#2A2A2A] border-white/10 text-white h-11"
                     placeholder="Ej: Fondo de emergencia, Vacaciones, etc."
                     required
                   />
-                  <p className="text-xs text-muted-foreground">Dale un nombre descriptivo a tu objetivo</p>
+                  <p className="text-xs text-gray-400">Dale un nombre descriptivo a tu objetivo</p>
                 </div>
 
                 <CurrencySelect
@@ -248,8 +248,8 @@ export default function Savings() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="target_amount" className="text-foreground font-semibold">
-                      Monto Objetivo <span className="text-destructive">*</span>
+                    <Label htmlFor="target_amount" className="text-white font-semibold">
+                      Monto Objetivo <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="target_amount"
@@ -258,13 +258,13 @@ export default function Savings() {
                       min="0"
                       value={formData.target_amount}
                       onChange={(e) => setFormData({ ...formData, target_amount: e.target.value })}
-                      className="bg-background border-border text-foreground font-mono h-11"
+                      className="bg-[#2A2A2A] border-white/10 text-white font-mono h-11"
                       required
                     />
-                    <p className="text-xs text-muted-foreground">Meta a alcanzar</p>
+                    <p className="text-xs text-gray-400">Meta a alcanzar</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="current_amount" className="text-foreground font-semibold">
+                    <Label htmlFor="current_amount" className="text-white font-semibold">
                       Monto Actual
                     </Label>
                     <Input
@@ -274,39 +274,39 @@ export default function Savings() {
                       min="0"
                       value={formData.current_amount}
                       onChange={(e) => setFormData({ ...formData, current_amount: e.target.value })}
-                      className="bg-background border-border text-foreground font-mono h-11"
+                      className="bg-[#2A2A2A] border-white/10 text-white font-mono h-11"
                     />
-                    <p className="text-xs text-muted-foreground">Ahorro actual</p>
+                    <p className="text-xs text-gray-400">Ahorro actual</p>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="target_date" className="text-foreground font-semibold">
-                    Fecha Límite <span className="text-destructive">*</span>
+                  <Label htmlFor="target_date" className="text-white font-semibold">
+                    Fecha Límite <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="target_date"
                     type="date"
                     value={formData.target_date}
                     onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
-                    className="bg-background border-border text-foreground h-11"
+                    className="bg-[#2A2A2A] border-white/10 text-white h-11"
                     required
                   />
-                  <p className="text-xs text-muted-foreground">Fecha objetivo para completar la meta</p>
+                  <p className="text-xs text-gray-400">Fecha objetivo para completar la meta</p>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t border-border">
+                <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setIsDialogOpen(false)}
-                    className="border-border text-foreground hover:bg-accent"
+                    className="border-white/10 text-white hover:bg-white/5"
                   >
                     Cancelar
                   </Button>
                   <Button 
                     type="submit" 
-                    className="bg-primary text-primary-foreground hover:opacity-90"
+                    className="bg-[#FF9500] text-black hover:bg-[#FFA500] font-semibold"
                     disabled={createGoal.isPending || updateGoal.isPending}
                   >
                     {editingGoal ? 'Actualizar' : 'Crear'} Meta
@@ -319,21 +319,21 @@ export default function Savings() {
 
         {/* Savings Goals */}
         {isLoading ? (
-          <Card className="bg-card border-border">
+          <Card className="bg-[#2A2A2A] border-white/5">
             <CardContent className="flex items-center justify-center py-16">
-              <div className="text-muted-foreground">Cargando metas...</div>
+              <div className="text-gray-400">Cargando metas...</div>
             </CardContent>
           </Card>
         ) : !savingsGoals || savingsGoals.length === 0 ? (
-          <Card className="bg-card border-border">
+          <Card className="bg-[#2A2A2A] border-white/5">
             <CardContent className="flex flex-col items-center justify-center py-16">
-              <div className="w-32 h-32 rounded-full bg-accent/20 flex items-center justify-center mb-6">
-                <Target className="w-16 h-16 text-muted-foreground" strokeWidth={1} />
+              <div className="w-32 h-32 rounded-full bg-white/5 flex items-center justify-center mb-6">
+                <Target className="w-16 h-16 text-gray-500" strokeWidth={1} />
               </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
+              <h3 className="text-xl font-semibold text-white mb-2">
                 No hay metas de ahorro aún
               </h3>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-gray-400 mb-6">
                 Comienza definiendo tu primera meta financiera
               </p>
             </CardContent>
@@ -347,93 +347,100 @@ export default function Savings() {
               const remaining = targetAmount - currentAmount;
 
               return (
-                <Card key={goal.id} className="bg-card border-border hover:border-accent transition-colors">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        {goal.status === 'completed' ? (
-                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                            <CheckCircle2 className="w-5 h-5 text-green-500" />
-                          </div>
-                        ) : (
-                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                            <Target className="w-5 h-5 text-muted-foreground" />
-                          </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <CardTitle className="text-foreground text-base sm:text-lg truncate">{goal.name}</CardTitle>
-                          <p className="text-xs sm:text-sm text-muted-foreground">
-                            {goal.target_date && `Fecha límite: ${format(new Date(goal.target_date), 'dd MMM yyyy', { locale: es })}`}
-                          </p>
+                <div key={goal.id} className="savings-goal-card">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {goal.status === 'completed' ? (
+                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                          <CheckCircle2 className="w-5 h-5 text-green-500" />
                         </div>
+                      ) : (
+                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#FF9500]/20 flex items-center justify-center">
+                          <Target className="w-5 h-5 text-[#FF9500]" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-white text-lg font-bold truncate">{goal.name}</h3>
+                        <p className="text-sm text-gray-400">
+                          {goal.target_date && `Fecha límite: ${format(new Date(goal.target_date), 'dd MMM yyyy', { locale: es })}`}
+                        </p>
                       </div>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="flex-shrink-0">
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-popover border-border">
-                          <DropdownMenuItem onClick={() => handleEdit(goal)} className="cursor-pointer">
-                            <Pencil className="w-4 h-4 mr-2" />
-                            Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator className="bg-border" />
-                          <DropdownMenuItem 
-                            onClick={() => handleDelete(goal.id)} 
-                            className="cursor-pointer text-destructive"
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Eliminar
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <div className="flex justify-between items-baseline mb-2">
-                        <span className="text-2xl font-bold text-foreground font-mono">
-                          {formatCurrency(currentAmount, goal.currency as Currency)}
-                        </span>
-                        <span className="text-sm text-muted-foreground font-mono">
-                          de {formatCurrency(targetAmount, goal.currency as Currency)}
-                        </span>
-                      </div>
-                      <Progress value={progress} className="h-2" />
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {progress.toFixed(1)}% completado
-                      </p>
-                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="flex-shrink-0 text-white hover:bg-white/5">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-[#1C1C1C] border-white/10">
+                        <DropdownMenuItem onClick={() => handleEdit(goal)} className="cursor-pointer text-white hover:bg-white/5">
+                          <Pencil className="w-4 h-4 mr-2" />
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-white/10" />
+                        <DropdownMenuItem 
+                          onClick={() => handleDelete(goal.id)} 
+                          className="cursor-pointer text-red-400 hover:bg-red-500/10"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
 
-                    {goal.status !== 'completed' && remaining > 0 && (
-                      <div className="flex items-center justify-between p-3 bg-accent/10 rounded-lg">
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-2xl font-bold text-white font-mono">
+                        {formatCurrency(currentAmount, goal.currency as Currency)}
+                      </span>
+                      <span className="text-sm text-gray-400 font-mono">
+                        de {formatCurrency(targetAmount, goal.currency as Currency)}
+                      </span>
+                    </div>
+                    
+                    {/* Barra de progreso naranja */}
+                    <div className="progress-container">
+                      <div 
+                        className="progress-bar-orange" 
+                        style={{ width: `${Math.min(progress, 100)}%` }}
+                      />
+                    </div>
+                    
+                    <p className="text-xs text-gray-400">
+                      {progress.toFixed(1)}% completado
+                    </p>
+                  </div>
+
+                  {goal.status !== 'completed' && remaining > 0 && (
+                    <div className="amount-missing">
+                      <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-xs text-muted-foreground">Falta</p>
-                          <p className="text-lg font-semibold text-foreground font-mono">
+                          <p className="text-xs text-gray-400">Falta</p>
+                          <p className="text-lg font-semibold text-white font-mono">
                             {formatCurrency(remaining, goal.currency as Currency)}
                           </p>
                         </div>
                         <Button
                           size="sm"
                           onClick={() => handleAddAmount(goal)}
-                          className="bg-primary text-primary-foreground hover:opacity-90"
+                          className="bg-[#FF9500] text-black hover:bg-[#FFA500] font-semibold"
                         >
                           <TrendingUp className="w-4 h-4 mr-2" />
                           Agregar
                         </Button>
                       </div>
-                    )}
+                    </div>
+                  )}
 
-                    {goal.status === 'completed' && (
-                      <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-                        <p className="text-sm text-green-600 dark:text-green-400 font-medium text-center">
-                          ¡Meta completada! 🎉
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                  {goal.status === 'completed' && (
+                    <div className="p-3 bg-green-500/10 rounded-xl border border-green-500/20 mt-4">
+                      <p className="text-sm text-green-400 font-medium text-center">
+                        ¡Meta completada!
+                      </p>
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>

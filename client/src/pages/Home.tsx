@@ -129,35 +129,33 @@ export default function Home() {
     <DashboardLayout>
       <div className="p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground mt-1">Gestión financiera integral y eventos</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm">
-              <Settings className="w-4 h-4 mr-2" />
-              Configurar
-            </Button>
-            <Button size="sm" className="bg-primary hover:bg-primary/90">
-              <Plus className="w-4 h-4 mr-2" />
-              Nuevo
-            </Button>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground mt-1">Gestión financiera integral y eventos</p>
         </div>
 
         {/* Criptomonedas Section */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div>
             <h2 className="text-xl font-bold">Criptomonedas</h2>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Añadir Cripto
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
+          </div>
+          
+          {/* Crypto Cards - Horizontal scroll */}
+          <div className="scroll-container pb-2">
+            {displayedCryptos.map((crypto) => (
+              <CryptoCard
+                key={crypto.symbol}
+                {...crypto}
+                onRemove={() => removeCrypto(crypto.symbol)}
+              />
+            ))}
+          </div>
+          
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <button style={{display: 'none'}}></button>
+            </DialogTrigger>
+            <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Añadir Criptomoneda</DialogTitle>
                   <DialogDescription>
@@ -196,26 +194,14 @@ export default function Home() {
                     </p>
                   )}
                 </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-          
-          {/* Crypto Cards - Horizontal scroll */}
-          <div className="scroll-container pb-2">
-            {displayedCryptos.map((crypto) => (
-              <CryptoCard
-                key={crypto.symbol}
-                {...crypto}
-                onRemove={() => removeCrypto(crypto.symbol)}
-              />
-            ))}
-          </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* 4 Tarjetas Superiores */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {/* Total Balance */}
-          <div className="dashboard-stat-card glow-effect">
+          <div className="dashboard-stat-card">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Total Balance</span>
               <Wallet className="w-4 h-4 text-muted-foreground" />
@@ -228,7 +214,7 @@ export default function Home() {
           </div>
 
           {/* Ingresos */}
-          <div className="dashboard-stat-card glow-effect">
+          <div className="dashboard-stat-card">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Ingresos</span>
               <TrendingUp className="w-4 h-4 text-muted-foreground" />
@@ -241,7 +227,7 @@ export default function Home() {
           </div>
 
           {/* Gastos */}
-          <div className="dashboard-stat-card glow-effect">
+          <div className="dashboard-stat-card">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Gastos</span>
               <TrendingDown className="w-4 h-4 text-muted-foreground" />
@@ -254,7 +240,7 @@ export default function Home() {
           </div>
 
           {/* Ahorros */}
-          <div className="dashboard-stat-card glow-effect">
+          <div className="dashboard-stat-card">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">Ahorros</span>
               <PiggyBank className="w-4 h-4 text-muted-foreground" />
@@ -272,7 +258,7 @@ export default function Home() {
           {/* Columna Izquierda - Gráficos (2/3) */}
           <div className="lg:col-span-2 space-y-6">
             {/* Ingresos Semanales */}
-            <div className="dashboard-chart-card glow-effect">
+            <div className="dashboard-chart-card">
               <h3 className="dashboard-chart-title">Ingresos Semanales</h3>
               <p className="dashboard-chart-subtitle">Actividad de esta semana</p>
               <div className="h-64 flex items-end justify-between gap-2">
@@ -292,7 +278,7 @@ export default function Home() {
             </div>
 
             {/* Progreso de Ahorros */}
-            <div className="dashboard-chart-card glow-effect">
+            <div className="dashboard-chart-card">
               <h3 className="dashboard-chart-title">Progreso de Ahorros</h3>
               <p className="dashboard-chart-subtitle">Últimos 5 meses</p>
               <div className="h-64 flex items-center justify-center">
@@ -304,7 +290,7 @@ export default function Home() {
           {/* Columna Derecha - Meta y Resumen (1/3) */}
           <div className="space-y-6">
             {/* Meta de Ahorros */}
-            <div className="dashboard-chart-card glow-effect">
+            <div className="dashboard-chart-card">
               <h3 className="dashboard-chart-title">Meta de Ahorros</h3>
               <div className="flex items-center justify-center h-48">
                 <div className="relative w-32 h-32">
@@ -340,7 +326,7 @@ export default function Home() {
             </div>
 
             {/* Resumen */}
-            <div className="resume-card glow-effect">
+            <div className="resume-card">
               <h3 className="text-lg font-semibold mb-4">Resumen</h3>
               <div className="space-y-1">
                 <div className="resume-item">
@@ -374,7 +360,7 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="dashboard-chart-card glow-effect text-center py-12">
+            <div className="dashboard-chart-card text-center py-12">
               <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">No hay eventos próximos</p>
             </div>

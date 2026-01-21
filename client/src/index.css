@@ -688,3 +688,271 @@
   .scroll-container::-webkit-scrollbar-thumb:hover {
     background: oklch(0.40 0 0);
   }
+
+  /* Reminder Card */
+  .reminder-card {
+    background: oklch(0.18 0 0);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .reminder-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px oklch(0 0 0 / 0.15);
+  }
+
+  /* Resume Card */
+  .resume-card {
+    background: oklch(0.18 0 0);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 20px;
+    padding: 1.5rem;
+  }
+
+  .resume-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid oklch(1 0 0 / 0.06);
+  }
+
+  .resume-item:last-child {
+    border-bottom: none;
+  }
+
+  /* Crypto Card */
+  .crypto-card {
+    background: oklch(0.18 0 0);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 20px;
+    padding: 1.5rem;
+    min-width: 280px;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .crypto-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px oklch(0 0 0 / 0.2);
+    border-color: oklch(1 0 0 / 0.12);
+  }
+
+  .crypto-card .delete-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .crypto-card:hover .delete-btn {
+    opacity: 1;
+  }
+
+  /* Scroll Container */
+  .scroll-container {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Glow Effect */
+  .glow-effect {
+    box-shadow: 0 0 20px oklch(0.68 0.20 35 / 0.15);
+  }
+
+  /* Card Event (para EventCard component) */
+  .card-event {
+    background: linear-gradient(135deg, oklch(0.18 0 0 / 0.9) 0%, oklch(0.18 0 0 / 0.7) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .card-event::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 1rem 0 0 1rem;
+  }
+
+  .card-event.category-green::before {
+    background: oklch(0.65 0.18 145); /* Verde */
+  }
+
+  .card-event.category-blue::before {
+    background: oklch(0.70 0.18 250); /* Azul */
+  }
+
+  .card-event.category-purple::before {
+    background: oklch(0.65 0.18 290); /* Morado */
+  }
+
+  .card-event:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px oklch(0 0 0 / 0.2);
+  }
+
+  /* Progress Bar */
+  .progress-bar-orange {
+    height: 8px;
+    background: linear-gradient(90deg, #FF9500 0%, #FFA500 100%);
+    border-radius: 999px;
+    transition: width 0.5s ease;
+  }
+
+  /* Savings Goal Card */
+  .savings-goal-card {
+    background: oklch(0.18 0 0);
+    border: 1px solid oklch(1 0 0 / 0.08);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px oklch(0 0 0 / 0.1);
+  }
+
+  .savings-goal-card .progress-container {
+    background: oklch(0.12 0 0);
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+
+  .savings-goal-card .amount-missing {
+    background: oklch(0.12 0 0);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-top: 1rem;
+  }
+
+/* ========================================
+   RECORDATORIOS / REMINDERS STYLES
+   ======================================== */
+
+/* Summary Cards con fondo de color completo */
+.reminder-summary-card {
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px oklch(0 0 0 / 0.3);
+}
+
+.reminder-summary-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px oklch(0 0 0 / 0.4);
+}
+
+.reminder-summary-overdue {
+  background: linear-gradient(135deg, #4A0E0E 0%, #7A1515 100%);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.reminder-summary-urgent {
+  background: linear-gradient(135deg, #4A3E0E 0%, #7A6515 100%);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.reminder-summary-upcoming {
+  background: linear-gradient(135deg, #0E1F4A 0%, #15357A 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Reminder List Item */
+.reminder-list-item {
+  background: oklch(0.18 0 0);
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+  border: 1px solid oklch(1 0 0 / 0.08);
+}
+
+.reminder-list-item:hover {
+  transform: translateY(-2px);
+  border-color: oklch(0.68 0.20 35 / 0.3);
+  box-shadow: 0 4px 12px oklch(0 0 0 / 0.15);
+}
+
+/* Reminder Badge */
+.reminder-badge {
+  padding: 0.375rem 0.875rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.reminder-badge.proximo {
+  background: oklch(0.70 0.18 250 / 0.15);
+  color: oklch(0.75 0.18 250);
+  border-color: oklch(0.70 0.18 250 / 0.3);
+}
+
+.reminder-badge.urgente {
+  background: oklch(0.75 0.18 80 / 0.15);
+  color: oklch(0.80 0.18 80);
+  border-color: oklch(0.75 0.18 80 / 0.3);
+}
+
+.reminder-badge.vencido {
+  background: oklch(0.60 0.24 25 / 0.15);
+  color: oklch(0.70 0.24 25);
+  border-color: oklch(0.60 0.24 25 / 0.3);
+}
+
+/* Tab Filter Buttons */
+.reminder-tab {
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: oklch(0.18 0 0);
+  border: 1px solid oklch(1 0 0 / 0.08);
+  color: oklch(0.65 0 0);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.reminder-tab:hover {
+  border-color: oklch(0.68 0.20 35 / 0.3);
+  color: oklch(0.85 0 0);
+}
+
+.reminder-tab.active {
+  background: oklch(0.68 0.20 35);
+  color: oklch(0.15 0 0);
+  border-color: oklch(0.68 0.20 35);
+}
+
+/* Reminder Icon Circle */
+.reminder-icon-circle {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.reminder-icon-circle.overdue {
+  background: oklch(0.60 0.24 25 / 0.15);
+}
+
+.reminder-icon-circle.urgent {
+  background: oklch(0.75 0.18 80 / 0.15);
+}
+
+.reminder-icon-circle.upcoming {
+  background: oklch(0.70 0.18 250 / 0.15);
+}

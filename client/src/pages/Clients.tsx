@@ -1,10 +1,9 @@
 /**
  * Clients Page - Gestión de Clientes (CRM)
- * Design Philosophy: Apple Minimalism - Collapsible cards for space efficiency
+ * Design Philosophy: Modern Fintech - Clean table list with status badges
  */
 
 import DashboardLayout from '@/components/DashboardLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,8 +31,8 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { trpc } from '@/lib/trpc';
-import { Users, Plus, Search, MoreVertical, Pencil, Trash2, Mail, Phone, Calendar, DollarSign, Bell, Building2, ChevronDown, ChevronUp } from 'lucide-react';
-import { format, parseISO, differenceInDays, addMonths, addDays } from 'date-fns';
+import { Plus, MoreVertical, Pencil, Trash2, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -99,10 +98,10 @@ export default function Clients() {
     },
   });
   
-  const [searchQuery, setSearchQuery] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
-  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [formData, setFormData] = useState<any>({
     name: '',
     email: '',
@@ -121,25 +120,9 @@ export default function Clients() {
     const params = new URLSearchParams(search);
     if (params.get('new') === 'true') {
       setIsDialogOpen(true);
-      // Remove the parameter from URL
       setLocation('/clients', { replace: true });
     }
   }, [search, setLocation]);
-
-  const filteredClients = clients?.filter(client =>
-    client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const toggleCard = (client_id: number) => {
-    const newExpanded = new Set(expandedCards);
-    if (newExpanded.has(client_id)) {
-      newExpanded.delete(client_id);
-    } else {
-      newExpanded.add(client_id);
-    }
-    setExpandedCards(newExpanded);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -198,18 +181,28 @@ export default function Clients() {
     }
   };
 
-  const getPaymentStatus = (next_payment_date: Date, reminder_days: number) => {
-    const daysUntil = differenceInDays(new Date(next_payment_date), new Date());
+  const getStatusBadge = (client: Client) => {
+    const daysUntil = differenceInDays(new Date(client.next_payment_date), new Date());
+    
+    if (client.status === 'inactive') {
+      return { label: 'Inactivo', color: 'bg-gray-500' };
+    }
     
     if (daysUntil < 0) {
-      return { color: 'bg-destructive/10 text-destructive border-destructive/30', label: t.clients.overdue, icon: '🔴' };
+      return { label: 'Vencido', color: 'bg-red-500' };
     } else if (daysUntil <= 3) {
-      return { color: 'bg-orange-500/10 text-orange-500 border-orange-500/30', label: `${daysUntil} ${t.common.days}`, icon: '🟠' };
-    } else if (daysUntil <= reminder_days) {
-      return { color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30', label: `${daysUntil} ${t.common.days}`, icon: '🟡' };
+      return { label: 'Urgente', color: 'bg-red-500' };
+    } else if (daysUntil <= 7) {
+      return { label: 'Próximo', color: 'bg-yellow-500' };
     }
-    return { color: 'bg-muted text-muted-foreground border-border', label: `${daysUntil} ${t.common.days}`, icon: '🟢' };
+    return { label: 'Activo', color: 'bg-green-500' };
   };
+
+  // Pagination
+  const totalPages = Math.ceil((clients?.length || 0) / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedClients = clients?.slice(startIndex, endIndex) || [];
 
   if (isLoading) {
     return (
@@ -218,7 +211,7 @@ export default function Clients() {
           <div className="flex items-center justify-center py-16">
             <div className="text-center">
               <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-muted-foreground">{t.clients.loadingClients}</p>
+              <p className="text-gray-400">{t.clients.loadingClients}</p>
             </div>
           </div>
         </div>
@@ -232,9 +225,9 @@ export default function Clients() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{t.clients.title}</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
-              {t.clients.subtitle}
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Clientes</h1>
+            <p className="text-sm sm:text-base text-gray-400">
+              Gestiona tu cartera de clientes y pagos recurrentes
             </p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
@@ -256,92 +249,92 @@ export default function Clients() {
             }
           }}>
             <DialogTrigger asChild>
-              <Button className="bg-primary text-primary-foreground hover:opacity-90">
+              <Button className="bg-[#FF9500] text-black hover:bg-[#FFA500] font-semibold">
                 <Plus className="w-4 h-4 mr-2" />
                 {t.clients.newClient}
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto w-[95vw] lg:w-[90vw]">
+            <DialogContent className="bg-[#1C1C1C] border-white/10 max-w-6xl max-h-[90vh] overflow-y-auto w-[95vw] lg:w-[90vw]">
               <DialogHeader className="pb-4">
-                <DialogTitle className="text-foreground text-xl sm:text-2xl">
+                <DialogTitle className="text-white text-xl sm:text-2xl">
                   {editingClient ? t.clients.editClient : t.clients.addClient}
                 </DialogTitle>
-                <DialogDescription className="text-muted-foreground text-sm">
+                <DialogDescription className="text-gray-400 text-sm">
                   {editingClient ? t.clients.updateClientInfo : t.clients.completeClientInfo}
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-foreground font-semibold text-sm">{t.clients.name} <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="name" className="text-white font-semibold text-sm">{t.clients.name} <span className="text-red-500">*</span></Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="bg-background border-border text-foreground h-10"
+                      className="bg-[#2A2A2A] border-white/10 text-white h-10"
                       required
                     />
-                    <p className="text-xs text-muted-foreground">{t.clients.nameHelper}</p>
+                    <p className="text-xs text-gray-400">{t.clients.nameHelper}</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-foreground font-semibold">{t.clients.email} <span className="text-destructive">*</span></Label>
+                    <Label htmlFor="email" className="text-white font-semibold">{t.clients.email} <span className="text-red-500">*</span></Label>
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="bg-background border-border text-foreground h-11"
+                      className="bg-[#2A2A2A] border-white/10 text-white h-11"
                       required
                     />
-                    <p className="text-xs text-muted-foreground">{t.clients.emailHelper}</p>
+                    <p className="text-xs text-gray-400">{t.clients.emailHelper}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-foreground font-semibold">{t.clients.phone}</Label>
+                    <Label htmlFor="phone" className="text-white font-semibold">{t.clients.phone}</Label>
                     <Input
                       id="phone"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="bg-background border-border text-foreground h-11"
+                      className="bg-[#2A2A2A] border-white/10 text-white h-11"
                     />
-                    <p className="text-xs text-muted-foreground">{t.clients.phoneHelper}</p>
+                    <p className="text-xs text-gray-400">{t.clients.phoneHelper}</p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="company" className="text-foreground font-semibold">{t.clients.company}</Label>
+                    <Label htmlFor="company" className="text-white font-semibold">{t.clients.company}</Label>
                     <Input
                       id="company"
                       value={formData.company}
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      className="bg-background border-border text-foreground h-11"
+                      className="bg-[#2A2A2A] border-white/10 text-white h-11"
                     />
-                    <p className="text-xs text-muted-foreground">{t.clients.companyHelper}</p>
+                    <p className="text-xs text-gray-400">{t.clients.companyHelper}</p>
                   </div>
                 </div>
 
                 {/* Billing Section */}
-                <div className="pt-4 border-t-2 border-border space-y-4">
+                <div className="pt-4 border-t-2 border-white/10 space-y-4">
                   <div>
-                    <h3 className="text-foreground font-semibold text-lg mb-1">{t.clients.billingInformation}</h3>
-                    <p className="text-sm text-muted-foreground">{t.clients.billingInformationSubtitle}</p>
+                    <h3 className="text-white font-semibold text-lg mb-1">{t.clients.billingInformation}</h3>
+                    <p className="text-sm text-gray-400">{t.clients.billingInformationSubtitle}</p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="next_payment_date" className="text-foreground font-semibold">{t.clients.next_payment_date} <span className="text-destructive">*</span></Label>
+                      <Label htmlFor="next_payment_date" className="text-white font-semibold">{t.clients.next_payment_date} <span className="text-red-500">*</span></Label>
                       <Input
                         id="next_payment_date"
                         type="date"
                         value={formData.next_payment_date}
                         onChange={(e) => setFormData({ ...formData, next_payment_date: e.target.value })}
-                        className="bg-background border-border text-foreground h-11"
+                        className="bg-[#2A2A2A] border-white/10 text-white h-11"
                         required
                       />
-                      <p className="text-xs text-muted-foreground">{t.clients.nextPaymentDateHelper}</p>
+                      <p className="text-xs text-gray-400">{t.clients.nextPaymentDateHelper}</p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="reminder_days" className="text-foreground font-semibold">{t.clients.daysInAdvanceLabel}</Label>
+                      <Label htmlFor="reminder_days" className="text-white font-semibold">{t.clients.daysInAdvanceLabel}</Label>
                       <Input
                         id="reminder_days"
                         type="number"
@@ -349,102 +342,96 @@ export default function Clients() {
                         max="30"
                         value={formData.reminder_days}
                         onChange={(e) => setFormData({ ...formData, reminder_days: parseInt(e.target.value) || 7 })}
-                        className="bg-background border-border text-foreground h-11"
+                        className="bg-[#2A2A2A] border-white/10 text-white h-11"
                       />
-                      <p className="text-xs text-muted-foreground">{t.clients.daysInAdvanceHelper}</p>
+                      <p className="text-xs text-gray-400">{t.clients.daysInAdvanceHelper}</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="billing_cycle" className="text-foreground font-semibold">{t.clients.billing_cycle}</Label>
+                      <Label htmlFor="billing_cycle" className="text-white font-semibold">{t.clients.billing_cycle}</Label>
                       <Select
                         value={formData.billing_cycle}
                         onValueChange={(value: any) => setFormData({ ...formData, billing_cycle: value })}
                       >
-                        <SelectTrigger className="bg-background border-border text-foreground h-11">
+                        <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
                           <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="bg-popover border-border">
+                        <SelectContent className="bg-[#1C1C1C] border-white/10">
                           <SelectItem value="monthly">{t.clients.monthly}</SelectItem>
                           <SelectItem value="quarterly">{t.clients.quarterly}</SelectItem>
                           <SelectItem value="yearly">{t.clients.yearly}</SelectItem>
                           <SelectItem value="custom">{t.clients.custom}</SelectItem>
                         </SelectContent>
                       </Select>
-                      <p className="text-xs text-muted-foreground">{t.clients.billingCycleHelper}</p>
+                      <p className="text-xs text-gray-400">{t.clients.billingCycleHelper}</p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="amount" className="text-foreground font-semibold">{t.clients.amount} <span className="text-destructive">*</span></Label>
+                      <Label htmlFor="amount" className="text-white font-semibold">{t.clients.amount} <span className="text-red-500">*</span></Label>
                       <Input
                         id="amount"
                         type="number"
                         step="0.01"
                         value={formData.amount}
                         onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                        className="bg-background border-border text-foreground font-mono h-11"
+                        className="bg-[#2A2A2A] border-white/10 text-white font-mono h-11"
                         required
                       />
-                      <p className="text-xs text-muted-foreground">{t.clients.billingAmount}</p>
+                      <p className="text-xs text-gray-400">{t.clients.billingAmount}</p>
                     </div>
                   </div>
                 </div>
 
                 {formData.billing_cycle === 'custom' && (
                   <div className="space-y-2">
-                    <Label htmlFor="custom_cycle_days" className="text-foreground font-semibold">{t.clients.customCycleDays}</Label>
+                    <Label htmlFor="custom_cycle_days" className="text-white font-semibold">{t.clients.customCycleDays}</Label>
                     <Input
                       id="custom_cycle_days"
                       type="number"
                       min="1"
                       value={formData.custom_cycle_days}
                       onChange={(e) => setFormData({ ...formData, custom_cycle_days: parseInt(e.target.value) })}
-                      className="bg-background border-border text-foreground h-11"
+                      className="bg-[#2A2A2A] border-white/10 text-white h-11"
                     />
-                    <p className="text-xs text-muted-foreground">{t.clients.reminder_days}</p>
+                    <p className="text-xs text-gray-400">{t.clients.customCycleDaysHelper}</p>
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="status" className="text-foreground font-semibold">{t.clients.status}</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value: any) => setFormData({ ...formData, status: value })}
-                  >
-                    <SelectTrigger className="bg-background border-border text-foreground h-11">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover border-border">
-                      <SelectItem value="active">{t.clients.active}</SelectItem>
-                      <SelectItem value="inactive">{t.clients.inactive}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">{t.clients.statusHelper}</p>
+                {/* Status Section */}
+                <div className="pt-4 border-t-2 border-white/10 space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="status" className="text-white font-semibold">{t.clients.status}</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value: any) => setFormData({ ...formData, status: value })}
+                    >
+                      <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1C1C1C] border-white/10">
+                        <SelectItem value="active">{t.clients.active}</SelectItem>
+                        <SelectItem value="inactive">{t.clients.inactive}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="notes" className="text-foreground font-semibold">{t.clients.notes}</Label>
-                  <Input
-                    id="notes"
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="bg-background border-border text-foreground h-10"
-                    placeholder={t.clients.notesPlaceholder}
-                  />
-                  <p className="text-xs text-muted-foreground">{t.clients.notesHelper}</p>
-                </div>
-
-                <div className="flex justify-end gap-3 pt-6 border-t border-border">
+                <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setIsDialogOpen(false)}
-                    className="border-border text-foreground hover:bg-accent"
+                    className="border-white/10 text-white hover:bg-white/5"
                   >
                     {t.common.cancel}
                   </Button>
-                  <Button type="submit" className="bg-primary text-primary-foreground hover:opacity-90">
-                    {editingClient ? t.clients.updateButton : t.clients.addButton} {t.clients.clientLabel}
+                  <Button 
+                    type="submit" 
+                    className="bg-[#FF9500] text-black hover:bg-[#FFA500] font-semibold"
+                    disabled={createClient.isPending || updateClient.isPending}
+                  >
+                    {editingClient ? t.common.update : t.common.create}
                   </Button>
                 </div>
               </form>
@@ -452,139 +439,136 @@ export default function Clients() {
           </Dialog>
         </div>
 
-        {/* Search */}
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder={t.clients.searchPlaceholder}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-card border-border text-foreground h-11"
-            />
-          </div>
-        </div>
-
-        {/* Clients List */}
-        <div className="mt-6">
-        {!filteredClients || filteredClients.length === 0 ? (
-          <Card className="bg-card border-border">
-            <CardContent className="flex flex-col items-center justify-center py-16">
-              <div className="w-32 h-32 rounded-full bg-accent/20 flex items-center justify-center mb-6">
-                <Users className="w-16 h-16 text-muted-foreground" strokeWidth={1} />
-              </div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
-                {searchQuery ? t.clients.noClientsFound : t.clients.noClients}
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                {searchQuery ? t.clients.tryAnotherSearch : t.clients.noClientsSubtitle}
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {filteredClients.map((client) => {
-              const paymentStatus = getPaymentStatus(client.next_payment_date, client.reminder_days);
-              const isExpanded = expandedCards.has(client.id);
-
-              return (
-                <Card key={client.id} className="bg-card border-border hover:border-accent transition-colors">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-foreground text-lg truncate">{client.name}</CardTitle>
-                        {client.company && (
-                          <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1 truncate">
-                            <Building2 className="w-3 h-3 flex-shrink-0" />
-                            {client.company}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1 flex-shrink-0">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => toggleCard(client.id)}
-                          className="text-muted-foreground hover:text-foreground h-8 w-8"
-                        >
-                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                        </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground h-8 w-8">
-                              <MoreVertical className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent className="bg-popover border-border" align="end">
-                            <DropdownMenuItem 
-                              onClick={() => handleEdit(client)}
-                              className="text-foreground hover:bg-accent cursor-pointer"
-                            >
-                              <Pencil className="w-4 h-4 mr-2" />
-                              {t.clients.editAction}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator className="bg-border" />
-                            <DropdownMenuItem 
-                              onClick={() => handleDelete(client.id)}
-                              className="text-destructive hover:bg-destructive/10 cursor-pointer"
-                            >
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              {t.clients.deleteAction}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </div>
-                  </CardHeader>
-
-                  {isExpanded && (
-                    <CardContent className="space-y-3 pt-0">
-                      <div className="space-y-2 text-sm">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Mail className="w-4 h-4 flex-shrink-0" />
-                          <span className="truncate">{client.email}</span>
-                        </div>
-                        {client.phone && (
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Phone className="w-4 h-4 flex-shrink-0" />
-                            <span>{client.phone}</span>
+        {/* Clients Table */}
+        <div className="bg-[#1C1C1C] rounded-2xl border border-white/5 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th className="text-left p-4 text-sm font-semibold text-gray-400">Nombre Cliente</th>
+                  <th className="text-left p-4 text-sm font-semibold text-gray-400">Empresa</th>
+                  <th className="text-left p-4 text-sm font-semibold text-gray-400">Fecha de Pago</th>
+                  <th className="text-left p-4 text-sm font-semibold text-gray-400">Contacto</th>
+                  <th className="text-left p-4 text-sm font-semibold text-gray-400">Monto</th>
+                  <th className="text-left p-4 text-sm font-semibold text-gray-400">Estado</th>
+                  <th className="text-left p-4 text-sm font-semibold text-gray-400"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedClients.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="text-center py-12 text-gray-400">
+                      No hay clientes registrados
+                    </td>
+                  </tr>
+                ) : (
+                  paginatedClients.map((client) => {
+                    const statusBadge = getStatusBadge(client);
+                    return (
+                      <tr key={client.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                        <td className="p-4">
+                          <div className="font-semibold text-white">{client.name}</div>
+                        </td>
+                        <td className="p-4">
+                          <div className="text-gray-400">{client.company || '-'}</div>
+                        </td>
+                        <td className="p-4">
+                          <div className="text-white">
+                            {format(new Date(client.next_payment_date), 'dd/MM/yyyy', { locale: es })}
                           </div>
-                        )}
-                      </div>
-
-                      <div className="pt-3 border-t border-border">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-muted-foreground">{t.clients.nextPayment}</span>
-                          <span className="text-sm font-semibold text-foreground">
-                            {format(new Date(client.next_payment_date), 'dd/MM/yyyy')}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm text-muted-foreground">{t.common.amount}</span>
-                          <span className="text-lg font-bold font-mono text-foreground">
-                            ${parseFloat(client.amount).toLocaleString('es-ES')}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Bell className="w-4 h-4 text-muted-foreground" />
-                          <Badge className={`${paymentStatus.color} border text-xs`}>
-                            {paymentStatus.icon} {paymentStatus.label}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      <div className="pt-3 border-t border-border">
-                        <Badge variant={client.status === 'active' ? 'default' : 'secondary'} className="text-xs">
-                          {client.status === 'active' ? t.clients.active : t.clients.inactive}
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  )}
-                </Card>
-              );
-            })}
+                          <div className="text-sm text-gray-400">
+                            {format(new Date(client.next_payment_date), 'hh:mm a')}
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="text-white">{client.phone || '-'}</div>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2 text-gray-400">
+                            <MapPin className="w-4 h-4" />
+                            <span className="font-mono text-white">${parseFloat(client.amount).toLocaleString('es-ES')}</span>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${statusBadge.color}`}></div>
+                            <span className="text-white text-sm">{statusBadge.label}</span>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white hover:bg-white/5">
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="bg-[#1C1C1C] border-white/10" align="end">
+                              <DropdownMenuItem 
+                                onClick={() => handleEdit(client)}
+                                className="text-white hover:bg-white/5 cursor-pointer"
+                              >
+                                <Pencil className="w-4 h-4 mr-2" />
+                                {t.clients.editAction}
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator className="bg-white/10" />
+                              <DropdownMenuItem 
+                                onClick={() => handleDelete(client.id)}
+                                className="text-red-400 hover:bg-red-500/10 cursor-pointer"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                {t.clients.deleteAction}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between p-4 border-t border-white/10">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="text-white hover:bg-white/5 disabled:opacity-30"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              
+              <div className="flex items-center gap-2">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 rounded-full text-sm font-semibold transition-colors ${
+                      currentPage === page
+                        ? 'bg-[#FF9500] text-black'
+                        : 'text-white hover:bg-white/5'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="text-white hover:bg-white/5 disabled:opacity-30 bg-[#FF9500] text-black"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>
