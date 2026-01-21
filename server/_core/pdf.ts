@@ -27,7 +27,8 @@ interface InvoiceData extends Invoice {
 export async function generateInvoicePDF(invoiceData: InvoiceData): Promise<string> {
   try {
     // Dynamic import of jsPDF
-    const { default: jsPDF } = await import('jspdf');
+    const jsPDFModule = await import('jspdf');
+    const jsPDF = jsPDFModule.default || jsPDFModule;
     
     // Create new PDF document
     const doc = new jsPDF();
