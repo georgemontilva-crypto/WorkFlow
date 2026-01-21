@@ -151,8 +151,10 @@ export default function Home() {
   });
 
   // Crypto functions
+  const MAX_CRYPTOS = 5;
+  
   const addCrypto = (symbol: string) => {
-    if (!selectedCryptos.includes(symbol)) {
+    if (!selectedCryptos.includes(symbol) && selectedCryptos.length < MAX_CRYPTOS) {
       setSelectedCryptos([...selectedCryptos, symbol]);
     }
     setIsAddDialogOpen(false);
@@ -164,6 +166,7 @@ export default function Home() {
 
   const displayedCryptos = AVAILABLE_CRYPTOS.filter(c => selectedCryptos.includes(c.symbol));
   const availableCryptos = AVAILABLE_CRYPTOS.filter(c => !selectedCryptos.includes(c.symbol));
+  const canAddMoreCryptos = selectedCryptos.length < MAX_CRYPTOS;
 
   return (
     <DashboardLayout>
@@ -172,7 +175,7 @@ export default function Home() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground mt-1">Gestión financiera integral y eventos</p>
+            <p className="text-sm text-muted-foreground mt-1">Gestión financiera integral y eventos</p>
           </div>
           <Button
             variant="outline"
@@ -210,7 +213,7 @@ export default function Home() {
                 <DialogHeader>
                   <DialogTitle>Añadir Criptomoneda</DialogTitle>
                   <DialogDescription>
-                    Selecciona una criptomoneda para añadir al dashboard
+                    Selecciona una criptomoneda para añadir al dashboard (máximo 5)
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-3 py-4">
@@ -241,7 +244,9 @@ export default function Home() {
                     ))
                   ) : (
                     <p className="text-center text-muted-foreground py-8">
-                      Todas las criptomonedas ya están añadidas
+                      {selectedCryptos.length >= MAX_CRYPTOS 
+                        ? 'Has alcanzado el límite de 5 criptomonedas'
+                        : 'Todas las criptomonedas ya están añadidas'}
                     </p>
                   )}
                 </div>

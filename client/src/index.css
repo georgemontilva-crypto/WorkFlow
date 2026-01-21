@@ -361,26 +361,15 @@
   @apply opacity-100;
 }
 
-/* Scroll Container - Horizontal layout for crypto cards */
+/* Scroll Container - Grid adaptativo para crypto cards (máximo 5) */
 .scroll-container {
-  @apply flex gap-4 overflow-x-auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 149, 0, 0.3) transparent;
+  @apply grid gap-4;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
-.scroll-container::-webkit-scrollbar {
-  height: 6px;
-}
-
-.scroll-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.scroll-container::-webkit-scrollbar-thumb {
-  background: rgba(255, 149, 0, 0.3);
-  border-radius: 3px;
-}
-
-.scroll-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 149, 0, 0.5);
+/* Limitar a máximo 5 columnas */
+@media (min-width: 1920px) {
+  .scroll-container {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
