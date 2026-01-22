@@ -445,8 +445,8 @@ export default function Home() {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="flex-1 flex flex-col overflow-hidden">
-                <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+              <CardContent>
+                <div className="max-h-[400px] overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                   {/* Recordatorios */}
                   {reminders && reminders.length > 0 && reminders
                     .sort((a, b) => new Date(a.reminder_date).getTime() - new Date(b.reminder_date).getTime())
