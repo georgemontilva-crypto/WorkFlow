@@ -784,12 +784,10 @@ export const appRouter = router({
             
             await db.createTransaction({
               type: 'income',
-              category: 'Pago de Factura',
+              category: 'freelance', // Using valid enum value - represents invoice payment
               amount: transactionAmount.toFixed(2),
               description: `Pago de factura ${invoice.invoice_number} - ${clientName}`,
               date: new Date(),
-              client_id: invoice.client_id,
-              invoiceId: invoice.id,
               user_id: ctx.user.id,
               created_at: new Date(),
             });
@@ -1189,12 +1187,10 @@ export const appRouter = router({
             
             await db.createTransaction({
               type: 'income',
-              category: 'Pago de Factura (Stripe)',
+              category: 'freelance', // Using valid enum value - represents invoice payment
               amount: input.amount.toFixed(2),
               description: `Pago Stripe de factura ${invoice.invoice_number} - ${clientName}`,
               date: new Date(),
-              client_id: invoice.client_id,
-              invoiceId: invoice.id,
               user_id: invoice.user_id,
               created_at: new Date(),
             });
