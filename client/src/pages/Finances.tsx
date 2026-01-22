@@ -629,29 +629,34 @@ export default function Finances() {
                   return (
                     <div
                       key={transaction.id}
-                      className="flex items-center justify-between p-4 bg-background rounded-lg border border-border"
+                      className="flex items-start gap-3 p-3 sm:p-4 bg-background rounded-lg border border-border"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className={`p-2 rounded-full ${
-                          transaction.type === 'income' 
-                            ? 'bg-green-500/10' 
-                            : 'bg-red-500/10'
-                        }`}>
-                          {transaction.type === 'income' ? (
-                            <TrendingUp className="w-5 h-5 text-green-500" />
-                          ) : (
-                            <TrendingDown className="w-5 h-5 text-red-500" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">{transaction.description}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {transaction.category} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
-                          </p>
-                        </div>
+                      {/* Icono */}
+                      <div className={`p-2 rounded-full flex-shrink-0 ${
+                        transaction.type === 'income' 
+                          ? 'bg-green-500/10' 
+                          : 'bg-red-500/10'
+                      }`}>
+                        {transaction.type === 'income' ? (
+                          <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+                        ) : (
+                          <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
+                        )}
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className={`text-lg font-bold font-mono ${
+
+                      {/* Contenido principal */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-foreground text-sm sm:text-base break-words">
+                          {transaction.description}
+                        </p>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                          {transaction.category} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
+                        </p>
+                      </div>
+
+                      {/* Monto y acciones */}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className={`text-base sm:text-lg font-bold font-mono ${
                           transaction.type === 'income' 
                             ? 'text-green-500' 
                             : 'text-red-500'
