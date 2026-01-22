@@ -446,7 +446,7 @@ export default function Home() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="h-[441px] overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+                <div className="h-[320px] overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                   {/* Recordatorios */}
                   {reminders && reminders.length > 0 && reminders
                     .sort((a, b) => new Date(a.reminder_date).getTime() - new Date(b.reminder_date).getTime())
