@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { client } from "@/lib/trpc";
+import { trpc } from "@/lib/trpc";
 import { Bell, Trash2, CheckCircle2, AlertCircle, Info } from "lucide-react";
 
 export default function AlertTesting() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const { data: alerts, refetch } = client.alerts.list.useQuery({});
-  const { data: unreadCount } = client.alerts.unreadCount.useQuery();
+  const { data: alerts, refetch } = trpc.alerts.list.useQuery({});
+  const { data: unreadCount } = trpc.alerts.unreadCount.useQuery();
 
-  const generateTestAlerts = client.alerts.generateTestAlerts.useMutation({
+  const generateTestAlerts = trpc.alerts.generateTestAlerts.useMutation({
     onSuccess: (data) => {
       setMessage(`✅ ${data.message}`);
       refetch();
@@ -23,7 +23,7 @@ export default function AlertTesting() {
     },
   });
 
-  const markAllAsRead = client.alerts.markAllAsRead.useMutation({
+  const markAllAsRead = trpc.alerts.markAllAsRead.useMutation({
     onSuccess: () => {
       setMessage("✅ Todas las alertas marcadas como leídas");
       refetch();
@@ -31,7 +31,7 @@ export default function AlertTesting() {
     },
   });
 
-  const deleteAlert = client.alerts.delete.useMutation({
+  const deleteAlert = trpc.alerts.delete.useMutation({
     onSuccess: () => {
       refetch();
     },
