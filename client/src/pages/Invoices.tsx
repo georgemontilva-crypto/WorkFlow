@@ -331,20 +331,28 @@ export default function Invoices() {
   };
 
   const handleStatusChange = async (invoice: Invoice, status: 'pending' | 'paid' | 'overdue' | 'cancelled') => {
-    // Si el cambio es a "paid", actualizar con el monto total pagado
-    // El backend se encargará de crear la transacción automáticamente
-    if (status === 'paid' && (invoice.status === 'draft' || invoice.status === 'sent' || invoice.status === 'payment_sent')) {
-      const totalAmount = typeof invoice.total === 'string' ? invoice.total : invoice.total.toString();
-      await updateInvoice.mutateAsync({ 
-        id: invoice.id, 
-        status: 'paid',
-        paid_amount: totalAmount
-      });
-      toast.success('Factura pagada e ingreso registrado en Finanzas');
-    } else {
-      // Cambiar estado directamente para otros estados
-      await updateInvoice.mutateAsync({ id: invoice.id, status });
-      toast.success('Estado actualizado');
+    try {
+      // Si el cambio es a "paid", actualizar con el monto total pagado
+      // El backend se encargará de crear la transacción automáticamente
+      if (status === 'paid' && (invoice.status === 'draft' || invoice.status === 'sent' || invoice.status === 'payment_sent')) {
+        const totalAmount = typeof invoice.total === 'string' ? invoice.total : invoice.total.toString();
+        await updateInvoice.mutateAsync({ 
+          id: invoice.id, 
+          status: 'paid',
+          paid_amount: totalAmount
+        });
+        toast.success('Factura pagada e ingreso registrado en Finanzas');
+      } else if (status === 'pending') {
+        // 'pending' no existe en el enum del backend, mapeamos a 'sent'
+        await updateInvoice.mutateAsync({ id: invoice.id, status: 'sent' });
+        toast.success('Factura marcada como pendiente');
+      } else {
+        // Cambiar estado directamente para otros estados
+        await updateInvoice.mutateAsync({ id: invoice.id, status });
+        toast.success('Estado actualizado');
+      }
+    } catch (error) {
+      toast.error('Error al actualizar el estado de la factura');
     }
   };
 
@@ -390,10 +398,37 @@ export default function Invoices() {
   };
 
   const confirmPartialPayment = async () => {
-    // Funcionalidad de pagos parciales deshabilitada temporalmente
-    // El backend actual no soporta paid_amount
-    toast.error('Funcionalidad no disponible');
-    setShowPartialPaymentDialog(false);
+    if (!selectedInvoice || partialPaymentAmount <= 0) {
+      toast.error('Ingresa un monto válido');
+      return;
+    }
+    
+    try {
+      const currentPaid = parseFloat(selectedInvoice.paid_amount || '0');
+      const newPaidAmount = (currentPaid + partialPaymentAmount).toFixed(2);
+      const total = parseFloat(selectedInvoice.total);
+      
+      // Determinar el nuevo status
+      const newStatus = parseFloat(newPaidAmount) >= total ? 'paid' : selectedInvoice.status;
+      
+      await updateInvoice.mutateAsync({
+        id: selectedInvoice.id,
+        paid_amount: newPaidAmount,
+        status: newStatus === 'paid' ? 'paid' : undefined
+      });
+      
+      if (parseFloat(newPaidAmount) >= total) {
+        toast.success('Pago completo registrado - Factura pagada');
+      } else {
+        toast.success(`Pago parcial de $${partialPaymentAmount.toFixed(2)} registrado`);
+      }
+      
+      setShowPartialPaymentDialog(false);
+      setPartialPaymentAmount(0);
+      setSelectedInvoice(null);
+    } catch (error) {
+      toast.error('Error al registrar el pago parcial');
+    }
   };
 
   const generatePDF = async (invoiceId: number) => {
@@ -1224,8 +1259,9 @@ export default function Invoices() {
               </AlertDialogTitle>
               <AlertDialogDescription className="text-muted-foreground">
                 {t.invoices.invoice_number} {selectedInvoice?.invoice_number}<br />
-                Total: ${parseFloat(selectedInvoice?.total || '0').toFixed(2)}<br />
-                <span className="text-xs text-orange-400">Funcionalidad de pagos parciales temporalmente deshabilitada</span>
+                Total: ${parseFloat(selectedInvoice?.total || '0').toLocaleString('es-ES', { minimumFractionDigits: 2 })}<br />
+                Pagado: ${parseFloat(selectedInvoice?.paid_amount || '0').toLocaleString('es-ES', { minimumFractionDigits: 2 })}<br />
+                <span className="text-sm text-orange-400 font-medium">Saldo pendiente: ${(parseFloat(selectedInvoice?.total || '0') - parseFloat(selectedInvoice?.paid_amount || '0')).toLocaleString('es-ES', { minimumFractionDigits: 2 })}</span>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <div className="py-4">
