@@ -329,26 +329,16 @@ export default function Invoices() {
   };
 
   const handleStatusChange = async (invoice: Invoice, status: 'pending' | 'paid' | 'overdue' | 'cancelled') => {
-    // Si el cambio es a "paid", agregar automáticamente a finanzas
+    // Si el cambio es a "paid", actualizar con el monto total pagado
+    // El backend se encargará de crear la transacción automáticamente
     if (status === 'paid' && (invoice.status === 'draft' || invoice.status === 'sent' || invoice.status === 'payment_sent')) {
-      await updateInvoice.mutateAsync({ id: invoice.id, status: 'paid' });
-      
-      // Agregar ingreso automáticamente a finanzas
-      const client = clients?.find(c => c.id === invoice.client_id);
-      try {
-        const amount = typeof invoice.total === 'string' ? parseFloat(invoice.total) : invoice.total;
-        await createTransaction.mutateAsync({
-          type: 'income',
-          amount: amount.toString(),
-          category: 'Pago de Factura',
-          description: `Pago de factura ${invoice.invoice_number} - ${client?.name || 'Cliente'}`,
-          date: new Date().toISOString().split('T')[0],
-        });
-        toast.success('Factura pagada e ingreso registrado en Finanzas');
-      } catch (error: any) {
-        toast.success('Factura marcada como pagada');
-        console.error('Error al registrar ingreso:', error?.message || error);
-      }
+      const totalAmount = typeof invoice.total === 'string' ? invoice.total : invoice.total.toString();
+      await updateInvoice.mutateAsync({ 
+        id: invoice.id, 
+        status: 'paid',
+        paid_amount: totalAmount
+      });
+      toast.success('Factura pagada e ingreso registrado en Finanzas');
     } else {
       // Cambiar estado directamente para otros estados
       await updateInvoice.mutateAsync({ id: invoice.id, status });

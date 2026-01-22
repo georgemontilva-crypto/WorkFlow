@@ -728,6 +728,10 @@ export const appRouter = router({
         updateData.paid_amount = paid.toFixed(2);
         
         // Auto-update status based on payment
+        const previousPaid = parseFloat(invoice.paid_amount || "0");
+        const newPaymentAmount = paid - previousPaid;
+        const wasNotPaid = invoice.status !== 'paid';
+        
         if (paid >= total && total > 0) {
           updateData.status = "paid";
         } else if (paid > 0 && paid < total) {
@@ -746,6 +750,32 @@ export const appRouter = router({
         }
         
         await db.updateInvoice(id, ctx.user.id, updateData);
+        
+        // Create finance transaction when payment is received
+        if (newPaymentAmount > 0 && wasNotPaid) {
+          try {
+            // Get client name for description
+            const client = await db.getClientById(invoice.client_id, ctx.user.id);
+            const clientName = client?.name || 'Cliente';
+            
+            await db.createTransaction({
+              type: 'income',
+              category: 'Pago de Factura',
+              amount: newPaymentAmount.toFixed(2),
+              description: `Pago de factura ${invoice.invoice_number} - ${clientName}`,
+              date: new Date(),
+              client_id: invoice.client_id,
+              invoiceId: invoice.id,
+              user_id: ctx.user.id,
+              created_at: new Date(),
+            });
+            console.log(`[Invoice Update] Created finance transaction for invoice ${invoice.invoice_number}: $${newPaymentAmount.toFixed(2)}`);
+          } catch (transactionError) {
+            console.error('[Invoice Update] Error creating finance transaction:', transactionError);
+            // Don't throw - invoice was already updated successfully
+          }
+        }
+        
         return { success: true };
       }),
     
@@ -1127,6 +1157,27 @@ export const appRouter = router({
             payment_method: 'stripe',
             updated_at: new Date(),
           });
+          
+          // Create finance transaction for Stripe payment
+          try {
+            const client = await db.getClientById(invoice.client_id, invoice.user_id);
+            const clientName = client?.name || 'Cliente';
+            
+            await db.createTransaction({
+              type: 'income',
+              category: 'Pago de Factura (Stripe)',
+              amount: input.amount.toFixed(2),
+              description: `Pago Stripe de factura ${invoice.invoice_number} - ${clientName}`,
+              date: new Date(),
+              client_id: invoice.client_id,
+              invoiceId: invoice.id,
+              user_id: invoice.user_id,
+              created_at: new Date(),
+            });
+            console.log(`[Stripe Payment] Created finance transaction for invoice ${invoice.invoice_number}: $${input.amount.toFixed(2)}`);
+          } catch (transactionError) {
+            console.error('[Stripe Payment] Error creating finance transaction:', transactionError);
+          }
           
           return { success: true, message: 'Payment confirmed' };
         } catch (error: any) {
