@@ -548,7 +548,8 @@ export async function getTransactionsByUserId(user_id: number) {
   return await db
     .select()
     .from(transactions)
-    .where(eq(transactions.user_id, user_id));
+    .where(eq(transactions.user_id, user_id))
+    .orderBy(desc(transactions.created_at));
 }
 
 export async function getTransactionById(id: number, user_id: number) {

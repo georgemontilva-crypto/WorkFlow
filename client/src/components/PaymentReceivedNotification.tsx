@@ -7,7 +7,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { DollarSign, X, Eye, CheckCircle2 } from 'lucide-react';
+import { DollarSign, X, Eye, Clock } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import { useLocation } from 'wouter';
 
@@ -104,24 +104,24 @@ export function PaymentReceivedNotificationProvider({ children }: { children: Re
           >
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
-                {/* Icon */}
-                <div className="p-2.5 rounded-full bg-green-500/20 text-green-500 flex-shrink-0">
+                {/* Icon - Orange color */}
+                <div className="p-2.5 rounded-full bg-orange-500/20 text-orange-500 flex-shrink-0">
                   <DollarSign className="w-6 h-6" />
                 </div>
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <Clock className="w-4 h-4 text-orange-500" />
                     <h3 className="font-semibold text-foreground text-sm sm:text-base">
-                      Comprobante de Pago Recibido
+                      Pago por Confirmar
                     </h3>
                   </div>
                   <p className="text-sm text-muted-foreground mb-1">
                     <span className="font-medium text-foreground">{notification.clientName}</span> ha enviado un comprobante de pago
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Factura {notification.invoiceNumber} • <span className="font-mono font-semibold text-green-400">${parseFloat(notification.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}</span>
+                    Factura {notification.invoiceNumber} • <span className="font-mono font-semibold text-orange-400">${parseFloat(notification.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}</span>
                   </p>
 
                   {/* Actions */}
@@ -130,7 +130,7 @@ export function PaymentReceivedNotificationProvider({ children }: { children: Re
                       size="sm"
                       onClick={handleView}
                       variant="outline"
-                      className="border border-green-500 text-green-500 hover:bg-green-500/10 w-full sm:w-auto"
+                      className="border border-orange-500 text-orange-500 hover:bg-orange-500/10 w-full sm:w-auto"
                     >
                       <Eye className="w-3 h-3 mr-1" />
                       Ver Factura
