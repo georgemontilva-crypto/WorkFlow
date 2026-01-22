@@ -144,6 +144,10 @@ export const transactions = mysqlTable("transactions", {
   currency: varchar("currency", { length: 3 }).notNull().default("USD"),
   description: text("description").notNull(),
   date: timestamp("date").notNull(),
+  status: mysqlEnum("status", ["active", "voided"]).notNull().default("active"),
+  invoice_id: int("invoice_id"),
+  voided_at: timestamp("voided_at"),
+  void_reason: text("void_reason"),
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
 

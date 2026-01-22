@@ -474,6 +474,36 @@ export async function deleteTransaction(id: number, user_id: number) {
     .where(eq(transactions.id, id));
 }
 
+export async function voidTransaction(id: number, user_id: number, reason: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  // Verify ownership
+  const result = await db
+    .select()
+    .from(transactions)
+    .where(eq(transactions.id, id))
+    .limit(1);
+  
+  const transaction = result[0];
+  if (!transaction || transaction.user_id !== user_id) {
+    throw new Error("Transaction not found or access denied");
+  }
+
+  await db
+    .update(transactions)
+    .set({
+      status: 'voided',
+      voided_at: new Date(),
+      void_reason: reason,
+    })
+    .where(eq(transactions.id, id));
+  
+  return transaction;
+}
+
 export async function getSavingsGoalsByUserId(user_id: number) {
   const db = await getDb();
   if (!db) {

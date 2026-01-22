@@ -1307,6 +1307,47 @@ export const appRouter = router({
         await db.deleteTransaction(input.id, ctx.user.id);
         return { success: true };
       }),
+    
+    // Void a transaction - marks as voided and creates reversing entry
+    void: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        reason: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Get and void the original transaction
+        const transaction = await db.voidTransaction(input.id, ctx.user.id, input.reason || 'Anulación manual');
+        
+        if (!transaction) {
+          throw new Error('Transacción no encontrada');
+        }
+        
+        // Create reversing entry (opposite type)
+        const reversingType = transaction.type === 'income' ? 'expense' : 'income';
+        await db.createTransaction({
+          type: reversingType,
+          category: transaction.category,
+          amount: transaction.amount,
+          description: `[ANULACIÓN] ${transaction.description}`,
+          date: new Date(),
+          user_id: ctx.user.id,
+          created_at: new Date(),
+        });
+        
+        // If linked to an invoice, update invoice status to cancelled
+        if (transaction.invoice_id) {
+          try {
+            await db.updateInvoice(transaction.invoice_id, ctx.user.id, {
+              status: 'cancelled',
+              updated_at: new Date(),
+            });
+          } catch (e) {
+            console.log('Could not update invoice status:', e);
+          }
+        }
+        
+        return { success: true };
+      }),
 
   }),
 
