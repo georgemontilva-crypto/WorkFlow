@@ -39,13 +39,14 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { trpc } from '@/lib/trpc';
-import { Plus, TrendingUp, TrendingDown, MoreVertical, Ban } from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, MoreVertical, Ban, FileDown } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, parseISO, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
+import * as XLSX from 'xlsx';
 
 type Transaction = {
   id: number;
@@ -176,6 +177,45 @@ export default function Finances() {
         reason: 'Anulada por el usuario',
       });
     }
+  };
+
+  const exportToExcel = () => {
+    if (!transactions || transactions.length === 0) {
+      toast.error('No hay transacciones para exportar');
+      return;
+    }
+
+    // Preparar datos para Excel
+    const excelData = transactions.map(transaction => ({
+      'Fecha': format(new Date(transaction.date), 'dd/MM/yyyy', { locale: es }),
+      'Tipo': transaction.type === 'income' ? 'Ingreso' : 'Gasto',
+      'Categoría': transaction.category,
+      'Descripción': transaction.description,
+      'Monto': parseFloat(transaction.amount),
+      'Estado': transaction.status === 'voided' ? 'Anulada' : 'Activa',
+    }));
+
+    // Crear libro de trabajo
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Transacciones');
+
+    // Ajustar ancho de columnas
+    const maxWidth = 30;
+    worksheet['!cols'] = [
+      { wch: 12 }, // Fecha
+      { wch: 10 }, // Tipo
+      { wch: 20 }, // Categoría
+      { wch: maxWidth }, // Descripción
+      { wch: 15 }, // Monto
+      { wch: 10 }, // Estado
+    ];
+
+    // Generar archivo
+    const fileName = `transacciones_${format(new Date(), 'yyyy-MM-dd')}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+    
+    toast.success('Historial exportado exitosamente');
   };
 
   return (
@@ -403,7 +443,18 @@ export default function Finances() {
         {/* Recent Transactions */}
         <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-foreground">Transacciones Recientes</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-foreground">Transacciones Recientes</CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={exportToExcel}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <FileDown className="w-4 h-4 mr-2" />
+                Exportar
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             {isLoading ? (
