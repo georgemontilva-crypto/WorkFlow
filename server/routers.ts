@@ -731,8 +731,23 @@ export const appRouter = router({
         const previousPaid = parseFloat(invoice.paid_amount || "0");
         const newPaymentAmount = paid - previousPaid;
         const wasNotPaid = invoice.status !== 'paid';
+        const isBeingMarkedAsPaid = data.status === 'paid' || (paid >= total && total > 0);
+        
+        console.log('[Invoice Update] Payment calculation:', {
+          invoiceId: id,
+          previousPaid,
+          newPaid: paid,
+          newPaymentAmount,
+          wasNotPaid,
+          isBeingMarkedAsPaid,
+          currentStatus: invoice.status,
+          requestedStatus: data.status
+        });
         
         if (paid >= total && total > 0) {
+          updateData.status = "paid";
+        } else if (data.status === 'paid') {
+          // If explicitly marked as paid, set status to paid
           updateData.status = "paid";
         } else if (paid > 0 && paid < total) {
           // Partial payment - keep current status or set to sent if was draft
@@ -751,17 +766,26 @@ export const appRouter = router({
         
         await db.updateInvoice(id, ctx.user.id, updateData);
         
-        // Create finance transaction when payment is received
-        if (newPaymentAmount > 0 && wasNotPaid) {
+        // Create finance transaction when invoice is marked as paid
+        // Either when there's a new payment amount OR when status changes to paid
+        const shouldCreateTransaction = (newPaymentAmount > 0 && wasNotPaid) || 
+                                         (isBeingMarkedAsPaid && wasNotPaid && total > 0);
+        
+        console.log('[Invoice Update] Should create transaction:', shouldCreateTransaction);
+        
+        if (shouldCreateTransaction) {
           try {
             // Get client name for description
             const client = await db.getClientById(invoice.client_id, ctx.user.id);
             const clientName = client?.name || 'Cliente';
             
+            // Use the payment amount if there's a new payment, otherwise use the total
+            const transactionAmount = newPaymentAmount > 0 ? newPaymentAmount : total;
+            
             await db.createTransaction({
               type: 'income',
               category: 'Pago de Factura',
-              amount: newPaymentAmount.toFixed(2),
+              amount: transactionAmount.toFixed(2),
               description: `Pago de factura ${invoice.invoice_number} - ${clientName}`,
               date: new Date(),
               client_id: invoice.client_id,
@@ -769,7 +793,7 @@ export const appRouter = router({
               user_id: ctx.user.id,
               created_at: new Date(),
             });
-            console.log(`[Invoice Update] Created finance transaction for invoice ${invoice.invoice_number}: $${newPaymentAmount.toFixed(2)}`);
+            console.log(`[Invoice Update] Created finance transaction for invoice ${invoice.invoice_number}: $${transactionAmount.toFixed(2)}`);
           } catch (transactionError) {
             console.error('[Invoice Update] Error creating finance transaction:', transactionError);
             // Don't throw - invoice was already updated successfully
