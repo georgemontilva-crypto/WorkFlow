@@ -1,17 +1,15 @@
 /**
  * AlertCenter - Centro de alertas persistente
  * Muestra todas las alertas del usuario con filtros y acciones
- * Design Philosophy: Apple Minimalism - Clean, functional, informative
+ * Design Philosophy: Outline-only - Clean, minimal, consistent with AlertToast
  */
 
 import { useState } from 'react';
-import { X, Info, AlertTriangle, AlertCircle, Check, Trash2, Filter } from 'lucide-react';
+import { X, Info, AlertTriangle, AlertCircle, Check, Trash2, Filter, Bell } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
 import { useLocation } from 'wouter';
 
 type AlertType = 'info' | 'warning' | 'critical';
@@ -20,6 +18,22 @@ interface AlertCenterProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+// Mapeo de eventos a títulos legibles
+const EVENT_TITLES: Record<string, string> = {
+  'invoice_overdue': 'Factura Vencida',
+  'pending_receipt': 'Comprobante Pendiente',
+  'invoice_due_soon': 'Factura Próxima a Vencer',
+  'invoice_upcoming': 'Factura Próxima',
+  'income_confirmed': 'Ingreso Confirmado',
+  'monthly_comparison': 'Resumen Mensual',
+  'no_income_month': 'Sin Ingresos',
+  'plan_limit': 'Límite de Plan',
+  'plan_limit_reached': 'Límite de Plan Alcanzado',
+  'feature_blocked': 'Función Bloqueada',
+  'multiple_pending': 'Facturas Pendientes',
+  'client_late_history': 'Historial de Cliente',
+};
 
 export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
   const [, setLocation] = useLocation();
@@ -69,25 +83,35 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
     }
   };
 
-  const getAlertIcon = (type: AlertType) => {
+  const getAlertStyles = (type: AlertType) => {
     switch (type) {
       case 'critical':
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
+        return {
+          borderColor: 'border-red-500',
+          iconBorder: 'border-2 border-red-500',
+          iconColor: 'text-red-500',
+          titleColor: 'text-red-400',
+          buttonBorder: 'border-2 border-red-500 text-red-400 hover:border-red-400 hover:text-red-300',
+          Icon: AlertCircle,
+        };
       case 'warning':
-        return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
+        return {
+          borderColor: 'border-yellow-500',
+          iconBorder: 'border-2 border-yellow-500',
+          iconColor: 'text-yellow-500',
+          titleColor: 'text-yellow-400',
+          buttonBorder: 'border-2 border-yellow-500 text-yellow-400 hover:border-yellow-400 hover:text-yellow-300',
+          Icon: AlertTriangle,
+        };
       default:
-        return <Info className="w-5 h-5 text-blue-500" />;
-    }
-  };
-
-  const getAlertBadge = (type: AlertType) => {
-    switch (type) {
-      case 'critical':
-        return <Badge className="bg-red-500/10 text-red-500 border-red-500/20">Crítico</Badge>;
-      case 'warning':
-        return <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">Advertencia</Badge>;
-      default:
-        return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Info</Badge>;
+        return {
+          borderColor: 'border-blue-500',
+          iconBorder: 'border-2 border-blue-500',
+          iconColor: 'text-blue-500',
+          titleColor: 'text-blue-400',
+          buttonBorder: 'border-2 border-blue-500 text-blue-400 hover:border-blue-400 hover:text-blue-300',
+          Icon: Info,
+        };
     }
   };
 
@@ -116,7 +140,7 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full">
             <Button
               variant="outline"
               size="sm"
@@ -138,16 +162,23 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
           </div>
 
           {/* Filter by type */}
-          <div className="flex gap-2 mt-3">
+          <div className="flex gap-2 mt-3 w-full">
             {(['all', 'critical', 'warning', 'info'] as const).map((type) => (
               <button
                 key={type}
                 onClick={() => setFilterType(type)}
                 className={`
-                  px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
+                  flex-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
+                  border-2
                   ${filterType === type
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-accent hover:bg-accent/80'
+                    ? type === 'critical' 
+                      ? 'border-red-500 text-red-400'
+                      : type === 'warning'
+                      ? 'border-yellow-500 text-yellow-400'
+                      : type === 'info'
+                      ? 'border-blue-500 text-blue-400'
+                      : 'border-primary text-primary'
+                    : 'border-border text-muted-foreground hover:border-primary/50 hover:text-foreground'
                   }
                 `}
               >
@@ -171,64 +202,77 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
             </div>
           ) : (
             <div className="p-4 space-y-3">
-              {alerts.map((alert) => (
-                <Card
-                  key={alert.id}
-                  className={`
-                    p-4 transition-all cursor-pointer
-                    ${alert.is_read === 0
-                      ? 'bg-accent/50 border-l-4 border-l-primary'
-                      : 'bg-card hover:bg-accent/30'
-                    }
-                  `}
-                  onClick={() => alert.is_read === 0 && handleMarkAsRead(alert.id)}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="mt-1">
-                      {getAlertIcon(alert.type as AlertType)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        {getAlertBadge(alert.type as AlertType)}
-                        <span className="text-xs text-muted-foreground">
-                          {format(new Date(alert.created_at), "d 'de' MMM, HH:mm", { locale: es })}
-                        </span>
+              {alerts.map((alert) => {
+                const styles = getAlertStyles(alert.type as AlertType);
+                const { Icon } = styles;
+                const title = EVENT_TITLES[alert.event] || alert.event;
+
+                return (
+                  <div
+                    key={alert.id}
+                    className={`
+                      bg-[#1a1a1a] ${styles.borderColor} border rounded-2xl p-4
+                      transition-all cursor-pointer
+                      ${alert.is_read === 0 ? 'border-l-4' : ''}
+                    `}
+                    onClick={() => alert.is_read === 0 && handleMarkAsRead(alert.id)}
+                  >
+                    <div className="flex items-start gap-3">
+                      {/* Icono circular con solo borde */}
+                      <div className={`${styles.iconBorder} p-2.5 rounded-full flex-shrink-0`}>
+                        <Icon className={`w-5 h-5 ${styles.iconColor}`} />
                       </div>
-                      <p className="text-sm font-medium mb-1">{alert.event}</p>
-                      <p className="text-sm text-muted-foreground">{alert.message}</p>
+                      
+                      {/* Contenido */}
+                      <div className="flex-1 min-w-0">
+                        {/* Título */}
+                        <h3 className={`font-semibold text-base mb-1 ${styles.titleColor}`}>
+                          {title}
+                        </h3>
+                        
+                        {/* Fecha */}
+                        <p className="text-xs text-muted-foreground mb-2">
+                          {format(new Date(alert.created_at), "d 'de' MMM, HH:mm", { locale: es })}
+                        </p>
+                        
+                        {/* Mensaje */}
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {alert.message}
+                        </p>
 
-                      {alert.required_plan && (
-                        <Badge variant="outline" className="mt-2 text-xs">
-                          Requiere plan {alert.required_plan.toUpperCase()}
-                        </Badge>
-                      )}
-
-                      {alert.action_url && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleAction(alert);
-                          }}
-                          className="mt-3 w-full"
-                        >
-                          {alert.action_text || 'Ver detalles'}
-                        </Button>
-                      )}
+                        {/* Botón de acción - Ancho completo */}
+                        {alert.action_url && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAction(alert);
+                            }}
+                            className={`
+                              w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg 
+                              font-medium text-sm border transition-colors
+                              ${styles.buttonBorder}
+                            `}
+                          >
+                            <Bell className="w-4 h-4" />
+                            Ver
+                          </button>
+                        )}
+                      </div>
+                      
+                      {/* Botón eliminar */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(alert.id);
+                        }}
+                        className="p-1.5 hover:bg-destructive/10 rounded-lg transition-colors flex-shrink-0"
+                      >
+                        <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
+                      </button>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(alert.id);
-                      }}
-                      className="p-1.5 hover:bg-destructive/10 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
-                    </button>
                   </div>
-                </Card>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
