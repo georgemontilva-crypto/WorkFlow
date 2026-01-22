@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, BarChart3, Activity } from 'lucide-react';
 import { useLocation } from 'wouter';
+import { Sparkline } from './Sparkline';
 
 interface MarketWidgetProps {
   symbol: string;
@@ -20,6 +21,7 @@ interface MarketData {
   change24h: number;
   high24h: number;
   low24h: number;
+  sparklineData: number[];
 }
 
 // Map crypto symbols to display names
@@ -73,32 +75,53 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
             `https://api.binance.com/api/v3/ticker/24hr?symbol=${pair}`
           );
           
-          if (!response.ok) {
+          // Fetch kline/candlestick data for sparkline (last 24 hours, 1-hour intervals)
+          const klineResponse = await fetch(
+            `https://api.binance.com/api/v3/klines?symbol=${pair}&interval=1h&limit=24`
+          );
+          
+          if (!response.ok || !klineResponse.ok) {
             // If USDT pair doesn't exist, try BUSD
             const busdResponse = await fetch(
               `https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol.toUpperCase()}BUSD`
             );
             
-            if (!busdResponse.ok) {
+            const busdKlineResponse = await fetch(
+              `https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}BUSD&interval=1h&limit=24`
+            );
+            
+            if (!busdResponse.ok || !busdKlineResponse.ok) {
               throw new Error(`API error: ${response.status}`);
             }
             
             const result = await busdResponse.json();
+            const klineResult = await busdKlineResponse.json();
+            
+            // Extract closing prices for sparkline
+            const sparklineData = klineResult.map((candle: any) => parseFloat(candle[4]));
+            
             setData({
               name: CRYPTO_NAMES[symbol.toUpperCase()] || symbol.toUpperCase(),
               price: parseFloat(result.lastPrice),
               change24h: parseFloat(result.priceChangePercent),
               high24h: parseFloat(result.highPrice),
               low24h: parseFloat(result.lowPrice),
+              sparklineData,
             });
           } else {
             const result = await response.json();
+            const klineResult = await klineResponse.json();
+            
+            // Extract closing prices for sparkline
+            const sparklineData = klineResult.map((candle: any) => parseFloat(candle[4]));
+            
             setData({
               name: CRYPTO_NAMES[symbol.toUpperCase()] || symbol.toUpperCase(),
               price: parseFloat(result.lastPrice),
               change24h: parseFloat(result.priceChangePercent),
               high24h: parseFloat(result.highPrice),
               low24h: parseFloat(result.lowPrice),
+              sparklineData,
             });
           }
         } catch (error) {
@@ -156,17 +179,42 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
   const changeColor = isPositive ? 'text-green-500' : 'text-red-500';
   const changeBgColor = isPositive ? 'bg-green-500/10' : 'bg-red-500/10';
   const borderColor = isPositive ? 'border-green-500/30' : 'border-red-500/30';
+  const sparklineColor = isPositive ? '#10b981' : '#ef4444';
 
   return (
     <Card 
       className={`bg-card border ${borderColor} hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer`}
       onClick={() => setLocation('/markets')}
     >
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-          <BarChart3 className="w-4 h-4" strokeWidth={1.5} />
-          {symbol.toUpperCase()}
-        </CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between pb-3">
+        <div className="flex items-center gap-3">
+          {/* Crypto Logo */}
+          <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-muted/20 flex-shrink-0">
+            <img 
+              src={`/crypto-logos/${symbol.toLowerCase()}.png`}
+              alt={symbol.toUpperCase()}
+              className="w-full h-full object-contain p-1"
+              onError={(e) => {
+                // Fallback to initials if logo fails to load
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                target.parentElement!.innerHTML = `<span class="text-sm font-bold text-muted-foreground">${symbol.toUpperCase().slice(0, 2)}</span>`;
+              }}
+            />
+          </div>
+          
+          {/* Symbol and Name */}
+          <div>
+            <CardTitle className="text-sm font-semibold text-foreground">
+              {symbol.toUpperCase()}
+            </CardTitle>
+            <p className="text-xs text-muted-foreground">
+              {data.name}
+            </p>
+          </div>
+        </div>
+        
+        {/* Change Badge */}
         <div className={`flex items-center gap-1 px-2 py-1 rounded-md ${changeBgColor}`}>
           {isPositive ? (
             <TrendingUp className={`w-3 h-3 ${changeColor}`} />
@@ -178,17 +226,26 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
           </span>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-1">
-          <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
-            ${data.price.toLocaleString('en-US', { 
-              minimumFractionDigits: data.price < 1 ? 4 : 2,
-              maximumFractionDigits: data.price < 1 ? 6 : 2
-            })}
-          </div>
-          <p className="text-xs text-muted-foreground">
-            {data.name} • Actualización en tiempo real
-          </p>
+      
+      <CardContent className="space-y-3">
+        {/* Price */}
+        <div className="text-2xl sm:text-3xl font-bold text-foreground font-mono">
+          ${data.price.toLocaleString('en-US', { 
+            minimumFractionDigits: data.price < 1 ? 4 : 2,
+            maximumFractionDigits: data.price < 1 ? 6 : 2
+          })}
+        </div>
+        
+        {/* Sparkline Chart */}
+        <div className="w-full flex items-center justify-center">
+          <Sparkline 
+            data={data.sparklineData}
+            width={200}
+            height={60}
+            color={sparklineColor}
+            strokeWidth={1.5}
+            className="w-full"
+          />
         </div>
       </CardContent>
     </Card>
