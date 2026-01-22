@@ -39,6 +39,22 @@ import { es } from 'date-fns/locale';
 import { useLocation } from 'wouter';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+// Mapeo de eventos a títulos legibles
+const EVENT_TITLES: Record<string, string> = {
+  'invoice_overdue': 'Factura Vencida',
+  'pending_receipt': 'Comprobante Pendiente',
+  'invoice_due_soon': 'Factura Próxima a Vencer',
+  'invoice_upcoming': 'Factura Próxima',
+  'income_confirmed': 'Ingreso Confirmado',
+  'monthly_comparison': 'Resumen Mensual',
+  'no_income_month': 'Sin Ingresos',
+  'plan_limit': 'Límite de Plan',
+  'plan_limit_reached': 'Límite de Plan Alcanzado',
+  'feature_blocked': 'Función Bloqueada',
+  'multiple_pending': 'Facturas Pendientes',
+  'client_late_history': 'Historial de Cliente',
+};
+
 export default function Home() {
   const [, setLocation] = useLocation();
   const [selectedChart, setSelectedChart] = useState<'weekly' | 'monthly' | 'savings'>('weekly');
@@ -500,7 +516,7 @@ export default function Home() {
                             <Icon className={`w-4 h-4 ${iconColor}`} />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-foreground text-sm">{alert.event}</p>
+                            <p className="font-medium text-foreground text-sm">{EVENT_TITLES[alert.event] || alert.event}</p>
                             <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{alert.message}</p>
                           </div>
                         </div>
