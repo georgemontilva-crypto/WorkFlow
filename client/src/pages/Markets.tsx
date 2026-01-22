@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { useLocation } from 'wouter';
 import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
 import DashboardLayout from '@/components/DashboardLayout';
+import ScenarioSimulator from '@/components/ScenarioSimulator';
 
 interface MarketAsset {
   symbol: string;
@@ -575,6 +576,19 @@ export default function Markets() {
             </Accordion>
           </TabsContent>
         </Tabs>
+
+        {/* Scenario Simulator - Below assets */}
+        <div className="mt-8">
+          <ScenarioSimulator
+            availableAssets={[
+              ...cryptoData,
+              ...MOCK_STOCKS,
+              ...MOCK_FOREX,
+              ...MOCK_COMMODITIES
+            ]}
+            selectedAsset={null}
+          />
+        </div>
       </div>
     </DashboardLayout>
   );
