@@ -586,3 +586,20 @@
 .alert-meta {
   @apply text-xs text-muted-foreground/60 mt-0.5;
 }
+
+
+/* ===== GLASSMORPHISM UTILITIES ===== */
+
+/* Glass modal - solid dark background for dropdowns and dialogs */
+.glass-modal {
+  background-color: #0D0D0D;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+}
+
+/* Glass card - subtle transparency for cards */
+.glass-card {
+  background-color: rgba(26, 26, 26, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}

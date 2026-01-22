@@ -856,7 +856,6 @@ export default function Invoices() {
                             <SelectValue placeholder="Selecciona frecuencia" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="every_minute">🧪 Cada minuto (Testing)</SelectItem>
                             <SelectItem value="monthly">Mensual</SelectItem>
                             <SelectItem value="biweekly">Quincenal</SelectItem>
                             <SelectItem value="annual">Anual</SelectItem>
