@@ -428,7 +428,7 @@ export default function Home() {
             )}
 
             {/* Recordatorios y Notificaciones - Módulo Combinado */}
-            <Card className="bg-card border-border flex-1 flex flex-col">
+            <Card className="bg-card border-border flex-1 flex flex-col min-h-0">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-foreground flex items-center gap-2">
@@ -445,8 +445,8 @@ export default function Home() {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="max-h-[400px] overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+              <CardContent className="flex-1 flex flex-col min-h-0">
+                <div className="flex-1 max-h-full overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                   {/* Recordatorios */}
                   {reminders && reminders.length > 0 && reminders
                     .sort((a, b) => new Date(a.reminder_date).getTime() - new Date(b.reminder_date).getTime())
