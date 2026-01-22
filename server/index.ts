@@ -3,6 +3,7 @@ import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 import { startRecurringInvoicesScheduler } from "./_core/recurring-invoices-job.js";
+import { startOverdueInvoicesScheduler } from "./_core/overdue-invoices-job.js";
 import { testRedisConnection } from "./config/redis.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -42,6 +43,9 @@ async function startServer() {
     
     // Start recurring invoices scheduler
     startRecurringInvoicesScheduler();
+    
+    // Start overdue invoices scheduler
+    startOverdueInvoicesScheduler();
     
     // Initialize Bull Queue worker for reminders
     // This starts processing jobs from the queue
