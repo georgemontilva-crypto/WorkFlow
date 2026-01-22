@@ -368,7 +368,7 @@ export default function Home() {
         {/* ZONA 3: Información Secundaria - Dos Columnas Flexibles */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Columna Izquierda */}
-          <div className="space-y-6">
+          <div className="flex flex-col gap-6">
             {/* Alertas de Hoy */}
             {todayAlerts.length > 0 && (
               <Card className="bg-card border-border">
@@ -428,7 +428,7 @@ export default function Home() {
             )}
 
             {/* Recordatorios y Notificaciones - Módulo Combinado */}
-            <Card className="bg-card border-border">
+            <Card className="bg-card border-border flex-1 flex flex-col">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-foreground flex items-center gap-2">
@@ -445,8 +445,8 @@ export default function Home() {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="max-h-[500px] overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+              <CardContent className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
                   {/* Recordatorios */}
                   {reminders && reminders.length > 0 && reminders
                     .sort((a, b) => new Date(a.reminder_date).getTime() - new Date(b.reminder_date).getTime())
