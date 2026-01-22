@@ -366,7 +366,7 @@ export default function Home() {
         </Card>
 
         {/* ZONA 3: Información Secundaria - Dos Columnas Flexibles */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
           {/* Columna Izquierda */}
           <div className="space-y-6">
             {/* Alertas de Hoy */}
