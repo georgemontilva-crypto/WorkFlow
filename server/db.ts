@@ -1444,14 +1444,20 @@ export async function stopRecurringInvoice(id: number, user_id: number) {
  * Get company profile for a user
  */
 export async function getCompanyProfile(userId: number) {
-  const dbInstance = await getDb();
-  const profiles = await dbInstance
-    .select()
-    .from(companyProfiles)
-    .where(eq(companyProfiles.user_id, userId))
-    .limit(1);
-  
-  return profiles[0] || null;
+  try {
+    const dbInstance = await getDb();
+    const profiles = await dbInstance
+      .select()
+      .from(companyProfiles)
+      .where(eq(companyProfiles.user_id, userId))
+      .limit(1);
+    
+    return profiles[0] || null;
+  } catch (error) {
+    console.error('[DB] Error getting company profile:', error);
+    // Return null if table doesn't exist or has missing columns
+    return null;
+  }
 }
 
 /**
