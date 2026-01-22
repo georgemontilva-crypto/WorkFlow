@@ -80,7 +80,7 @@ type InvoiceFormData = {
   recurrence_frequency?: 'every_minute' | 'monthly' | 'biweekly' | 'annual' | 'custom';
   recurrence_interval?: number;
 };
-import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, DollarSign, Search, User, FolderArchive, ArchiveRestore, Link as LinkIcon, Copy, Eye, Repeat, Mail } from 'lucide-react';
+import { FileText, Download, Plus, Trash2, MoreVertical, CheckCircle2, XCircle, Clock, AlertCircle, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, DollarSign, Search, User, FolderArchive, ArchiveRestore, Link as LinkIcon, Copy, Eye, Repeat, Mail } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { format, parseISO, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -89,7 +89,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { PlanLimitDialog } from '@/components/PlanLimitDialog';
 import jsPDF from 'jspdf';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useSearch } from 'wouter';
 
 // Helper function to parse invoice items
@@ -115,8 +115,61 @@ export default function Invoices() {
   const { data: archivedInvoices, isLoading: archivedLoading } = trpc.invoices.listArchived.useQuery();
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery();
   
-  // Show all active invoices (not archived)
-  const invoices = allInvoices;
+  // Apply filters
+  const filteredInvoices = useMemo(() => {
+    if (!allInvoices) return [];
+    
+    let filtered = allInvoices;
+    
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(inv => inv.status === statusFilter);
+    }
+    
+    // Date filter
+    if (dateFilter !== 'all') {
+      const now = new Date();
+      let cutoffDate = new Date();
+      
+      switch (dateFilter) {
+        case '30days':
+          cutoffDate.setDate(now.getDate() - 30);
+          break;
+        case '90days':
+          cutoffDate.setDate(now.getDate() - 90);
+          break;
+        case 'year':
+          cutoffDate.setFullYear(now.getFullYear() - 1);
+          break;
+      }
+      
+      filtered = filtered.filter(inv => new Date(inv.created_at) >= cutoffDate);
+    }
+    
+    // Search filter (invoice number or client name)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(inv => {
+        const client = clients?.find(c => c.id === inv.client_id);
+        return (
+          inv.invoice_number.toLowerCase().includes(query) ||
+          client?.name.toLowerCase().includes(query) ||
+          client?.company?.toLowerCase().includes(query)
+        );
+      });
+    }
+    
+    return filtered;
+  }, [allInvoices, statusFilter, dateFilter, searchQuery, clients]);
+  
+  // Pagination
+  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
+  const paginatedInvoices = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredInvoices.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredInvoices, currentPage, itemsPerPage]);
+  
+  const invoices = paginatedInvoices;
   
   // Mutations
   const createInvoice = trpc.invoices.create.useMutation({
@@ -180,6 +233,13 @@ export default function Invoices() {
   const [showArchivedDialog, setShowArchivedDialog] = useState(false);
   const [expandedClientFolder, setExpandedClientFolder] = useState<number | null>(null);
   const [clientSearch, setClientSearch] = useState('');
+  
+  // Filters and pagination
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [dateFilter, setDateFilter] = useState<string>('all'); // all, 30days, 90days, year
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 20;
   const [formData, setFormData] = useState<InvoiceFormData>({
     client_id: 0,
     issue_date: new Date().toISOString().split('T')[0],
@@ -602,6 +662,86 @@ export default function Invoices() {
               <Plus className="w-4 h-4 mr-2" />
               Nueva Factura
             </Button>
+          </div>
+        </div>
+
+        {/* Filters Bar */}
+        <div className="bg-card border border-border rounded-lg p-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Search */}
+            <div className="lg:col-span-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Buscar por número o cliente..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
+            
+            {/* Status Filter */}
+            <div>
+              <Select value={statusFilter} onValueChange={(value) => {
+                setStatusFilter(value);
+                setCurrentPage(1);
+              }}>
+                <SelectTrigger className="bg-background border-border text-foreground">
+                  <SelectValue placeholder="Estado" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border-border">
+                  <SelectItem value="all">Todos los estados</SelectItem>
+                  <SelectItem value="draft">Borrador</SelectItem>
+                  <SelectItem value="sent">Enviada</SelectItem>
+                  <SelectItem value="paid">Pagada</SelectItem>
+                  <SelectItem value="overdue">Vencida</SelectItem>
+                  <SelectItem value="payment_sent">Pago Enviado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Date Filter */}
+            <div>
+              <Select value={dateFilter} onValueChange={(value) => {
+                setDateFilter(value);
+                setCurrentPage(1);
+              }}>
+                <SelectTrigger className="bg-background border-border text-foreground">
+                  <SelectValue placeholder="Fecha" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border-border">
+                  <SelectItem value="all">Todas las fechas</SelectItem>
+                  <SelectItem value="30days">Últimos 30 días</SelectItem>
+                  <SelectItem value="90days">Últimos 90 días</SelectItem>
+                  <SelectItem value="year">Último año</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          {/* Results Summary */}
+          <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+            <p>
+              Mostrando {invoices?.length || 0} de {filteredInvoices.length} facturas
+              {(statusFilter !== 'all' || dateFilter !== 'all' || searchQuery) && (
+                <button
+                  onClick={() => {
+                    setStatusFilter('all');
+                    setDateFilter('all');
+                    setSearchQuery('');
+                    setCurrentPage(1);
+                  }}
+                  className="ml-2 text-primary hover:underline"
+                >
+                  Limpiar filtros
+                </button>
+              )}
+            </p>
           </div>
         </div>
 
@@ -1203,6 +1343,37 @@ export default function Invoices() {
                 </Card>
               );
             })}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-6 flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Página {currentPage} de {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="border-border text-foreground hover:bg-accent"
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                Anterior
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="border-border text-foreground hover:bg-accent"
+              >
+                Siguiente
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            </div>
           </div>
         )}
 

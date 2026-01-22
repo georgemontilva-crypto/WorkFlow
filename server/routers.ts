@@ -844,6 +844,31 @@ export const appRouter = router({
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
+        // Only allow deletion of draft invoices older than 90 days
+        const invoice = await db.getInvoiceById(input.id, ctx.user.id);
+        
+        if (!invoice) {
+          throw new Error('Factura no encontrada');
+        }
+        
+        // Check if invoice is a draft
+        if (invoice.status !== 'draft') {
+          throw new Error('Solo se pueden eliminar facturas en estado Borrador. Use la opción de Archivar para facturas pagadas.');
+        }
+        
+        // Check if invoice has any payments
+        if (parseFloat(invoice.paid_amount || '0') > 0) {
+          throw new Error('No se puede eliminar una factura con pagos registrados.');
+        }
+        
+        // Check if invoice is older than 90 days
+        const ninetyDaysAgo = new Date();
+        ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+        
+        if (new Date(invoice.updated_at) > ninetyDaysAgo) {
+          throw new Error('Solo se pueden eliminar borradores con más de 90 días de antigüedad.');
+        }
+        
         await db.deleteInvoice(input.id, ctx.user.id);
         return { success: true };
       }),
@@ -1318,11 +1343,12 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    // DELETE DISABLED: Transactions must never be deleted per data retention policy
+    // Use the 'void' endpoint instead to annul transactions
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        await db.deleteTransaction(input.id, ctx.user.id);
-        return { success: true };
+        throw new Error('No se pueden eliminar transacciones. Use la opción de Anular para revertir transacciones.');
       }),
     
     // Void a transaction - marks as voided and creates reversing entry
