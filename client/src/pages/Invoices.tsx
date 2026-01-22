@@ -142,6 +142,8 @@ export default function Invoices() {
   const updateInvoice = trpc.invoices.update.useMutation({
     onSuccess: () => {
       utils.invoices.list.invalidate();
+      // También invalidar transacciones para que se actualice Finanzas en tiempo real
+      utils.transactions.list.invalidate();
     },
     onError: () => {
       toast.error('Error al actualizar la factura');
