@@ -110,6 +110,13 @@ export default function Invoices() {
   const search = useSearch();
   const [, setLocation] = useLocation();
   
+  // Filters and pagination state (must be declared before useMemo)
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [dateFilter, setDateFilter] = useState<string>('all'); // all, 30days, 90days, year
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 20;
+  
   // Fetch data using tRPC
   const { data: allInvoices, isLoading: invoicesLoading } = trpc.invoices.list.useQuery();
   const { data: archivedInvoices, isLoading: archivedLoading } = trpc.invoices.listArchived.useQuery();
@@ -233,13 +240,6 @@ export default function Invoices() {
   const [showArchivedDialog, setShowArchivedDialog] = useState(false);
   const [expandedClientFolder, setExpandedClientFolder] = useState<number | null>(null);
   const [clientSearch, setClientSearch] = useState('');
-  
-  // Filters and pagination
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [dateFilter, setDateFilter] = useState<string>('all'); // all, 30days, 90days, year
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 20;
   const [formData, setFormData] = useState<InvoiceFormData>({
     client_id: 0,
     issue_date: new Date().toISOString().split('T')[0],
