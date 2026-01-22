@@ -810,6 +810,8 @@ export const appRouter = router({
               description,
               date: new Date(),
               user_id: ctx.user.id,
+              invoice_id: invoice.id,
+              status: 'active',
               created_at: new Date(),
             });
             console.log(`[Invoice Update] Created finance transaction for invoice ${invoice.invoice_number}: $${transactionAmount.toFixed(2)}`);
@@ -1305,6 +1307,55 @@ export const appRouter = router({
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
         await db.deleteTransaction(input.id, ctx.user.id);
+        return { success: true };
+      }),
+    
+    // Void a transaction - creates a reversing entry and marks original as voided
+    void: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        reason: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        // Get the original transaction
+        const transaction = await db.getTransactionById(input.id, ctx.user.id);
+        if (!transaction) {
+          throw new Error('Transacción no encontrada');
+        }
+        
+        if (transaction.status === 'voided') {
+          throw new Error('Esta transacción ya fue anulada');
+        }
+        
+        // Mark original transaction as voided
+        await db.voidTransaction(input.id, ctx.user.id, input.reason || 'Anulación manual');
+        
+        // Create reversing entry (opposite type)
+        const reversingType = transaction.type === 'income' ? 'expense' : 'income';
+        await db.createTransaction({
+          type: reversingType,
+          category: transaction.category,
+          amount: transaction.amount,
+          description: `[ANULACIÓN] ${transaction.description}`,
+          date: new Date(),
+          user_id: ctx.user.id,
+          status: 'active',
+          invoice_id: transaction.invoice_id,
+          created_at: new Date(),
+        });
+        
+        // If linked to an invoice, update invoice status to cancelled
+        if (transaction.invoice_id) {
+          try {
+            await db.updateInvoice(transaction.invoice_id, ctx.user.id, {
+              status: 'cancelled',
+              updated_at: new Date(),
+            });
+          } catch (e) {
+            console.log('Could not update invoice status:', e);
+          }
+        }
+        
         return { success: true };
       }),
   }),

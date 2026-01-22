@@ -23,7 +23,23 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { trpc } from '@/lib/trpc';
-import { Plus, TrendingUp, TrendingDown } from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, Ban, MoreVertical } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -39,6 +55,10 @@ type Transaction = {
   amount: string;
   description: string;
   date: Date;
+  status?: 'active' | 'voided';
+  invoice_id?: number | null;
+  voided_at?: Date | null;
+  void_reason?: string | null;
   created_at: Date;
 };
 
@@ -68,7 +88,23 @@ export default function Finances() {
     },
   });
   
+  // Void transaction mutation
+  const voidTransaction = trpc.transactions.void.useMutation({
+    onSuccess: () => {
+      utils.transactions.list.invalidate();
+      utils.invoices.list.invalidate();
+      toast.success('Transacción anulada exitosamente');
+      setShowVoidDialog(false);
+      setTransactionToVoid(null);
+    },
+    onError: (error) => {
+      toast.error('Error al anular la transacción: ' + error.message);
+    },
+  });
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [showVoidDialog, setShowVoidDialog] = useState(false);
+  const [transactionToVoid, setTransactionToVoid] = useState<Transaction | null>(null);
   const [formData, setFormData] = useState({
     type: 'income' as 'income' | 'expense',
     category: '',
@@ -76,10 +112,22 @@ export default function Finances() {
     description: '',
     date: new Date().toISOString().split('T')[0],
   });
+  
+  const handleVoidTransaction = (transaction: Transaction) => {
+    setTransactionToVoid(transaction);
+    setShowVoidDialog(true);
+  };
+  
+  const confirmVoidTransaction = () => {
+    if (transactionToVoid) {
+      voidTransaction.mutate({ id: transactionToVoid.id });
+    }
+  };
 
-  // Calcular totales
-  const totalIncome = transactions?.filter(t => t.type === 'income').reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
-  const totalExpenses = transactions?.filter(t => t.type === 'expense').reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
+  // Calcular totales (excluyendo transacciones anuladas)
+  const activeTransactions = transactions?.filter(t => t.status !== 'voided') || [];
+  const totalIncome = activeTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
+  const totalExpenses = activeTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
   const balance = totalIncome - totalExpenses;
 
   // Datos para gráfico mensual (últimos 6 meses)
@@ -92,12 +140,12 @@ export default function Finances() {
     const monthStart = startOfMonth(month);
     const monthEnd = endOfMonth(month);
 
-    const income = transactions?.filter(t => {
+    const income = activeTransactions.filter(t => {
       const tDate = new Date(t.date);
       return t.type === 'income' && tDate >= monthStart && tDate <= monthEnd;
     }).reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
 
-    const expenses = transactions?.filter(t => {
+    const expenses = activeTransactions.filter(t => {
       const tDate = new Date(t.date);
       return t.type === 'expense' && tDate >= monthStart && tDate <= monthEnd;
     }).reduce((sum, t) => sum + parseFloat(t.amount), 0) || 0;
@@ -365,33 +413,66 @@ export default function Finances() {
                 {transactions.map((transaction) => (
                   <div
                     key={transaction.id}
-                    className="flex items-center justify-between p-4 bg-background rounded-lg border border-border"
+                    className={`flex items-center justify-between p-4 bg-background rounded-lg border border-border ${transaction.status === 'voided' ? 'opacity-50' : ''}`}
                   >
                     <div className="flex items-center gap-4">
                       <div className={`p-2 rounded-full ${
-                        transaction.type === 'income' 
-                          ? 'bg-green-500/10' 
-                          : 'bg-red-500/10'
+                        transaction.status === 'voided'
+                          ? 'bg-gray-500/10'
+                          : transaction.type === 'income' 
+                            ? 'bg-green-500/10' 
+                            : 'bg-red-500/10'
                       }`}>
-                        {transaction.type === 'income' ? (
+                        {transaction.status === 'voided' ? (
+                          <Ban className="w-5 h-5 text-gray-500" />
+                        ) : transaction.type === 'income' ? (
                           <TrendingUp className="w-5 h-5 text-green-500" />
                         ) : (
                           <TrendingDown className="w-5 h-5 text-red-500" />
                         )}
                       </div>
                       <div>
-                        <p className="font-medium text-foreground">{transaction.description}</p>
+                        <div className="flex items-center gap-2">
+                          <p className={`font-medium ${transaction.status === 'voided' ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
+                            {transaction.description}
+                          </p>
+                          {transaction.status === 'voided' && (
+                            <span className="text-xs px-2 py-0.5 bg-gray-500/20 text-gray-400 rounded-full">Anulada</span>
+                          )}
+                        </div>
                         <p className="text-sm text-muted-foreground">
                           {transaction.category} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
                         </p>
                       </div>
                     </div>
-                    <div className={`text-lg font-bold font-mono ${
-                      transaction.type === 'income' 
-                        ? 'text-green-500' 
-                        : 'text-red-500'
-                    }`}>
-                      {transaction.type === 'income' ? '+' : '-'}${parseFloat(transaction.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                    <div className="flex items-center gap-3">
+                      <div className={`text-lg font-bold font-mono ${
+                        transaction.status === 'voided'
+                          ? 'text-gray-500 line-through'
+                          : transaction.type === 'income' 
+                            ? 'text-green-500' 
+                            : 'text-red-500'
+                      }`}>
+                        {transaction.type === 'income' ? '+' : '-'}${parseFloat(transaction.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                      </div>
+                      {transaction.status !== 'voided' && !transaction.description.startsWith('[ANULACIÓN]') && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="bg-card border-border">
+                            <DropdownMenuItem
+                              onClick={() => handleVoidTransaction(transaction)}
+                              className="text-red-500 focus:text-red-500 focus:bg-red-500/10"
+                            >
+                              <Ban className="w-4 h-4 mr-2" />
+                              Anular Transacción
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -405,6 +486,44 @@ export default function Finances() {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Void Transaction Confirmation Dialog */}
+      <AlertDialog open={showVoidDialog} onOpenChange={setShowVoidDialog}>
+        <AlertDialogContent className="bg-card border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-foreground flex items-center gap-2">
+              <Ban className="w-5 h-5 text-red-500" />
+              Anular Transacción
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              ¿Estás seguro de que deseas anular esta transacción?
+              <div className="mt-3 p-3 bg-background rounded-lg border border-border">
+                <p className="font-medium text-foreground">{transactionToVoid?.description}</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Monto: <span className={transactionToVoid?.type === 'income' ? 'text-green-500' : 'text-red-500'}>
+                    {transactionToVoid?.type === 'income' ? '+' : '-'}${parseFloat(transactionToVoid?.amount || '0').toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                  </span>
+                </p>
+              </div>
+              <p className="mt-3 text-sm text-orange-400">
+                Esta acción creará una transacción de reversión y marcará la original como anulada.
+                {transactionToVoid?.invoice_id && ' La factura asociada también será cancelada.'}
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-border text-foreground hover:bg-accent">
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmVoidTransaction}
+              className="bg-red-500 hover:bg-red-600 text-white"
+            >
+              Anular Transacción
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }
