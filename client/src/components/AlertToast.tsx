@@ -20,10 +20,13 @@ interface Alert {
   message: string;
   action_url?: string | null;
   action_text?: string | null;
+  shown_as_toast?: number;
+  created_at?: string;
 }
 
 const TOAST_DURATION = 5000; // 5 seconds
 const PRIORITY_ORDER: AlertType[] = ['critical', 'warning', 'info'];
+const SHOWN_TOASTS_KEY = 'finwrk_shown_toasts';
 
 // Mapeo de eventos a títulos legibles
 const EVENT_TITLES: Record<string, string> = {
@@ -39,22 +42,51 @@ const EVENT_TITLES: Record<string, string> = {
   'feature_blocked': 'Función Bloqueada',
   'multiple_pending': 'Facturas Pendientes',
   'client_late_history': 'Historial de Cliente',
+  'Facturas Vencidas': 'Facturas Vencidas',
+  'Comprobantes Pendientes': 'Comprobantes Pendientes',
+  'Facturas Próximas a Vencer': 'Facturas Próximas a Vencer',
+  'Ingresos Mensuales Bajos': 'Ingresos Mensuales Bajos',
+  'Ingresos Mensuales en Aumento': 'Ingresos Mensuales en Aumento',
+  'Mes Sin Ingresos': 'Mes Sin Ingresos',
+  'Límite de Plan Alcanzado': 'Límite de Plan Alcanzado',
+  'Función Pro Bloqueada': 'Función Pro Bloqueada',
+  'Múltiples Facturas Pendientes': 'Múltiples Facturas Pendientes',
+  'Cliente con Pagos Tardíos': 'Cliente con Pagos Tardíos',
 };
+
+// Get shown toast IDs from localStorage
+function getShownToastIds(): Set<number> {
+  try {
+    const stored = localStorage.getItem(SHOWN_TOASTS_KEY);
+    if (!stored) return new Set();
+    return new Set(JSON.parse(stored));
+  } catch {
+    return new Set();
+  }
+}
+
+// Add toast ID to shown list
+function markToastAsShown(id: number) {
+  try {
+    const shown = getShownToastIds();
+    shown.add(id);
+    localStorage.setItem(SHOWN_TOASTS_KEY, JSON.stringify([...shown]));
+  } catch (error) {
+    console.error('Error saving shown toast:', error);
+  }
+}
 
 export function AlertToast() {
   const [, setLocation] = useLocation();
   const [currentAlert, setCurrentAlert] = useState<Alert | null>(null);
   const [queue, setQueue] = useState<Alert[]>([]);
+  const utils = trpc.useUtils();
 
   // Fetch unread alerts that should be shown as toast
-  const { data: alerts, refetch } = trpc.alerts.list.useQuery({
+  const { data: alerts } = trpc.alerts.list.useQuery({
     unreadOnly: true,
   }, {
-    refetchInterval: 10000, // Check every 10 seconds
-  });
-
-  const markAsReadMutation = trpc.alerts.markAsRead.useMutation({
-    onSuccess: () => refetch(),
+    refetchInterval: 5000, // Check every 5 seconds for new alerts
   });
 
   // Process alerts and build queue based on priority
@@ -64,8 +96,13 @@ export function AlertToast() {
       return;
     }
 
-    // Filter alerts that haven't been shown as toast yet
-    const pendingToasts = alerts.filter(a => a.shown_as_toast === 0);
+    // Filter alerts that should be shown as toast but haven't been shown yet
+    const shownIds = getShownToastIds();
+    const pendingToasts = alerts.filter(a => {
+      // shown_as_toast === 1 means this alert SHOULD be shown as a toast
+      // Check if we haven't shown it yet in this session
+      return a.shown_as_toast === 1 && !shownIds.has(a.id);
+    });
 
     if (pendingToasts.length === 0) return;
 
@@ -79,7 +116,10 @@ export function AlertToast() {
       }
       
       // Same priority, sort by date (newest first)
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      if (a.created_at && b.created_at) {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      return 0;
     });
 
     setQueue(sortedAlerts as Alert[]);
@@ -93,20 +133,25 @@ export function AlertToast() {
     setCurrentAlert(nextAlert);
     setQueue(prev => prev.slice(1));
 
+    // Mark as shown in localStorage (but NOT as read in database)
+    markToastAsShown(nextAlert.id);
+
+    // Invalidate unread count to update bell badge immediately
+    utils.alerts.unreadCount.invalidate();
+    utils.alerts.list.invalidate();
+
     // Auto-dismiss after duration
     const timer = setTimeout(() => {
       handleDismiss();
     }, TOAST_DURATION);
 
     return () => clearTimeout(timer);
-  }, [currentAlert, queue]);
+  }, [currentAlert, queue, utils]);
 
-  const handleDismiss = async () => {
-    if (currentAlert) {
-      // Mark as read
-      await markAsReadMutation.mutateAsync({ id: currentAlert.id });
-      setCurrentAlert(null);
-    }
+  const handleDismiss = () => {
+    // Just close the toast, don't mark as read
+    // The alert will remain in AlertCenter for the user to see
+    setCurrentAlert(null);
   };
 
   const handleAction = () => {

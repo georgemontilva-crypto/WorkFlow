@@ -360,7 +360,7 @@ export const alerts = mysqlTable("alerts", {
   message: text("message").notNull(),
   /** Si la alerta debe persistir en el centro de alertas */
   persistent: int("persistent").notNull().default(1),
-  /** Si la alerta fue mostrada como toast */
+  /** Si la alerta debe mostrarse como toast (1 = sí, 0 = no) */
   shown_as_toast: int("shown_as_toast").notNull().default(0),
   /** Si la alerta fue leída por el usuario */
   is_read: int("is_read").notNull().default(0),
