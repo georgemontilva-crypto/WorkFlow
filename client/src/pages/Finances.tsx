@@ -411,33 +411,22 @@ export default function Finances() {
                   return (
                     <div
                       key={transaction.id}
-                      className={`flex items-center justify-between p-4 bg-background rounded-lg border border-border ${isVoided ? 'opacity-50' : ''}`}
+                      className="flex items-center justify-between p-4 bg-background rounded-lg border border-border"
                     >
                       <div className="flex items-center gap-4">
                         <div className={`p-2 rounded-full ${
-                          isVoided
-                            ? 'bg-gray-500/10'
-                            : transaction.type === 'income' 
-                              ? 'bg-green-500/10' 
-                              : 'bg-red-500/10'
+                          transaction.type === 'income' 
+                            ? 'bg-green-500/10' 
+                            : 'bg-red-500/10'
                         }`}>
-                          {isVoided ? (
-                            <Ban className="w-5 h-5 text-gray-500" />
-                          ) : transaction.type === 'income' ? (
+                          {transaction.type === 'income' ? (
                             <TrendingUp className="w-5 h-5 text-green-500" />
                           ) : (
                             <TrendingDown className="w-5 h-5 text-red-500" />
                           )}
                         </div>
                         <div>
-                          <div className="flex items-center gap-2">
-                            <p className={`font-medium ${isVoided ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
-                              {transaction.description}
-                            </p>
-                            {isVoided && (
-                              <span className="text-xs px-2 py-0.5 bg-gray-500/20 text-gray-400 rounded-full">Anulada</span>
-                            )}
-                          </div>
+                          <p className="font-medium text-foreground">{transaction.description}</p>
                           <p className="text-sm text-muted-foreground">
                             {transaction.category} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
                           </p>
@@ -445,11 +434,9 @@ export default function Finances() {
                       </div>
                       <div className="flex items-center gap-3">
                         <div className={`text-lg font-bold font-mono ${
-                          isVoided
-                            ? 'text-gray-500 line-through'
-                            : transaction.type === 'income' 
-                              ? 'text-green-500' 
-                              : 'text-red-500'
+                          transaction.type === 'income' 
+                            ? 'text-green-500' 
+                            : 'text-red-500'
                         }`}>
                           {transaction.type === 'income' ? '+' : '-'}${parseFloat(transaction.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                         </div>
