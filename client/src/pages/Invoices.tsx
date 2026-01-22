@@ -332,8 +332,8 @@ export default function Invoices() {
     setSelectedInvoice(invoice);
     setNewStatus(status);
     
-    // Si el cambio es a "paid" y la factura estaba pendiente, mostrar diálogo
-    if (status === 'paid' && (invoice.status === 'draft' || invoice.status === 'sent')) {
+    // Si el cambio es a "paid", mostrar diálogo para agregar a finanzas
+    if (status === 'paid' && (invoice.status === 'draft' || invoice.status === 'sent' || invoice.status === 'payment_sent')) {
       setShowStatusDialog(true);
     } else {
       // Cambiar estado directamente
@@ -1072,6 +1072,19 @@ export default function Invoices() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent className="bg-popover border-border w-56" align="end">
+                                {/* Opción destacada para confirmar pago cuando el cliente ya envió comprobante */}
+                                {invoice.status === 'payment_sent' && (
+                                  <>
+                                    <DropdownMenuItem 
+                                      onClick={() => handleStatusChange(invoice, 'paid')}
+                                      className="text-green-400 hover:bg-green-500/10 cursor-pointer font-semibold"
+                                    >
+                                      <CheckCircle2 className="w-4 h-4 mr-2" />
+                                      Confirmar Pago Recibido
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator className="bg-border" />
+                                  </>
+                                )}
                                 <DropdownMenuItem 
                                   onClick={() => handleStatusChange(invoice, 'pending')}
                                   className="text-foreground hover:bg-accent cursor-pointer"
@@ -1079,13 +1092,15 @@ export default function Invoices() {
                                   <Clock className="w-4 h-4 mr-2 text-yellow-400" />
                                   Marcar como Pendiente
                                 </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  onClick={() => handleStatusChange(invoice, 'paid')}
-                                  className="text-foreground hover:bg-accent cursor-pointer"
-                                >
-                                  <CheckCircle2 className="w-4 h-4 mr-2 text-green-400" />
-                                  Marcar como Pagada
-                                </DropdownMenuItem>
+                                {invoice.status !== 'payment_sent' && (
+                                  <DropdownMenuItem 
+                                    onClick={() => handleStatusChange(invoice, 'paid')}
+                                    className="text-foreground hover:bg-accent cursor-pointer"
+                                  >
+                                    <CheckCircle2 className="w-4 h-4 mr-2 text-green-400" />
+                                    Marcar como Pagada
+                                  </DropdownMenuItem>
+                                )}
                                 <DropdownMenuItem 
                                   onClick={() => handlePartialPayment(invoice)}
                                   className="text-foreground hover:bg-accent cursor-pointer"

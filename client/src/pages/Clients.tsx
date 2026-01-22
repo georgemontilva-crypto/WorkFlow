@@ -31,7 +31,8 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { trpc } from '@/lib/trpc';
-import { Plus, MoreVertical, Pencil, Trash2, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, MoreVertical, Pencil, Trash2, MapPin, ChevronLeft, ChevronRight, Repeat } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -107,6 +108,7 @@ export default function Clients() {
     email: '',
     phone: '',
     company: '',
+    has_recurring_billing: false,
     billing_cycle: 'monthly',
     amount: '0',
     next_payment_date: '',
@@ -127,8 +129,14 @@ export default function Clients() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.amount || !formData.next_payment_date) {
+    if (!formData.name || !formData.email) {
       toast.error(t.clients.completeRequiredFields);
+      return;
+    }
+
+    // Validate recurring billing fields only if enabled
+    if (formData.has_recurring_billing && (!formData.amount || !formData.next_payment_date)) {
+      toast.error('Complete los campos de facturación recurrente');
       return;
     }
 
@@ -148,6 +156,7 @@ export default function Clients() {
       email: '',
       phone: '',
       company: '',
+      has_recurring_billing: false,
       billing_cycle: 'monthly',
       amount: '0',
       next_payment_date: '',
@@ -313,74 +322,90 @@ export default function Clients() {
                   </div>
                 </div>
 
-                {/* Billing Section */}
+                {/* Recurring Billing Section - Optional */}
                 <div className="pt-4 border-t-2 border-white/10 space-y-4">
-                  <div>
-                    <h3 className="text-white font-semibold text-lg mb-1">{t.clients.billingInformation}</h3>
-                    <p className="text-sm text-gray-400">{t.clients.billingInformationSubtitle}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Repeat className="w-4 h-4 text-primary" />
+                        <Label htmlFor="has_recurring_billing" className="text-white font-semibold text-lg cursor-pointer">
+                          Pago Recurrente
+                        </Label>
+                      </div>
+                      <p className="text-sm text-gray-400">Activa esta opción si el cliente tiene pagos programados</p>
+                    </div>
+                    <Switch
+                      id="has_recurring_billing"
+                      checked={formData.has_recurring_billing || false}
+                      onCheckedChange={(checked) => setFormData({ ...formData, has_recurring_billing: checked })}
+                    />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="next_payment_date" className="text-white font-semibold">{t.clients.next_payment_date} <span className="text-red-500">*</span></Label>
-                      <Input
-                        id="next_payment_date"
-                        type="date"
-                        value={formData.next_payment_date}
-                        onChange={(e) => setFormData({ ...formData, next_payment_date: e.target.value })}
-                        className="bg-[#2A2A2A] border-white/10 text-white h-11"
-                        required
-                      />
-                      <p className="text-xs text-gray-400">{t.clients.nextPaymentDateHelper}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="reminder_days" className="text-white font-semibold">{t.clients.daysInAdvanceLabel}</Label>
-                      <Input
-                        id="reminder_days"
-                        type="number"
-                        min="1"
-                        max="30"
-                        value={formData.reminder_days}
-                        onChange={(e) => setFormData({ ...formData, reminder_days: parseInt(e.target.value) || 7 })}
-                        className="bg-[#2A2A2A] border-white/10 text-white h-11"
-                      />
-                      <p className="text-xs text-gray-400">{t.clients.daysInAdvanceHelper}</p>
-                    </div>
-                  </div>
+                  {formData.has_recurring_billing && (
+                    <div className="space-y-4 pt-3 border-t border-white/5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="next_payment_date" className="text-white font-semibold">{t.clients.next_payment_date} <span className="text-red-500">*</span></Label>
+                          <Input
+                            id="next_payment_date"
+                            type="date"
+                            value={formData.next_payment_date}
+                            onChange={(e) => setFormData({ ...formData, next_payment_date: e.target.value })}
+                            className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                            required={formData.has_recurring_billing}
+                          />
+                          <p className="text-xs text-gray-400">{t.clients.nextPaymentDateHelper}</p>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="reminder_days" className="text-white font-semibold">{t.clients.daysInAdvanceLabel}</Label>
+                          <Input
+                            id="reminder_days"
+                            type="number"
+                            min="1"
+                            max="30"
+                            value={formData.reminder_days}
+                            onChange={(e) => setFormData({ ...formData, reminder_days: parseInt(e.target.value) || 7 })}
+                            className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                          />
+                          <p className="text-xs text-gray-400">{t.clients.daysInAdvanceHelper}</p>
+                        </div>
+                      </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="billing_cycle" className="text-white font-semibold">{t.clients.billing_cycle}</Label>
-                      <Select
-                        value={formData.billing_cycle}
-                        onValueChange={(value: any) => setFormData({ ...formData, billing_cycle: value })}
-                      >
-                        <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="bg-[#1C1C1C] border-white/10">
-                          <SelectItem value="monthly">{t.clients.monthly}</SelectItem>
-                          <SelectItem value="quarterly">{t.clients.quarterly}</SelectItem>
-                          <SelectItem value="yearly">{t.clients.yearly}</SelectItem>
-                          <SelectItem value="custom">{t.clients.custom}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <p className="text-xs text-gray-400">{t.clients.billingCycleHelper}</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="billing_cycle" className="text-white font-semibold">{t.clients.billing_cycle}</Label>
+                          <Select
+                            value={formData.billing_cycle}
+                            onValueChange={(value: any) => setFormData({ ...formData, billing_cycle: value })}
+                          >
+                            <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#1C1C1C] border-white/10">
+                              <SelectItem value="monthly">{t.clients.monthly}</SelectItem>
+                              <SelectItem value="quarterly">{t.clients.quarterly}</SelectItem>
+                              <SelectItem value="yearly">{t.clients.yearly}</SelectItem>
+                              <SelectItem value="custom">{t.clients.custom}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-gray-400">{t.clients.billingCycleHelper}</p>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="amount" className="text-white font-semibold">{t.clients.amount} <span className="text-red-500">*</span></Label>
+                          <Input
+                            id="amount"
+                            type="number"
+                            step="0.01"
+                            value={formData.amount}
+                            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                            className="bg-[#2A2A2A] border-white/10 text-white font-mono h-11"
+                            required={formData.has_recurring_billing}
+                          />
+                          <p className="text-xs text-gray-400">{t.clients.billingAmount}</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="amount" className="text-white font-semibold">{t.clients.amount} <span className="text-red-500">*</span></Label>
-                      <Input
-                        id="amount"
-                        type="number"
-                        step="0.01"
-                        value={formData.amount}
-                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                        className="bg-[#2A2A2A] border-white/10 text-white font-mono h-11"
-                        required
-                      />
-                      <p className="text-xs text-gray-400">{t.clients.billingAmount}</p>
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 {formData.billing_cycle === 'custom' && (

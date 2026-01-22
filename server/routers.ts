@@ -490,12 +490,13 @@ export const appRouter = router({
       .input(z.object({
         name: z.string(),
         email: z.string().email(),
-        phone: z.string(),
+        phone: z.string().optional().default(""),
         company: z.string().optional(),
-        billing_cycle: z.enum(["monthly", "quarterly", "yearly", "custom"]),
+        has_recurring_billing: z.boolean().optional().default(false),
+        billing_cycle: z.enum(["monthly", "quarterly", "yearly", "custom"]).optional().default("monthly"),
         custom_cycle_days: z.number().optional(),
-        amount: z.string(),
-        next_payment_date: z.string(),
+        amount: z.string().optional().default("0"),
+        next_payment_date: z.string().optional(),
         reminder_days: z.number().default(7),
         status: z.enum(["active", "inactive", "overdue"]).default("active"),
         archived: z.number().default(0),
@@ -518,7 +519,7 @@ export const appRouter = router({
 
         await db.createClient({
           ...input,
-          next_payment_date: new Date(input.next_payment_date),
+          next_payment_date: input.next_payment_date ? new Date(input.next_payment_date) : new Date(),
           user_id: ctx.user.id,
           created_at: new Date(),
           updated_at: new Date(),
@@ -875,7 +876,7 @@ export const appRouter = router({
 </html>
           `;
           
-          await sendEmail({
+          const emailSent = await sendEmail({
             to: client.email,
             subject: `Factura ${invoice.invoice_number} - Finwrk`,
             html: emailHtml,
@@ -885,6 +886,13 @@ export const appRouter = router({
               encoding: 'base64',
             }],
           });
+          
+          if (!emailSent) {
+            throw new Error('No se pudo enviar el email. Verifica la configuración de RESEND_API_KEY.');
+          }
+          
+          // Update invoice status to 'sent' after successful email
+          await db.updateInvoice(input.id, ctx.user.id, { status: 'sent' });
           
           return { success: true, message: 'Invoice sent successfully' };
         } catch (error: any) {
