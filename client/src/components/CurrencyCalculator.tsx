@@ -80,23 +80,19 @@ export default function CurrencyCalculator() {
 
   return (
     <Card className="bg-card border-border h-full">
-      <CardHeader>
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <DollarSign className="w-5 h-5 text-primary" />
-          </div>
-          <div>
-            <CardTitle>Calculadora de Divisas</CardTitle>
-            <CardDescription>
-              Conversión en tiempo real entre monedas
-            </CardDescription>
-          </div>
+      <CardHeader className="pb-3">
+        <div className="flex items-center gap-2">
+          <DollarSign className="w-5 h-5 text-primary" />
+          <CardTitle className="text-lg">Calculadora de Divisas</CardTitle>
         </div>
+        <CardDescription className="text-xs">
+          Conversión en tiempo real entre monedas
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3">
         {/* Amount Input */}
-        <div className="space-y-2">
-          <Label htmlFor="amount">Cantidad</Label>
+        <div className="space-y-1">
+          <Label htmlFor="amount" className="text-xs">Cantidad</Label>
           <Input
             id="amount"
             type="number"
@@ -105,54 +101,55 @@ export default function CurrencyCalculator() {
             placeholder="0.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
+            className="h-8 text-sm"
           />
         </div>
 
-        {/* From Currency */}
-        <div className="space-y-2">
-          <Label htmlFor="fromCurrency">De</Label>
-          <Select value={fromCurrency} onValueChange={setFromCurrency}>
-            <SelectTrigger id="fromCurrency">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {POPULAR_CURRENCIES.map((currency) => (
-                <SelectItem key={currency.code} value={currency.code}>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold">{currency.code}</span>
-                    <span className="text-muted-foreground text-sm">{currency.name}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Currency Selectors - 2 Columns */}
+        <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
+          {/* From Currency */}
+          <div className="space-y-1">
+            <Label htmlFor="fromCurrency" className="text-xs">De</Label>
+            <Select value={fromCurrency} onValueChange={setFromCurrency}>
+              <SelectTrigger id="fromCurrency" className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {POPULAR_CURRENCIES.map((currency) => (
+                  <SelectItem key={currency.code} value={currency.code}>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold">{currency.code}</span>
+                      <span className="text-muted-foreground text-xs">{currency.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        {/* Swap Button */}
-        <div className="flex justify-center">
+          {/* Swap Button */}
           <Button
             variant="ghost"
             size="icon"
             onClick={swapCurrencies}
-            className="rounded-full"
+            className="rounded-full h-8 w-8"
           >
-            <ArrowRightLeft className="w-4 h-4" />
+            <ArrowRightLeft className="w-3 h-3" />
           </Button>
-        </div>
 
-        {/* To Currency */}
-        <div className="space-y-2">
-          <Label htmlFor="toCurrency">A</Label>
-          <Select value={toCurrency} onValueChange={setToCurrency}>
-            <SelectTrigger id="toCurrency">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {POPULAR_CURRENCIES.map((currency) => (
-                <SelectItem key={currency.code} value={currency.code}>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold">{currency.code}</span>
-                    <span className="text-muted-foreground text-sm">{currency.name}</span>
+          {/* To Currency */}
+          <div className="space-y-1">
+            <Label htmlFor="toCurrency" className="text-xs">A</Label>
+            <Select value={toCurrency} onValueChange={setToCurrency}>
+              <SelectTrigger id="toCurrency" className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {POPULAR_CURRENCIES.map((currency) => (
+                  <SelectItem key={currency.code} value={currency.code}>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold">{currency.code}</span>
+                      <span className="text-muted-foreground text-xs">{currency.name}</span>
                   </div>
                 </SelectItem>
               ))}
@@ -164,7 +161,7 @@ export default function CurrencyCalculator() {
         <Button
           onClick={fetchExchangeRate}
           disabled={!amount || parseFloat(amount) <= 0 || loading}
-          className="w-full"
+          className="w-full h-9"
         >
           {loading ? (
             <>
@@ -181,25 +178,25 @@ export default function CurrencyCalculator() {
 
         {/* Result */}
         {result !== null && (
-          <div className="space-y-3 pt-4 border-t border-border">
-            <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
-              <p className="text-sm text-muted-foreground mb-1">Resultado</p>
-              <p className="text-3xl font-bold font-mono text-primary">
+          <div className="space-y-2 pt-3 border-t border-border">
+            <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+              <p className="text-[10px] text-muted-foreground mb-0.5">Resultado</p>
+              <p className="text-2xl font-bold font-mono text-primary">
                 {formatNumber(result)} {toCurrency}
               </p>
             </div>
 
             {rate && (
-              <div className="p-3 bg-background rounded-lg border border-border">
-                <p className="text-xs text-muted-foreground mb-1">Tasa de cambio</p>
-                <p className="font-mono text-sm">
+              <div className="p-2 bg-background rounded-lg border border-border">
+                <p className="text-[10px] text-muted-foreground mb-0.5">Tasa de cambio</p>
+                <p className="font-mono text-xs">
                   1 {fromCurrency} = {formatNumber(rate)} {toCurrency}
                 </p>
               </div>
             )}
 
             {lastUpdate && (
-              <p className="text-xs text-muted-foreground text-center">
+              <p className="text-[10px] text-muted-foreground text-center">
                 Actualizado: {lastUpdate.toLocaleTimeString()}
               </p>
             )}

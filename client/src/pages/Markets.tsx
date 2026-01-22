@@ -308,7 +308,7 @@ export default function Markets() {
     const favorite = isFavorite(asset.symbol);
 
     return (
-      <div className="flex items-center justify-between p-3 sm:p-4 border rounded-xl bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-200 shadow-sm gap-3">
+      <div className="flex items-center justify-between p-2.5 sm:p-3 border rounded-xl bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-200 shadow-sm gap-2 sm:gap-3">
         {/* Left: Symbol & Name */}
         <div className="flex items-center gap-3 text-left min-w-0 flex-1">
           <div className="flex flex-col min-w-0">
@@ -509,7 +509,7 @@ export default function Markets() {
           </div>
 
           <TabsContent value="crypto">
-            <div className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            <div className="w-full space-y-2 max-h-[400px] overflow-y-auto pr-2">
               {sortAssets(filterAssets(cryptoData)).map((asset) => (
                 <AssetItem key={asset.symbol} asset={asset} />
               ))}
@@ -517,7 +517,7 @@ export default function Markets() {
           </TabsContent>
 
           <TabsContent value="stocks">
-            <div className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            <div className="w-full space-y-2 max-h-[400px] overflow-y-auto pr-2">
               {sortAssets(filterAssets(MOCK_STOCKS)).map((asset) => (
                 <AssetItem key={asset.symbol} asset={asset} />
               ))}
@@ -525,7 +525,7 @@ export default function Markets() {
           </TabsContent>
 
           <TabsContent value="forex">
-            <div className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            <div className="w-full space-y-2 max-h-[400px] overflow-y-auto pr-2">
               {sortAssets(filterAssets(MOCK_FOREX)).map((asset) => (
                 <AssetItem key={asset.symbol} asset={asset} />
               ))}
@@ -533,7 +533,7 @@ export default function Markets() {
           </TabsContent>
 
           <TabsContent value="commodities">
-            <div className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            <div className="w-full space-y-2 max-h-[400px] overflow-y-auto pr-2">
               {sortAssets(filterAssets(MOCK_COMMODITIES)).map((asset) => (
                 <AssetItem key={asset.symbol} asset={asset} />
               ))}
@@ -542,7 +542,7 @@ export default function Markets() {
         </Tabs>
 
         {/* Tools Section - 50/50 Layout */}
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Scenario Simulator - Left 50% */}
           <ScenarioSimulator
             availableAssets={[
