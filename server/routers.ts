@@ -888,7 +888,9 @@ export const appRouter = router({
           });
           
           if (!emailSent) {
-            throw new Error('No se pudo enviar el email. Verifica la configuración de RESEND_API_KEY.');
+            console.error('[Invoice] Email send failed for invoice:', invoice.invoice_number);
+            console.error('[Invoice] Client email:', client.email);
+            throw new Error('No se pudo enviar el email. Verifica que RESEND_API_KEY esté configurado y el dominio verificado en Resend.');
           }
           
           // Update invoice status to 'sent' after successful email

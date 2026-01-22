@@ -49,8 +49,11 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error("[Email] Failed to send email:", error);
+      const errorText = await response.text();
+      console.error("[Email] Failed to send email. Status:", response.status);
+      console.error("[Email] Error response:", errorText);
+      console.error("[Email] Attempted to send to:", options.to);
+      console.error("[Email] From address:", process.env.EMAIL_FROM || "Finwrk <noreply@finwrk.app>");
       return false;
     }
 
