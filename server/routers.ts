@@ -767,35 +767,44 @@ export const appRouter = router({
         await db.updateInvoice(id, ctx.user.id, updateData);
         
         // Create finance transaction when invoice is marked as paid
-        // Either when there's a new payment amount OR when status changes to paid
-        const shouldCreateTransaction = (newPaymentAmount > 0 && wasNotPaid) || 
-                                         (isBeingMarkedAsPaid && wasNotPaid && total > 0);
+        // Simple logic: if status is being changed to 'paid' and it wasn't paid before, create transaction
+        const statusChangingToPaid = (data.status === 'paid' || updateData.status === 'paid') && wasNotPaid;
         
-        console.log('[Invoice Update] Should create transaction:', shouldCreateTransaction);
+        console.log('[Invoice Update] Transaction check:', {
+          dataStatus: data.status,
+          updateDataStatus: updateData.status,
+          wasNotPaid,
+          statusChangingToPaid,
+          total
+        });
         
-        if (shouldCreateTransaction) {
+        if (statusChangingToPaid && total > 0) {
           try {
             // Get client name for description
             const client = await db.getClientById(invoice.client_id, ctx.user.id);
             const clientName = client?.name || 'Cliente';
             
-            // Use the payment amount if there's a new payment, otherwise use the total
-            const transactionAmount = newPaymentAmount > 0 ? newPaymentAmount : total;
+            // Use the total amount of the invoice
+            const transactionAmount = total;
+            
+            console.log('[Invoice Update] Creating transaction with amount:', transactionAmount);
             
             await db.createTransaction({
               type: 'income',
-              category: 'freelance', // Using valid enum value - represents invoice payment
+              category: 'freelance',
               amount: transactionAmount.toFixed(2),
               description: `Pago de factura ${invoice.invoice_number} - ${clientName}`,
               date: new Date(),
               user_id: ctx.user.id,
               created_at: new Date(),
             });
-            console.log(`[Invoice Update] Created finance transaction for invoice ${invoice.invoice_number}: $${transactionAmount.toFixed(2)}`);
-          } catch (transactionError) {
-            console.error('[Invoice Update] Error creating finance transaction:', transactionError);
+            console.log(`[Invoice Update] ✅ Created finance transaction for invoice ${invoice.invoice_number}: $${transactionAmount.toFixed(2)}`);
+          } catch (transactionError: any) {
+            console.error('[Invoice Update] ❌ Error creating finance transaction:', transactionError?.message || transactionError);
             // Don't throw - invoice was already updated successfully
           }
+        } else {
+          console.log('[Invoice Update] Skipping transaction creation - conditions not met');
         }
         
         return { success: true };
