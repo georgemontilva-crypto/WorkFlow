@@ -100,12 +100,12 @@ export function PaymentReceivedNotificationProvider({ children }: { children: Re
           style={{ maxWidth: '420px', width: 'calc(100vw - 2rem)' }}
         >
           <Card 
-            className="bg-popover border-2 border-green-500 shadow-[0_0_25px_rgba(34,197,94,0.4)] animate-pulse-border-green"
+            className="bg-[#1A1A1A] border border-border rounded-2xl"
           >
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
                 {/* Icon */}
-                <div className="p-2.5 rounded-xl bg-green-500/20 text-green-500 flex-shrink-0 animate-bounce-subtle">
+                <div className="p-2.5 rounded-full bg-green-500/20 text-green-500 flex-shrink-0">
                   <DollarSign className="w-6 h-6" />
                 </div>
 
@@ -129,7 +129,8 @@ export function PaymentReceivedNotificationProvider({ children }: { children: Re
                     <Button
                       size="sm"
                       onClick={handleView}
-                      className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto"
+                      variant="outline"
+                      className="border-2 border-green-500 text-green-500 hover:bg-green-500/10 w-full sm:w-auto"
                     >
                       <Eye className="w-3 h-3 mr-1" />
                       Ver Factura
@@ -156,35 +157,7 @@ export function PaymentReceivedNotificationProvider({ children }: { children: Re
             </CardContent>
           </Card>
 
-          <style>{`
-            @keyframes pulse-border-green {
-              0%, 100% {
-                border-color: rgb(34 197 94);
-                box-shadow: 0 0 25px rgba(34, 197, 94, 0.4);
-              }
-              50% {
-                border-color: rgb(34 197 94 / 0.6);
-                box-shadow: 0 0 35px rgba(34, 197, 94, 0.6);
-              }
-            }
 
-            @keyframes bounce-subtle {
-              0%, 100% {
-                transform: translateY(0);
-              }
-              50% {
-                transform: translateY(-3px);
-              }
-            }
-
-            .animate-pulse-border-green {
-              animation: pulse-border-green 2s ease-in-out infinite;
-            }
-
-            .animate-bounce-subtle {
-              animation: bounce-subtle 2s ease-in-out infinite;
-            }
-          `}</style>
         </div>
       )}
     </>
