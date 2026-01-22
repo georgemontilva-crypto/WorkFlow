@@ -550,7 +550,7 @@ export default function Invoices() {
       payment_sent: { label: 'Pago por Confirmar', className: 'bg-orange-500/20 text-orange-400 border-orange-500/30', icon: Clock },
       paid: { label: 'Pagada', className: 'bg-green-500/20 text-green-400 border-green-500/30', icon: CheckCircle2 },
       overdue: { label: 'Vencida', className: 'bg-destructive/20 text-destructive border-destructive/30', icon: AlertCircle },
-      cancelled: { label: 'Cancelada', className: 'bg-muted text-muted-foreground border-border', icon: XCircle },
+      cancelled: { label: 'Anulada', className: 'bg-red-500/20 text-red-400 border-red-500/30', icon: XCircle },
     };
     return variants[status] || variants.sent;
   };
