@@ -39,12 +39,12 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { trpc } from '@/lib/trpc';
-import { Plus, TrendingUp, TrendingDown, MoreVertical, Ban, FileDown } from 'lucide-react';
+import { Plus, TrendingUp, TrendingDown, MoreVertical, Ban, FileDown, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { format, parseISO, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths } from 'date-fns';
+import { format, parseISO, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, addMonths, isWithinInterval } from 'date-fns';
 import { es } from 'date-fns/locale';
 import * as XLSX from 'xlsx';
 
@@ -105,6 +105,14 @@ export default function Finances() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [voidDialogOpen, setVoidDialogOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  
+  // Estados para filtrado por periodo
+  const [selectedPeriod, setSelectedPeriod] = useState<Date>(new Date());
+  const [periodType, setPeriodType] = useState<'month' | 'custom'>('month');
+  const [customDateRange, setCustomDateRange] = useState<{ start: string; end: string }>({
+    start: format(startOfMonth(new Date()), 'yyyy-MM-dd'),
+    end: format(endOfMonth(new Date()), 'yyyy-MM-dd'),
+  });
   const [formData, setFormData] = useState({
     type: 'income' as 'income' | 'expense',
     category: '',
@@ -113,40 +121,91 @@ export default function Finances() {
     date: new Date().toISOString().split('T')[0],
   });
 
+  // Calcular rango de fechas según el periodo seleccionado
+  const getDateRange = () => {
+    if (periodType === 'custom') {
+      return {
+        start: parseISO(customDateRange.start),
+        end: parseISO(customDateRange.end),
+      };
+    }
+    return {
+      start: startOfMonth(selectedPeriod),
+      end: endOfMonth(selectedPeriod),
+    };
+  };
+
+  const dateRange = getDateRange();
+
   // Filtrar transacciones activas para cálculos
   const activeTransactions = transactions?.filter(t => t.status !== 'voided') || [];
+  
+  // Filtrar transacciones por periodo seleccionado
+  const filteredTransactions = activeTransactions.filter(t => {
+    const tDate = new Date(t.date);
+    return isWithinInterval(tDate, { start: dateRange.start, end: dateRange.end });
+  });
 
-  // Calcular totales (solo transacciones activas)
-  const totalIncome = activeTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + parseFloat(t.amount), 0);
-  const totalExpenses = activeTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  // Funciones de navegación de periodo
+  const goToPreviousMonth = () => {
+    setSelectedPeriod(prev => subMonths(prev, 1));
+  };
+
+  const goToNextMonth = () => {
+    setSelectedPeriod(prev => addMonths(prev, 1));
+  };
+
+  const goToCurrentMonth = () => {
+    setSelectedPeriod(new Date());
+  };
+
+  // Calcular totales del periodo seleccionado (transacciones filtradas)
+  const totalIncome = filteredTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + parseFloat(t.amount), 0);
+  const totalExpenses = filteredTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + parseFloat(t.amount), 0);
   const balance = totalIncome - totalExpenses;
 
-  // Datos para gráfico mensual (últimos 6 meses, solo transacciones activas)
-  const last6Months = eachMonthOfInterval({
-    start: subMonths(new Date(), 5),
-    end: new Date()
-  });
+  // Datos para gráfico mensual (basado en el periodo seleccionado)
+  // Si es mes individual, mostrar últimos 6 meses centrados en el seleccionado
+  // Si es rango custom, dividir en semanas o días según duración
+  const generateChartData = () => {
+    if (periodType === 'month') {
+      // Mostrar el mes seleccionado y los 5 anteriores
+      const months = eachMonthOfInterval({
+        start: subMonths(selectedPeriod, 5),
+        end: selectedPeriod
+      });
 
-  const monthlyData = last6Months.map(month => {
-    const monthStart = startOfMonth(month);
-    const monthEnd = endOfMonth(month);
+      return months.map(month => {
+        const monthStart = startOfMonth(month);
+        const monthEnd = endOfMonth(month);
 
-    const income = activeTransactions.filter(t => {
-      const tDate = new Date(t.date);
-      return t.type === 'income' && tDate >= monthStart && tDate <= monthEnd;
-    }).reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        const income = activeTransactions.filter(t => {
+          const tDate = new Date(t.date);
+          return t.type === 'income' && tDate >= monthStart && tDate <= monthEnd;
+        }).reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
-    const expenses = activeTransactions.filter(t => {
-      const tDate = new Date(t.date);
-      return t.type === 'expense' && tDate >= monthStart && tDate <= monthEnd;
-    }).reduce((sum, t) => sum + parseFloat(t.amount), 0);
+        const expenses = activeTransactions.filter(t => {
+          const tDate = new Date(t.date);
+          return t.type === 'expense' && tDate >= monthStart && tDate <= monthEnd;
+        }).reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
-    return {
-      month: format(month, 'MMM', { locale: es }),
-      ingresos: income,
-      gastos: expenses,
-    };
-  });
+        return {
+          month: format(month, 'MMM yyyy', { locale: es }),
+          ingresos: income,
+          gastos: expenses,
+        };
+      });
+    } else {
+      // Para rango custom, mostrar solo el total del periodo
+      return [{
+        month: 'Periodo',
+        ingresos: totalIncome,
+        gastos: totalExpenses,
+      }];
+    }
+  };
+
+  const monthlyData = generateChartData();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,13 +239,13 @@ export default function Finances() {
   };
 
   const exportToExcel = () => {
-    if (!transactions || transactions.length === 0) {
-      toast.error('No hay transacciones para exportar');
+    if (!filteredTransactions || filteredTransactions.length === 0) {
+      toast.error('No hay transacciones en el periodo seleccionado para exportar');
       return;
     }
 
-    // Preparar datos para Excel
-    const excelData = transactions.map(transaction => ({
+    // Preparar datos para Excel (solo transacciones del periodo)
+    const excelData = filteredTransactions.map(transaction => ({
       'Fecha': format(new Date(transaction.date), 'dd/MM/yyyy', { locale: es }),
       'Tipo': transaction.type === 'income' ? 'Ingreso' : 'Gasto',
       'Categoría': transaction.category,
@@ -213,8 +272,11 @@ export default function Finances() {
       { wch: 20 }, // ID Referencia
     ];
 
-    // Generar archivo
-    const fileName = `transacciones_${format(new Date(), 'yyyy-MM-dd')}.xlsx`;
+    // Generar archivo con nombre que incluye el periodo
+    const periodLabel = periodType === 'month' 
+      ? format(selectedPeriod, 'yyyy-MM', { locale: es })
+      : `${customDateRange.start}_${customDateRange.end}`;
+    const fileName = `transacciones_${periodLabel}.xlsx`;
     XLSX.writeFile(workbook, fileName);
     
     toast.success('Historial exportado exitosamente');
@@ -231,6 +293,96 @@ export default function Finances() {
               Control de ingresos y gastos
             </p>
           </div>
+
+          {/* Selector de Periodo */}
+          <Card className="bg-card border-border">
+            <CardContent className="p-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                {/* Navegación de mes */}
+                {periodType === 'month' && (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={goToPreviousMonth}
+                      className="h-8 w-8"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <div className="min-w-[140px] text-center">
+                      <p className="text-sm font-medium text-foreground">
+                        {format(selectedPeriod, 'MMMM yyyy', { locale: es })}
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={goToNextMonth}
+                      className="h-8 w-8"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={goToCurrentMonth}
+                      className="text-xs"
+                    >
+                      Hoy
+                    </Button>
+                  </div>
+                )}
+
+                {/* Rango personalizado */}
+                {periodType === 'custom' && (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="date"
+                      value={customDateRange.start}
+                      onChange={(e) => setCustomDateRange(prev => ({ ...prev, start: e.target.value }))}
+                      className="w-auto"
+                    />
+                    <span className="text-muted-foreground">-</span>
+                    <Input
+                      type="date"
+                      value={customDateRange.end}
+                      onChange={(e) => setCustomDateRange(prev => ({ ...prev, end: e.target.value }))}
+                      className="w-auto"
+                    />
+                  </div>
+                )}
+
+                {/* Toggle tipo de periodo */}
+                <div className="flex items-center gap-2 ml-auto">
+                  <Button
+                    variant={periodType === 'month' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setPeriodType('month')}
+                    className="text-xs"
+                  >
+                    <Calendar className="h-3 w-3 mr-1" />
+                    Mes
+                  </Button>
+                  <Button
+                    variant={periodType === 'custom' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setPeriodType('custom')}
+                    className="text-xs"
+                  >
+                    Rango
+                  </Button>
+                </div>
+              </div>
+
+              {/* Resumen del periodo */}
+              <div className="mt-3 pt-3 border-t border-border">
+                <p className="text-xs text-muted-foreground">
+                  Mostrando {filteredTransactions.length} transacciones del {format(dateRange.start, 'dd/MM/yyyy')} al {format(dateRange.end, 'dd/MM/yyyy')}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="w-full sm:w-auto">
@@ -465,9 +617,13 @@ export default function Finances() {
               <p className="text-muted-foreground text-center py-8">
                 No hay transacciones registradas
               </p>
+            ) : filteredTransactions.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                No hay transacciones en el periodo seleccionado
+              </p>
             ) : (
               <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                {transactions.map((transaction) => {
+                {filteredTransactions.map((transaction) => {
                   const isVoided = transaction.status === 'voided';
                   const isReversal = transaction.description.startsWith('[ANULACIÓN]');
                   
