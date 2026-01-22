@@ -689,6 +689,10 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
+        console.log('[Invoice Update] ========== START ==========');
+        console.log('[Invoice Update] Input received:', JSON.stringify(input));
+        console.log('[Invoice Update] User ID:', ctx.user.id);
+        
         const { id, ...data } = input;
         const updateData: any = { ...data, updated_at: new Date() };
         
