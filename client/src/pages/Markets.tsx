@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
@@ -303,102 +303,65 @@ export default function Markets() {
     );
   };
 
-  const AssetAccordionItem = ({ asset }: { asset: MarketAsset }) => {
+  const AssetItem = ({ asset }: { asset: MarketAsset }) => {
     const isPositive = asset.change24h >= 0;
     const favorite = isFavorite(asset.symbol);
-    const widget = isWidget(asset.symbol);
 
     return (
-      <AccordionItem value={asset.symbol} className="border rounded-xl px-3 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-200 shadow-sm h-fit">
-        <AccordionTrigger className="hover:no-underline py-4">
-          <div className="flex items-center justify-between w-full pr-2 gap-2">
-            {/* Left: Symbol & Name */}
-            <div className="flex items-center gap-3 text-left min-w-0 flex-1">
-              <div className="flex flex-col min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-base truncate">{asset.symbol}</span>
-                  {widget && (
-                    <Badge variant="default" className="text-[10px] h-4 px-1 hidden sm:inline-flex">
-                      Dash
-                    </Badge>
-                  )}
-                  {favorite && (
-                    <Star className="w-3 h-3 fill-primary text-primary" />
-                  )}
-                </div>
-                <span className="text-xs text-muted-foreground truncate max-w-[80px]">{asset.name}</span>
-              </div>
-            </div>
+      <div className="flex items-center justify-between p-3 sm:p-4 border rounded-xl bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-200 shadow-sm gap-3">
+        {/* Left: Symbol & Name */}
+        <div className="flex items-center gap-3 text-left min-w-0 flex-1">
+          <div className="flex flex-col min-w-0">
+            <span className="font-bold text-sm sm:text-base truncate">{asset.symbol}</span>
+            <span className="text-xs text-muted-foreground truncate">{asset.name}</span>
+          </div>
+        </div>
 
-            {/* Right: Price, Chart, Change */}
-            <div className="flex items-center gap-2 shrink-0">
-              {/* Mini Chart - Compact for grid */}
-              {asset.sparkline && (
-                <div className="opacity-80 hover:opacity-100 transition-opacity hidden xs:block">
-                  <MiniChart data={asset.sparkline} isPositive={isPositive} />
-                </div>
-              )}
+        {/* Center: Mini Chart */}
+        {asset.sparkline && (
+          <div className="opacity-80 hover:opacity-100 transition-opacity hidden sm:block">
+            <MiniChart data={asset.sparkline} isPositive={isPositive} />
+          </div>
+        )}
 
-              <div className="text-right min-w-[70px]">
-                <div className="font-mono font-medium text-sm">{formatPrice(asset.price)}</div>
-                <div className={`text-[10px] flex items-center justify-end gap-1 font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
-                  {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                  {Math.abs(asset.change24h).toFixed(2)}%
-                </div>
-              </div>
+        {/* Right: Price, Change, Actions */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="text-right min-w-[70px]">
+            <div className="font-mono font-medium text-sm">{formatPrice(asset.price)}</div>
+            <div className={`text-[10px] flex items-center justify-end gap-1 font-medium ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+              {isPositive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+              {Math.abs(asset.change24h).toFixed(2)}%
             </div>
           </div>
-        </AccordionTrigger>
-        
-        <AccordionContent>
-          <div className="pt-2 pb-4 px-1 space-y-4">
-            {/* Expanded Details */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-muted/30 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">Cap. Mercado</p>
-                <p className="font-mono font-medium">{asset.marketCap ? formatMarketCap(asset.marketCap) : 'N/A'}</p>
-              </div>
-              <div className="p-3 bg-muted/30 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">Volumen 24h</p>
-                <p className="font-mono font-medium">{asset.volume24h ? formatMarketCap(asset.volume24h) : 'N/A'}</p>
-              </div>
-            </div>
 
-            {/* Actions */}
-            <div className="flex flex-col gap-2 mt-2">
-              <Button
-                variant={favorite ? 'secondary' : 'outline'}
-                size="sm"
-                className="w-full justify-start"
-                onClick={(e) => handleToggleFavorite(e, asset)}
-              >
-                <Star className={`w-4 h-4 mr-2 ${favorite ? 'fill-current text-yellow-500' : ''}`} />
-                {favorite ? 'En Favoritos' : 'Añadir a Favoritos'}
-              </Button>
-              
-              <Button
-                variant={widget ? 'secondary' : 'outline'}
-                size="sm"
-                className="w-full justify-start"
-                onClick={(e) => handleSetWidget(e, asset)}
-              >
-                <Eye className={`w-4 h-4 mr-2 ${widget ? 'text-primary' : ''}`} />
-                {widget ? 'Quitar del Dashboard' : 'Añadir al Dashboard'}
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start hover:text-yellow-500 hover:border-yellow-500/50"
-                onClick={(e) => openAlertDialog(e, asset)}
-              >
-                <BellPlus className="w-4 h-4 mr-2" />
-                Crear Alerta de Precio
-              </Button>
-            </div>
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggleFavorite(e, asset);
+              }}
+            >
+              <Star className={`w-4 h-4 ${favorite ? 'fill-primary text-primary' : ''}`} />
+            </Button>
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={(e) => {
+                e.stopPropagation();
+                openAlertDialog(e, asset);
+              }}
+            >
+              <Bell className="w-4 h-4" />
+            </Button>
           </div>
-        </AccordionContent>
-      </AccordionItem>
+        </div>
+      </div>
     );
   };
 
@@ -546,35 +509,35 @@ export default function Markets() {
           </div>
 
           <TabsContent value="crypto">
-            <Accordion type="single" collapsible className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            <div className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
               {sortAssets(filterAssets(cryptoData)).map((asset) => (
-                <AssetAccordionItem key={asset.symbol} asset={asset} />
+                <AssetItem key={asset.symbol} asset={asset} />
               ))}
-            </Accordion>
+            </div>
           </TabsContent>
 
           <TabsContent value="stocks">
-            <Accordion type="single" collapsible className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            <div className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
               {sortAssets(filterAssets(MOCK_STOCKS)).map((asset) => (
-                <AssetAccordionItem key={asset.symbol} asset={asset} />
+                <AssetItem key={asset.symbol} asset={asset} />
               ))}
-            </Accordion>
+            </div>
           </TabsContent>
 
           <TabsContent value="forex">
-            <Accordion type="single" collapsible className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            <div className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
               {sortAssets(filterAssets(MOCK_FOREX)).map((asset) => (
-                <AssetAccordionItem key={asset.symbol} asset={asset} />
+                <AssetItem key={asset.symbol} asset={asset} />
               ))}
-            </Accordion>
+            </div>
           </TabsContent>
 
           <TabsContent value="commodities">
-            <Accordion type="single" collapsible className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            <div className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
               {sortAssets(filterAssets(MOCK_COMMODITIES)).map((asset) => (
-                <AssetAccordionItem key={asset.symbol} asset={asset} />
+                <AssetItem key={asset.symbol} asset={asset} />
               ))}
-            </Accordion>
+            </div>
           </TabsContent>
         </Tabs>
 
