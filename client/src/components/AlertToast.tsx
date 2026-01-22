@@ -1,12 +1,13 @@
 /**
  * AlertToast - Sistema de toasts temporales con prioridades
  * Muestra alertas temporales en la esquina inferior derecha
+ * Estilo visual idéntico a PaymentNotifications
  * Prioridad: Critical > Warning > Info
  * Máximo un toast a la vez
  */
 
 import { useEffect, useState } from 'react';
-import { X, Info, AlertTriangle, AlertCircle } from 'lucide-react';
+import { X, Clock, AlertTriangle, AlertCircle, Info, Bell } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import { useLocation } from 'wouter';
 
@@ -23,6 +24,20 @@ interface Alert {
 
 const TOAST_DURATION = 5000; // 5 seconds
 const PRIORITY_ORDER: AlertType[] = ['critical', 'warning', 'info'];
+
+// Mapeo de eventos a títulos legibles
+const EVENT_TITLES: Record<string, string> = {
+  'invoice_overdue': 'Factura Vencida',
+  'pending_receipt': 'Comprobante Pendiente',
+  'invoice_upcoming': 'Factura Próxima',
+  'income_confirmed': 'Ingreso Confirmado',
+  'monthly_comparison': 'Resumen Mensual',
+  'no_income_month': 'Sin Ingresos',
+  'plan_limit': 'Límite de Plan',
+  'feature_blocked': 'Función Bloqueada',
+  'multiple_pending': 'Facturas Pendientes',
+  'client_late_history': 'Historial de Cliente',
+};
 
 export function AlertToast() {
   const [, setLocation] = useLocation();
@@ -105,26 +120,29 @@ export function AlertToast() {
     switch (type) {
       case 'critical':
         return {
-          bgColor: 'bg-red-500/10',
           borderColor: 'border-red-500',
-          textColor: 'text-red-600 dark:text-red-400',
-          buttonBg: 'bg-red-500 hover:bg-red-600',
+          iconBg: 'bg-red-500',
+          iconColor: 'text-white',
+          titleColor: 'text-red-400',
+          buttonBorder: 'border-red-500 text-red-400 hover:bg-red-500/20',
           Icon: AlertCircle,
         };
       case 'warning':
         return {
-          bgColor: 'bg-yellow-500/10',
           borderColor: 'border-yellow-500',
-          textColor: 'text-yellow-600 dark:text-yellow-400',
-          buttonBg: 'bg-yellow-500 hover:bg-yellow-600',
+          iconBg: 'bg-yellow-500',
+          iconColor: 'text-black',
+          titleColor: 'text-yellow-400',
+          buttonBorder: 'border-yellow-500 text-yellow-400 hover:bg-yellow-500/20',
           Icon: AlertTriangle,
         };
       default:
         return {
-          bgColor: 'bg-blue-500/10',
           borderColor: 'border-blue-500',
-          textColor: 'text-blue-600 dark:text-blue-400',
-          buttonBg: 'bg-blue-500 hover:bg-blue-600',
+          iconBg: 'bg-blue-500',
+          iconColor: 'text-white',
+          titleColor: 'text-blue-400',
+          buttonBorder: 'border-blue-500 text-blue-400 hover:bg-blue-500/20',
           Icon: Info,
         };
     }
@@ -132,65 +150,83 @@ export function AlertToast() {
 
   const styles = getAlertStyles(currentAlert.type);
   const { Icon } = styles;
+  const title = EVENT_TITLES[currentAlert.event] || currentAlert.event;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 duration-500">
       <div 
         className={`
-          ${styles.bgColor} ${styles.borderColor} border rounded-lg shadow-2xl 
+          bg-[#1a1a1a] ${styles.borderColor} border rounded-2xl shadow-2xl 
           max-w-sm w-full sm:w-96 p-4
           backdrop-blur-sm
         `}
       >
-        {/* Header */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <div className={`${styles.bgColor} p-2 rounded-full`}>
-              <Icon className={`w-5 h-5 ${styles.textColor}`} />
-            </div>
-            <div>
-              <h3 className={`font-bold text-base ${styles.textColor}`}>
-                {currentAlert.event}
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {currentAlert.message}
-              </p>
-            </div>
+        {/* Header con icono circular y título */}
+        <div className="flex items-start gap-3">
+          {/* Icono circular */}
+          <div className={`${styles.iconBg} p-2.5 rounded-full flex-shrink-0`}>
+            <Icon className={`w-5 h-5 ${styles.iconColor}`} />
           </div>
+          
+          {/* Contenido */}
+          <div className="flex-1 min-w-0">
+            {/* Título con icono de reloj */}
+            <div className="flex items-center gap-2 mb-1">
+              <Clock className="w-4 h-4 text-muted-foreground" />
+              <h3 className={`font-semibold text-base ${styles.titleColor}`}>
+                {title}
+              </h3>
+            </div>
+            
+            {/* Mensaje */}
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {currentAlert.message}
+            </p>
+            
+            {/* Información adicional (si hay) */}
+            {currentAlert.action_text && (
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                {currentAlert.action_text}
+              </p>
+            )}
+          </div>
+          
+          {/* Botón cerrar */}
           <button
             onClick={handleDismiss}
-            className="text-muted-foreground hover:text-foreground transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Actions */}
+        {/* Botones de acción */}
         <div className="flex gap-2 mt-4">
           {currentAlert.action_url && (
             <button
               onClick={handleAction}
               className={`
-                flex-1 px-4 py-2 rounded-lg font-medium text-sm text-white
-                ${styles.buttonBg}
-                transition-colors
+                flex items-center justify-center gap-2 px-4 py-2 rounded-lg 
+                font-medium text-sm border transition-colors
+                ${styles.buttonBorder}
               `}
             >
+              <Bell className="w-4 h-4" />
               {currentAlert.action_text || 'Ver detalles'}
             </button>
           )}
           <button
             onClick={handleDismiss}
-            className="px-4 py-2 rounded-lg font-medium text-sm border border-border hover:bg-accent transition-colors"
+            className="px-4 py-2 rounded-lg font-medium text-sm border border-border text-muted-foreground hover:bg-accent transition-colors"
           >
             Descartar
           </button>
         </div>
 
-        {/* Queue indicator */}
+        {/* Indicador de cola */}
         {queue.length > 0 && (
-          <div className="mt-3 text-xs text-center text-muted-foreground">
-            {queue.length} alerta{queue.length > 1 ? 's' : ''} más
+          <div className="mt-3 text-xs text-center text-muted-foreground/60">
+            {queue.length} alerta{queue.length > 1 ? 's' : ''} más en cola
           </div>
         )}
       </div>
