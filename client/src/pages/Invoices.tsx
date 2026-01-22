@@ -113,6 +113,7 @@ export default function Invoices() {
   // Filters and pagination state (must be declared before useMemo)
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateFilter, setDateFilter] = useState<string>('all'); // all, 30days, 90days, year
+  const [clientFilter, setClientFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 20;
@@ -132,6 +133,11 @@ export default function Invoices() {
     if (!allInvoices) return [];
     
     let filtered = allInvoices;
+    
+    // Client filter
+    if (clientFilter !== 'all') {
+      filtered = filtered.filter(inv => inv.client_id === parseInt(clientFilter));
+    }
     
     // Status filter (for non-archived invoices)
     if (statusFilter !== 'all') {
@@ -172,7 +178,7 @@ export default function Invoices() {
     }
     
     return filtered;
-  }, [allInvoices, archivedInvoices, statusFilter, dateFilter, searchQuery, clients]);
+  }, [allInvoices, archivedInvoices, statusFilter, dateFilter, clientFilter, searchQuery, clients]);
   
   // Pagination
   const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
@@ -685,9 +691,9 @@ export default function Invoices() {
 
         {/* Filters Bar */}
         <div className="bg-card border border-border rounded-lg p-4 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Search */}
-            <div className="lg:col-span-2">
+          <div className="flex flex-col lg:flex-row gap-3">
+            {/* Search - Full width on mobile, flex-1 on desktop */}
+            <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
@@ -703,17 +709,36 @@ export default function Invoices() {
               </div>
             </div>
             
-            {/* Status Filter */}
-            <div>
+            {/* Filters Group - Compact and aligned */}
+            <div className="flex gap-2">
+              {/* Client Filter */}
+              <Select value={clientFilter} onValueChange={(value) => {
+                setClientFilter(value);
+                setCurrentPage(1);
+              }}>
+                <SelectTrigger className="bg-background border-border text-foreground w-[180px]">
+                  <SelectValue placeholder="Cliente" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border-border">
+                  <SelectItem value="all">Todos los clientes</SelectItem>
+                  {clients?.map((client) => (
+                    <SelectItem key={client.id} value={client.id.toString()}>
+                      {client.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              {/* Status Filter */}
               <Select value={statusFilter} onValueChange={(value) => {
                 setStatusFilter(value);
                 setCurrentPage(1);
               }}>
-                <SelectTrigger className="bg-background border-border text-foreground">
+                <SelectTrigger className="bg-background border-border text-foreground w-[160px]">
                   <SelectValue placeholder="Estado" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-border">
-                  <SelectItem value="all">Todos los estados</SelectItem>
+                  <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value="draft">Borrador</SelectItem>
                   <SelectItem value="sent">Enviada</SelectItem>
                   <SelectItem value="paid">Pagada</SelectItem>
@@ -723,22 +748,20 @@ export default function Invoices() {
                   <SelectItem value="archived">Archivadas</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            
-            {/* Date Filter */}
-            <div>
+              
+              {/* Date Filter */}
               <Select value={dateFilter} onValueChange={(value) => {
                 setDateFilter(value);
                 setCurrentPage(1);
               }}>
-                <SelectTrigger className="bg-background border-border text-foreground">
+                <SelectTrigger className="bg-background border-border text-foreground w-[160px]">
                   <SelectValue placeholder="Fecha" />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-border">
-                  <SelectItem value="all">Todas las fechas</SelectItem>
-                  <SelectItem value="30days">Últimos 30 días</SelectItem>
-                  <SelectItem value="90days">Últimos 90 días</SelectItem>
-                  <SelectItem value="year">Último año</SelectItem>
+                  <SelectItem value="all">Todas</SelectItem>
+                  <SelectItem value="30days">30 días</SelectItem>
+                  <SelectItem value="90days">90 días</SelectItem>
+                  <SelectItem value="year">1 año</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -748,11 +771,12 @@ export default function Invoices() {
           <div className="mt-4 flex items-center justify-between text-sm">
             <p className="text-muted-foreground">
               Mostrando {invoices?.length || 0} de {filteredInvoices.length} facturas
-              {(statusFilter !== 'all' || dateFilter !== 'all' || searchQuery) && (
+              {(statusFilter !== 'all' || dateFilter !== 'all' || clientFilter !== 'all' || searchQuery) && (
                 <button
                   onClick={() => {
                     setStatusFilter('all');
                     setDateFilter('all');
+                    setClientFilter('all');
                     setSearchQuery('');
                     setCurrentPage(1);
                   }}
