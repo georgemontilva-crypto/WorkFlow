@@ -572,7 +572,7 @@ export default function Markets() {
         </Tabs>
 
         {/* Tools Section - 50/50 Layout */}
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
           {/* Scenario Simulator - Left 50% */}
           <ScenarioSimulator
             availableAssets={[

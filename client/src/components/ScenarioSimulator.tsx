@@ -1,5 +1,5 @@
 /**
- * Scenario Simulator Component - Compact Version
+ * Scenario Simulator Component - Compact & Stable Version
  * Allows users to simulate hypothetical profit/loss scenarios for financial assets
  */
 
@@ -130,116 +130,118 @@ export default function ScenarioSimulator({ availableAssets, selectedAsset }: Sc
   const isFormValid = asset && quantity && buyPrice && targetPrice;
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
+    <Card className="flex flex-col" style={{ minHeight: '420px', maxHeight: '420px' }}>
+      <CardHeader className="pb-2 px-4 pt-3 shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Calculator className="w-5 h-5 text-primary" />
-            <CardTitle className="text-lg">Simulador de Escenario</CardTitle>
+            <Calculator className="w-4 h-4 text-primary" />
+            <CardTitle className="text-base">Simulador de Escenario</CardTitle>
           </div>
           {result && (
-            <Button variant="ghost" size="sm" onClick={handleClear} className="h-7 px-2">
-              <X className="w-4 h-4" />
+            <Button variant="ghost" size="sm" onClick={handleClear} className="h-6 px-2">
+              <X className="w-3 h-3" />
             </Button>
           )}
         </div>
-        <CardDescription className="text-xs">
+        <CardDescription className="text-[10px]">
           Calcula posibles ganancias o pérdidas en un escenario hipotético
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-3">
-        {/* Asset Selector */}
-        <div className="space-y-1">
-          <Label htmlFor="asset" className="text-xs">Activo *</Label>
-          <AssetSelector
-            assets={availableAssets}
-            selectedAsset={asset}
-            onSelect={setAsset}
-            placeholder="Seleccionar activo"
-          />
-          {errors.asset && <p className="text-xs text-destructive">{errors.asset}</p>}
-        </div>
+      <CardContent className="px-4 pb-3 flex-1 overflow-y-auto">
+        <div className="space-y-2">
+          {/* Asset Selector */}
+          <div className="space-y-1">
+            <Label htmlFor="asset" className="text-xs">Activo *</Label>
+            <AssetSelector
+              assets={availableAssets}
+              selectedAsset={asset}
+              onSelect={setAsset}
+              placeholder="Seleccionar activo"
+            />
+            {errors.asset && <p className="text-[10px] text-destructive">{errors.asset}</p>}
+          </div>
 
-        {/* Asset Info Card */}
-        {asset && (
-          <div className="p-2 bg-muted/30 rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold">{asset.symbol}</p>
-                <p className="text-[10px] text-muted-foreground">{asset.name}</p>
+          {/* Asset Info Card */}
+          {asset && (
+            <div className="p-1.5 bg-muted/30 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold">{asset.symbol}</p>
+                  <p className="text-[9px] text-muted-foreground">{asset.name}</p>
+                </div>
+                <p className="text-xs font-mono">${asset.price.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</p>
               </div>
-              <p className="text-xs font-mono">${asset.price.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</p>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Form Fields - 2 Columns */}
-        <div className="grid grid-cols-2 gap-3">
-          {/* Quantity */}
-          <div className="space-y-1">
-            <Label htmlFor="quantity" className="text-xs">Cantidad *</Label>
-            <Input
-              id="quantity"
-              type="number"
-              placeholder="0.00"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              className="h-8 text-sm"
-              step="any"
-            />
-            {errors.quantity && <p className="text-xs text-destructive">{errors.quantity}</p>}
-          </div>
+          {/* Form Fields - 2 Columns */}
+          <div className="grid grid-cols-2 gap-2">
+            {/* Quantity */}
+            <div className="space-y-0.5">
+              <Label htmlFor="quantity" className="text-xs">Cantidad *</Label>
+              <Input
+                id="quantity"
+                type="number"
+                placeholder="0.00"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
+                className="h-7 text-xs"
+                step="any"
+              />
+              {errors.quantity && <p className="text-[10px] text-destructive">{errors.quantity}</p>}
+            </div>
 
-          {/* Buy Price */}
-          <div className="space-y-1">
-            <Label htmlFor="buyPrice" className="text-xs">Precio Compra *</Label>
-            <Input
-              id="buyPrice"
-              type="number"
-              placeholder="0.00"
-              value={buyPrice}
-              onChange={(e) => setBuyPrice(e.target.value)}
-              className="h-8 text-sm"
-              step="any"
-            />
-            {errors.buyPrice && <p className="text-xs text-destructive">{errors.buyPrice}</p>}
-          </div>
+            {/* Buy Price */}
+            <div className="space-y-0.5">
+              <Label htmlFor="buyPrice" className="text-xs">Precio Compra *</Label>
+              <Input
+                id="buyPrice"
+                type="number"
+                placeholder="0.00"
+                value={buyPrice}
+                onChange={(e) => setBuyPrice(e.target.value)}
+                className="h-7 text-xs"
+                step="any"
+              />
+              {errors.buyPrice && <p className="text-[10px] text-destructive">{errors.buyPrice}</p>}
+            </div>
 
-          {/* Target Price */}
-          <div className="space-y-1">
-            <Label htmlFor="targetPrice" className="text-xs">Precio Objetivo *</Label>
-            <Input
-              id="targetPrice"
-              type="number"
-              placeholder="0.00"
-              value={targetPrice}
-              onChange={(e) => setTargetPrice(e.target.value)}
-              className="h-8 text-sm"
-              step="any"
-            />
-            {errors.targetPrice && <p className="text-xs text-destructive">{errors.targetPrice}</p>}
-          </div>
+            {/* Target Price */}
+            <div className="space-y-0.5">
+              <Label htmlFor="targetPrice" className="text-xs">Precio Objetivo *</Label>
+              <Input
+                id="targetPrice"
+                type="number"
+                placeholder="0.00"
+                value={targetPrice}
+                onChange={(e) => setTargetPrice(e.target.value)}
+                className="h-7 text-xs"
+                step="any"
+              />
+              {errors.targetPrice && <p className="text-[10px] text-destructive">{errors.targetPrice}</p>}
+            </div>
 
-          {/* Commission Percent */}
-          <div className="space-y-1">
-            <Label htmlFor="commissionPercent" className="text-xs">Comisión (%)</Label>
-            <Input
-              id="commissionPercent"
-              type="number"
-              placeholder="0.00"
-              value={commissionPercent}
-              onChange={(e) => setCommissionPercent(e.target.value)}
-              className="h-8 text-sm"
-              step="any"
-              min="0"
-              max="100"
-            />
-            {errors.commissionPercent && <p className="text-xs text-destructive">{errors.commissionPercent}</p>}
+            {/* Commission Percent */}
+            <div className="space-y-0.5">
+              <Label htmlFor="commissionPercent" className="text-xs">Comisión (%)</Label>
+              <Input
+                id="commissionPercent"
+                type="number"
+                placeholder="0.00"
+                value={commissionPercent}
+                onChange={(e) => setCommissionPercent(e.target.value)}
+                className="h-7 text-xs"
+                step="any"
+                min="0"
+                max="100"
+              />
+              {errors.commissionPercent && <p className="text-[10px] text-destructive">{errors.commissionPercent}</p>}
+            </div>
           </div>
 
           {/* Commission Fixed - Full Width */}
-          <div className="col-span-2 space-y-1">
+          <div className="space-y-0.5">
             <Label htmlFor="commissionFixed" className="text-xs">Comisión Fija</Label>
             <Input
               id="commissionFixed"
@@ -247,65 +249,65 @@ export default function ScenarioSimulator({ availableAssets, selectedAsset }: Sc
               placeholder="0.00"
               value={commissionFixed}
               onChange={(e) => setCommissionFixed(e.target.value)}
-              className="h-8 text-sm"
+              className="h-7 text-xs"
               step="any"
               min="0"
             />
-            {errors.commissionFixed && <p className="text-xs text-destructive">{errors.commissionFixed}</p>}
+            {errors.commissionFixed && <p className="text-[10px] text-destructive">{errors.commissionFixed}</p>}
           </div>
-        </div>
 
-        {/* Calculate Button */}
-        <Button
-          onClick={calculateScenario}
-          disabled={!isFormValid}
-          className="w-full h-9"
-        >
-          <Calculator className="w-4 h-4 mr-2" />
-          Calcular
-        </Button>
+          {/* Calculate Button */}
+          <Button
+            onClick={calculateScenario}
+            disabled={!isFormValid}
+            className="w-full h-8 text-xs"
+          >
+            <Calculator className="w-3 h-3 mr-1.5" />
+            Calcular
+          </Button>
 
-        {/* Results */}
-        {result && (
-          <div className="space-y-2 pt-2 border-t">
-            <h4 className="text-sm font-semibold">Resultados</h4>
-            
-            <div className="grid grid-cols-2 gap-2">
-              <div className="p-2 bg-muted/30 rounded-lg">
-                <p className="text-[10px] text-muted-foreground mb-0.5">Inversión Inicial</p>
-                <p className="text-sm font-mono">${result.initialInvestment.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+          {/* Results */}
+          {result && (
+            <div className="space-y-2 pt-2 border-t">
+              <h4 className="text-xs font-semibold">Resultados</h4>
+              
+              <div className="grid grid-cols-2 gap-2">
+                <div className="p-1.5 bg-muted/30 rounded-lg">
+                  <p className="text-[9px] text-muted-foreground mb-0.5">Inversión Inicial</p>
+                  <p className="text-xs font-mono">${result.initialInvestment.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                </div>
+
+                <div className="p-1.5 bg-muted/30 rounded-lg">
+                  <p className="text-[9px] text-muted-foreground mb-0.5">Valor Final</p>
+                  <p className="text-xs font-mono">${result.finalValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                </div>
+
+                <div className={`p-1.5 rounded-lg ${result.profitLoss >= 0 ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                  <p className="text-[9px] text-muted-foreground mb-0.5">Ganancia / Pérdida</p>
+                  <p className={`text-xs font-mono font-semibold flex items-center gap-1 ${result.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {result.profitLoss >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                    {result.profitLoss >= 0 ? '+' : ''} ${result.profitLoss.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                </div>
+
+                <div className={`p-1.5 rounded-lg ${result.roi >= 0 ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                  <p className="text-[9px] text-muted-foreground mb-0.5">ROI</p>
+                  <p className={`text-xs font-mono font-semibold ${result.roi >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {result.roi >= 0 ? '+' : ''}{result.roi.toFixed(2)}%
+                  </p>
+                </div>
               </div>
 
-              <div className="p-2 bg-muted/30 rounded-lg">
-                <p className="text-[10px] text-muted-foreground mb-0.5">Valor Final</p>
-                <p className="text-sm font-mono">${result.finalValue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-              </div>
-
-              <div className={`p-2 rounded-lg ${result.profitLoss >= 0 ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
-                <p className="text-[10px] text-muted-foreground mb-0.5">Ganancia / Pérdida</p>
-                <p className={`text-sm font-mono font-semibold flex items-center gap-1 ${result.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {result.profitLoss >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                  {result.profitLoss >= 0 ? '+' : ''} ${result.profitLoss.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
-              </div>
-
-              <div className={`p-2 rounded-lg ${result.roi >= 0 ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
-                <p className="text-[10px] text-muted-foreground mb-0.5">ROI</p>
-                <p className={`text-sm font-mono font-semibold ${result.roi >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {result.roi >= 0 ? '+' : ''}{result.roi.toFixed(2)}%
-                </p>
-              </div>
+              {/* Disclaimer */}
+              <Alert className="py-1.5">
+                <AlertCircle className="w-3 h-3" />
+                <AlertDescription className="text-[9px]">
+                  Este cálculo es una simulación hipotética y no constituye asesoría financiera.
+                </AlertDescription>
+              </Alert>
             </div>
-
-            {/* Disclaimer */}
-            <Alert className="py-2">
-              <AlertCircle className="w-3 h-3" />
-              <AlertDescription className="text-[10px]">
-                Este cálculo es una simulación hipotética y no constituye asesoría financiera.
-              </AlertDescription>
-            </Alert>
-          </div>
-        )}
+          )}
+        </div>
       </CardContent>
     </Card>
   );

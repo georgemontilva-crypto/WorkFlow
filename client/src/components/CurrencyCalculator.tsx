@@ -1,5 +1,5 @@
 /**
- * Currency Calculator Component - Compact Version
+ * Currency Calculator Component - Compact & Stable Version
  * Real-time currency conversion tool
  */
 
@@ -79,113 +79,117 @@ export default function CurrencyCalculator() {
   };
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
+    <Card className="flex flex-col" style={{ minHeight: '420px', maxHeight: '420px' }}>
+      <CardHeader className="pb-2 px-4 pt-3 shrink-0">
         <div className="flex items-center gap-2">
-          <DollarSign className="w-5 h-5 text-primary" />
-          <CardTitle className="text-lg">Calculadora de Divisas</CardTitle>
+          <DollarSign className="w-4 h-4 text-primary" />
+          <CardTitle className="text-base">Calculadora de Divisas</CardTitle>
         </div>
-        <CardDescription className="text-xs">
+        <CardDescription className="text-[10px]">
           Conversión en tiempo real entre monedas
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="space-y-3">
-        {/* Amount Input */}
-        <div className="space-y-1">
-          <Label htmlFor="amount" className="text-xs">Cantidad</Label>
-          <Input
-            id="amount"
-            type="number"
-            step="any"
-            min="0"
-            placeholder="0.00"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="h-8 text-sm"
-          />
-        </div>
-
-        {/* Currency Selectors - Horizontal Layout */}
-        <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
-          {/* From Currency */}
-          <div className="space-y-1">
-            <Label htmlFor="fromCurrency" className="text-xs">De</Label>
-            <CurrencySelector
-              currencies={POPULAR_CURRENCIES}
-              selectedCurrency={fromCurrency}
-              onSelect={setFromCurrency}
-              placeholder="Seleccionar"
+      <CardContent className="px-4 pb-3 flex-1 overflow-y-auto">
+        <div className="space-y-2">
+          {/* Amount Input */}
+          <div className="space-y-0.5">
+            <Label htmlFor="amount" className="text-xs">Cantidad</Label>
+            <Input
+              id="amount"
+              type="number"
+              step="any"
+              min="0"
+              placeholder="0.00"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="h-7 text-xs"
             />
           </div>
 
-          {/* Swap Button */}
+          {/* Currency Selectors - Horizontal Layout */}
+          <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
+            {/* From Currency */}
+            <div className="space-y-0.5">
+              <Label htmlFor="fromCurrency" className="text-xs">De</Label>
+              <CurrencySelector
+                currencies={POPULAR_CURRENCIES}
+                selectedCurrency={fromCurrency}
+                onSelect={setFromCurrency}
+                placeholder="Seleccionar"
+              />
+            </div>
+
+            {/* Swap Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={swapCurrencies}
+              className="rounded-full h-7 w-7 mb-0"
+            >
+              <ArrowRightLeft className="w-3 h-3" />
+            </Button>
+
+            {/* To Currency */}
+            <div className="space-y-0.5">
+              <Label htmlFor="toCurrency" className="text-xs">A</Label>
+              <CurrencySelector
+                currencies={POPULAR_CURRENCIES}
+                selectedCurrency={toCurrency}
+                onSelect={setToCurrency}
+                placeholder="Seleccionar"
+              />
+            </div>
+          </div>
+
+          {/* Convert Button */}
           <Button
-            variant="ghost"
-            size="icon"
-            onClick={swapCurrencies}
-            className="rounded-full h-8 w-8 mb-0"
+            onClick={fetchExchangeRate}
+            disabled={!amount || parseFloat(amount) <= 0 || loading}
+            className="w-full h-8 text-xs"
           >
-            <ArrowRightLeft className="w-3 h-3" />
+            {loading ? (
+              <>
+                <RefreshCw className="w-3 h-3 mr-1.5 animate-spin" />
+                Convirtiendo...
+              </>
+            ) : (
+              <>
+                <DollarSign className="w-3 h-3 mr-1.5" />
+                Convertir
+              </>
+            )}
           </Button>
 
-          {/* To Currency */}
-          <div className="space-y-1">
-            <Label htmlFor="toCurrency" className="text-xs">A</Label>
-            <CurrencySelector
-              currencies={POPULAR_CURRENCIES}
-              selectedCurrency={toCurrency}
-              onSelect={setToCurrency}
-              placeholder="Seleccionar"
-            />
+          {/* Result - Fixed Height Container */}
+          <div style={{ minHeight: '80px' }}>
+            {result !== null && (
+              <div className="space-y-2 pt-2 border-t">
+                {/* Main Result */}
+                <div className="p-2 bg-primary/10 rounded-lg border border-primary/20">
+                  <p className="text-[9px] text-muted-foreground mb-0.5">Resultado</p>
+                  <p className="text-lg font-bold font-mono text-primary">
+                    {formatNumber(result)} {toCurrency}
+                  </p>
+                </div>
+
+                {/* Exchange Rate & Last Update - Inline */}
+                <div className="flex items-center justify-between text-[9px] text-muted-foreground">
+                  {rate && (
+                    <span className="font-mono">
+                      1 {fromCurrency} = {formatNumber(rate)} {toCurrency}
+                    </span>
+                  )}
+                  {lastUpdate && (
+                    <span>
+                      {lastUpdate.toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Convert Button */}
-        <Button
-          onClick={fetchExchangeRate}
-          disabled={!amount || parseFloat(amount) <= 0 || loading}
-          className="w-full h-9"
-        >
-          {loading ? (
-            <>
-              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-              Convirtiendo...
-            </>
-          ) : (
-            <>
-              <DollarSign className="w-4 h-4 mr-2" />
-              Convertir
-            </>
-          )}
-        </Button>
-
-        {/* Result */}
-        {result !== null && (
-          <div className="space-y-2 pt-2 border-t">
-            {/* Main Result */}
-            <div className="p-2.5 bg-primary/10 rounded-lg border border-primary/20">
-              <p className="text-[10px] text-muted-foreground mb-0.5">Resultado</p>
-              <p className="text-xl font-bold font-mono text-primary">
-                {formatNumber(result)} {toCurrency}
-              </p>
-            </div>
-
-            {/* Exchange Rate & Last Update - Inline */}
-            <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-              {rate && (
-                <span className="font-mono">
-                  1 {fromCurrency} = {formatNumber(rate)} {toCurrency}
-                </span>
-              )}
-              {lastUpdate && (
-                <span>
-                  {lastUpdate.toLocaleTimeString()}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
