@@ -361,8 +361,8 @@ export default function Finances() {
                 No hay transacciones registradas
               </p>
             ) : (
-              <div className="space-y-4">
-                {transactions.slice(0, 10).map((transaction) => (
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                {transactions.map((transaction) => (
                   <div
                     key={transaction.id}
                     className="flex items-center justify-between p-4 bg-background rounded-lg border border-border"
@@ -395,6 +395,11 @@ export default function Finances() {
                     </div>
                   </div>
                 ))}
+                {transactions.length > 5 && (
+                  <p className="text-sm text-muted-foreground text-center pt-2">
+                    Desliza para ver más transacciones
+                  </p>
+                )}
               </div>
             )}
           </CardContent>
