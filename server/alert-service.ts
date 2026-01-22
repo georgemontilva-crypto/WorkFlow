@@ -38,7 +38,7 @@ export async function createAlert(params: CreateAlertParams) {
       eq(alerts.user_id, params.user_id),
       eq(alerts.event, params.event),
       eq(alerts.related_id, params.related_id || 0),
-      eq(alerts.read, 0)
+      eq(alerts.is_read, 0)
     ))
     .limit(1);
 
@@ -54,7 +54,7 @@ export async function createAlert(params: CreateAlertParams) {
     message: params.message,
     persistent: params.persistent !== false ? 1 : 0,
     shown_as_toast: params.shown_as_toast === true ? 1 : 0,
-    read: 0,
+    is_read: 0,
     action_url: params.action_url,
     action_text: params.action_text,
     required_plan: params.required_plan,

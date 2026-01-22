@@ -93,7 +93,7 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
 
   if (!isOpen) return null;
 
-  const unreadCount = alerts?.filter(a => a.read === 0).length || 0;
+  const unreadCount = alerts?.filter(a => a.is_read === 0).length || 0;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
@@ -176,12 +176,12 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
                   key={alert.id}
                   className={`
                     p-4 transition-all cursor-pointer
-                    ${alert.read === 0
+                    ${alert.is_read === 0
                       ? 'bg-accent/50 border-l-4 border-l-primary'
                       : 'bg-card hover:bg-accent/30'
                     }
                   `}
-                  onClick={() => alert.read === 0 && handleMarkAsRead(alert.id)}
+                  onClick={() => alert.is_read === 0 && handleMarkAsRead(alert.id)}
                 >
                   <div className="flex items-start gap-3">
                     <div className="mt-1">

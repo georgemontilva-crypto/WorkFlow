@@ -363,7 +363,7 @@ export const alerts = mysqlTable("alerts", {
   /** Si la alerta fue mostrada como toast */
   shown_as_toast: int("shown_as_toast").notNull().default(0),
   /** Si la alerta fue leída por el usuario */
-  read: int("read").notNull().default(0),
+  is_read: int("is_read").notNull().default(0),
   /** Acción asociada (URL o identificador) */
   action_url: varchar("action_url", { length: 255 }),
   /** Texto del botón de acción */

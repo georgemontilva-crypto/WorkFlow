@@ -2086,7 +2086,7 @@ export const appRouter = router({
         const conditions = [eq(alerts.user_id, ctx.user!.id)];
         
         if (input?.unreadOnly) {
-          conditions.push(eq(alerts.read, 0));
+          conditions.push(eq(alerts.is_read, 0));
         }
         
         if (input?.type) {
@@ -2113,7 +2113,7 @@ export const appRouter = router({
           .from(alerts)
           .where(and(
             eq(alerts.user_id, ctx.user!.id),
-            eq(alerts.read, 0)
+            eq(alerts.is_read, 0)
           ));
         
         return result[0]?.count || 0;
@@ -2132,7 +2132,7 @@ export const appRouter = router({
         const database = await getDb();
         await database
           .update(alerts)
-          .set({ read: 1, updated_at: new Date() })
+          .set({ is_read: 1, updated_at: new Date() })
           .where(and(
             eq(alerts.id, input.id),
             eq(alerts.user_id, ctx.user!.id)
@@ -2151,10 +2151,10 @@ export const appRouter = router({
         const database = await getDb();
         await database
           .update(alerts)
-          .set({ read: 1, updated_at: new Date() })
+          .set({ is_read: 1, updated_at: new Date() })
           .where(and(
             eq(alerts.user_id, ctx.user!.id),
-            eq(alerts.read, 0)
+            eq(alerts.is_read, 0)
           ));
         
         return { success: true };
@@ -2207,7 +2207,7 @@ export const appRouter = router({
           message: input.message,
           persistent: input.persistent ? 1 : 0,
           shown_as_toast: input.shown_as_toast ? 1 : 0,
-          read: 0,
+          is_read: 0,
           action_url: input.action_url,
           action_text: input.action_text,
           required_plan: input.required_plan,
