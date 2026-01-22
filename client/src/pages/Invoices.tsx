@@ -329,42 +329,36 @@ export default function Invoices() {
   };
 
   const handleStatusChange = async (invoice: Invoice, status: 'pending' | 'paid' | 'overdue' | 'cancelled') => {
-    setSelectedInvoice(invoice);
-    setNewStatus(status);
-    
-    // Si el cambio es a "paid", mostrar diálogo para agregar a finanzas
+    // Si el cambio es a "paid", agregar automáticamente a finanzas
     if (status === 'paid' && (invoice.status === 'draft' || invoice.status === 'sent' || invoice.status === 'payment_sent')) {
-      setShowStatusDialog(true);
+      await updateInvoice.mutateAsync({ id: invoice.id, status: 'paid' });
+      
+      // Agregar ingreso automáticamente a finanzas
+      const client = clients?.find(c => c.id === invoice.client_id);
+      try {
+        await createTransaction.mutateAsync({
+          type: 'income',
+          amount: invoice.total,
+          category: 'Pago de Factura',
+          description: `Pago de factura ${invoice.invoice_number} - ${client?.name || 'Cliente'}`,
+          date: new Date().toISOString(),
+        });
+        toast.success('Factura pagada e ingreso registrado en Finanzas');
+      } catch (error) {
+        toast.success('Factura marcada como pagada');
+        console.error('Error al registrar ingreso:', error);
+      }
     } else {
-      // Cambiar estado directamente
+      // Cambiar estado directamente para otros estados
       await updateInvoice.mutateAsync({ id: invoice.id, status });
       toast.success('Estado actualizado');
     }
   };
 
+  // Función legacy para compatibilidad (ya no se usa el diálogo)
   const confirmStatusChange = async (addToFinances: boolean) => {
     if (!selectedInvoice) return;
-
-    await updateInvoice.mutateAsync({ 
-      id: selectedInvoice.id, 
-      status: newStatus
-    });
-
-    if (addToFinances) {
-      // Agregar ingreso a finanzas
-      const client = clients?.find(c => c.id === selectedInvoice.client_id);
-      await createTransaction.mutateAsync({
-        type: 'income',
-        amount: selectedInvoice.total,
-        category: 'Pago de Factura',
-        description: `Pago de factura ${selectedInvoice.invoice_number} - ${client?.name || 'Cliente'}`,
-        date: new Date().toISOString(),
-      });
-      toast.success('Factura marcada como pagada e ingreso agregado a Finanzas');
-    } else {
-      toast.success('Factura marcada como pagada');
-    }
-
+    await handleStatusChange(selectedInvoice, 'paid');
     setShowStatusDialog(false);
     setSelectedInvoice(null);
   };
