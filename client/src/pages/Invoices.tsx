@@ -949,14 +949,14 @@ export default function Invoices() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" style={{ gridAutoFlow: 'dense' }}>
             {invoices.map((invoice) => {
               const statusInfo = getStatusBadge(invoice.status);
               const StatusIcon = statusInfo.icon;
               const isExpanded = expandedCardId === invoice.id;
               
               return (
-                <Card key={invoice.id} className="bg-card border-border hover:border-accent/50 transition-all h-fit">
+                <Card key={invoice.id} className="bg-card border-border hover:border-accent/50 transition-all h-fit relative">
                   <CardContent className="p-4">
                     {/* Collapsed View - Invoice Number, Client, Status */}
                     {!isExpanded ? (
