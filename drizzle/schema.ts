@@ -103,6 +103,7 @@ export const invoices = mysqlTable("invoices", {
   paid_amount: decimal("paid_amount", { precision: 10, scale: 2 }).notNull().default("0"),
   balance: decimal("balance", { precision: 10, scale: 2 }).notNull(),
   status: mysqlEnum("status", ["draft", "sent", "payment_sent", "paid", "overdue", "cancelled"]).notNull().default("draft"),
+  archived: int("archived").notNull().default(0),
   payment_token: varchar("payment_token", { length: 64 }).unique(),
   payment_link: text("payment_link"),
   client_comment: text("client_comment"),

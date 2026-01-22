@@ -112,11 +112,11 @@ export default function Invoices() {
   
   // Fetch data using tRPC
   const { data: allInvoices, isLoading: invoicesLoading } = trpc.invoices.list.useQuery();
+  const { data: archivedInvoices, isLoading: archivedLoading } = trpc.invoices.listArchived.useQuery();
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery();
   
   // Filter invoices
-  const invoices = allInvoices?.filter(inv => inv.status !== 'cancelled');
-  const archivedInvoices = allInvoices?.filter(inv => inv.status === 'cancelled');
+  const invoices = allInvoices;
   
   // Mutations
   const createInvoice = trpc.invoices.create.useMutation({
@@ -178,6 +178,7 @@ export default function Invoices() {
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
   const [showClientSelector, setShowClientSelector] = useState(false);
   const [showArchivedDialog, setShowArchivedDialog] = useState(false);
+  const [expandedClientFolder, setExpandedClientFolder] = useState<number | null>(null);
   const [clientSearch, setClientSearch] = useState('');
   const [formData, setFormData] = useState<InvoiceFormData>({
     client_id: 0,
@@ -378,7 +379,7 @@ export default function Invoices() {
     
     await updateInvoice.mutateAsync({ 
       id: invoice.id, 
-      status: 'archived'
+      archived: 1
     });
     toast.success('Factura archivada exitosamente');
   };
@@ -386,7 +387,7 @@ export default function Invoices() {
   const handleUnarchive = async (invoice: Invoice) => {
     await updateInvoice.mutateAsync({ 
       id: invoice.id, 
-      status: 'paid'
+      archived: 0
     });
     toast.success('Factura restaurada');
   };
@@ -1390,13 +1391,16 @@ export default function Invoices() {
           </DialogContent>
         </Dialog>
 
-        {/* Archived Invoices Dialog */}
+        {/* Archived Invoices Dialog - Organized by Client Folders */}
         <Dialog open={showArchivedDialog} onOpenChange={setShowArchivedDialog}>
-          <DialogContent className="bg-popover border-border max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="bg-popover border-border max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-foreground text-xl sm:text-2xl">Facturas Archivadas</DialogTitle>
+              <DialogTitle className="text-foreground text-xl sm:text-2xl flex items-center gap-2">
+                <FolderArchive className="w-6 h-6" />
+                Facturas Archivadas
+              </DialogTitle>
               <DialogDescription className="text-muted-foreground text-sm">
-                Gestiona tus facturas archivadas y restáuralas cuando sea necesario
+                Facturas organizadas por carpetas de cliente
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 mt-4">
@@ -1406,48 +1410,108 @@ export default function Invoices() {
                   <p className="text-muted-foreground">No hay facturas archivadas</p>
                 </div>
               ) : (
-                archivedInvoices?.map((invoice) => {
-                  const client = clients?.find(c => c.id === invoice.client_id);
-                  return (
-                    <Card key={invoice.id} className="bg-card border-border">
-                      <CardContent className="p-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <FileText className="w-4 h-4 text-muted-foreground" />
-                              <span className="font-mono text-sm text-muted-foreground">{invoice.invoice_number}</span>
+                // Group invoices by client
+                (() => {
+                  const invoicesByClient = archivedInvoices?.reduce((acc, invoice) => {
+                    const clientId = invoice.client_id;
+                    if (!acc[clientId]) {
+                      acc[clientId] = [];
+                    }
+                    acc[clientId].push(invoice);
+                    return acc;
+                  }, {} as Record<number, typeof archivedInvoices>);
+
+                  return Object.entries(invoicesByClient || {}).map(([clientId, clientInvoices]) => {
+                    const client = clients?.find(c => c.id === parseInt(clientId));
+                    const isExpanded = expandedClientFolder === parseInt(clientId);
+                    const totalAmount = clientInvoices.reduce((sum, inv) => sum + parseFloat(inv.total), 0);
+
+                    return (
+                      <Card key={clientId} className="bg-card border-border">
+                        <CardContent className="p-0">
+                          {/* Client Folder Header */}
+                          <button
+                            onClick={() => setExpandedClientFolder(isExpanded ? null : parseInt(clientId))}
+                            className="w-full p-4 flex items-center justify-between hover:bg-accent/50 transition-colors"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                                <User className="w-5 h-5 text-primary" />
+                              </div>
+                              <div className="text-left">
+                                <h3 className="font-semibold text-foreground">
+                                  {client?.name || 'Cliente desconocido'}
+                                </h3>
+                                {client?.company && (
+                                  <p className="text-sm text-muted-foreground">{client.company}</p>
+                                )}
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {clientInvoices.length} factura{clientInvoices.length > 1 ? 's' : ''} archivada{clientInvoices.length > 1 ? 's' : ''}
+                                </p>
+                              </div>
                             </div>
-                            <h3 className="font-semibold text-foreground mb-1">{client?.name || 'Cliente desconocido'}</h3>
-                            {client?.company && (
-                              <p className="text-sm text-muted-foreground">{client.company}</p>
-                            )}
-                            <div className="flex flex-wrap gap-3 mt-2 text-sm text-muted-foreground">
-                              <span>Emitida: {format(new Date(invoice.issue_date), 'dd/MM/yyyy')}</span>
-                              <span>Vencimiento: {format(new Date(invoice.due_date), 'dd/MM/yyyy')}</span>
+                            <div className="flex items-center gap-3">
+                              <div className="text-right">
+                                <p className="text-sm text-muted-foreground">Total</p>
+                                <p className="text-lg font-bold font-mono text-foreground">
+                                  ${totalAmount.toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                                </p>
+                              </div>
+                              {isExpanded ? (
+                                <ChevronUp className="w-5 h-5 text-muted-foreground" />
+                              ) : (
+                                <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                              )}
                             </div>
-                          </div>
-                          <div className="flex flex-col sm:items-end gap-2">
-                            <div className="text-2xl font-bold font-mono text-foreground">
-                              ${parseFloat(invoice.total).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                          </button>
+
+                          {/* Invoices List */}
+                          {isExpanded && (
+                            <div className="border-t border-border">
+                              {clientInvoices.map((invoice, index) => (
+                                <div
+                                  key={invoice.id}
+                                  className={`p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${
+                                    index !== clientInvoices.length - 1 ? 'border-b border-border' : ''
+                                  }`}
+                                >
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <FileText className="w-4 h-4 text-muted-foreground" />
+                                      <span className="font-mono text-sm text-muted-foreground">
+                                        {invoice.invoice_number}
+                                      </span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
+                                      <span>Emitida: {format(new Date(invoice.issue_date), 'dd/MM/yyyy')}</span>
+                                      <span>Vencimiento: {format(new Date(invoice.due_date), 'dd/MM/yyyy')}</span>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                    <div className="text-xl font-bold font-mono text-foreground">
+                                      ${parseFloat(invoice.total).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                                    </div>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={async () => {
+                                        await handleUnarchive(invoice);
+                                      }}
+                                      className="border-border text-foreground hover:bg-accent"
+                                    >
+                                      <ArchiveRestore className="w-3 h-3 mr-1" />
+                                      Restaurar
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={async () => {
-                                await updateInvoice.mutateAsync({ id: invoice.id, status: 'pending' });
-                                toast.success('Factura restaurada correctamente');
-                              }}
-                              className="border-border text-foreground hover:bg-accent"
-                            >
-                              <ArchiveRestore className="w-3 h-3 mr-1" />
-                              Restaurar
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  });
+                })()
               )}
             </div>
           </DialogContent>

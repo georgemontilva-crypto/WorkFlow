@@ -569,6 +569,22 @@ export const appRouter = router({
       return await db.getInvoicesByUserId(ctx.user.id);
     }),
     
+    listArchived: protectedProcedure.query(async ({ ctx }) => {
+      const { getDb } = await import("./db");
+      const { invoices } = await import("../drizzle/schema");
+      const { eq, and, desc } = await import("drizzle-orm");
+      
+      const database = await getDb();
+      return await database
+        .select()
+        .from(invoices)
+        .where(and(
+          eq(invoices.user_id, ctx.user.id),
+          eq(invoices.archived, 1)
+        ))
+        .orderBy(desc(invoices.created_at));
+    }),
+    
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ ctx, input }) => {
@@ -680,6 +696,7 @@ export const appRouter = router({
         amount: z.string().optional(),
         paid_amount: z.string().optional(),
         status: z.enum(["draft", "sent", "payment_sent", "paid", "overdue", "cancelled"]).optional(),
+        archived: z.number().optional(),
         items: z.array(z.object({
           description: z.string(),
           quantity: z.number(),

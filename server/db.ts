@@ -639,7 +639,10 @@ export async function getInvoicesByUserId(user_id: number) {
   return await db
     .select()
     .from(invoices)
-    .where(eq(invoices.user_id, user_id));
+    .where(and(
+      eq(invoices.user_id, user_id),
+      eq(invoices.archived, 0)
+    ));
 }
 
 export async function getInvoiceById(id: number, user_id: number) {
