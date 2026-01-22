@@ -294,212 +294,97 @@ export default function Finances() {
             </p>
           </div>
 
-          {/* Barra de acciones y filtros */}
-          <div className="flex flex-col gap-3">
-            {/* Fila 1: Botón Nueva Transacción + Controles de periodo (Desktop) */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-              {/* Botón Nueva Transacción */}
-              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="w-full sm:w-auto">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Nueva Transacción
-                  </Button>
-                </DialogTrigger>
-              
-              {/* Controles de periodo (visible en desktop) */}
-              <div className="hidden sm:flex items-center gap-2">
-                {/* Navegación de mes */}
-                {periodType === 'month' && (
-                  <div className="flex items-center gap-1.5">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={goToPreviousMonth}
-                      className="h-9 w-9"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <div className="min-w-[100px] text-center">
-                      <p className="text-xs font-medium text-foreground capitalize">
-                        {format(selectedPeriod, 'MMM yyyy', { locale: es })}
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={goToNextMonth}
-                      className="h-9 w-9"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={goToCurrentMonth}
-                      className="text-xs h-9 px-3"
-                    >
-                      Hoy
-                    </Button>
-                  </div>
-                )}
+          {/* Fila de acciones: Botón + Controles de periodo */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            {/* Botón Nueva Transacción */}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="w-full sm:w-auto">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Nueva Transacción
+                </Button>
+              </DialogTrigger>
+            </Dialog>
 
-                {/* Rango personalizado */}
-                {periodType === 'custom' && (
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="date"
-                      value={customDateRange.start}
-                      onChange={(e) => setCustomDateRange(prev => ({ ...prev, start: e.target.value }))}
-                      className="h-9 text-xs w-[140px]"
-                    />
-                    <span className="text-muted-foreground text-xs">-</span>
-                    <Input
-                      type="date"
-                      value={customDateRange.end}
-                      onChange={(e) => setCustomDateRange(prev => ({ ...prev, end: e.target.value }))}
-                      className="h-9 text-xs w-[140px]"
-                    />
-                  </div>
-                )}
-
-                {/* Toggle tipo de periodo */}
-                <div className="flex items-center gap-1.5 ml-2">
-                  <Button
-                    variant={periodType === 'month' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setPeriodType('month')}
-                    className="text-xs h-9 px-3"
-                  >
-                    <Calendar className="h-3.5 w-3.5 mr-1.5" />
-                    Mes
-                  </Button>
-                  <Button
-                    variant={periodType === 'custom' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setPeriodType('custom')}
-                    className="text-xs h-9 px-3"
-                  >
-                    Rango
-                  </Button>
-                </div>
-
-                {/* Contador de transacciones */}
-                <span className="text-xs text-muted-foreground ml-2">
-                  {filteredTransactions.length} transacciones
-                </span>
-              </div>
-            </div>
-
-            {/* Fila 2: Controles de periodo (visible en móvil) */}
-            <div className="flex sm:hidden flex-col gap-2">
+            {/* Controles de periodo - Desktop: en línea, Móvil: debajo */}
+            <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
               {/* Navegación de mes */}
               {periodType === 'month' && (
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1.5">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={goToPreviousMonth}
-                      className="h-9 w-9"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <div className="min-w-[100px] text-center">
-                      <p className="text-xs font-medium text-foreground capitalize">
-                        {format(selectedPeriod, 'MMM yyyy', { locale: es })}
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={goToNextMonth}
-                      className="h-9 w-9"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={goToCurrentMonth}
-                      className="text-xs h-9 px-3"
-                    >
-                      Hoy
-                    </Button>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Button
-                      variant={periodType === 'month' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setPeriodType('month')}
-                      className="text-xs h-9 px-3"
-                    >
-                      <Calendar className="h-3.5 w-3.5 mr-1.5" />
-                      Mes
-                    </Button>
-                    <Button
-                      variant={periodType === 'custom' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setPeriodType('custom')}
-                      className="text-xs h-9 px-3"
-                    >
-                      Rango
-                    </Button>
-                  </div>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={goToPreviousMonth}
+                    className="h-8 w-8"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="text-xs font-medium text-foreground capitalize min-w-[80px] text-center">
+                    {format(selectedPeriod, 'MMM yyyy', { locale: es })}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={goToNextMonth}
+                    className="h-8 w-8"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={goToCurrentMonth}
+                    className="text-xs h-8 px-2"
+                  >
+                    Hoy
+                  </Button>
                 </div>
               )}
 
               {/* Rango personalizado */}
               {periodType === 'custom' && (
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="date"
-                      value={customDateRange.start}
-                      onChange={(e) => setCustomDateRange(prev => ({ ...prev, start: e.target.value }))}
-                      className="h-9 text-xs flex-1"
-                    />
-                    <span className="text-muted-foreground text-xs">-</span>
-                    <Input
-                      type="date"
-                      value={customDateRange.end}
-                      onChange={(e) => setCustomDateRange(prev => ({ ...prev, end: e.target.value }))}
-                      className="h-9 text-xs flex-1"
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <Button
-                        variant={periodType === 'month' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setPeriodType('month')}
-                        className="text-xs h-9 px-3"
-                      >
-                        <Calendar className="h-3.5 w-3.5 mr-1.5" />
-                        Mes
-                      </Button>
-                      <Button
-                        variant={periodType === 'custom' ? 'default' : 'outline'}
-                        size="sm"
-                        onClick={() => setPeriodType('custom')}
-                        className="text-xs h-9 px-3"
-                      >
-                        Rango
-                      </Button>
-                    </div>
-                    <span className="text-xs text-muted-foreground">
-                      {filteredTransactions.length} transacciones
-                    </span>
-                  </div>
+                <div className="flex items-center gap-1.5">
+                  <Input
+                    type="date"
+                    value={customDateRange.start}
+                    onChange={(e) => setCustomDateRange(prev => ({ ...prev, start: e.target.value }))}
+                    className="h-8 text-xs w-[120px]"
+                  />
+                  <span className="text-muted-foreground text-xs">-</span>
+                  <Input
+                    type="date"
+                    value={customDateRange.end}
+                    onChange={(e) => setCustomDateRange(prev => ({ ...prev, end: e.target.value }))}
+                    className="h-8 text-xs w-[120px]"
+                  />
                 </div>
               )}
 
-              {/* Contador (solo en modo mes) */}
-              {periodType === 'month' && (
-                <span className="text-xs text-muted-foreground text-center">
-                  {filteredTransactions.length} transacciones
-                </span>
-              )}
+              {/* Toggle tipo de periodo */}
+              <div className="flex items-center gap-1">
+                <Button
+                  variant={periodType === 'month' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPeriodType('month')}
+                  className="text-xs h-8 px-2"
+                >
+                  <Calendar className="h-3 w-3 mr-1" />
+                  Mes
+                </Button>
+                <Button
+                  variant={periodType === 'custom' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setPeriodType('custom')}
+                  className="text-xs h-8 px-2"
+                >
+                  Rango
+                </Button>
+              </div>
+
+              {/* Contador de transacciones */}
+              <span className="text-xs text-muted-foreground">
+                {filteredTransactions.length} trans.
+              </span>
             </div>
           </div>
 
