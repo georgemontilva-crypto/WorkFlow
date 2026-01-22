@@ -338,7 +338,7 @@ export default function Landing() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="border-2 hover:border-primary/50 transition-all hover:shadow-lg">
+              <Card key={index} className="border hover:border-primary/50 transition-all hover:shadow-lg">
                 <CardHeader>
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                     <feature.icon className="w-6 h-6 text-primary" />
@@ -372,7 +372,7 @@ export default function Landing() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {securityFeatures.map((feature, index) => (
-              <Card key={index} className="border-2">
+              <Card key={index} className="border">
                 <CardHeader>
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center shrink-0">
@@ -429,7 +429,7 @@ export default function Landing() {
           
           <div className="space-y-4">
             {faqs.map((faq, index) => (
-              <Card key={index} className="border-2">
+              <Card key={index} className="border">
                 <CardHeader 
                   className="cursor-pointer hover:bg-accent/50 transition-colors"
                   onClick={() => setOpenFaq(openFaq === index ? null : index)}

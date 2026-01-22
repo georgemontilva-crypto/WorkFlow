@@ -87,7 +87,7 @@ export function TrialBanner() {
   };
 
   return (
-    <Card className={`${colors.bg} border-2 p-4 mb-6 relative`}>
+    <Card className={`${colors.bg} border p-4 mb-6 relative`}>
       <Button
         variant="ghost"
         size="icon"

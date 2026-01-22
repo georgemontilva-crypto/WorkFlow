@@ -97,7 +97,7 @@ export function PaymentNotifications() {
     <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 duration-500">
       <div 
         className={`
-          ${bgColor} ${borderColor} border-2 rounded-lg shadow-2xl 
+          ${bgColor} ${borderColor} border rounded-lg shadow-2xl 
           max-w-sm w-full sm:w-96 p-4
           backdrop-blur-sm
         `}

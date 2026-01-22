@@ -22,7 +22,7 @@ export function AccessBlocker({ trialDaysRemaining, onUpgrade }: AccessBlockerPr
     if (trialDaysRemaining <= 3) {
       return (
         <div className="fixed bottom-4 right-4 z-50 max-w-md">
-          <div className="bg-yellow-500/10 border-2 border-yellow-500/50 rounded-2xl p-6 backdrop-blur-md">
+          <div className="bg-yellow-500/10 border border-yellow-500/50 rounded-2xl p-6 backdrop-blur-md">
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
                 <Sparkles className="w-5 h-5 text-yellow-500" />

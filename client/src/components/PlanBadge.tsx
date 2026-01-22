@@ -61,7 +61,7 @@ export function PlanBadge() {
         <Button
           size="sm"
           variant="outline"
-          className="w-full border-2 border-white text-white hover:bg-white hover:text-black transition-colors font-semibold"
+          className="w-full border border-white text-white hover:bg-white hover:text-black transition-colors font-semibold"
           onClick={() => {
             // Navigate to pricing page within the app
             window.location.href = '/pricing';

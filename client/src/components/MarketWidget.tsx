@@ -121,7 +121,7 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
 
   if (loading) {
     return (
-      <Card className="bg-card border-2 border-border hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer" onClick={() => setLocation('/markets')}>
+      <Card className="bg-card border border-border hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer" onClick={() => setLocation('/markets')}>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
             <BarChart3 className="w-4 h-4" strokeWidth={1.5} />
@@ -138,7 +138,7 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
 
   if (!data) {
     return (
-      <Card className="bg-card border-2 border-border hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer" onClick={() => setLocation('/markets')}>
+      <Card className="bg-card border border-border hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer" onClick={() => setLocation('/markets')}>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
             <BarChart3 className="w-4 h-4" strokeWidth={1.5} />
@@ -159,7 +159,7 @@ export function MarketWidget({ symbol, type }: MarketWidgetProps) {
 
   return (
     <Card 
-      className={`bg-card border-2 ${borderColor} hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer`}
+      className={`bg-card border ${borderColor} hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer`}
       onClick={() => setLocation('/markets')}
     >
       <CardHeader className="flex flex-row items-center justify-between pb-2">

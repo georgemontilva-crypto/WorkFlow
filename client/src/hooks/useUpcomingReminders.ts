@@ -165,7 +165,7 @@ export function useUpcomingReminders() {
     toast(toastContent, {
       duration: 10000, // 10 segundos
       position: 'bottom-right',
-      className: 'border-2 border-orange-500 shadow-lg',
+      className: 'border border-orange-500 shadow-lg',
     });
   };
 

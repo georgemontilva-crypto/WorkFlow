@@ -211,7 +211,7 @@ function LandingContent() {
             </p>
           </div>
 
-          <div className="bg-card border-2 border-primary rounded-3xl p-8 md:p-12 max-w-lg mx-auto">
+          <div className="bg-card border border-primary rounded-3xl p-8 md:p-12 max-w-lg mx-auto">
             <div className="text-center mb-8">
               <div className="inline-block bg-primary/10 text-primary text-sm font-medium px-4 py-1 rounded-full mb-4">
                 {t.pricing.badge}

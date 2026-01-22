@@ -110,7 +110,7 @@ export function WelcomeDialog() {
         <div className="space-y-5 py-4">
           {/* Plan Badge (only for Pro/Business) */}
           {content.badge && (
-            <div className="bg-gradient-to-r from-primary/15 to-primary/5 rounded-xl p-4 border-2 border-primary/30 shadow-sm">
+            <div className="bg-gradient-to-r from-primary/15 to-primary/5 rounded-xl p-4 border border-primary/30 shadow-sm">
               <p className="text-sm sm:text-base font-semibold text-center text-foreground flex items-center justify-center gap-2">
                 <span>{content.badge}</span>
               </p>

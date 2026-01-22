@@ -141,7 +141,7 @@ export default function PricingPage() {
           return (
             <Card 
               key={plan.id}
-              className={`relative ${plan.highlighted ? 'border-primary border-2 shadow-xl' : 'border-2'} ${isCurrentPlan ? 'ring-2 ring-primary' : ''}`}
+              className={`relative ${plan.highlighted ? 'border-primary border shadow-xl' : 'border'} ${isCurrentPlan ? 'ring-2 ring-primary' : ''}`}
             >
               {plan.highlighted && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">

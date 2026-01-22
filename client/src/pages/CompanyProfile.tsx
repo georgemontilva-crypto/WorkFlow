@@ -141,7 +141,7 @@ export default function CompanyProfile() {
             </CardHeader>
             <CardContent className="space-y-4 py-6">
               <div className="flex items-center gap-6">
-                <div className="w-32 h-32 border-2 border-border rounded-lg flex items-center justify-center bg-card overflow-hidden">
+                <div className="w-32 h-32 border border-border rounded-lg flex items-center justify-center bg-card overflow-hidden">
                   {logoPreview ? (
                     <img src={logoPreview} alt="Logo" className="w-full h-full object-contain" />
                   ) : (

@@ -69,7 +69,7 @@ export function ReminderAlert({ type, count, onView, onDismiss }: ReminderAlertP
     >
       <Card 
         className={`
-          bg-popover border-2 ${config.borderColor} ${config.glowClass}
+          bg-popover border ${config.borderColor} ${config.glowClass}
           animate-pulse-border
         `}
       >

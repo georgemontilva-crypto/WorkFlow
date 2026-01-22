@@ -130,7 +130,7 @@ export function PaymentReceivedNotificationProvider({ children }: { children: Re
                       size="sm"
                       onClick={handleView}
                       variant="outline"
-                      className="border-2 border-green-500 text-green-500 hover:bg-green-500/10 w-full sm:w-auto"
+                      className="border border-green-500 text-green-500 hover:bg-green-500/10 w-full sm:w-auto"
                     >
                       <Eye className="w-3 h-3 mr-1" />
                       Ver Factura

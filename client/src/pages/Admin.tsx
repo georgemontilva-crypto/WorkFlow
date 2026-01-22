@@ -121,7 +121,7 @@ export default function Admin() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          <Card className="border-2 hover:border-primary/50 transition-colors">
+          <Card className="border hover:border-primary/50 transition-colors">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -136,7 +136,7 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          <Card className="border-2 hover:border-green-500/50 transition-colors">
+          <Card className="border hover:border-green-500/50 transition-colors">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -153,7 +153,7 @@ export default function Admin() {
             </CardContent>
           </Card>
 
-          <Card className="border-2 hover:border-amber-500/50 transition-colors sm:col-span-2 lg:col-span-1">
+          <Card className="border hover:border-amber-500/50 transition-colors sm:col-span-2 lg:col-span-1">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -172,7 +172,7 @@ export default function Admin() {
         </div>
 
         {/* Filters */}
-        <Card className="mb-6 border-2">
+        <Card className="mb-6 border">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Search className="w-5 h-5" />
@@ -232,7 +232,7 @@ export default function Admin() {
         </Card>
 
         {/* Users List - Mobile Cards / Desktop Table */}
-        <Card className="border-2">
+        <Card className="border">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="w-5 h-5" />
