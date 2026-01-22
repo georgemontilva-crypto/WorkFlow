@@ -3,8 +3,10 @@
  * Design Philosophy: Apple Minimalism - Clean, functional, powerful
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Shield, Users, CheckCircle, XCircle, Search, Calendar, Mail, User } from 'lucide-react';
+import { useAuth } from '@/_core/hooks/useAuth';
+import { useLocation } from 'wouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +19,15 @@ import DashboardLayout from '@/components/DashboardLayout';
 
 export default function Admin() {
   const { t } = useLanguage();
+  const { user, loading } = useAuth();
+  const [, setLocation] = useLocation();
+  
+  // Redirect non-super-admins to 404
+  useEffect(() => {
+    if (!loading && (!user || user.role !== 'super_admin')) {
+      setLocation('/404');
+    }
+  }, [user, loading, setLocation]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState<'all' | 'user' | 'admin' | 'super_admin'>('all');
 
@@ -90,7 +101,8 @@ export default function Admin() {
     return <Badge variant="secondary">Sin acceso</Badge>;
   };
 
-  if (isLoading) {
+  // Show loading while checking authentication
+  if (loading || isLoading) {
     return (
       <div className="flex items-center justify-center h-full min-h-screen">
         <div className="text-center">
@@ -99,6 +111,11 @@ export default function Admin() {
         </div>
       </div>
     );
+  }
+  
+  // Don't render if not super_admin (will redirect via useEffect)
+  if (!user || user.role !== 'super_admin') {
+    return null;
   }
 
   return (
