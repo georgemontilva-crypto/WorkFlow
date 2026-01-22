@@ -510,14 +510,14 @@ export default function Markets() {
 
           {/* Crypto + Stocks */}
           <TabsContent value="crypto-stocks">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[600px]">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Crypto Column */}
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
                   Criptomonedas
                 </h3>
-                <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                <div className="overflow-y-auto pr-2 space-y-2" style={{ maxHeight: 'calc(5 * 68px + 4 * 0.5rem)' }}>
                   {sortAssets(filterAssets(cryptoData)).map((asset) => (
                     <AssetItem key={asset.symbol} asset={asset} />
                   ))}
@@ -525,12 +525,12 @@ export default function Markets() {
               </div>
 
               {/* Stocks Column */}
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-primary" />
                   Acciones
                 </h3>
-                <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                <div className="overflow-y-auto pr-2 space-y-2" style={{ maxHeight: 'calc(5 * 68px + 4 * 0.5rem)' }}>
                   {sortAssets(filterAssets(MOCK_STOCKS)).map((asset) => (
                     <AssetItem key={asset.symbol} asset={asset} />
                   ))}
@@ -541,14 +541,14 @@ export default function Markets() {
 
           {/* Forex + Commodities */}
           <TabsContent value="forex-commodities">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[600px]">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Forex Column */}
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-primary" />
                   Forex
                 </h3>
-                <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                <div className="overflow-y-auto pr-2 space-y-2" style={{ maxHeight: 'calc(5 * 68px + 4 * 0.5rem)' }}>
                   {sortAssets(filterAssets(MOCK_FOREX)).map((asset) => (
                     <AssetItem key={asset.symbol} asset={asset} />
                   ))}
@@ -556,12 +556,12 @@ export default function Markets() {
               </div>
 
               {/* Commodities Column */}
-              <div className="flex flex-col h-full">
+              <div className="flex flex-col">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-primary" />
                   Commodities
                 </h3>
-                <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                <div className="overflow-y-auto pr-2 space-y-2" style={{ maxHeight: 'calc(5 * 68px + 4 * 0.5rem)' }}>
                   {sortAssets(filterAssets(MOCK_COMMODITIES)).map((asset) => (
                     <AssetItem key={asset.symbol} asset={asset} />
                   ))}
