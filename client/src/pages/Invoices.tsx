@@ -520,7 +520,7 @@ export default function Invoices() {
     const variants: Record<string, { label: string; className: string; icon: any }> = {
       draft: { label: 'Borrador', className: 'bg-gray-500/20 text-gray-400 border-gray-500/30', icon: FileText },
       sent: { label: 'Enviada', className: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: Clock },
-      payment_sent: { label: 'Pago Enviado', className: 'bg-purple-500/20 text-purple-400 border-purple-500/30', icon: DollarSign },
+      payment_sent: { label: 'Pago Recibido', className: 'bg-green-500/20 text-green-400 border-green-500/30', icon: DollarSign },
       paid: { label: 'Pagada', className: 'bg-green-500/20 text-green-400 border-green-500/30', icon: CheckCircle2 },
       overdue: { label: 'Vencida', className: 'bg-destructive/20 text-destructive border-destructive/30', icon: AlertCircle },
       cancelled: { label: 'Cancelada', className: 'bg-muted text-muted-foreground border-border', icon: XCircle },
