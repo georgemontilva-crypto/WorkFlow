@@ -360,26 +360,68 @@ export default function Home() {
         {/* Main Widgets Grid - Layout adaptativo */}
         <div className="dashboard-main-grid">
           {/* Ingresos Semanales - Widget grande */}
-          {isWidgetVisible('weeklyIncome') && (
-          <div className="dashboard-chart-card dashboard-widget-large">
-            <h3 className="dashboard-chart-title">Ingresos Semanales</h3>
-            <p className="dashboard-chart-subtitle">Actividad de esta semana</p>
-            <div className="h-64 flex items-end justify-between gap-2">
-              {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day, i) => {
-                const heights = [40, 25, 80, 60, 70, 65, 75];
-                return (
-                  <div key={day} className="flex-1 flex flex-col items-center gap-2">
-                    <div 
-                      className="w-full bg-primary rounded-t-lg transition-all hover:bg-primary/80"
-                      style={{ height: `${heights[i]}%` }}
-                    />
-                    <span className="text-xs text-muted-foreground">{day}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          )}
+          {isWidgetVisible('weeklyIncome') && (() => {
+            // Calcular ingresos por día de la semana actual
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Lunes
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            const weeklyData = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map((day, index) => {
+              const dayDate = new Date(startOfWeek);
+              dayDate.setDate(startOfWeek.getDate() + index);
+              
+              const dayIncome = transactions
+                ?.filter(t => {
+                  const tDate = new Date(t.date);
+                  return t.type === 'income' && 
+                         t.status !== 'voided' &&
+                         tDate.toDateString() === dayDate.toDateString();
+                })
+                .reduce((sum, t) => sum + parseFloat(t.amount.toString()), 0) || 0;
+              
+              return { day, income: dayIncome };
+            });
+            
+            const maxIncome = Math.max(...weeklyData.map(d => d.income), 1);
+            
+            return (
+              <div className="dashboard-chart-card dashboard-widget-large">
+                <h3 className="dashboard-chart-title">Ingresos Semanales</h3>
+                <p className="dashboard-chart-subtitle">Actividad de esta semana</p>
+                <div className="h-64 flex items-end justify-between gap-2 px-2">
+                  {weeklyData.map(({ day, income }) => {
+                    const height = maxIncome > 0 ? (income / maxIncome) * 100 : 0;
+                    const hasData = income > 0;
+                    
+                    return (
+                      <div key={day} className="flex-1 flex flex-col items-center gap-2">
+                        <div className="relative w-full flex flex-col items-center">
+                          {hasData && (
+                            <span className="text-[10px] text-primary font-semibold mb-1">
+                              ${(income / 1000).toFixed(0)}k
+                            </span>
+                          )}
+                          <div 
+                            className={`w-full rounded-t-lg transition-all ${
+                              hasData 
+                                ? 'bg-primary hover:bg-primary/80' 
+                                : 'bg-muted/20'
+                            }`}
+                            style={{ 
+                              height: hasData ? `${Math.max(height, 10)}%` : '4px',
+                              minHeight: hasData ? '20px' : '4px'
+                            }}
+                          />
+                        </div>
+                        <span className="text-xs text-muted-foreground">{day}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Progreso de Ahorros - Widget grande */}
           {isWidgetVisible('savingsProgress') && (
