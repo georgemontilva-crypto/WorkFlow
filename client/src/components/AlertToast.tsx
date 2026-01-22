@@ -29,11 +29,13 @@ const PRIORITY_ORDER: AlertType[] = ['critical', 'warning', 'info'];
 const EVENT_TITLES: Record<string, string> = {
   'invoice_overdue': 'Factura Vencida',
   'pending_receipt': 'Comprobante Pendiente',
+  'invoice_due_soon': 'Factura Próxima a Vencer',
   'invoice_upcoming': 'Factura Próxima',
   'income_confirmed': 'Ingreso Confirmado',
   'monthly_comparison': 'Resumen Mensual',
   'no_income_month': 'Sin Ingresos',
   'plan_limit': 'Límite de Plan',
+  'plan_limit_reached': 'Límite de Plan Alcanzado',
   'feature_blocked': 'Función Bloqueada',
   'multiple_pending': 'Facturas Pendientes',
   'client_late_history': 'Historial de Cliente',
