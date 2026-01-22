@@ -2223,6 +2223,9 @@ export const appRouter = router({
     // Testing endpoint - Generate sample alerts for testing
     generateTestAlerts: protectedProcedure
       .mutation(async ({ ctx }) => {
+        const { getDb } = await import("./db");
+        const { alerts } = await import("../drizzle/schema");
+        
         const database = await getDb();
         const userId = ctx.user!.id;
         
