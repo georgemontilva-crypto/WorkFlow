@@ -28,6 +28,7 @@ import Finances from "./pages/Finances";
 import Savings from "./pages/Savings";
 import Settings from "./pages/Settings";
 import Reminders from "./pages/Reminders";
+import AlertTesting from "./pages/AlertTesting";
 import Admin from "./pages/Admin";
 import Markets from "./pages/Markets";
 import PricingPage from "./pages/PricingPage";
@@ -110,6 +111,11 @@ function Router() {
       <Route path="/updates">
         <ProtectedRoute>
           <Updates />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/alert-testing">
+        <ProtectedRoute>
+          <AlertTesting />
         </ProtectedRoute>
       </Route>
 

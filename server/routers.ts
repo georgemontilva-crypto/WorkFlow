@@ -2219,6 +2219,88 @@ export const appRouter = router({
         
         return { success: true, id: result[0].insertId };
       }),
+
+    // Testing endpoint - Generate sample alerts for testing
+    generateTestAlerts: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const database = await getDb();
+        const userId = ctx.user!.id;
+        
+        const testAlerts = [
+          {
+            type: 'critical' as const,
+            event: 'invoice_overdue',
+            message: 'Factura #1234 venció hace 5 días. Contacta al cliente urgentemente.',
+            shown_as_toast: 1,
+            action_url: '/invoices/1234',
+            action_text: 'Ver factura',
+          },
+          {
+            type: 'warning' as const,
+            event: 'pending_receipt',
+            message: 'Tienes 3 comprobantes de pago pendientes de confirmar.',
+            shown_as_toast: 1,
+            action_url: '/invoices?filter=pending_receipt',
+            action_text: 'Revisar',
+          },
+          {
+            type: 'warning' as const,
+            event: 'invoice_due_soon',
+            message: 'Factura #5678 vence en 2 días.',
+            shown_as_toast: 0,
+            action_url: '/invoices/5678',
+            action_text: 'Ver factura',
+          },
+          {
+            type: 'info' as const,
+            event: 'income_confirmed',
+            message: 'Ingreso de $1,500 confirmado exitosamente.',
+            shown_as_toast: 1,
+            action_url: '/transactions',
+            action_text: 'Ver',
+          },
+          {
+            type: 'warning' as const,
+            event: 'plan_limit_reached',
+            message: 'Has alcanzado el límite de 10 facturas del plan Free. Actualiza a Pro para continuar.',
+            shown_as_toast: 1,
+            action_url: '/settings/plan',
+            action_text: 'Actualizar plan',
+            required_plan: 'pro' as const,
+          },
+          {
+            type: 'info' as const,
+            event: 'monthly_comparison',
+            message: 'Tus ingresos este mes aumentaron un 15% respecto al mes anterior.',
+            shown_as_toast: 0,
+          },
+        ];
+        
+        const insertedIds = [];
+        for (const alert of testAlerts) {
+          const result = await database.insert(alerts).values({
+            user_id: userId,
+            type: alert.type,
+            event: alert.event,
+            message: alert.message,
+            persistent: 1,
+            shown_as_toast: alert.shown_as_toast,
+            is_read: 0,
+            action_url: alert.action_url,
+            action_text: alert.action_text,
+            required_plan: alert.required_plan,
+            created_at: new Date(),
+            updated_at: new Date(),
+          });
+          insertedIds.push(result[0].insertId);
+        }
+        
+        return { 
+          success: true, 
+          count: insertedIds.length,
+          message: `${insertedIds.length} alertas de prueba generadas exitosamente` 
+        };
+      }),
   }),
 });
 export type AppRouter = typeof appRouter;
