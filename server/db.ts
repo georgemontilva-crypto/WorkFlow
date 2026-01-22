@@ -474,34 +474,6 @@ export async function deleteTransaction(id: number, user_id: number) {
     .where(eq(transactions.id, id));
 }
 
-export async function voidTransaction(id: number, user_id: number, reason: string) {
-  const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
-  // Verify ownership
-  const result = await db
-    .select()
-    .from(transactions)
-    .where(eq(transactions.id, id))
-    .limit(1);
-  
-  const transaction = result[0];
-  if (!transaction || transaction.user_id !== user_id) {
-    throw new Error("Transaction not found or access denied");
-  }
-
-  await db
-    .update(transactions)
-    .set({
-      status: 'voided',
-      voided_at: new Date(),
-      void_reason: reason,
-    })
-    .where(eq(transactions.id, id));
-}
-
 export async function getSavingsGoalsByUserId(user_id: number) {
   const db = await getDb();
   if (!db) {
@@ -573,51 +545,11 @@ export async function getTransactionsByUserId(user_id: number) {
     throw new Error("Database not available");
   }
 
-  try {
-    const results = await db
-      .select()
-      .from(transactions)
-      .where(eq(transactions.user_id, user_id))
-      .orderBy(desc(transactions.created_at));
-    
-    // Add default values for new fields if they don't exist
-    return results.map(t => ({
-      ...t,
-      status: t.status || 'active',
-      invoice_id: t.invoice_id || null,
-      voided_at: t.voided_at || null,
-      void_reason: t.void_reason || null,
-    }));
-  } catch (error: any) {
-    console.error('Error fetching transactions:', error?.message || error);
-    // If error is due to missing columns, try simpler query
-    if (error?.message?.includes('Unknown column')) {
-      const results = await db
-        .select({
-          id: transactions.id,
-          user_id: transactions.user_id,
-          type: transactions.type,
-          category: transactions.category,
-          amount: transactions.amount,
-          currency: transactions.currency,
-          description: transactions.description,
-          date: transactions.date,
-          created_at: transactions.created_at,
-        })
-        .from(transactions)
-        .where(eq(transactions.user_id, user_id))
-        .orderBy(desc(transactions.created_at));
-      
-      return results.map(t => ({
-        ...t,
-        status: 'active' as const,
-        invoice_id: null,
-        voided_at: null,
-        void_reason: null,
-      }));
-    }
-    throw error;
-  }
+  return await db
+    .select()
+    .from(transactions)
+    .where(eq(transactions.user_id, user_id))
+    .orderBy(desc(transactions.created_at));
 }
 
 export async function getTransactionById(id: number, user_id: number) {
@@ -626,60 +558,18 @@ export async function getTransactionById(id: number, user_id: number) {
     throw new Error("Database not available");
   }
 
-  try {
-    const result = await db
-      .select()
-      .from(transactions)
-      .where(eq(transactions.id, id))
-      .limit(1);
-    
-    const transaction = result[0];
-    if (!transaction || transaction.user_id !== user_id) {
-      return null;
-    }
-    
-    return {
-      ...transaction,
-      status: transaction.status || 'active',
-      invoice_id: transaction.invoice_id || null,
-      voided_at: transaction.voided_at || null,
-      void_reason: transaction.void_reason || null,
-    };
-  } catch (error: any) {
-    console.error('Error fetching transaction:', error?.message || error);
-    // Fallback query without new columns
-    if (error?.message?.includes('Unknown column')) {
-      const result = await db
-        .select({
-          id: transactions.id,
-          user_id: transactions.user_id,
-          type: transactions.type,
-          category: transactions.category,
-          amount: transactions.amount,
-          currency: transactions.currency,
-          description: transactions.description,
-          date: transactions.date,
-          created_at: transactions.created_at,
-        })
-        .from(transactions)
-        .where(eq(transactions.id, id))
-        .limit(1);
-      
-      const transaction = result[0];
-      if (!transaction || transaction.user_id !== user_id) {
-        return null;
-      }
-      
-      return {
-        ...transaction,
-        status: 'active' as const,
-        invoice_id: null,
-        voided_at: null,
-        void_reason: null,
-      };
-    }
-    throw error;
+  const result = await db
+    .select()
+    .from(transactions)
+    .where(eq(transactions.id, id))
+    .limit(1);
+  
+  const transaction = result[0];
+  if (!transaction || transaction.user_id !== user_id) {
+    return null;
   }
+  
+  return transaction;
 }
 
 
