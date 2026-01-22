@@ -308,7 +308,7 @@ export default function Markets() {
     const favorite = isFavorite(asset.symbol);
 
     return (
-      <div className="flex items-center justify-between p-2.5 sm:p-3 border rounded-xl bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-200 shadow-sm gap-2 sm:gap-3">
+      <div className="flex items-center justify-between p-2 border rounded-xl bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-200 shadow-sm gap-2">
         {/* Left: Symbol & Name */}
         <div className="flex items-center gap-3 text-left min-w-0 flex-1">
           <div className="flex flex-col min-w-0">
@@ -497,46 +497,74 @@ export default function Markets() {
           />
         </div>
 
-        {/* Tabs - Scrollable on mobile */}
-        <Tabs defaultValue="crypto" className="w-full">
-          <div className="overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-hide">
-            <TabsList className="w-full min-w-max flex md:grid md:grid-cols-4 mb-2 md:mb-6 pr-4 md:pr-0">
-              <TabsTrigger value="crypto" className="flex-1">Cripto</TabsTrigger>
-              <TabsTrigger value="stocks" className="flex-1">Acciones</TabsTrigger>
-              <TabsTrigger value="forex" className="flex-1">Forex</TabsTrigger>
-              <TabsTrigger value="commodities" className="flex-1">Commodities</TabsTrigger>
+        {/* Group Buttons */}
+        <Tabs defaultValue="crypto-stocks" className="w-full">
+          <div className="flex justify-center mb-6">
+            <TabsList className="inline-flex">
+              <TabsTrigger value="crypto-stocks" className="px-6">Cripto + Acciones</TabsTrigger>
+              <TabsTrigger value="forex-commodities" className="px-6">Forex + Commodities</TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent value="crypto">
-            <div className="w-full space-y-2 max-h-[400px] overflow-y-auto pr-2">
-              {sortAssets(filterAssets(cryptoData)).map((asset) => (
-                <AssetItem key={asset.symbol} asset={asset} />
-              ))}
+          {/* Crypto + Stocks */}
+          <TabsContent value="crypto-stocks">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[600px]">
+              {/* Crypto Column */}
+              <div className="flex flex-col h-full">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  Criptomonedas
+                </h3>
+                <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                  {sortAssets(filterAssets(cryptoData)).map((asset) => (
+                    <AssetItem key={asset.symbol} asset={asset} />
+                  ))}
+                </div>
+              </div>
+
+              {/* Stocks Column */}
+              <div className="flex flex-col h-full">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                  Acciones
+                </h3>
+                <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                  {sortAssets(filterAssets(MOCK_STOCKS)).map((asset) => (
+                    <AssetItem key={asset.symbol} asset={asset} />
+                  ))}
+                </div>
+              </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="stocks">
-            <div className="w-full space-y-2 max-h-[400px] overflow-y-auto pr-2">
-              {sortAssets(filterAssets(MOCK_STOCKS)).map((asset) => (
-                <AssetItem key={asset.symbol} asset={asset} />
-              ))}
-            </div>
-          </TabsContent>
+          {/* Forex + Commodities */}
+          <TabsContent value="forex-commodities">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[600px]">
+              {/* Forex Column */}
+              <div className="flex flex-col h-full">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-primary" />
+                  Forex
+                </h3>
+                <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                  {sortAssets(filterAssets(MOCK_FOREX)).map((asset) => (
+                    <AssetItem key={asset.symbol} asset={asset} />
+                  ))}
+                </div>
+              </div>
 
-          <TabsContent value="forex">
-            <div className="w-full space-y-2 max-h-[400px] overflow-y-auto pr-2">
-              {sortAssets(filterAssets(MOCK_FOREX)).map((asset) => (
-                <AssetItem key={asset.symbol} asset={asset} />
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="commodities">
-            <div className="w-full space-y-2 max-h-[400px] overflow-y-auto pr-2">
-              {sortAssets(filterAssets(MOCK_COMMODITIES)).map((asset) => (
-                <AssetItem key={asset.symbol} asset={asset} />
-              ))}
+              {/* Commodities Column */}
+              <div className="flex flex-col h-full">
+                <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                  Commodities
+                </h3>
+                <div className="flex-1 overflow-y-auto pr-2 space-y-2">
+                  {sortAssets(filterAssets(MOCK_COMMODITIES)).map((asset) => (
+                    <AssetItem key={asset.symbol} asset={asset} />
+                  ))}
+                </div>
+              </div>
             </div>
           </TabsContent>
         </Tabs>
