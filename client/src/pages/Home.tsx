@@ -427,75 +427,61 @@ export default function Home() {
               </Card>
             )}
 
-            {/* Recordatorios */}
-            {reminders && reminders.length > 0 && (
-              <Card className="bg-card border-border">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-foreground flex items-center gap-2">
-                      <Bell className="w-5 h-5" />
-                      Recordatorios
-                    </CardTitle>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => setLocation('/reminders')}
-                      className="text-xs"
-                    >
-                      Ver todos
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {reminders
-                      .sort((a, b) => new Date(a.reminder_date).getTime() - new Date(b.reminder_date).getTime())
-                      .slice(0, 5)
-                      .map((reminder) => {
-                        const reminderDate = new Date(reminder.reminder_date);
-                        const today = new Date();
-                        const isToday = reminderDate.toDateString() === today.toDateString();
-                        const isPast = reminderDate < today && !isToday;
-                        
-                        return (
-                          <div 
-                            key={reminder.id} 
-                            className="flex items-start gap-3 p-3 bg-background rounded-lg border border-border cursor-pointer hover:border-primary/50 transition-colors"
-                            onClick={() => setLocation('/reminders')}
-                          >
-                            <div className={`p-2 rounded-full flex-shrink-0 ${
-                              isPast ? 'bg-red-500/10' : isToday ? 'bg-yellow-500/10' : 'bg-blue-500/10'
-                            }`}>
-                              <Bell className={`w-4 h-4 ${
-                                isPast ? 'text-red-500' : isToday ? 'text-yellow-500' : 'text-blue-500'
-                              }`} />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-foreground text-sm">{reminder.title}</p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {format(reminderDate, "dd 'de' MMMM, yyyy", { locale: es })}
-                                {isToday && ' • Hoy'}
-                                {isPast && ' • Vencido'}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Acciones Pendientes con Alertas Urgentes */}
+            {/* Recordatorios y Notificaciones - Módulo Combinado */}
             <Card className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-foreground flex items-center gap-2">
-                  <Bell className="w-5 h-5" />
-                  Acciones Pendientes
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-foreground flex items-center gap-2">
+                    <Bell className="w-5 h-5" />
+                    Recordatorios y Notificaciones
+                  </CardTitle>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setLocation('/reminders')}
+                    className="text-xs"
+                  >
+                    Ver todos
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="max-h-[400px] overflow-y-auto space-y-3 pr-2">
+                <div className="max-h-[500px] overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent">
+                  {/* Recordatorios */}
+                  {reminders && reminders.length > 0 && reminders
+                    .sort((a, b) => new Date(a.reminder_date).getTime() - new Date(b.reminder_date).getTime())
+                    .map((reminder) => {
+                      const reminderDate = new Date(reminder.reminder_date);
+                      const today = new Date();
+                      const isToday = reminderDate.toDateString() === today.toDateString();
+                      const isPast = reminderDate < today && !isToday;
+                      
+                      return (
+                        <div 
+                          key={`reminder-${reminder.id}`} 
+                          className="flex items-start gap-3 p-3 bg-background rounded-lg border border-border cursor-pointer hover:border-primary/50 transition-colors"
+                          onClick={() => setLocation('/reminders')}
+                        >
+                          <div className={`p-2 rounded-full flex-shrink-0 ${
+                            isPast ? 'bg-red-500/10' : isToday ? 'bg-yellow-500/10' : 'bg-blue-500/10'
+                          }`}>
+                            <Bell className={`w-4 h-4 ${
+                              isPast ? 'text-red-500' : isToday ? 'text-yellow-500' : 'text-blue-500'
+                            }`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-foreground text-sm">{reminder.title}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {format(reminderDate, "dd 'de' MMMM, yyyy", { locale: es })}
+                              {isToday && ' • Hoy'}
+                              {isPast && ' • Vencido'}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  
+
                   {/* Alertas Urgentes (Critical y Warning) */}
                   {filteredUrgentAlerts.map((alert) => {
                     const isCritical = alert.type === 'critical';
@@ -573,11 +559,11 @@ export default function Home() {
                     </Badge>
                   </div>
                   
-                  {/* Mensaje si no hay alertas */}
-                  {filteredUrgentAlerts.length === 0 && pendingInvoices === 0 && (
+                  {/* Mensaje si no hay nada */}
+                  {(!reminders || reminders.length === 0) && filteredUrgentAlerts.length === 0 && pendingInvoices === 0 && (
                     <div className="text-center py-8 text-muted-foreground text-sm">
                       <Info className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                      <p>No hay acciones pendientes</p>
+                      <p>No hay recordatorios ni notificaciones</p>
                     </div>
                   )}
                 </div>
