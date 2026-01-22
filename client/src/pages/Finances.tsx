@@ -192,7 +192,8 @@ export default function Finances() {
       'Categoría': transaction.category,
       'Descripción': transaction.description,
       'Monto': parseFloat(transaction.amount),
-      'Estado': transaction.status === 'voided' ? 'Anulada' : 'Activa',
+      'Estado': transaction.status === 'voided' ? 'Anulada' : 'Vigente',
+      'ID Referencia': transaction.invoice_id ? `INV-${transaction.invoice_id}` : '-',
     }));
 
     // Crear libro de trabajo
@@ -209,6 +210,7 @@ export default function Finances() {
       { wch: maxWidth }, // Descripción
       { wch: 15 }, // Monto
       { wch: 10 }, // Estado
+      { wch: 20 }, // ID Referencia
     ];
 
     // Generar archivo
