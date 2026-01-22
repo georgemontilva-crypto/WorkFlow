@@ -499,10 +499,12 @@ export default function Markets() {
 
         {/* Group Buttons */}
         <Tabs defaultValue="crypto-stocks" className="w-full">
-          <div className="flex justify-center mb-6">
-            <TabsList className="inline-flex">
-              <TabsTrigger value="crypto-stocks" className="px-6">Cripto + Acciones</TabsTrigger>
-              <TabsTrigger value="forex-commodities" className="px-6">Forex + Commodities</TabsTrigger>
+          <div className="flex gap-3 mb-6">
+            <TabsList className="inline-flex flex-1">
+              <TabsTrigger value="crypto-stocks" className="flex-1">Cripto + Acciones</TabsTrigger>
+            </TabsList>
+            <TabsList className="inline-flex flex-1">
+              <TabsTrigger value="forex-commodities" className="flex-1">Forex + Commodities</TabsTrigger>
             </TabsList>
           </div>
 
