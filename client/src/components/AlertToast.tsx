@@ -123,28 +123,28 @@ export function AlertToast() {
       case 'critical':
         return {
           borderColor: 'border-red-500',
-          iconBg: 'bg-red-500',
-          iconColor: 'text-white',
+          iconBg: 'border-2 border-red-500',
+          iconColor: 'text-red-500',
           titleColor: 'text-red-400',
-          buttonBorder: 'border-red-500 text-red-400 hover:bg-red-500/20',
+          buttonBorder: 'border-2 border-red-500 text-red-400 hover:border-red-400 hover:text-red-300',
           Icon: AlertCircle,
         };
       case 'warning':
         return {
           borderColor: 'border-yellow-500',
-          iconBg: 'bg-yellow-500',
-          iconColor: 'text-black',
+          iconBg: 'border-2 border-yellow-500',
+          iconColor: 'text-yellow-500',
           titleColor: 'text-yellow-400',
-          buttonBorder: 'border-yellow-500 text-yellow-400 hover:bg-yellow-500/20',
+          buttonBorder: 'border-2 border-yellow-500 text-yellow-400 hover:border-yellow-400 hover:text-yellow-300',
           Icon: AlertTriangle,
         };
       default:
         return {
           borderColor: 'border-blue-500',
-          iconBg: 'bg-blue-500',
-          iconColor: 'text-white',
+          iconBg: 'border-2 border-blue-500',
+          iconColor: 'text-blue-500',
           titleColor: 'text-blue-400',
-          buttonBorder: 'border-blue-500 text-blue-400 hover:bg-blue-500/20',
+          buttonBorder: 'border-2 border-blue-500 text-blue-400 hover:border-blue-400 hover:text-blue-300',
           Icon: Info,
         };
     }
@@ -217,10 +217,10 @@ export function AlertToast() {
               {currentAlert.action_text || 'Ver detalles'}
             </button>
           )}
-          <button
-            onClick={handleDismiss}
-            className="px-4 py-2 rounded-lg font-medium text-sm border border-border text-muted-foreground hover:bg-accent transition-colors"
-          >
+            <button
+              onClick={handleDismiss}
+              className="px-4 py-2 rounded-lg font-medium text-sm border-2 border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300 transition-colors"
+            >
             Descartar
           </button>
         </div>
