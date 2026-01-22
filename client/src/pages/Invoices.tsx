@@ -115,8 +115,8 @@ export default function Invoices() {
   const { data: archivedInvoices, isLoading: archivedLoading } = trpc.invoices.listArchived.useQuery();
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery();
   
-  // Filter invoices
-  const invoices = allInvoices;
+  // Filter invoices - hide cancelled invoices from main list
+  const invoices = allInvoices?.filter(inv => inv.status !== 'cancelled');
   
   // Mutations
   const createInvoice = trpc.invoices.create.useMutation({
