@@ -1,15 +1,15 @@
 /**
- * Currency Calculator Component
+ * Currency Calculator Component - Compact Version
  * Real-time currency conversion tool
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { DollarSign, ArrowRightLeft, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import CurrencySelector from './CurrencySelector';
 
 const POPULAR_CURRENCIES = [
   { code: 'USD', name: 'Dólar estadounidense', symbol: '$' },
@@ -79,7 +79,7 @@ export default function CurrencyCalculator() {
   };
 
   return (
-    <Card className="bg-card border-border h-full">
+    <Card className="h-full">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <DollarSign className="w-5 h-5 text-primary" />
@@ -89,6 +89,7 @@ export default function CurrencyCalculator() {
           Conversión en tiempo real entre monedas
         </CardDescription>
       </CardHeader>
+
       <CardContent className="space-y-3">
         {/* Amount Input */}
         <div className="space-y-1">
@@ -105,26 +106,17 @@ export default function CurrencyCalculator() {
           />
         </div>
 
-        {/* Currency Selectors - 2 Columns */}
+        {/* Currency Selectors - Horizontal Layout */}
         <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
           {/* From Currency */}
           <div className="space-y-1">
             <Label htmlFor="fromCurrency" className="text-xs">De</Label>
-            <Select value={fromCurrency} onValueChange={setFromCurrency}>
-              <SelectTrigger id="fromCurrency" className="h-8 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {POPULAR_CURRENCIES.map((currency) => (
-                  <SelectItem key={currency.code} value={currency.code}>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold">{currency.code}</span>
-                      <span className="text-muted-foreground text-xs">{currency.name}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <CurrencySelector
+              currencies={POPULAR_CURRENCIES}
+              selectedCurrency={fromCurrency}
+              onSelect={setFromCurrency}
+              placeholder="Seleccionar"
+            />
           </div>
 
           {/* Swap Button */}
@@ -132,7 +124,7 @@ export default function CurrencyCalculator() {
             variant="ghost"
             size="icon"
             onClick={swapCurrencies}
-            className="rounded-full h-8 w-8"
+            className="rounded-full h-8 w-8 mb-0"
           >
             <ArrowRightLeft className="w-3 h-3" />
           </Button>
@@ -140,21 +132,13 @@ export default function CurrencyCalculator() {
           {/* To Currency */}
           <div className="space-y-1">
             <Label htmlFor="toCurrency" className="text-xs">A</Label>
-            <Select value={toCurrency} onValueChange={setToCurrency}>
-              <SelectTrigger id="toCurrency" className="h-8 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {POPULAR_CURRENCIES.map((currency) => (
-                  <SelectItem key={currency.code} value={currency.code}>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold">{currency.code}</span>
-                      <span className="text-muted-foreground text-xs">{currency.name}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <CurrencySelector
+              currencies={POPULAR_CURRENCIES}
+              selectedCurrency={toCurrency}
+              onSelect={setToCurrency}
+              placeholder="Seleccionar"
+            />
+          </div>
         </div>
 
         {/* Convert Button */}
@@ -178,28 +162,28 @@ export default function CurrencyCalculator() {
 
         {/* Result */}
         {result !== null && (
-          <div className="space-y-2 pt-3 border-t border-border">
-            <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+          <div className="space-y-2 pt-2 border-t">
+            {/* Main Result */}
+            <div className="p-2.5 bg-primary/10 rounded-lg border border-primary/20">
               <p className="text-[10px] text-muted-foreground mb-0.5">Resultado</p>
-              <p className="text-2xl font-bold font-mono text-primary">
+              <p className="text-xl font-bold font-mono text-primary">
                 {formatNumber(result)} {toCurrency}
               </p>
             </div>
 
-            {rate && (
-              <div className="p-2 bg-background rounded-lg border border-border">
-                <p className="text-[10px] text-muted-foreground mb-0.5">Tasa de cambio</p>
-                <p className="font-mono text-xs">
+            {/* Exchange Rate & Last Update - Inline */}
+            <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+              {rate && (
+                <span className="font-mono">
                   1 {fromCurrency} = {formatNumber(rate)} {toCurrency}
-                </p>
-              </div>
-            )}
-
-            {lastUpdate && (
-              <p className="text-[10px] text-muted-foreground text-center">
-                Actualizado: {lastUpdate.toLocaleTimeString()}
-              </p>
-            )}
+                </span>
+              )}
+              {lastUpdate && (
+                <span>
+                  {lastUpdate.toLocaleTimeString()}
+                </span>
+              )}
+            </div>
           </div>
         )}
       </CardContent>
