@@ -829,7 +829,10 @@ export const appRouter = router({
           };
           
           // Generate PDF
+          console.log('[Invoice] Generating PDF for invoice:', invoice.invoice_number);
           const pdfBase64 = await generateInvoicePDF(invoiceData);
+          console.log('[Invoice] PDF generated successfully, size:', pdfBase64.length, 'chars');
+          console.log('[Invoice] Sending email to:', client.email);
           
           // Send email with PDF attachment
           const emailHtml = `

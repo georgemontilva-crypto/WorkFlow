@@ -11,6 +11,7 @@ interface EmailOptions {
   attachments?: Array<{
     filename: string;
     content: string; // base64 encoded
+    encoding?: string; // 'base64'
     contentType?: string;
     contentId?: string; // For inline images (cid:xxx)
   }>;
@@ -44,7 +45,13 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
         to: options.to,
         subject: options.subject,
         html: options.html,
-        ...(options.attachments && { attachments: options.attachments }),
+        ...(options.attachments && { 
+          attachments: options.attachments.map(att => ({
+            filename: att.filename,
+            content: att.content,
+            ...(att.contentType && { type: att.contentType }),
+          }))
+        }),
       }),
     });
 
