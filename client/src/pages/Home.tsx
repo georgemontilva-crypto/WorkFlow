@@ -225,10 +225,12 @@ export default function Home() {
           <Button
             variant="outline"
             onClick={() => setIsWidgetConfigOpen(true)}
-            className="gap-2"
+            className="group relative h-10 w-10 rounded-full p-0 overflow-hidden transition-all duration-300 hover:w-auto hover:px-4 hover:gap-2"
           >
-            <Settings className="w-4 h-4" />
-            Configurar
+            <Settings className="w-4 h-4 flex-shrink-0" />
+            <span className="absolute opacity-0 whitespace-nowrap group-hover:opacity-100 group-hover:relative transition-opacity duration-300 text-sm">
+              Configurar
+            </span>
           </Button>
         </div>
 
