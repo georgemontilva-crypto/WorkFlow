@@ -115,8 +115,8 @@ export default function Invoices() {
   const { data: archivedInvoices, isLoading: archivedLoading } = trpc.invoices.listArchived.useQuery();
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery();
   
-  // Filter invoices - hide cancelled invoices from main list
-  const invoices = allInvoices?.filter(inv => inv.status !== 'cancelled');
+  // Show all active invoices (not archived)
+  const invoices = allInvoices;
   
   // Mutations
   const createInvoice = trpc.invoices.create.useMutation({
@@ -648,7 +648,6 @@ export default function Invoices() {
                         <SelectItem value="sent">Enviar</SelectItem>
                         <SelectItem value="paid">Pagada</SelectItem>
                         <SelectItem value="overdue">Vencida</SelectItem>
-                        <SelectItem value="cancelled">Cancelada</SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground">Estado actual de la factura</p>
@@ -1056,14 +1055,7 @@ export default function Invoices() {
                                 Archivar Factura
                               </DropdownMenuItem>
                             )}
-                            <DropdownMenuSeparator className="bg-border" />
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(invoice, 'cancelled')}
-                              className="text-destructive hover:bg-destructive/10 cursor-pointer"
-                            >
-                              <XCircle className="w-4 h-4 mr-2" />
-                              {t.invoices.cancelInvoice}
-                            </DropdownMenuItem>
+
                           </DropdownMenuContent>
                         </DropdownMenu>
                           </div>
@@ -1146,14 +1138,7 @@ export default function Invoices() {
                                     Archivar Factura
                                   </DropdownMenuItem>
                                 )}
-                                <DropdownMenuSeparator className="bg-border" />
-                                <DropdownMenuItem 
-                                  onClick={() => handleStatusChange(invoice, 'cancelled')}
-                                  className="text-destructive hover:bg-destructive/10 cursor-pointer"
-                                >
-                                  <XCircle className="w-4 h-4 mr-2" />
-                                  {t.invoices.cancelInvoice}
-                                </DropdownMenuItem>
+
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
