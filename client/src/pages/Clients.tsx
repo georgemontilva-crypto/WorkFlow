@@ -1,6 +1,7 @@
 /**
  * Clients Page - Gestión de Clientes (CRM)
  * Design Philosophy: Modern Fintech - Clean table list with status badges
+ * Responsive: Table in desktop, collapsible list in mobile
  */
 
 import DashboardLayout from '@/components/DashboardLayout';
@@ -30,14 +31,37 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { trpc } from '@/lib/trpc';
-import { Plus, MoreVertical, Pencil, Trash2, MapPin, ChevronLeft, ChevronRight, Repeat } from 'lucide-react';
+import { 
+  Plus, 
+  MoreVertical, 
+  Pencil, 
+  Trash2, 
+  MapPin, 
+  ChevronLeft, 
+  ChevronRight, 
+  Repeat,
+  Search,
+  Filter,
+  ChevronDown,
+  Mail,
+  Phone,
+  Building2,
+  DollarSign,
+  Calendar,
+  Eye,
+} from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useSearch } from 'wouter';
 
 // Client type based on tRPC schema
@@ -103,6 +127,11 @@ export default function Clients() {
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  
+  // Search and filter states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  
   const [formData, setFormData] = useState<any>({
     name: '',
     email: '',
@@ -125,6 +154,29 @@ export default function Clients() {
       setLocation('/clients', { replace: true });
     }
   }, [search, setLocation]);
+
+  // Filter and search logic
+  const filteredClients = useMemo(() => {
+    if (!clients) return [];
+    
+    return clients.filter(client => {
+      // Status filter
+      if (statusFilter === 'active' && client.status !== 'active') return false;
+      if (statusFilter === 'inactive' && client.status !== 'inactive') return false;
+      
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesName = client.name.toLowerCase().includes(query);
+        const matchesCompany = client.company?.toLowerCase().includes(query);
+        const matchesEmail = client.email.toLowerCase().includes(query);
+        
+        if (!matchesName && !matchesCompany && !matchesEmail) return false;
+      }
+      
+      return true;
+    });
+  }, [clients, searchQuery, statusFilter]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -208,10 +260,15 @@ export default function Clients() {
   };
 
   // Pagination
-  const totalPages = Math.ceil((clients?.length || 0) / itemsPerPage);
+  const totalPages = Math.ceil((filteredClients?.length || 0) / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedClients = clients?.slice(startIndex, endIndex) || [];
+  const paginatedClients = filteredClients?.slice(startIndex, endIndex) || [];
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter]);
 
   if (isLoading) {
     return (
@@ -308,7 +365,6 @@ export default function Clients() {
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="bg-[#2A2A2A] border-white/10 text-white h-11"
                     />
-                    <p className="text-xs text-gray-400">{t.clients.phoneHelper}</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="company" className="text-white font-semibold">{t.clients.company}</Label>
@@ -318,94 +374,41 @@ export default function Clients() {
                       onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                       className="bg-[#2A2A2A] border-white/10 text-white h-11"
                     />
-                    <p className="text-xs text-gray-400">{t.clients.companyHelper}</p>
                   </div>
                 </div>
 
-                {/* Recurring Billing Section - Optional */}
-                <div className="pt-4 border-t-2 border-white/10 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <Repeat className="w-4 h-4 text-primary" />
-                        <Label htmlFor="has_recurring_billing" className="text-white font-semibold text-lg cursor-pointer">
-                          Pago Recurrente
-                        </Label>
-                      </div>
-                      <p className="text-sm text-gray-400">Activa esta opción si el cliente tiene pagos programados</p>
-                    </div>
-                    <Switch
-                      id="has_recurring_billing"
-                      checked={formData.has_recurring_billing || false}
-                      onCheckedChange={(checked) => setFormData({ ...formData, has_recurring_billing: checked })}
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="status" className="text-white font-semibold">{t.clients.status}</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value) => setFormData({ ...formData, status: value })}
+                  >
+                    <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1C1C1C] border-white/10">
+                      <SelectItem value="active" className="text-white hover:bg-white/5">Activo</SelectItem>
+                      <SelectItem value="inactive" className="text-white hover:bg-white/5">Inactivo</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  {formData.has_recurring_billing && (
-                    <div className="space-y-4 pt-3 border-t border-white/5">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="next_payment_date" className="text-white font-semibold">{t.clients.next_payment_date} <span className="text-red-500">*</span></Label>
-                          <Input
-                            id="next_payment_date"
-                            type="date"
-                            value={formData.next_payment_date}
-                            onChange={(e) => setFormData({ ...formData, next_payment_date: e.target.value })}
-                            className="bg-[#2A2A2A] border-white/10 text-white h-11"
-                            required={formData.has_recurring_billing}
-                          />
-                          <p className="text-xs text-gray-400">{t.clients.nextPaymentDateHelper}</p>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="reminder_days" className="text-white font-semibold">{t.clients.daysInAdvanceLabel}</Label>
-                          <Input
-                            id="reminder_days"
-                            type="number"
-                            min="1"
-                            max="30"
-                            value={formData.reminder_days}
-                            onChange={(e) => setFormData({ ...formData, reminder_days: parseInt(e.target.value) || 7 })}
-                            className="bg-[#2A2A2A] border-white/10 text-white h-11"
-                          />
-                          <p className="text-xs text-gray-400">{t.clients.daysInAdvanceHelper}</p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="billing_cycle" className="text-white font-semibold">{t.clients.billing_cycle}</Label>
-                          <Select
-                            value={formData.billing_cycle}
-                            onValueChange={(value: any) => setFormData({ ...formData, billing_cycle: value })}
-                          >
-                            <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-[#1C1C1C] border-white/10">
-                              <SelectItem value="monthly">{t.clients.monthly}</SelectItem>
-                              <SelectItem value="quarterly">{t.clients.quarterly}</SelectItem>
-                              <SelectItem value="yearly">{t.clients.yearly}</SelectItem>
-                              <SelectItem value="custom">{t.clients.custom}</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <p className="text-xs text-gray-400">{t.clients.billingCycleHelper}</p>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="amount" className="text-white font-semibold">{t.clients.amount} <span className="text-red-500">*</span></Label>
-                          <Input
-                            id="amount"
-                            type="number"
-                            step="0.01"
-                            value={formData.amount}
-                            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                            className="bg-[#2A2A2A] border-white/10 text-white font-mono h-11"
-                            required={formData.has_recurring_billing}
-                          />
-                          <p className="text-xs text-gray-400">{t.clients.billingAmount}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                <div className="space-y-2">
+                  <Label htmlFor="billing_cycle" className="text-white font-semibold">{t.clients.billingCycle}</Label>
+                  <Select
+                    value={formData.billing_cycle}
+                    onValueChange={(value) => setFormData({ ...formData, billing_cycle: value })}
+                  >
+                    <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1C1C1C] border-white/10">
+                      <SelectItem value="monthly" className="text-white hover:bg-white/5">{t.clients.monthly}</SelectItem>
+                      <SelectItem value="quarterly" className="text-white hover:bg-white/5">{t.clients.quarterly}</SelectItem>
+                      <SelectItem value="yearly" className="text-white hover:bg-white/5">{t.clients.yearly}</SelectItem>
+                      <SelectItem value="custom" className="text-white hover:bg-white/5">{t.clients.custom}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {formData.billing_cycle === 'custom' && (
@@ -414,46 +417,71 @@ export default function Clients() {
                     <Input
                       id="custom_cycle_days"
                       type="number"
-                      min="1"
-                      value={formData.custom_cycle_days}
+                      value={formData.custom_cycle_days || ''}
                       onChange={(e) => setFormData({ ...formData, custom_cycle_days: parseInt(e.target.value) })}
                       className="bg-[#2A2A2A] border-white/10 text-white h-11"
                     />
-                    <p className="text-xs text-gray-400">{t.clients.customCycleDaysHelper}</p>
                   </div>
                 )}
 
-                {/* Status Section */}
-                <div className="pt-4 border-t-2 border-white/10 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="status" className="text-white font-semibold">{t.clients.status}</Label>
-                    <Select
-                      value={formData.status}
-                      onValueChange={(value: any) => setFormData({ ...formData, status: value })}
-                    >
-                      <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#1C1C1C] border-white/10">
-                        <SelectItem value="active">{t.clients.active}</SelectItem>
-                        <SelectItem value="inactive">{t.clients.inactive}</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <Label htmlFor="amount" className="text-white font-semibold">{t.clients.amount}</Label>
+                    <Input
+                      id="amount"
+                      type="number"
+                      step="0.01"
+                      value={formData.amount}
+                      onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                      className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="next_payment_date" className="text-white font-semibold">{t.clients.nextPaymentDate}</Label>
+                    <Input
+                      id="next_payment_date"
+                      type="date"
+                      value={formData.next_payment_date}
+                      onChange={(e) => setFormData({ ...formData, next_payment_date: e.target.value })}
+                      className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                    />
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                <div className="space-y-2">
+                  <Label htmlFor="reminder_days" className="text-white font-semibold">{t.clients.reminderDays}</Label>
+                  <Input
+                    id="reminder_days"
+                    type="number"
+                    value={formData.reminder_days}
+                    onChange={(e) => setFormData({ ...formData, reminder_days: parseInt(e.target.value) })}
+                    className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="notes" className="text-white font-semibold">{t.clients.notes}</Label>
+                  <textarea
+                    id="notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                    className="w-full bg-[#2A2A2A] border border-white/10 text-white rounded-lg p-3 min-h-[100px]"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setIsDialogOpen(false)}
-                    className="border-white/10 text-white hover:bg-white/5"
+                    className="flex-1"
                   >
                     {t.common.cancel}
                   </Button>
                   <Button 
                     type="submit"
                     disabled={createClient.isPending || updateClient.isPending}
+                    className="flex-1"
                   >
                     {editingClient ? t.common.update : t.common.create}
                   </Button>
@@ -463,8 +491,44 @@ export default function Clients() {
           </Dialog>
         </div>
 
-        {/* Clients Table */}
-        <div className="bg-[#1C1C1C] rounded-2xl border border-white/5 overflow-hidden">
+        {/* Search and Filter Bar */}
+        <div className="bg-[#1C1C1C] rounded-2xl border border-white/5 p-4 mb-4">
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Buscar por nombre, empresa o email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-[#2A2A2A] border-white/10 text-white h-10"
+              />
+            </div>
+
+            {/* Status Filter */}
+            <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
+              <SelectTrigger className="w-full sm:w-[180px] bg-[#2A2A2A] border-white/10 text-white h-10">
+                <Filter className="w-4 h-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-[#1C1C1C] border-white/10">
+                <SelectItem value="all" className="text-white hover:bg-white/5">Todos</SelectItem>
+                <SelectItem value="active" className="text-white hover:bg-white/5">Activos</SelectItem>
+                <SelectItem value="inactive" className="text-white hover:bg-white/5">Inactivos</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Results count */}
+          <div className="mt-3 text-sm text-gray-400">
+            Mostrando {filteredClients.length} {filteredClients.length === 1 ? 'cliente' : 'clientes'}
+            {(searchQuery || statusFilter !== 'all') && ` (filtrado de ${clients?.length || 0} total)`}
+          </div>
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden lg:block bg-[#1C1C1C] rounded-2xl border border-white/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -482,7 +546,9 @@ export default function Clients() {
                 {paginatedClients.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="text-center py-12 text-gray-400">
-                      No hay clientes registrados
+                      {searchQuery || statusFilter !== 'all' 
+                        ? 'No se encontraron clientes con los filtros aplicados'
+                        : 'No hay clientes registrados'}
                     </td>
                   </tr>
                 ) : (
@@ -590,6 +656,147 @@ export default function Clients() {
                 className="disabled:opacity-30"
               >
                 <ChevronRight className="w-5 h-5" />
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Collapsible List View */}
+        <div className="lg:hidden space-y-3">
+          {paginatedClients.length === 0 ? (
+            <div className="bg-[#1C1C1C] rounded-2xl border border-white/5 p-8 text-center">
+              <p className="text-gray-400">
+                {searchQuery || statusFilter !== 'all' 
+                  ? 'No se encontraron clientes con los filtros aplicados'
+                  : 'No hay clientes registrados'}
+              </p>
+            </div>
+          ) : (
+            paginatedClients.map((client) => {
+              const statusBadge = getStatusBadge(client);
+              return (
+                <Collapsible key={client.id}>
+                  <div className="bg-[#1C1C1C] rounded-2xl border border-white/5 overflow-hidden">
+                    <CollapsibleTrigger className="w-full p-4 hover:bg-white/5 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 text-left">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-white">{client.name}</h3>
+                            <div className={`w-2 h-2 rounded-full ${statusBadge.color}`}></div>
+                          </div>
+                          {client.company && (
+                            <p className="text-sm text-gray-400">{client.company}</p>
+                          )}
+                        </div>
+                        <ChevronDown className="w-5 h-5 text-gray-400 transition-transform ui-expanded:rotate-180" />
+                      </div>
+                    </CollapsibleTrigger>
+                    
+                    <CollapsibleContent>
+                      <div className="px-4 pb-4 space-y-3 border-t border-white/5 pt-4">
+                        {/* Email */}
+                        <div className="flex items-start gap-3">
+                          <Mail className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-gray-400 mb-0.5">Email</p>
+                            <p className="text-sm text-white break-all">{client.email}</p>
+                          </div>
+                        </div>
+
+                        {/* Phone */}
+                        {client.phone && (
+                          <div className="flex items-start gap-3">
+                            <Phone className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                            <div className="flex-1">
+                              <p className="text-xs text-gray-400 mb-0.5">Teléfono</p>
+                              <p className="text-sm text-white">{client.phone}</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Next Payment Date */}
+                        <div className="flex items-start gap-3">
+                          <Calendar className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-400 mb-0.5">Próximo Pago</p>
+                            <p className="text-sm text-white">
+                              {format(new Date(client.next_payment_date), 'dd/MM/yyyy', { locale: es })}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Amount */}
+                        <div className="flex items-start gap-3">
+                          <DollarSign className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-400 mb-0.5">Monto</p>
+                            <p className="text-sm text-white font-mono">
+                              ${parseFloat(client.amount).toLocaleString('es-ES')}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Status Badge */}
+                        <div className="flex items-center gap-2 pt-2">
+                          <Badge className={`${statusBadge.color} text-white border-0`}>
+                            {statusBadge.label}
+                          </Badge>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-2 pt-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(client)}
+                            className="flex-1"
+                          >
+                            <Pencil className="w-3 h-3 mr-1.5" />
+                            Editar
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDelete(client.id)}
+                            className="flex-1 text-red-400 border-red-400/20 hover:bg-red-500/10"
+                          >
+                            <Trash2 className="w-3 h-3 mr-1.5" />
+                            Eliminar
+                          </Button>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+              );
+            })
+          )}
+
+          {/* Mobile Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                Anterior
+              </Button>
+              
+              <span className="text-sm text-gray-400">
+                Página {currentPage} de {totalPages}
+              </span>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Siguiente
+                <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
           )}
