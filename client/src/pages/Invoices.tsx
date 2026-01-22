@@ -336,17 +336,18 @@ export default function Invoices() {
       // Agregar ingreso automáticamente a finanzas
       const client = clients?.find(c => c.id === invoice.client_id);
       try {
+        const amount = typeof invoice.total === 'string' ? parseFloat(invoice.total) : invoice.total;
         await createTransaction.mutateAsync({
           type: 'income',
-          amount: invoice.total,
+          amount: amount.toString(),
           category: 'Pago de Factura',
           description: `Pago de factura ${invoice.invoice_number} - ${client?.name || 'Cliente'}`,
-          date: new Date().toISOString(),
+          date: new Date().toISOString().split('T')[0],
         });
         toast.success('Factura pagada e ingreso registrado en Finanzas');
-      } catch (error) {
+      } catch (error: any) {
         toast.success('Factura marcada como pagada');
-        console.error('Error al registrar ingreso:', error);
+        console.error('Error al registrar ingreso:', error?.message || error);
       }
     } else {
       // Cambiar estado directamente para otros estados
