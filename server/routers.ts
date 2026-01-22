@@ -1045,6 +1045,7 @@ export const appRouter = router({
           
           // Update invoice status to payment_sent (without saving the proof)
           await db.updateInvoiceStatus(invoice.id, invoice.user_id, 'payment_sent');
+          console.log('[uploadPaymentProof] Status updated to payment_sent for invoice:', invoice.id);
           
           // Send notification email to user with proof attached
           try {
@@ -1101,9 +1102,10 @@ export const appRouter = router({
               
               console.log('[uploadPaymentProof] Email sent successfully to:', user.email);
             }
-          } catch (error) {
-            console.error('[Invoice] Error sending payment proof notification:', error);
-            throw new Error('Failed to send notification email');
+          } catch (emailError) {
+            console.error('[Invoice] Error sending payment proof notification:', emailError);
+            // Don't throw - status was already updated, email is secondary
+            console.log('[uploadPaymentProof] Status updated but email failed');
           }
           
           return { success: true, message: 'Payment proof uploaded and email sent' };

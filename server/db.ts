@@ -662,10 +662,17 @@ export async function updateInvoiceStatus(id: number, user_id: number, status: s
     throw new Error("Database not available");
   }
 
-  await db
+  console.log(`[updateInvoiceStatus] Updating invoice ${id} to status: ${status}`);
+  
+  const result = await db
     .update(invoices)
-    .set({ status: status as any })
+    .set({ 
+      status: status as any,
+      updated_at: new Date()
+    })
     .where(eq(invoices.id, id));
+    
+  console.log(`[updateInvoiceStatus] Update result:`, result);
 }
 
 
