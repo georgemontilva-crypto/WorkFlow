@@ -616,7 +616,7 @@ export default function Invoices() {
                       </SelectTrigger>
                       <SelectContent className="bg-popover border-border">
                         <SelectItem value="draft">Borrador</SelectItem>
-                        <SelectItem value="sent">Enviada</SelectItem>
+                        <SelectItem value="sent">Enviar</SelectItem>
                         <SelectItem value="paid">Pagada</SelectItem>
                         <SelectItem value="overdue">Vencida</SelectItem>
                         <SelectItem value="cancelled">Cancelada</SelectItem>
