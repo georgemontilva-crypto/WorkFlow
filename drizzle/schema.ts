@@ -344,3 +344,39 @@ export const reminders = mysqlTable("reminders", {
 
 export type Reminder = typeof reminders.$inferSelect;
 export type InsertReminder = typeof reminders.$inferInsert;
+
+/**
+ * Alerts table - Sistema de alertas robusto con toasts y centro de alertas
+ * Almacena todas las alertas generadas por el sistema
+ */
+export const alerts = mysqlTable("alerts", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull(),
+  /** Tipo de alerta: info, warning, critical */
+  type: mysqlEnum("type", ["info", "warning", "critical"]).notNull(),
+  /** Evento que generó la alerta */
+  event: varchar("event", { length: 100 }).notNull(),
+  /** Mensaje descriptivo de la alerta */
+  message: text("message").notNull(),
+  /** Si la alerta debe persistir en el centro de alertas */
+  persistent: int("persistent").notNull().default(1),
+  /** Si la alerta fue mostrada como toast */
+  shown_as_toast: int("shown_as_toast").notNull().default(0),
+  /** Si la alerta fue leída por el usuario */
+  read: int("read").notNull().default(0),
+  /** Acción asociada (URL o identificador) */
+  action_url: varchar("action_url", { length: 255 }),
+  /** Texto del botón de acción */
+  action_text: varchar("action_text", { length: 50 }),
+  /** Plan requerido para la funcionalidad (si aplica) */
+  required_plan: mysqlEnum("required_plan", ["free", "pro", "business"]),
+  /** ID relacionado (factura, cliente, etc.) */
+  related_id: int("related_id"),
+  /** Tipo de entidad relacionada */
+  related_type: varchar("related_type", { length: 50 }),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export type Alert = typeof alerts.$inferSelect;
+export type InsertAlert = typeof alerts.$inferInsert;

@@ -2068,5 +2068,157 @@ export const appRouter = router({
         return { success: true, message: "Reminder processing triggered" };
       }),
   }),
+
+  // Alerts router - Sistema de alertas robusto
+  alerts: router({
+    // Get all alerts for current user
+    list: protectedProcedure
+      .input(z.object({
+        unreadOnly: z.boolean().optional(),
+        type: z.enum(["info", "warning", "critical"]).optional(),
+      }).optional())
+      .query(async ({ ctx, input }) => {
+        const { getDb } = await import("./db");
+        const { alerts } = await import("../drizzle/schema");
+        const { eq, and, desc } = await import("drizzle-orm");
+        
+        const database = await getDb();
+        const conditions = [eq(alerts.user_id, ctx.user!.id)];
+        
+        if (input?.unreadOnly) {
+          conditions.push(eq(alerts.read, 0));
+        }
+        
+        if (input?.type) {
+          conditions.push(eq(alerts.type, input.type));
+        }
+        
+        return await database
+          .select()
+          .from(alerts)
+          .where(and(...conditions))
+          .orderBy(desc(alerts.created_at));
+      }),
+
+    // Get unread count
+    unreadCount: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getDb } = await import("./db");
+        const { alerts } = await import("../drizzle/schema");
+        const { eq, and, count } = await import("drizzle-orm");
+        
+        const database = await getDb();
+        const result = await database
+          .select({ count: count() })
+          .from(alerts)
+          .where(and(
+            eq(alerts.user_id, ctx.user!.id),
+            eq(alerts.read, 0)
+          ));
+        
+        return result[0]?.count || 0;
+      }),
+
+    // Mark alert as read
+    markAsRead: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { getDb } = await import("./db");
+        const { alerts } = await import("../drizzle/schema");
+        const { eq, and } = await import("drizzle-orm");
+        
+        const database = await getDb();
+        await database
+          .update(alerts)
+          .set({ read: 1, updated_at: new Date() })
+          .where(and(
+            eq(alerts.id, input.id),
+            eq(alerts.user_id, ctx.user!.id)
+          ));
+        
+        return { success: true };
+      }),
+
+    // Mark all alerts as read
+    markAllAsRead: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { getDb } = await import("./db");
+        const { alerts } = await import("../drizzle/schema");
+        const { eq, and } = await import("drizzle-orm");
+        
+        const database = await getDb();
+        await database
+          .update(alerts)
+          .set({ read: 1, updated_at: new Date() })
+          .where(and(
+            eq(alerts.user_id, ctx.user!.id),
+            eq(alerts.read, 0)
+          ));
+        
+        return { success: true };
+      }),
+
+    // Delete alert
+    delete: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { getDb } = await import("./db");
+        const { alerts } = await import("../drizzle/schema");
+        const { eq, and } = await import("drizzle-orm");
+        
+        const database = await getDb();
+        await database
+          .delete(alerts)
+          .where(and(
+            eq(alerts.id, input.id),
+            eq(alerts.user_id, ctx.user!.id)
+          ));
+        
+        return { success: true };
+      }),
+
+    // Create alert (internal use)
+    create: protectedProcedure
+      .input(z.object({
+        type: z.enum(["info", "warning", "critical"]),
+        event: z.string(),
+        message: z.string(),
+        persistent: z.boolean().default(true),
+        shown_as_toast: z.boolean().default(false),
+        action_url: z.string().optional(),
+        action_text: z.string().optional(),
+        required_plan: z.enum(["free", "pro", "business"]).optional(),
+        related_id: z.number().optional(),
+        related_type: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { getDb } = await import("./db");
+        const { alerts } = await import("../drizzle/schema");
+        
+        const database = await getDb();
+        const result = await database.insert(alerts).values({
+          user_id: ctx.user!.id,
+          type: input.type,
+          event: input.event,
+          message: input.message,
+          persistent: input.persistent ? 1 : 0,
+          shown_as_toast: input.shown_as_toast ? 1 : 0,
+          read: 0,
+          action_url: input.action_url,
+          action_text: input.action_text,
+          required_plan: input.required_plan,
+          related_id: input.related_id,
+          related_type: input.related_type,
+          created_at: new Date(),
+          updated_at: new Date(),
+        });
+        
+        return { success: true, id: result[0].insertId };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;

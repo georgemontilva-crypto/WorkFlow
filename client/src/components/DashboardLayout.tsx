@@ -12,6 +12,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { PaymentNotifications } from '@/components/PaymentNotifications';
 import { WelcomeDialog } from '@/components/WelcomeDialog';
 import { AccessBlocker } from './AccessBlocker';
+import { AlertCenter } from '@/components/AlertCenter';
+import { AlertToast } from '@/components/AlertToast';
 
 
 import { differenceInDays, parseISO } from 'date-fns';
@@ -21,9 +23,25 @@ import { trpc } from '@/lib/trpc';
 
 
 
+// Component for unread alert badge
+function UnreadAlertBadge() {
+  const { data: unreadCount } = trpc.alerts.unreadCount.useQuery(undefined, {
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+
+  if (!unreadCount || unreadCount === 0) return null;
+
+  return (
+    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+      {unreadCount > 9 ? '9+' : unreadCount}
+    </span>
+  );
+}
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAlertCenterOpen, setIsAlertCenterOpen] = useState(false);
   const { t } = useLanguage();
   
   // Auth and access control
@@ -323,6 +341,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </Button>
           
           <div className="flex-1" />
+          
+          {/* Alert Center Button */}
+          <button
+            onClick={() => setIsAlertCenterOpen(true)}
+            className="relative p-2 hover:bg-accent rounded-lg transition-colors"
+          >
+            <Bell className="w-5 h-5" />
+            {/* Unread count badge */}
+            <UnreadAlertBadge />
+          </button>
         </header>
 
         {/* Scrollable Content */}
@@ -337,6 +365,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       
       {/* Welcome Dialog for new users */}
       <WelcomeDialog />
+      
+      {/* Alert System */}
+      <AlertToast />
+      <AlertCenter isOpen={isAlertCenterOpen} onClose={() => setIsAlertCenterOpen(false)} />
     </div>
   );
 }
