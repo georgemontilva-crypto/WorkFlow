@@ -124,11 +124,16 @@ export default function Invoices() {
   
   // Apply filters
   const filteredInvoices = useMemo(() => {
+    // If 'archived' filter is selected, use archived invoices
+    if (statusFilter === 'archived') {
+      return archivedInvoices || [];
+    }
+    
     if (!allInvoices) return [];
     
     let filtered = allInvoices;
     
-    // Status filter
+    // Status filter (for non-archived invoices)
     if (statusFilter !== 'all') {
       filtered = filtered.filter(inv => inv.status === statusFilter);
     }
@@ -167,7 +172,7 @@ export default function Invoices() {
     }
     
     return filtered;
-  }, [allInvoices, statusFilter, dateFilter, searchQuery, clients]);
+  }, [allInvoices, archivedInvoices, statusFilter, dateFilter, searchQuery, clients]);
   
   // Pagination
   const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
@@ -210,6 +215,18 @@ export default function Invoices() {
     },
   });
   
+  const archiveBulk = trpc.invoices.archiveBulk.useMutation({
+    onSuccess: (data) => {
+      utils.invoices.list.invalidate();
+      utils.invoices.listArchived.invalidate();
+      toast.success(`${data.count} factura(s) archivada(s) exitosamente`);
+      setShowBulkArchiveDialog(false);
+    },
+    onError: () => {
+      toast.error('Error al archivar facturas');
+    },
+  });
+  
   const deleteInvoice = trpc.invoices.delete.useMutation({
     onSuccess: () => {
       utils.invoices.list.invalidate();
@@ -238,6 +255,7 @@ export default function Invoices() {
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
   const [showClientSelector, setShowClientSelector] = useState(false);
   const [showArchivedDialog, setShowArchivedDialog] = useState(false);
+  const [showBulkArchiveDialog, setShowBulkArchiveDialog] = useState(false);
   const [expandedClientFolder, setExpandedClientFolder] = useState<number | null>(null);
   const [clientSearch, setClientSearch] = useState('');
   const [formData, setFormData] = useState<InvoiceFormData>({
@@ -702,6 +720,7 @@ export default function Invoices() {
                   <SelectItem value="overdue">Vencida</SelectItem>
                   <SelectItem value="payment_sent">Pago Enviado</SelectItem>
                   <SelectItem value="cancelled">Anulado</SelectItem>
+                  <SelectItem value="archived">Archivadas</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -726,8 +745,8 @@ export default function Invoices() {
           </div>
           
           {/* Results Summary */}
-          <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-            <p>
+          <div className="mt-4 flex items-center justify-between text-sm">
+            <p className="text-muted-foreground">
               Mostrando {invoices?.length || 0} de {filteredInvoices.length} facturas
               {(statusFilter !== 'all' || dateFilter !== 'all' || searchQuery) && (
                 <button
@@ -743,6 +762,19 @@ export default function Invoices() {
                 </button>
               )}
             </p>
+            
+            {/* Bulk Archive Button */}
+            {filteredInvoices.length > 0 && statusFilter !== 'archived' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowBulkArchiveDialog(true)}
+                className="border-border text-foreground hover:bg-accent"
+              >
+                <FolderArchive className="w-4 h-4 mr-2" />
+                Archivar facturas visibles ({filteredInvoices.length})
+              </Button>
+            )}
           </div>
         </div>
 
@@ -1683,6 +1715,47 @@ export default function Invoices() {
           limit={5}
         />
       </div>
+      
+      {/* Bulk Archive Confirmation Dialog */}
+      <AlertDialog open={showBulkArchiveDialog} onOpenChange={setShowBulkArchiveDialog}>
+        <AlertDialogContent className="bg-popover border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-foreground flex items-center gap-2">
+              <FolderArchive className="w-5 h-5 text-primary" />
+              Archivar Facturas
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              Estás a punto de archivar <span className="font-bold text-foreground">{filteredInvoices.length} factura(s)</span>.
+              <br /><br />
+              Las facturas archivadas:
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>Se ocultarán de la vista principal</li>
+                <li>Conservarán todos sus datos e historial</li>
+                <li>Podrán ser restauradas en cualquier momento</li>
+              </ul>
+              <br />
+              ¿Deseas continuar?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              className="border-border text-foreground hover:bg-accent"
+            >
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                const ids = filteredInvoices.map(inv => inv.id!).filter(id => id !== undefined);
+                archiveBulk.mutate({ ids });
+              }}
+              className=""
+              disabled={archiveBulk.isLoading}
+            >
+              {archiveBulk.isLoading ? 'Archivando...' : `Archivar ${filteredInvoices.length} factura(s)`}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }

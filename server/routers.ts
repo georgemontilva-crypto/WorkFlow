@@ -585,6 +585,27 @@ export const appRouter = router({
         .orderBy(desc(invoices.created_at));
     }),
     
+    archiveBulk: protectedProcedure
+      .input(z.object({ ids: z.array(z.number()) }))
+      .mutation(async ({ ctx, input }) => {
+        const { getDb } = await import("./db");
+        const { invoices } = await import("../drizzle/schema");
+        const { eq, and, inArray } = await import("drizzle-orm");
+        
+        const database = await getDb();
+        
+        // Archive all invoices with the given IDs that belong to the user
+        await database
+          .update(invoices)
+          .set({ archived: 1, updated_at: new Date() })
+          .where(and(
+            eq(invoices.user_id, ctx.user.id),
+            inArray(invoices.id, input.ids)
+          ));
+        
+        return { success: true, count: input.ids.length };
+      }),
+    
     getById: protectedProcedure
       .input(z.object({ id: z.number() }))
       .query(async ({ ctx, input }) => {
