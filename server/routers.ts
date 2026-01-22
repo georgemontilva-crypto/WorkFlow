@@ -770,45 +770,55 @@ export const appRouter = router({
         
         await db.updateInvoice(id, ctx.user.id, updateData);
         
-        // Create finance transaction when invoice is marked as paid
-        // Simple logic: if status is being changed to 'paid' and it wasn't paid before, create transaction
+        // Create finance transaction for payments
+        // Two scenarios:
+        // 1. Invoice marked as paid (full payment) - create transaction for total
+        // 2. Partial payment received - create transaction for the partial amount
         const statusChangingToPaid = (data.status === 'paid' || updateData.status === 'paid') && wasNotPaid;
+        const hasNewPayment = newPaymentAmount > 0;
         
         console.log('[Invoice Update] Transaction check:', {
           dataStatus: data.status,
           updateDataStatus: updateData.status,
           wasNotPaid,
           statusChangingToPaid,
+          hasNewPayment,
+          newPaymentAmount,
           total
         });
         
-        if (statusChangingToPaid && total > 0) {
+        // Create transaction if there's a new payment (partial or full)
+        if (hasNewPayment && newPaymentAmount > 0) {
           try {
             // Get client name for description
             const client = await db.getClientById(invoice.client_id, ctx.user.id);
             const clientName = client?.name || 'Cliente';
             
-            // Use the total amount of the invoice
-            const transactionAmount = total;
+            // Use the new payment amount (could be partial or full)
+            const transactionAmount = newPaymentAmount;
+            const isPartial = paid < total;
+            const description = isPartial 
+              ? `Abono factura ${invoice.invoice_number} - ${clientName}`
+              : `Pago de factura ${invoice.invoice_number} - ${clientName}`;
             
-            console.log('[Invoice Update] Creating transaction with amount:', transactionAmount);
+            console.log('[Invoice Update] Creating transaction with amount:', transactionAmount, 'isPartial:', isPartial);
             
             await db.createTransaction({
               type: 'income',
               category: 'freelance',
               amount: transactionAmount.toFixed(2),
-              description: `Pago de factura ${invoice.invoice_number} - ${clientName}`,
+              description,
               date: new Date(),
               user_id: ctx.user.id,
               created_at: new Date(),
             });
-            console.log(`[Invoice Update] ✅ Created finance transaction for invoice ${invoice.invoice_number}: $${transactionAmount.toFixed(2)}`);
+            console.log(`[Invoice Update] Created finance transaction for invoice ${invoice.invoice_number}: $${transactionAmount.toFixed(2)}`);
           } catch (transactionError: any) {
-            console.error('[Invoice Update] ❌ Error creating finance transaction:', transactionError?.message || transactionError);
+            console.error('[Invoice Update] Error creating finance transaction:', transactionError?.message || transactionError);
             // Don't throw - invoice was already updated successfully
           }
         } else {
-          console.log('[Invoice Update] Skipping transaction creation - conditions not met');
+          console.log('[Invoice Update] Skipping transaction creation - no new payment');
         }
         
         return { success: true };
