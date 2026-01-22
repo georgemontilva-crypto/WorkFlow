@@ -192,9 +192,9 @@ export default function Home() {
         </div>
 
         {/* ZONA 1: Header - Cards de Resumen */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="lg:grid lg:grid-cols-4 lg:gap-4 flex lg:flex-none overflow-x-auto gap-4 snap-x snap-mandatory scrollbar-hide pb-2 -mx-4 px-4 lg:mx-0 lg:px-0">
           {/* Balance Total */}
-          <Card className="bg-card border-border">
+          <Card className="bg-card border-border min-w-[280px] lg:min-w-0 snap-center shrink-0">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -217,7 +217,7 @@ export default function Home() {
           </Card>
 
           {/* Ingresos del Mes */}
-          <Card className="bg-card border-border">
+          <Card className="bg-card border-border min-w-[280px] lg:min-w-0 snap-center shrink-0">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -234,7 +234,7 @@ export default function Home() {
           </Card>
 
           {/* Gastos del Mes */}
-          <Card className="bg-card border-border">
+          <Card className="bg-card border-border min-w-[280px] lg:min-w-0 snap-center shrink-0">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -251,7 +251,7 @@ export default function Home() {
           </Card>
 
           {/* Ahorros Totales */}
-          <Card className="bg-card border-border">
+          <Card className="bg-card border-border min-w-[280px] lg:min-w-0 snap-center shrink-0">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
