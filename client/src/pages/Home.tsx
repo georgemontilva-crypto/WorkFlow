@@ -29,6 +29,10 @@ import {
   Target,
   Activity,
   BarChart3,
+  X,
+  AlertTriangle,
+  AlertCircle,
+  Info,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -45,6 +49,21 @@ export default function Home() {
   const { data: transactions } = trpc.transactions.list.useQuery();
   const { data: savingsGoals } = trpc.savingsGoals.list.useQuery();
   const { data: reminders } = trpc.reminders.list.useQuery();
+  
+  // Fetch urgent alerts (critical and warning only)
+  const { data: urgentAlerts, refetch: refetchAlerts } = trpc.alerts.list.useQuery({
+    unreadOnly: true,
+  }, {
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
+  
+  // Filter only critical and warning alerts
+  const filteredUrgentAlerts = urgentAlerts?.filter(a => a.type === 'critical' || a.type === 'warning') || [];
+  
+  // Delete alert mutation
+  const deleteAlertMutation = trpc.alerts.delete.useMutation({
+    onSuccess: () => refetchAlerts(),
+  });
 
   // Calculate stats
   const currentMonth = new Date().getMonth();
@@ -451,16 +470,54 @@ export default function Home() {
               </Card>
             )}
 
-            {/* Acciones Pendientes */}
+            {/* Acciones Pendientes con Alertas Urgentes */}
             <Card className="bg-card border-border">
               <CardHeader>
                 <CardTitle className="text-foreground flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
+                  <Bell className="w-5 h-5" />
                   Acciones Pendientes
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="max-h-[400px] overflow-y-auto space-y-3 pr-2">
+                  {/* Alertas Urgentes (Critical y Warning) */}
+                  {filteredUrgentAlerts.map((alert) => {
+                    const isCritical = alert.type === 'critical';
+                    const iconBg = isCritical ? 'bg-red-500/10' : 'bg-yellow-500/10';
+                    const iconColor = isCritical ? 'text-red-500' : 'text-yellow-500';
+                    const Icon = isCritical ? AlertCircle : AlertTriangle;
+                    
+                    return (
+                      <div 
+                        key={alert.id}
+                        className="flex items-start justify-between p-3 bg-background rounded-lg border border-border group hover:border-primary/30 transition-colors"
+                      >
+                        <div 
+                          className="flex items-start gap-3 flex-1 cursor-pointer"
+                          onClick={() => alert.action_url && setLocation(alert.action_url)}
+                        >
+                          <div className={`p-2 rounded-full ${iconBg} flex-shrink-0`}>
+                            <Icon className={`w-4 h-4 ${iconColor}`} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-foreground text-sm">{alert.event}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{alert.message}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteAlertMutation.mutate({ id: alert.id });
+                          }}
+                          className="text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0 ml-2"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                  
+                  {/* Facturas Pendientes */}
                   {pendingInvoices > 0 && (
                     <div 
                       className="flex items-center justify-between p-3 bg-background rounded-lg border border-border cursor-pointer hover:border-primary/50 transition-colors"
@@ -480,13 +537,15 @@ export default function Home() {
                       </Badge>
                     </div>
                   )}
+                  
+                  {/* Clientes Activos */}
                   <div 
                     className="flex items-center justify-between p-3 bg-background rounded-lg border border-border cursor-pointer hover:border-primary/50 transition-colors"
                     onClick={() => setLocation('/clients')}
                   >
                     <div className="flex items-center gap-3">
                       <div className="p-2 rounded-full bg-blue-500/10">
-                        <DollarSign className="w-4 h-4 text-blue-500" />
+                        <Wallet className="w-4 h-4 text-blue-500" />
                       </div>
                       <div>
                         <p className="font-medium text-foreground text-sm">Clientes Activos</p>
@@ -497,6 +556,14 @@ export default function Home() {
                       {activeClients}
                     </Badge>
                   </div>
+                  
+                  {/* Mensaje si no hay alertas */}
+                  {filteredUrgentAlerts.length === 0 && pendingInvoices === 0 && (
+                    <div className="text-center py-8 text-muted-foreground text-sm">
+                      <Info className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p>No hay acciones pendientes</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
