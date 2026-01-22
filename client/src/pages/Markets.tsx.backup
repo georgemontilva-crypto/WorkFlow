@@ -20,7 +20,6 @@ import { useLocation } from 'wouter';
 import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
 import DashboardLayout from '@/components/DashboardLayout';
 import ScenarioSimulator from '@/components/ScenarioSimulator';
-import CurrencyCalculator from '@/components/CurrencyCalculator';
 
 interface MarketAsset {
   symbol: string;
@@ -546,7 +545,7 @@ export default function Markets() {
           </div>
 
           <TabsContent value="crypto">
-            <Accordion type="single" collapsible className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {sortAssets(filterAssets(cryptoData)).map((asset) => (
                 <AssetAccordionItem key={asset.symbol} asset={asset} />
               ))}
@@ -554,7 +553,7 @@ export default function Markets() {
           </TabsContent>
 
           <TabsContent value="stocks">
-            <Accordion type="single" collapsible className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {sortAssets(filterAssets(MOCK_STOCKS)).map((asset) => (
                 <AssetAccordionItem key={asset.symbol} asset={asset} />
               ))}
@@ -562,7 +561,7 @@ export default function Markets() {
           </TabsContent>
 
           <TabsContent value="forex">
-            <Accordion type="single" collapsible className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {sortAssets(filterAssets(MOCK_FOREX)).map((asset) => (
                 <AssetAccordionItem key={asset.symbol} asset={asset} />
               ))}
@@ -570,7 +569,7 @@ export default function Markets() {
           </TabsContent>
 
           <TabsContent value="commodities">
-            <Accordion type="single" collapsible className="w-full space-y-3 max-h-[400px] overflow-y-auto pr-2">
+            <Accordion type="single" collapsible className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {sortAssets(filterAssets(MOCK_COMMODITIES)).map((asset) => (
                 <AssetAccordionItem key={asset.symbol} asset={asset} />
               ))}
@@ -578,9 +577,8 @@ export default function Markets() {
           </TabsContent>
         </Tabs>
 
-        {/* Tools Section - 50/50 Layout */}
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Scenario Simulator - Left 50% */}
+        {/* Scenario Simulator - Below assets */}
+        <div className="mt-8">
           <ScenarioSimulator
             availableAssets={[
               ...cryptoData,
@@ -590,9 +588,6 @@ export default function Markets() {
             ]}
             selectedAsset={null}
           />
-          
-          {/* Currency Calculator - Right 50% */}
-          <CurrencyCalculator />
         </div>
       </div>
     </DashboardLayout>
