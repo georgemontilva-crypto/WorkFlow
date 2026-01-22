@@ -351,7 +351,7 @@ export type InsertReminder = typeof reminders.$inferInsert;
  */
 export const alerts = mysqlTable("alerts", {
   id: serial("id").primaryKey(),
-  user_id: int("user_id").notNull(),
+  user_id: bigint("user_id", { mode: "number", unsigned: true }).notNull(),
   /** Tipo de alerta: info, warning, critical */
   type: mysqlEnum("type", ["info", "warning", "critical"]).notNull(),
   /** Evento que generó la alerta */
@@ -371,7 +371,7 @@ export const alerts = mysqlTable("alerts", {
   /** Plan requerido para la funcionalidad (si aplica) */
   required_plan: mysqlEnum("required_plan", ["free", "pro", "business"]),
   /** ID relacionado (factura, cliente, etc.) */
-  related_id: int("related_id"),
+  related_id: bigint("related_id", { mode: "number", unsigned: true }),
   /** Tipo de entidad relacionada */
   related_type: varchar("related_type", { length: 50 }),
   created_at: timestamp("created_at").defaultNow().notNull(),
