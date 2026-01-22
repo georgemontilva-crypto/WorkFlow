@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { client } from "@/_core/trpc";
+import { client } from "@/lib/trpc";
 import { Bell, Trash2, CheckCircle2, AlertCircle, Info } from "lucide-react";
 
 export default function AlertTesting() {
