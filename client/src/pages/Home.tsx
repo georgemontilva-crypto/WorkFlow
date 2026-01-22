@@ -392,6 +392,65 @@ export default function Home() {
               </Card>
             )}
 
+            {/* Recordatorios */}
+            {reminders && reminders.length > 0 && (
+              <Card className="bg-card border-border">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-foreground flex items-center gap-2">
+                      <Bell className="w-5 h-5" />
+                      Recordatorios
+                    </CardTitle>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setLocation('/reminders')}
+                      className="text-xs"
+                    >
+                      Ver todos
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {reminders
+                      .sort((a, b) => new Date(a.reminder_date).getTime() - new Date(b.reminder_date).getTime())
+                      .slice(0, 5)
+                      .map((reminder) => {
+                        const reminderDate = new Date(reminder.reminder_date);
+                        const today = new Date();
+                        const isToday = reminderDate.toDateString() === today.toDateString();
+                        const isPast = reminderDate < today && !isToday;
+                        
+                        return (
+                          <div 
+                            key={reminder.id} 
+                            className="flex items-start gap-3 p-3 bg-background rounded-lg border border-border cursor-pointer hover:border-primary/50 transition-colors"
+                            onClick={() => setLocation('/reminders')}
+                          >
+                            <div className={`p-2 rounded-full flex-shrink-0 ${
+                              isPast ? 'bg-red-500/10' : isToday ? 'bg-yellow-500/10' : 'bg-blue-500/10'
+                            }`}>
+                              <Bell className={`w-4 h-4 ${
+                                isPast ? 'text-red-500' : isToday ? 'text-yellow-500' : 'text-blue-500'
+                              }`} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-foreground text-sm">{reminder.title}</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {format(reminderDate, "dd 'de' MMMM, yyyy", { locale: es })}
+                                {isToday && ' • Hoy'}
+                                {isPast && ' • Vencido'}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Acciones Pendientes */}
             <Card className="bg-card border-border">
               <CardHeader>
