@@ -701,6 +701,7 @@ export default function Invoices() {
                   <SelectItem value="paid">Pagada</SelectItem>
                   <SelectItem value="overdue">Vencida</SelectItem>
                   <SelectItem value="payment_sent">Pago Enviado</SelectItem>
+                  <SelectItem value="cancelled">Anulado</SelectItem>
                 </SelectContent>
               </Select>
             </div>
