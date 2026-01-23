@@ -510,7 +510,8 @@ export default function Clients() {
                   <Button 
                     type="submit"
                     disabled={createClient.isPending || updateClient.isPending}
-                    className="flex-1 h-11 bg-white text-black hover:bg-white/90"
+                    variant="outline"
+                    className="flex-1 h-11 border-white/20 text-white hover:bg-white/5 hover:border-white/40"
                   >
                     {editingClient ? t.common.update : t.common.create}
                   </Button>
