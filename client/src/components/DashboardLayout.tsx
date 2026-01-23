@@ -112,7 +112,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
   
   const handleViewReminders = () => {
-    window.location.href = '/reminders';
+    setIsAlertCenterOpen(true);
   };
   
   // Calculate counts for alerts
@@ -136,7 +136,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       title: 'OPERACIONES',
       items: [
         { name: t.nav.dashboard, href: '/dashboard', icon: LayoutDashboard },
-        { name: t.nav.reminders, href: '/reminders', icon: Bell },
       ]
     },
     {

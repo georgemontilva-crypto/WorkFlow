@@ -27,7 +27,6 @@ import Invoices from "./pages/Invoices";
 import Finances from "./pages/Finances";
 import Savings from "./pages/Savings";
 import Settings from "./pages/Settings";
-import Reminders from "./pages/Reminders";
 import AlertTesting from "./pages/AlertTesting";
 import Admin from "./pages/Admin";
 import Markets from "./pages/Markets";
@@ -76,11 +75,6 @@ function Router() {
       <Route path="/savings">
         <ProtectedRoute>
           <Savings />
-        </ProtectedRoute>
-      </Route>
-      <Route path="/reminders">
-        <ProtectedRoute>
-          <Reminders />
         </ProtectedRoute>
       </Route>
       <Route path="/settings">
