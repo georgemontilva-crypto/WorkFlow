@@ -125,6 +125,17 @@ export default function Invoices() {
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery();
   const { data: companyProfile } = trpc.companyProfile.get.useQuery();
   
+  // Debug: Log data on load
+  useEffect(() => {
+    if (allInvoices) {
+      console.log('[Invoices Debug] allInvoices count:', allInvoices.length);
+      console.log('[Invoices Debug] allInvoices sample:', allInvoices[0]);
+    }
+    if (archivedInvoices) {
+      console.log('[Invoices Debug] archivedInvoices count:', archivedInvoices.length);
+    }
+  }, [allInvoices, archivedInvoices]);
+  
   // Apply filters
   const filteredInvoices = useMemo(() => {
     // Determine which dataset to use based on status filter
@@ -162,15 +173,19 @@ export default function Invoices() {
       filtered = filtered.filter(inv => new Date(inv.created_at) >= cutoffDate);
     }
     
-    // Search filter (invoice number or client name)
+    // Search filter (invoice number, client name, or company)
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(inv => {
         const client = clients?.find(c => c.id === inv.client_id);
+        const invoiceNumber = inv.invoice_number?.toLowerCase() || '';
+        const clientName = client?.name?.toLowerCase() || '';
+        const clientCompany = client?.company?.toLowerCase() || '';
+        
         return (
-          inv.invoice_number.toLowerCase().includes(query) ||
-          client?.name.toLowerCase().includes(query) ||
-          client?.company?.toLowerCase().includes(query)
+          invoiceNumber.includes(query) ||
+          clientName.includes(query) ||
+          clientCompany.includes(query)
         );
       });
     }
