@@ -1,6 +1,6 @@
 /**
  * Email Verification Template - Finwrk
- * Minimalist design with logo in bordered container
+ * Minimalist design with logo and outline button
  */
 
 export const getVerificationEmailHtml = (verificationUrl: string, userName: string) => `
@@ -10,7 +10,7 @@ export const getVerificationEmailHtml = (verificationUrl: string, userName: stri
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <meta name="x-apple-disable-message-reformatting" />
-    <title>Verify your Finwrk account</title>
+    <title>Activate your Finwrk account</title>
   </head>
 
   <body style="margin:0; padding:0; background:#000000; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
@@ -21,18 +21,18 @@ export const getVerificationEmailHtml = (verificationUrl: string, userName: stri
 
           <!-- Main container -->
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
-            style="max-width:600px; background:#000000; border-radius:18px; overflow:hidden;">
+            style="max-width:520px; background:#0a0a0a; border:1px solid rgba(255,255,255,0.1); border-radius:24px; overflow:hidden;">
 
-            <!-- HEADER -->
+            <!-- HEADER with Logo -->
             <tr>
-              <td align="center" style="padding:35px 20px 25px 20px;">
-                <!-- Logo container -->
+              <td align="center" style="padding:40px 24px 30px 24px;">
+                <!-- Logo container with border -->
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                   <tr>
                     <td align="center"
-                      style="width:70px; height:70px; background:#0b0b0b; border:1px solid rgba(255,255,255,0.08);
-                             border-radius:18px; box-shadow:0 0 0 1px rgba(255,255,255,0.03) inset;">
-                      <img src="${process.env.APP_URL || 'https://finwrk.app'}/icon-512.png" width="34" height="34" alt="Finwrk"
+                      style="width:80px; height:80px; background:#0a0a0a; border:1px solid rgba(255,255,255,0.15);
+                             border-radius:20px;">
+                      <img src="${process.env.APP_URL || 'https://finwrk.app'}/icon-512.png" width="40" height="40" alt="Finwrk"
                         style="display:block; margin:0 auto; border:0; outline:none; text-decoration:none;" />
                     </td>
                   </tr>
@@ -42,36 +42,32 @@ export const getVerificationEmailHtml = (verificationUrl: string, userName: stri
 
             <!-- BODY -->
             <tr>
-              <td align="center" style="padding:20px 24px 30px 24px;">
-                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
-                  style="background:#000000; border-radius:16px;">
-                  <tr>
-                    <td style="padding:20px; text-align:center;">
-                      <h1 style="margin:0 0 16px 0; font-size:28px; font-weight:700; color:#ffffff; line-height:1.3;">
-                        Welcome to Finwrk!
-                      </h1>
-                      <p style="margin:0 0 16px 0; font-size:16px; line-height:1.6; color:#a0a0a0;">
-                        Hi ${userName}, we're excited to have you on board.
-                      </p>
-                      <p style="margin:0; font-size:16px; line-height:1.6; color:#a0a0a0;">
-                        To get started, please verify your email address by clicking the button below.
-                      </p>
-                    </td>
-                  </tr>
-                </table>
+              <td align="center" style="padding:0 32px 30px 32px;">
+                <h1 style="margin:0 0 16px 0; font-size:26px; font-weight:600; color:#ffffff; line-height:1.3; letter-spacing:-0.5px;">
+                  Activate Your Account
+                </h1>
+                <p style="margin:0 0 8px 0; font-size:16px; line-height:1.6; color:#888888;">
+                  Hi ${userName},
+                </p>
+                <p style="margin:0; font-size:16px; line-height:1.6; color:#888888;">
+                  Welcome to Finwrk. Click the button below to verify your email address and start managing your finances.
+                </p>
               </td>
             </tr>
 
-            <!-- BUTTON -->
+            <!-- BUTTON - Outline style -->
             <tr>
-              <td align="center" style="padding:0 24px 40px 24px;">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%; max-width:420px;">
+              <td align="center" style="padding:10px 32px 40px 32px;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%;">
                   <tr>
-                    <td align="center"
-                      style="background:#ffffff; border-radius:999px; padding:16px 20px;">
+                    <td align="center">
                       <a href="${verificationUrl}"
-                        style="display:block; text-decoration:none; font-family:Arial, sans-serif;
-                               font-size:16px; font-weight:700; color:#000000;">
+                        style="display:inline-block; padding:16px 48px; text-decoration:none;
+                               font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+                               font-size:15px; font-weight:600; color:#ffffff;
+                               background:transparent; border:2px solid #ffffff;
+                               border-radius:12px; letter-spacing:0.3px;
+                               transition:all 0.2s ease;">
                         Verify Email Address
                       </a>
                     </td>
@@ -80,13 +76,30 @@ export const getVerificationEmailHtml = (verificationUrl: string, userName: stri
               </td>
             </tr>
 
+            <!-- Security notice -->
+            <tr>
+              <td align="center" style="padding:0 32px 30px 32px;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" 
+                  style="width:100%; background:rgba(255,255,255,0.03); border-radius:12px;">
+                  <tr>
+                    <td style="padding:16px 20px;">
+                      <p style="margin:0; font-size:13px; line-height:1.5; color:#666666; text-align:center;">
+                        This link will expire in <strong style="color:#888888;">24 hours</strong>. If you didn't create an account with Finwrk, you can safely ignore this email.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
             <!-- Alternative link -->
             <tr>
-              <td align="center" style="padding:0 24px 30px 24px;">
-                <p style="margin:0 0 10px 0; font-size:13px; line-height:1.5; color:#666666;">
-                  Or copy and paste this link into your browser:
+              <td align="center" style="padding:0 32px 30px 32px;">
+                <p style="margin:0 0 8px 0; font-size:12px; line-height:1.5; color:#555555;">
+                  Or copy and paste this link:
                 </p>
-                <p style="margin:0; font-size:13px; line-height:1.5; color:#0066cc; word-break:break-all;">
+                <p style="margin:0; font-size:12px; line-height:1.5; color:#666666; word-break:break-all; 
+                          background:rgba(255,255,255,0.03); padding:12px 16px; border-radius:8px;">
                   ${verificationUrl}
                 </p>
               </td>
@@ -94,18 +107,18 @@ export const getVerificationEmailHtml = (verificationUrl: string, userName: stri
 
             <!-- FOOTER -->
             <tr>
-              <td align="center" style="padding:25px 24px 10px 24px;">
-                <div style="height:1px; background:rgba(255,255,255,0.08); width:100%; max-width:520px;"></div>
+              <td align="center" style="padding:20px 32px 10px 32px;">
+                <div style="height:1px; background:rgba(255,255,255,0.08); width:100%;"></div>
               </td>
             </tr>
 
             <tr>
-              <td align="center" style="padding:10px 24px 30px 24px;">
-                <p style="margin:0 0 5px 0; font-size:12px; color:#666666;">
-                  © ${new Date().getFullYear()} Finwrk. All rights reserved.
+              <td align="center" style="padding:20px 32px 35px 32px;">
+                <p style="margin:0 0 4px 0; font-size:12px; color:#444444; font-weight:500;">
+                  Finwrk
                 </p>
-                <p style="margin:0; font-size:12px; color:#666666;">
-                  Financial Manager for Freelancers
+                <p style="margin:0; font-size:11px; color:#444444;">
+                  Financial Management for Freelancers
                 </p>
               </td>
             </tr>

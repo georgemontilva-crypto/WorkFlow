@@ -1478,6 +1478,34 @@ export async function stopRecurringInvoice(id: number, user_id: number) {
 }
 
 /**
+ * Create company profile for a new user
+ */
+export async function createCompanyProfile(data: {
+  user_id: number;
+  company_name: string;
+  email: string;
+  business_type?: "freelancer" | "agencia" | "empresa";
+}) {
+  const dbInstance = await getDb();
+  
+  try {
+    await dbInstance.insert(companyProfiles).values({
+      user_id: data.user_id,
+      company_name: data.company_name,
+      email: data.email,
+      business_type: data.business_type || null,
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
+    
+    return await getCompanyProfile(data.user_id);
+  } catch (error) {
+    console.error('[DB] Error creating company profile:', error);
+    throw error;
+  }
+}
+
+/**
  * Get company profile for a user
  */
 export async function getCompanyProfile(userId: number) {

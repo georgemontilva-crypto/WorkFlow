@@ -12,7 +12,7 @@ import "./index.css";
 const queryClient = new QueryClient();
 
 // Public routes that should not trigger redirect on unauthorized errors
-const PUBLIC_ROUTES = ['/', '/login', '/signup', '/verify-email', '/forgot-password', '/reset-password', '/verify-2fa', '/pay', '/invoice'];
+const PUBLIC_ROUTES = ['/', '/login', '/signup', '/verify-email', '/verification-pending', '/forgot-password', '/reset-password', '/verify-2fa', '/pay', '/invoice'];
 
 const isPublicRoute = () => {
   if (typeof window === "undefined") return false;

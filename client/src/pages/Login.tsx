@@ -1,5 +1,5 @@
 /**
- * Login Page - HiWork
+ * Login Page - Finwrk
  * Design Philosophy: Apple Minimalism - Clean, elegant, and professional
  */
 
@@ -9,13 +9,23 @@ import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Mail, AlertCircle } from 'lucide-react';
 
 export default function Login() {
   const [, setLocation] = useLocation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
+
+  const resendMutation = trpc.auth.resendVerification.useMutation({
+    onSuccess: () => {
+      setLocation(`/verification-pending?email=${encodeURIComponent(email)}`);
+    },
+    onError: (error) => {
+      setError(error.message);
+    },
+  });
 
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: (data) => {
@@ -29,18 +39,29 @@ export default function Login() {
       }
     },
     onError: (error) => {
-      setError(error.message);
+      if (error.message === 'EMAIL_NOT_VERIFIED') {
+        setShowVerificationMessage(true);
+        setError('');
+      } else {
+        setError(error.message);
+        setShowVerificationMessage(false);
+      }
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setShowVerificationMessage(false);
     
     loginMutation.mutate({
       email,
       password,
     });
+  };
+
+  const handleResendVerification = () => {
+    resendMutation.mutate({ email });
   };
 
   return (
@@ -73,15 +94,51 @@ export default function Login() {
               Welcome back
             </h1>
             <p className="text-muted-foreground">
-              Sign in to your HiWork account
+              Sign in to your Finwrk account
             </p>
           </div>
 
           <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="bg-destructive/10 border border-destructive/30 text-destructive rounded-lg p-3 text-sm">
-                  {error}
+                <div className="bg-destructive/10 border border-destructive/30 text-destructive rounded-lg p-3 text-sm flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              {showVerificationMessage && (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-amber-500/20 rounded-lg">
+                      <Mail className="w-5 h-5 text-amber-500" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-sm font-medium text-foreground mb-1">
+                        Email not verified
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Please verify your email address before signing in. Check your inbox for the verification link.
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleResendVerification}
+                        disabled={resendMutation.isPending}
+                        className="border-amber-500/50 text-amber-500 hover:bg-amber-500/10"
+                      >
+                        {resendMutation.isPending ? (
+                          <>
+                            <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          'Resend verification email'
+                        )}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -119,7 +176,8 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="w-full"
+                variant="outline"
+                className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                 disabled={loginMutation.isPending}
               >
                 {loginMutation.isPending ? (

@@ -16,10 +16,11 @@ export const appRouter = router({
         name: z.string().min(2, "Name must be at least 2 characters"),
         email: z.string().email("Invalid email address"),
         password: z.string().min(8, "Password must be at least 8 characters"),
+        businessType: z.enum(["freelancer", "agencia", "empresa"]).optional(),
       }))
       .mutation(async ({ input }) => {
         try {
-          const { createUser, createVerificationToken } = await import("./db");
+          const { createUser, createVerificationToken, createCompanyProfile } = await import("./db");
           const { sendVerificationEmail } = await import("./emails/service");
           
           // Create user (email_verified = 0 by default)
@@ -28,6 +29,16 @@ export const appRouter = router({
             email: input.email,
             password: input.password,
           });
+
+          // Create company profile with business type if provided
+          if (input.businessType) {
+            await createCompanyProfile({
+              user_id: user.id,
+              company_name: input.name,
+              email: input.email,
+              business_type: input.businessType,
+            });
+          }
 
           // Generate verification token
           const token = await createVerificationToken(user.id);
@@ -72,6 +83,11 @@ export const appRouter = router({
 
           if (!user) {
             throw new Error("Invalid email or password");
+          }
+
+          // Check if email is verified
+          if (user.email_verified !== 1) {
+            throw new Error("EMAIL_NOT_VERIFIED");
           }
 
           // Check if 2FA is enabled

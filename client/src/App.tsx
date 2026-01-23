@@ -15,6 +15,7 @@ import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import VerifyEmail from "./pages/VerifyEmail";
+import VerificationPending from "./pages/VerificationPending";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Verify2FA from "./pages/Verify2FA";
@@ -45,6 +46,7 @@ function Router() {
       <Route path="/signup" component={Signup} />
       <Route path="/login" component={Login} />
       <Route path="/verify-email" component={VerifyEmail} />
+      <Route path="/verification-pending" component={VerificationPending} />
       <Route path="/forgot-password" component={ForgotPassword} />
       <Route path="/reset-password" component={ResetPassword} />
       <Route path="/verify-2fa" component={Verify2FA} />

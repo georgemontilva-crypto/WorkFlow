@@ -1,5 +1,5 @@
 /**
- * Signup Page - HiWork
+ * Signup Page - Finwrk
  * Design Philosophy: Apple Minimalism - Clean, elegant, and professional
  */
 
@@ -9,16 +9,15 @@ import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
-import { Loader2 } from 'lucide-react';
-import { VerificationModal } from '@/components/VerificationModal';
+import { Loader2, User, Building2, Users } from 'lucide-react';
 
 export default function Signup() {
   const [, setLocation] = useLocation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [businessType, setBusinessType] = useState<'freelancer' | 'agencia' | 'empresa' | ''>('');
   const [error, setError] = useState('');
-  const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   // Password strength calculator
   const getPasswordStrength = (pwd: string): { strength: number; label: string; color: string } => {
@@ -31,9 +30,9 @@ export default function Signup() {
     if (/\d/.test(pwd)) strength++;
     if (/[^a-zA-Z0-9]/.test(pwd)) strength++;
     
-    if (strength <= 2) return { strength: 33, label: 'Débil', color: 'bg-red-500' };
-    if (strength <= 3) return { strength: 66, label: 'Media', color: 'bg-yellow-500' };
-    return { strength: 100, label: 'Fuerte', color: 'bg-green-500' };
+    if (strength <= 2) return { strength: 33, label: 'Weak', color: 'bg-red-500' };
+    if (strength <= 3) return { strength: 66, label: 'Medium', color: 'bg-yellow-500' };
+    return { strength: 100, label: 'Strong', color: 'bg-green-500' };
   };
 
   const passwordStrength = getPasswordStrength(password);
@@ -41,8 +40,8 @@ export default function Signup() {
   const signupMutation = trpc.auth.signup.useMutation({
     onSuccess: (data) => {
       if (data.requiresVerification) {
-        // Show verification modal
-        setShowVerificationModal(true);
+        // Redirect to verification pending page
+        setLocation(`/verification-pending?email=${encodeURIComponent(email)}`);
       } else {
         // Old flow - direct login (shouldn't happen anymore)
         setLocation('/dashboard');
@@ -53,30 +52,43 @@ export default function Signup() {
     },
   });
 
-  const resendMutation = trpc.auth.resendVerification.useMutation({
-    onSuccess: () => {
-      // Show success message
-      setError('');
-    },
-    onError: (error) => {
-      setError(error.message);
-    },
-  });
-
-  const handleResendVerification = () => {
-    resendMutation.mutate({ email });
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    if (!businessType) {
+      setError('Please select your business type');
+      return;
+    }
     
     signupMutation.mutate({
       name,
       email,
       password,
+      businessType,
     });
   };
+
+  const businessTypes = [
+    {
+      value: 'freelancer' as const,
+      label: 'Freelancer',
+      description: 'Independent professional',
+      icon: User,
+    },
+    {
+      value: 'agencia' as const,
+      label: 'Agency',
+      description: 'Creative or service agency',
+      icon: Users,
+    },
+    {
+      value: 'empresa' as const,
+      label: 'Company',
+      description: 'Established business',
+      icon: Building2,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -187,9 +199,44 @@ export default function Signup() {
                 </p>
               </div>
 
+              {/* Business Type Selection */}
+              <div className="space-y-3">
+                <Label className="text-foreground">
+                  Business Type
+                </Label>
+                <div className="grid grid-cols-3 gap-3">
+                  {businessTypes.map((type) => {
+                    const Icon = type.icon;
+                    const isSelected = businessType === type.value;
+                    return (
+                      <button
+                        key={type.value}
+                        type="button"
+                        onClick={() => setBusinessType(type.value)}
+                        disabled={signupMutation.isPending}
+                        className={`
+                          flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all
+                          ${isSelected 
+                            ? 'border-primary bg-primary/5' 
+                            : 'border-border hover:border-muted-foreground/50 bg-background'
+                          }
+                          disabled:opacity-50 disabled:cursor-not-allowed
+                        `}
+                      >
+                        <Icon className={`w-6 h-6 mb-2 ${isSelected ? 'text-primary' : 'text-muted-foreground'}`} />
+                        <span className={`text-sm font-medium ${isSelected ? 'text-foreground' : 'text-muted-foreground'}`}>
+                          {type.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <Button
                 type="submit"
-                className="w-full"
+                variant="outline"
+                className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                 disabled={signupMutation.isPending}
               >
                 {signupMutation.isPending ? (
@@ -216,16 +263,6 @@ export default function Signup() {
           </div>
         </div>
       </main>
-
-      {/* Verification Modal */}
-      {showVerificationModal && (
-        <VerificationModal
-          email={email}
-          onClose={() => setShowVerificationModal(false)}
-          onResend={handleResendVerification}
-          isResending={resendMutation.isPending}
-        />
-      )}
     </div>
   );
 }
