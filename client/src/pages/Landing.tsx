@@ -189,18 +189,30 @@ export default function Landing() {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <button 
+              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
+            >
               Features
-            </a>
-            <a href="#security" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            </button>
+            <button 
+              onClick={() => document.getElementById('security')?.scrollIntoView({ behavior: 'smooth' })}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
+            >
               Security
-            </a>
-            <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            </button>
+            <button 
+              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
+            >
               Pricing
-            </a>
-            <a href="#faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            </button>
+            <button 
+              onClick={() => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' })}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
+            >
               FAQ
-            </a>
+            </button>
             <LanguageSelector />
             <Button 
               onClick={() => setLocation('/login')} 
@@ -228,34 +240,42 @@ export default function Landing() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-background border-t border-border">
             <nav className="container mx-auto px-4 py-4 flex flex-col gap-4">
-              <a 
-                href="#features" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              <button 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setTimeout(() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }), 100);
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-left bg-transparent border-none cursor-pointer"
               >
                 Features
-              </a>
-              <a 
-                href="#security" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              </button>
+              <button 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setTimeout(() => document.getElementById('security')?.scrollIntoView({ behavior: 'smooth' }), 100);
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-left bg-transparent border-none cursor-pointer"
               >
                 Security
-              </a>
-              <a 
-                href="#pricing" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              </button>
+              <button 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 100);
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-left bg-transparent border-none cursor-pointer"
               >
                 Pricing
-              </a>
-              <a 
-                href="#faq" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+              </button>
+              <button 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setTimeout(() => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' }), 100);
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-left bg-transparent border-none cursor-pointer"
               >
                 FAQ
-              </a>
+              </button>
               <div className="pt-2 border-t border-border space-y-3">
                 <LanguageSelector />
                 <div className="flex items-center gap-3">
@@ -490,9 +510,9 @@ export default function Landing() {
             <div>
               <h3 className="font-semibold mb-4">Product</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#features" className="hover:text-foreground transition-colors">Features</a></li>
-                <li><a href="#security" className="hover:text-foreground transition-colors">Security</a></li>
-                <li><a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a></li>
+                <li><button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground transition-colors bg-transparent border-none cursor-pointer p-0">Features</button></li>
+                <li><button onClick={() => document.getElementById('security')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground transition-colors bg-transparent border-none cursor-pointer p-0">Security</button></li>
+                <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground transition-colors bg-transparent border-none cursor-pointer p-0">Pricing</button></li>
               </ul>
             </div>
             
