@@ -2230,6 +2230,21 @@ export const appRouter = router({
         return { success: true };
       }),
 
+    // Delete all alerts for current user
+    deleteAll: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { getDb } = await import("./db");
+        const { alerts } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        
+        const database = await getDb();
+        const result = await database
+          .delete(alerts)
+          .where(eq(alerts.user_id, ctx.user!.id));
+        
+        return { success: true, deleted: result[0]?.affectedRows || 0 };
+      }),
+
     // Create alert (internal use)
     create: protectedProcedure
       .input(z.object({

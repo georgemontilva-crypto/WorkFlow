@@ -1,11 +1,20 @@
 /**
  * AlertCenter - Centro de alertas persistente
- * Muestra todas las alertas del usuario con filtros y acciones
- * Design Philosophy: Outline-only - Clean, minimal, consistent with AlertToast
+ * 
+ * FUENTE ÚNICA DE VERDAD: Todas las alertas se leen desde la base de datos.
+ * Este panel muestra TODAS las alertas persistentes del usuario:
+ * - Facturas vencidas/próximas
+ * - Pagos confirmados
+ * - Alertas de sistema
+ * - Alertas de precio
+ * - Alertas generadas por IA
+ * 
+ * Las alertas NO desaparecen cuando el toast se cierra.
+ * Solo desaparecen cuando el usuario las borra manualmente o las marca como resueltas.
  */
 
 import { useState } from 'react';
-import { X, Info, AlertTriangle, AlertCircle, Check, Trash2, Filter, Bell } from 'lucide-react';
+import { X, Info, AlertTriangle, AlertCircle, Check, Trash2, Filter, Bell, Trash } from 'lucide-react';
 import { AlertAIAnalysis } from './AlertAIAnalysis';
 import { trpc } from '@/lib/trpc';
 import { format } from 'date-fns';
@@ -34,33 +43,58 @@ const EVENT_TITLES: Record<string, string> = {
   'feature_blocked': 'Función Bloqueada',
   'multiple_pending': 'Facturas Pendientes',
   'client_late_history': 'Historial de Cliente',
+  'price_alert': 'Alerta de Precio',
+  'price_alert_triggered': 'Alerta de Precio Activada',
 };
 
 export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
   const [, setLocation] = useLocation();
   const [filterType, setFilterType] = useState<AlertType | 'all'>('all');
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  // Fetch alerts
-  const { data: alerts, refetch } = trpc.alerts.list.useQuery({
+  const utils = trpc.useUtils();
+
+  // Fetch alerts from database - this is the single source of truth
+  const { data: alerts, refetch, isLoading } = trpc.alerts.list.useQuery({
     unreadOnly: showUnreadOnly,
     type: filterType !== 'all' ? filterType : undefined,
   }, {
     enabled: isOpen,
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 10000, // Refetch every 10 seconds to stay in sync
   });
 
   // Mutations
   const markAsReadMutation = trpc.alerts.markAsRead.useMutation({
-    onSuccess: () => refetch(),
+    onSuccess: () => {
+      refetch();
+      utils.alerts.unreadCount.invalidate(); // Update badge immediately
+    },
   });
 
   const markAllAsReadMutation = trpc.alerts.markAllAsRead.useMutation({
-    onSuccess: () => refetch(),
+    onSuccess: () => {
+      refetch();
+      utils.alerts.unreadCount.invalidate(); // Update badge immediately
+    },
   });
 
   const deleteMutation = trpc.alerts.delete.useMutation({
-    onSuccess: () => refetch(),
+    onSuccess: () => {
+      refetch();
+      utils.alerts.unreadCount.invalidate(); // Update badge immediately
+    },
+  });
+
+  const deleteAllMutation = trpc.alerts.deleteAll.useMutation({
+    onSuccess: () => {
+      refetch();
+      utils.alerts.unreadCount.invalidate(); // Update badge immediately
+      setIsDeleting(false);
+    },
+    onError: () => {
+      setIsDeleting(false);
+    },
   });
 
   const handleMarkAsRead = async (id: number) => {
@@ -74,6 +108,13 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
   const handleDelete = async (id: number) => {
     if (confirm('¿Estás seguro de que quieres eliminar esta alerta?')) {
       await deleteMutation.mutateAsync({ id });
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (confirm('¿Estás seguro de que quieres eliminar TODAS las alertas? Esta acción no se puede deshacer.')) {
+      setIsDeleting(true);
+      await deleteAllMutation.mutateAsync();
     }
   };
 
@@ -119,6 +160,7 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
   if (!isOpen) return null;
 
   const unreadCount = alerts?.filter(a => a.is_read === 0).length || 0;
+  const totalCount = alerts?.length || 0;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
@@ -129,7 +171,12 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
             <div>
               <h2 className="text-2xl font-bold">Centro de Alertas</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                {unreadCount > 0 ? `${unreadCount} sin leer` : 'Todo al día'}
+                {totalCount === 0 
+                  ? 'Todo al día' 
+                  : unreadCount > 0 
+                    ? `${unreadCount} sin leer de ${totalCount} total`
+                    : `${totalCount} alertas`
+                }
               </p>
             </div>
             <button
@@ -140,7 +187,7 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
             </button>
           </div>
 
-          {/* Actions */}
+          {/* Actions Row 1 */}
           <div className="flex gap-2 w-full">
             <Button
               variant="outline"
@@ -159,6 +206,20 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
               className={showUnreadOnly ? 'bg-accent' : ''}
             >
               <Filter className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* Actions Row 2 - Delete All */}
+          <div className="mt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDeleteAll}
+              disabled={totalCount === 0 || isDeleting}
+              className="w-full border-destructive/50 text-destructive hover:bg-destructive/10 hover:border-destructive"
+            >
+              <Trash className="w-4 h-4 mr-2" />
+              {isDeleting ? 'Eliminando...' : 'Borrar todas las alertas'}
             </Button>
           </div>
 
@@ -190,8 +251,13 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
         </div>
 
         {/* Alerts List */}
-        <div className="overflow-y-auto h-[calc(100vh-240px)]">
-          {!alerts || alerts.length === 0 ? (
+        <div className="overflow-y-auto h-[calc(100vh-280px)]">
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center h-full text-center p-8">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+              <p className="text-sm text-muted-foreground">Cargando alertas...</p>
+            </div>
+          ) : !alerts || alerts.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center p-8">
               <Info className="w-16 h-16 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No hay alertas</h3>
@@ -214,7 +280,7 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
                     className={`
                       bg-[#1a1a1a] ${styles.borderColor} border rounded-2xl p-4
                       transition-all cursor-pointer
-                      ${alert.is_read === 0 ? 'border-l-4' : ''}
+                      ${alert.is_read === 0 ? 'border-l-4' : 'opacity-75'}
                     `}
                     onClick={() => alert.is_read === 0 && handleMarkAsRead(alert.id)}
                   >
@@ -226,10 +292,15 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
                       
                       {/* Contenido */}
                       <div className="flex-1 min-w-0">
-                        {/* Título */}
-                        <h3 className={`font-semibold text-base mb-1 ${styles.titleColor}`}>
-                          {title}
-                        </h3>
+                        {/* Título con indicador de no leído */}
+                        <div className="flex items-center gap-2">
+                          <h3 className={`font-semibold text-base ${styles.titleColor}`}>
+                            {title}
+                          </h3>
+                          {alert.is_read === 0 && (
+                            <span className="w-2 h-2 bg-primary rounded-full" />
+                          )}
+                        </div>
                         
                         {/* Fecha */}
                         <p className="text-xs text-muted-foreground mb-2">
@@ -297,6 +368,13 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
               })}
             </div>
           )}
+        </div>
+
+        {/* Footer info */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-background">
+          <p className="text-xs text-center text-muted-foreground">
+            Las alertas se sincronizan automáticamente cada 10 segundos
+          </p>
         </div>
       </div>
     </div>

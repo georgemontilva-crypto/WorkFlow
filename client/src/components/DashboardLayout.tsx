@@ -23,17 +23,28 @@ import { trpc } from '@/lib/trpc';
 
 
 
-// Component for unread alert badge
+/**
+ * UnreadAlertBadge - Badge que muestra el número de alertas sin leer
+ * 
+ * FUENTE ÚNICA DE VERDAD: Lee directamente desde la base de datos.
+ * Se sincroniza cada 10 segundos y también se invalida cuando:
+ * - Se marca una alerta como leída
+ * - Se borran alertas
+ * - Se crean nuevas alertas
+ * 
+ * El contador NO depende de los toasts visibles.
+ */
 function UnreadAlertBadge() {
   const { data: unreadCount } = trpc.alerts.unreadCount.useQuery(undefined, {
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 10000, // Refetch every 10 seconds for better sync
+    staleTime: 5000, // Consider data stale after 5 seconds
   });
 
   if (!unreadCount || unreadCount === 0) return null;
 
   return (
-    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-      {unreadCount > 9 ? '9+' : unreadCount}
+    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-in zoom-in duration-200">
+      {unreadCount > 99 ? '99+' : unreadCount}
     </span>
   );
 }

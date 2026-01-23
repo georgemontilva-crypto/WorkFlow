@@ -1,12 +1,20 @@
 /**
  * AlertToast - Sistema de toasts temporales con prioridades
- * Muestra alertas temporales en la esquina inferior derecha
- * Estilo visual idéntico a PaymentNotifications
- * Prioridad: Critical > Warning > Info
- * Máximo un toast a la vez
+ * 
+ * IMPORTANTE: Los toasts son SOLO una representación visual temporal.
+ * - NO eliminan alertas del sistema
+ * - NO afectan el estado persistente en la base de datos
+ * - Las alertas permanecen en el Centro de Alertas hasta que el usuario las borre
+ * 
+ * Flujo:
+ * 1. Se consultan alertas no leídas de la DB
+ * 2. Se filtran las que deben mostrarse como toast (shown_as_toast = 1)
+ * 3. Se muestran una por una según prioridad (critical > warning > info)
+ * 4. Al cerrar el toast, la alerta sigue en el Centro de Alertas
+ * 5. Solo se muestra cada toast una vez por sesión (localStorage)
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { X, Clock, AlertTriangle, AlertCircle, Info, Bell } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 import { useLocation } from 'wouter';
@@ -42,6 +50,7 @@ const EVENT_TITLES: Record<string, string> = {
   'feature_blocked': 'Función Bloqueada',
   'multiple_pending': 'Facturas Pendientes',
   'client_late_history': 'Historial de Cliente',
+  'price_alert': 'Alerta de Precio',
   'Facturas Vencidas': 'Facturas Vencidas',
   'Comprobantes Pendientes': 'Comprobantes Pendientes',
   'Facturas Próximas a Vencer': 'Facturas Próximas a Vencer',
@@ -54,7 +63,7 @@ const EVENT_TITLES: Record<string, string> = {
   'Cliente con Pagos Tardíos': 'Cliente con Pagos Tardíos',
 };
 
-// Get shown toast IDs from localStorage
+// Get shown toast IDs from localStorage (session-based tracking)
 function getShownToastIds(): Set<number> {
   try {
     const stored = localStorage.getItem(SHOWN_TOASTS_KEY);
@@ -65,12 +74,14 @@ function getShownToastIds(): Set<number> {
   }
 }
 
-// Add toast ID to shown list
+// Add toast ID to shown list (only tracks which toasts have been displayed this session)
 function markToastAsShown(id: number) {
   try {
     const shown = getShownToastIds();
     shown.add(id);
-    localStorage.setItem(SHOWN_TOASTS_KEY, JSON.stringify([...shown]));
+    // Keep only last 100 IDs to prevent localStorage bloat
+    const arr = [...shown].slice(-100);
+    localStorage.setItem(SHOWN_TOASTS_KEY, JSON.stringify(arr));
   } catch (error) {
     console.error('Error saving shown toast:', error);
   }
@@ -80,13 +91,14 @@ export function AlertToast() {
   const [, setLocation] = useLocation();
   const [currentAlert, setCurrentAlert] = useState<Alert | null>(null);
   const [queue, setQueue] = useState<Alert[]>([]);
-  const utils = trpc.useUtils();
+  const [isExiting, setIsExiting] = useState(false);
 
-  // Fetch unread alerts that should be shown as toast
+  // Fetch unread alerts - these are alerts that haven't been marked as read
+  // The toast system only shows alerts with shown_as_toast = 1
   const { data: alerts } = trpc.alerts.list.useQuery({
     unreadOnly: true,
   }, {
-    refetchInterval: 5000, // Check every 5 seconds for new alerts
+    refetchInterval: 10000, // Check every 10 seconds for new alerts
   });
 
   // Process alerts and build queue based on priority
@@ -96,7 +108,7 @@ export function AlertToast() {
       return;
     }
 
-    // Filter alerts that should be shown as toast but haven't been shown yet
+    // Filter alerts that should be shown as toast but haven't been shown yet in this session
     const shownIds = getShownToastIds();
     const pendingToasts = alerts.filter(a => {
       // shown_as_toast === 1 means this alert SHOULD be shown as a toast
@@ -127,32 +139,39 @@ export function AlertToast() {
 
   // Show next alert from queue
   useEffect(() => {
-    if (currentAlert || queue.length === 0) return;
+    if (currentAlert || queue.length === 0 || isExiting) return;
 
     const nextAlert = queue[0];
     setCurrentAlert(nextAlert);
     setQueue(prev => prev.slice(1));
 
-    // Mark as shown in localStorage (but NOT as read in database)
+    // Mark as shown in localStorage ONLY (NOT in database)
+    // This prevents showing the same toast multiple times in the same session
+    // But the alert remains in the database and AlertCenter
     markToastAsShown(nextAlert.id);
 
-    // Invalidate unread count to update bell badge immediately
-    utils.alerts.unreadCount.invalidate();
-    utils.alerts.list.invalidate();
+  }, [currentAlert, queue, isExiting]);
 
-    // Auto-dismiss after duration
+  // Auto-dismiss timer
+  useEffect(() => {
+    if (!currentAlert) return;
+
     const timer = setTimeout(() => {
       handleDismiss();
     }, TOAST_DURATION);
 
     return () => clearTimeout(timer);
-  }, [currentAlert, queue, utils]);
+  }, [currentAlert]);
 
-  const handleDismiss = () => {
-    // Just close the toast, don't mark as read
-    // The alert will remain in AlertCenter for the user to see
-    setCurrentAlert(null);
-  };
+  const handleDismiss = useCallback(() => {
+    // Animate out
+    setIsExiting(true);
+    
+    setTimeout(() => {
+      setCurrentAlert(null);
+      setIsExiting(false);
+    }, 300); // Match animation duration
+  }, []);
 
   const handleAction = () => {
     if (currentAlert?.action_url) {
@@ -200,7 +219,12 @@ export function AlertToast() {
   const title = EVENT_TITLES[currentAlert.event] || currentAlert.event;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 duration-500">
+    <div 
+      className={`
+        fixed bottom-6 right-6 z-50 
+        ${isExiting ? 'animate-out slide-out-to-bottom-5 fade-out duration-300' : 'animate-in slide-in-from-bottom-5 duration-500'}
+      `}
+    >
       <div 
         className={`
           bg-[#1a1a1a] ${styles.borderColor} border rounded-2xl shadow-2xl 
@@ -229,13 +253,6 @@ export function AlertToast() {
             <p className="text-sm text-muted-foreground leading-relaxed">
               {currentAlert.message}
             </p>
-            
-            {/* Información adicional (si hay) */}
-            {currentAlert.action_text && (
-              <p className="text-xs text-muted-foreground/70 mt-1">
-                {currentAlert.action_text}
-              </p>
-            )}
           </div>
           
           {/* Botón cerrar */}
@@ -262,10 +279,10 @@ export function AlertToast() {
               {currentAlert.action_text || 'Ver detalles'}
             </button>
           )}
-            <button
-              onClick={handleDismiss}
-              className="px-4 py-2 rounded-lg font-medium text-sm border-2 border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300 transition-colors"
-            >
+          <button
+            onClick={handleDismiss}
+            className="px-4 py-2 rounded-lg font-medium text-sm border-2 border-gray-600 text-gray-400 hover:border-gray-500 hover:text-gray-300 transition-colors"
+          >
             Descartar
           </button>
         </div>
@@ -276,6 +293,11 @@ export function AlertToast() {
             {queue.length} alerta{queue.length > 1 ? 's' : ''} más en cola
           </div>
         )}
+        
+        {/* Nota informativa */}
+        <div className="mt-2 text-[10px] text-center text-muted-foreground/40">
+          Esta alerta permanecerá en el Centro de Alertas
+        </div>
       </div>
     </div>
   );
