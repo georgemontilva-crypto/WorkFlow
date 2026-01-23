@@ -329,159 +329,188 @@ export default function Clients() {
                   {editingClient ? t.clients.updateClientInfo : t.clients.completeClientInfo}
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-white font-semibold text-sm">{t.clients.name} <span className="text-red-500">*</span></Label>
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="bg-[#2A2A2A] border-white/10 text-white h-10"
-                      required
-                    />
-                    <p className="text-xs text-gray-400">{t.clients.nameHelper}</p>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Información Básica */}
+                <div className="space-y-4">
+                  <h3 className="text-white font-semibold text-sm uppercase tracking-wide text-gray-400 border-b border-white/10 pb-2">Información Básica</h3>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-white font-medium text-sm">
+                        {t.clients.name} <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="name"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                        placeholder="Nombre completo o razón social"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-white font-medium text-sm">
+                        {t.clients.email} <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                        placeholder="correo@ejemplo.com"
+                        required
+                      />
+                    </div>
                   </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="phone" className="text-white font-medium text-sm">{t.clients.phone}</Label>
+                      <Input
+                        id="phone"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                        placeholder="+58 412 1234567"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="company" className="text-white font-medium text-sm">{t.clients.company}</Label>
+                      <Input
+                        id="company"
+                        value={formData.company}
+                        onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                        className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                        placeholder="Nombre de la empresa"
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-white font-semibold">{t.clients.email} <span className="text-red-500">*</span></Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="bg-[#2A2A2A] border-white/10 text-white h-11"
-                      required
-                    />
-                    <p className="text-xs text-gray-400">{t.clients.emailHelper}</p>
+                    <Label htmlFor="status" className="text-white font-medium text-sm">{t.clients.status}</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value) => setFormData({ ...formData, status: value })}
+                    >
+                      <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1C1C1C] border-white/10">
+                        <SelectItem value="active" className="text-white hover:bg-white/5">Activo</SelectItem>
+                        <SelectItem value="inactive" className="text-white hover:bg-white/5">Inactivo</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                {/* Facturación */}
+                <div className="space-y-4">
+                  <h3 className="text-white font-semibold text-sm uppercase tracking-wide text-gray-400 border-b border-white/10 pb-2">Facturación</h3>
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-white font-semibold">{t.clients.phone}</Label>
-                    <Input
-                      id="phone"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="bg-[#2A2A2A] border-white/10 text-white h-11"
-                    />
+                    <Label htmlFor="billing_cycle" className="text-white font-medium text-sm">{t.clients.billingCycle}</Label>
+                    <Select
+                      value={formData.billing_cycle}
+                      onValueChange={(value) => setFormData({ ...formData, billing_cycle: value })}
+                    >
+                      <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1C1C1C] border-white/10">
+                        <SelectItem value="monthly" className="text-white hover:bg-white/5">{t.clients.monthly}</SelectItem>
+                        <SelectItem value="quarterly" className="text-white hover:bg-white/5">{t.clients.quarterly}</SelectItem>
+                        <SelectItem value="yearly" className="text-white hover:bg-white/5">{t.clients.yearly}</SelectItem>
+                        <SelectItem value="custom" className="text-white hover:bg-white/5">{t.clients.custom}</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="company" className="text-white font-semibold">{t.clients.company}</Label>
-                    <Input
-                      id="company"
-                      value={formData.company}
-                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      className="bg-[#2A2A2A] border-white/10 text-white h-11"
-                    />
+
+                  {formData.billing_cycle === 'custom' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="custom_cycle_days" className="text-white font-medium text-sm">{t.clients.customCycleDays}</Label>
+                      <Input
+                        id="custom_cycle_days"
+                        type="number"
+                        value={formData.custom_cycle_days || ''}
+                        onChange={(e) => setFormData({ ...formData, custom_cycle_days: parseInt(e.target.value) })}
+                        className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                        placeholder="Número de días"
+                      />
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="amount" className="text-white font-medium text-sm">Monto</Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        step="0.01"
+                        value={formData.amount}
+                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                        className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                        placeholder="0.00"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="next_payment_date" className="text-white font-medium text-sm">Próximo Pago</Label>
+                      <Input
+                        id="next_payment_date"
+                        type="date"
+                        value={formData.next_payment_date}
+                        onChange={(e) => setFormData({ ...formData, next_payment_date: e.target.value })}
+                        className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="status" className="text-white font-semibold">{t.clients.status}</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(value) => setFormData({ ...formData, status: value })}
-                  >
-                    <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#1C1C1C] border-white/10">
-                      <SelectItem value="active" className="text-white hover:bg-white/5">Activo</SelectItem>
-                      <SelectItem value="inactive" className="text-white hover:bg-white/5">Inactivo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="billing_cycle" className="text-white font-semibold">{t.clients.billingCycle}</Label>
-                  <Select
-                    value={formData.billing_cycle}
-                    onValueChange={(value) => setFormData({ ...formData, billing_cycle: value })}
-                  >
-                    <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#1C1C1C] border-white/10">
-                      <SelectItem value="monthly" className="text-white hover:bg-white/5">{t.clients.monthly}</SelectItem>
-                      <SelectItem value="quarterly" className="text-white hover:bg-white/5">{t.clients.quarterly}</SelectItem>
-                      <SelectItem value="yearly" className="text-white hover:bg-white/5">{t.clients.yearly}</SelectItem>
-                      <SelectItem value="custom" className="text-white hover:bg-white/5">{t.clients.custom}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {formData.billing_cycle === 'custom' && (
                   <div className="space-y-2">
-                    <Label htmlFor="custom_cycle_days" className="text-white font-semibold">{t.clients.customCycleDays}</Label>
+                    <Label htmlFor="reminder_days" className="text-white font-medium text-sm">Días de Recordatorio</Label>
                     <Input
-                      id="custom_cycle_days"
+                      id="reminder_days"
                       type="number"
-                      value={formData.custom_cycle_days || ''}
-                      onChange={(e) => setFormData({ ...formData, custom_cycle_days: parseInt(e.target.value) })}
+                      value={formData.reminder_days}
+                      onChange={(e) => setFormData({ ...formData, reminder_days: parseInt(e.target.value) })}
                       className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                      placeholder="7"
                     />
+                    <p className="text-xs text-gray-400">Días antes del vencimiento para enviar recordatorio</p>
                   </div>
-                )}
+                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                {/* Notas Adicionales */}
+                <div className="space-y-4">
+                  <h3 className="text-white font-semibold text-sm uppercase tracking-wide text-gray-400 border-b border-white/10 pb-2">Notas Adicionales</h3>
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="amount" className="text-white font-semibold">{t.clients.amount}</Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      step="0.01"
-                      value={formData.amount}
-                      onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                      className="bg-[#2A2A2A] border-white/10 text-white h-11"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="next_payment_date" className="text-white font-semibold">{t.clients.nextPaymentDate}</Label>
-                    <Input
-                      id="next_payment_date"
-                      type="date"
-                      value={formData.next_payment_date}
-                      onChange={(e) => setFormData({ ...formData, next_payment_date: e.target.value })}
-                      className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                    <Label htmlFor="notes" className="text-white font-medium text-sm">{t.clients.notes}</Label>
+                    <textarea
+                      id="notes"
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      className="w-full bg-[#2A2A2A] border border-white/10 text-white rounded-lg p-3 min-h-[100px] focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all"
+                      placeholder="Información adicional sobre el cliente..."
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="reminder_days" className="text-white font-semibold">{t.clients.reminderDays}</Label>
-                  <Input
-                    id="reminder_days"
-                    type="number"
-                    value={formData.reminder_days}
-                    onChange={(e) => setFormData({ ...formData, reminder_days: parseInt(e.target.value) })}
-                    className="bg-[#2A2A2A] border-white/10 text-white h-11"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="notes" className="text-white font-semibold">{t.clients.notes}</Label>
-                  <textarea
-                    id="notes"
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="w-full bg-[#2A2A2A] border border-white/10 text-white rounded-lg p-3 min-h-[100px]"
-                  />
-                </div>
-
-                <div className="flex gap-3 pt-4">
+                <div className="flex gap-3 pt-6 border-t border-white/10">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setIsDialogOpen(false)}
-                    className="flex-1"
+                    className="flex-1 h-11"
                   >
                     {t.common.cancel}
                   </Button>
                   <Button 
                     type="submit"
                     disabled={createClient.isPending || updateClient.isPending}
-                    className="flex-1"
+                    className="flex-1 h-11 bg-white text-black hover:bg-white/90"
                   >
                     {editingClient ? t.common.update : t.common.create}
                   </Button>
