@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { startRecurringInvoicesScheduler } from "./_core/recurring-invoices-job.js";
 import { startOverdueInvoicesScheduler } from "./_core/overdue-invoices-job.js";
+import { startProactiveAIScheduler } from "./_core/proactive-ai-job.js";
 import { testRedisConnection } from "./config/redis.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -76,6 +77,10 @@ async function startServer() {
       }).catch((err) => {
         console.error('[Server] ❌ Failed to initialize alerts processor worker:', err);
       });
+      
+      // Proactive AI scheduler (generates insights based on financial data)
+      startProactiveAIScheduler();
+      console.log('[Server] ✅ Proactive AI scheduler initialized');
     } else {
       console.log('[Server] ⏭️  Skipping workers initialization (Redis not available)');
     }

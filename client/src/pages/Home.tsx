@@ -53,6 +53,15 @@ const EVENT_TITLES: Record<string, string> = {
   'feature_blocked': 'Función Bloqueada',
   'multiple_pending': 'Facturas Pendientes',
   'client_late_history': 'Historial de Cliente',
+  'price_alert': 'Alerta de Precio',
+  'price_alert_triggered': 'Alerta de Precio Activada',
+  // Proactive AI insights
+  'proactive_income': 'Análisis de Ingresos',
+  'proactive_clients': 'Análisis de Clientes',
+  'proactive_payments': 'Análisis de Pagos',
+  'proactive_activity': 'Análisis de Actividad',
+  'proactive_goals': 'Progreso de Metas',
+  'proactive_risk': 'Análisis de Riesgo',
 };
 
 export default function Home() {
