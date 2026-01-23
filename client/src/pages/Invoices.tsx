@@ -88,6 +88,7 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { PlanLimitDialog } from '@/components/PlanLimitDialog';
+import { InvoiceHeaderPreview } from '@/components/invoices/InvoiceHeaderPreview';
 import jsPDF from 'jspdf';
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useSearch } from 'wouter';
@@ -122,6 +123,7 @@ export default function Invoices() {
   const { data: allInvoices, isLoading: invoicesLoading } = trpc.invoices.list.useQuery();
   const { data: archivedInvoices, isLoading: archivedLoading } = trpc.invoices.listArchived.useQuery();
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery();
+  const { data: companyProfile } = trpc.companyProfile.get.useQuery();
   
   // Apply filters
   const filteredInvoices = useMemo(() => {
@@ -807,6 +809,29 @@ export default function Invoices() {
                   {t.invoices.createInvoiceSubtitle}
                 </DialogDescription>
               </DialogHeader>
+              
+              {/* Invoice Header Preview */}
+              <InvoiceHeaderPreview 
+                profile={companyProfile ? {
+                  company_name: companyProfile.company_name,
+                  logo_url: companyProfile.logo_url,
+                  business_type: companyProfile.business_type,
+                  email: companyProfile.email,
+                  phone: companyProfile.phone,
+                  website: companyProfile.website,
+                  address: companyProfile.address,
+                  city: companyProfile.city,
+                  state: companyProfile.state,
+                  postal_code: companyProfile.postal_code,
+                  country: companyProfile.country,
+                  tax_id: companyProfile.tax_id,
+                } : null}
+                invoiceNumber={`INV-${Date.now()}`}
+                issueDate={formData.issue_date ? new Date(formData.issue_date) : new Date()}
+                dueDate={formData.due_date ? new Date(formData.due_date) : addDays(new Date(), 30)}
+                status={formData.status}
+              />
+              
               <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 {/* Client and Status */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

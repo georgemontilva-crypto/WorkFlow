@@ -681,6 +681,33 @@ export const appRouter = router({
           );
         }
         
+        // Capture company profile snapshot at invoice creation time
+        let companyProfileSnapshot = null;
+        try {
+          const { getCompanyProfile } = await import('./db');
+          const profile = await getCompanyProfile(ctx.user.id);
+          if (profile) {
+            // Only include relevant fields for invoice header
+            companyProfileSnapshot = JSON.stringify({
+              company_name: profile.company_name,
+              logo_url: profile.logo_url,
+              business_type: profile.business_type,
+              email: profile.email,
+              phone: profile.phone,
+              website: profile.website,
+              address: profile.address,
+              city: profile.city,
+              state: profile.state,
+              postal_code: profile.postal_code,
+              country: profile.country,
+              tax_id: profile.tax_id,
+            });
+          }
+        } catch (error) {
+          console.error('[Invoice Create] Failed to capture company profile snapshot:', error);
+          // Continue without snapshot - invoice can still be created
+        }
+        
         const result = await db.createInvoice({
           user_id: ctx.user.id,
           client_id: input.client_id,
@@ -697,6 +724,7 @@ export const appRouter = router({
           payment_token: paymentToken,
           payment_link: input.payment_link || null,
           notes: input.notes || null,
+          company_profile_snapshot: companyProfileSnapshot,
           // Recurring fields
           is_recurring: input.is_recurring || false,
           recurrence_frequency: input.recurrence_frequency || null,

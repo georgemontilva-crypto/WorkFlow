@@ -108,6 +108,8 @@ export const invoices = mysqlTable("invoices", {
   payment_link: text("payment_link"),
   client_comment: text("client_comment"),
   notes: text("notes"),
+  // Company profile snapshot at invoice creation time
+  company_profile_snapshot: text("company_profile_snapshot"), // JSON snapshot of company profile
   // Recurring invoice fields
   is_recurring: boolean("is_recurring").notNull().default(false),
   recurrence_frequency: mysqlEnum("recurrence_frequency", ["every_minute", "monthly", "biweekly", "annual", "custom"]),
