@@ -4,6 +4,8 @@
  * Handles email sending via Resend API
  */
 
+import { getBaseEmailTemplate } from './email-template';
+
 interface EmailOptions {
   to: string;
   subject: string;
@@ -77,99 +79,47 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
  */
 
 export function getWelcomeEmailTemplate(userName: string, trialEndDate: Date): string {
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: #000; color: #fff; padding: 30px; text-align: center; }
-    .content { background: #f9f9f9; padding: 30px; }
-    .button { display: inline-block; padding: 12px 24px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>¡Bienvenido a WorkFlow!</h1>
-    </div>
-    <div class="content">
-      <h2>Hola ${userName},</h2>
-      <p>Gracias por registrarte en WorkFlow. Tu cuenta ha sido creada exitosamente.</p>
-      <p>Tu período de prueba gratuito termina el <strong>${trialEndDate.toLocaleDateString('es-ES')}</strong>.</p>
-      <p>Durante este tiempo, tendrás acceso completo a todas las funcionalidades:</p>
-      <ul>
-        <li>Gestión de clientes</li>
-        <li>Creación de facturas profesionales</li>
-        <li>Control de ingresos y gastos</li>
-        <li>Metas de ahorro</li>
-        <li>Soporte técnico</li>
-      </ul>
-      <a href="${process.env.APP_URL || 'http://localhost:3000'}" class="button">Comenzar Ahora</a>
-    </div>
-    <div class="footer">
-      <p>© ${new Date().getFullYear()} WorkFlow. Todos los derechos reservados.</p>
-    </div>
-  </div>
-</body>
-</html>
+  const body = `
+    <p style="margin:0 0 16px;">Hola <strong>${userName}</strong>,</p>
+    <p style="margin:0 0 16px;">Gracias por registrarte en Finwrk. Tu cuenta ha sido creada exitosamente.</p>
+    <p style="margin:0 0 16px;">Tu período de prueba gratuito termina el <strong>${trialEndDate.toLocaleDateString('es-ES')}</strong>.</p>
+    <p style="margin:0 0 12px;">Durante este tiempo, tendrás acceso completo a todas las funcionalidades:</p>
+    <ul style="margin:0 0 16px; padding-left:20px; color:#d1d1d6;">
+      <li style="margin-bottom:8px;">Gestión de clientes</li>
+      <li style="margin-bottom:8px;">Creación de facturas profesionales</li>
+      <li style="margin-bottom:8px;">Control de ingresos y gastos</li>
+      <li style="margin-bottom:8px;">Metas de ahorro</li>
+      <li style="margin-bottom:8px;">Soporte técnico</li>
+    </ul>
   `;
+
+  return getBaseEmailTemplate({
+    title: '¡Bienvenido a Finwrk!',
+    body,
+    ctaText: 'Comenzar Ahora',
+    ctaUrl: `${process.env.APP_URL || 'http://localhost:3000'}`
+  });
 }
 
 export function getPasswordResetEmailTemplate(userName: string, resetLink: string): string {
-  return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reset Your Password - Finwrk</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-  <table role="presentation" style="width: 100%; border-collapse: collapse;">
-    <tr>
-      <td align="center" style="padding: 40px 20px;">
-        <table role="presentation" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
-          <tr>
-            <td style="padding: 40px 40px 20px; text-align: center; border-bottom: 1px solid #e5e5e5;">
-              <h1 style="margin: 0; font-size: 28px; font-weight: 700; color: #000000;">Finwrk</h1>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 40px;">
-              <h2 style="margin: 0 0 20px; font-size: 24px; font-weight: 600; color: #000000;">Reset Your Password</h2>
-              <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #333333;">Hi ${userName},</p>
-              <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #333333;">We received a request to reset your password for your Finwrk account. Click the button below to create a new password:</p>
-              <table role="presentation" style="margin: 30px 0;">
-                <tr>
-                  <td align="center">
-                    <a href="${resetLink}" style="display: inline-block; padding: 16px 32px; background-color: #000000; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 16px; font-weight: 600;">Reset Password</a>
-                  </td>
-                </tr>
-              </table>
-              <p style="margin: 20px 0; font-size: 14px; line-height: 1.6; color: #666666;">Or copy and paste this link into your browser:</p>
-              <p style="margin: 0 0 20px; font-size: 14px; line-height: 1.6; color: #0066cc; word-break: break-all;">${resetLink}</p>
-              <p style="margin: 20px 0 0; font-size: 14px; line-height: 1.6; color: #666666;">This link will expire in 1 hour for security reasons.</p>
-              <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e5e5;">
-              <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #999999;">If you didn't request a password reset, you can safely ignore this email. Your password will not be changed.</p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 30px 40px; background-color: #f9f9f9; border-top: 1px solid #e5e5e5; text-align: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
-              <p style="margin: 0 0 10px; font-size: 14px; color: #666666;">© ${new Date().getFullYear()} Finwrk. All rights reserved.</p>
-              <p style="margin: 0; font-size: 12px; color: #999999;">Financial Manager for Freelancers</p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-  `.trim();
+  const body = `
+    <p style="margin:0 0 16px;">Hola <strong>${userName}</strong>,</p>
+    <p style="margin:0 0 16px;">Hemos recibido una solicitud para restablecer la contraseña de tu cuenta de Finwrk.</p>
+    <p style="margin:0 0 16px;">Haz clic en el botón de abajo para crear una nueva contraseña:</p>
+    <div style="margin:24px 0; padding:16px; background-color:#1a1a1f; border-radius:8px; border:1px solid #26262c;">
+      <p style="margin:0; font-size:13px; color:#8e8e93;">O copia y pega este enlace en tu navegador:</p>
+      <p style="margin:8px 0 0; font-size:13px; color:#ff8c2b; word-break:break-all;">${resetLink}</p>
+    </div>
+    <p style="margin:0 0 16px; font-size:14px; color:#8e8e93;">Este enlace expirará en 1 hora por razones de seguridad.</p>
+    <p style="margin:0; font-size:14px; color:#8e8e93;">Si no solicitaste restablecer tu contraseña, puedes ignorar este correo de forma segura.</p>
+  `;
+
+  return getBaseEmailTemplate({
+    title: 'Restablecer Contraseña',
+    body,
+    ctaText: 'Restablecer Contraseña',
+    ctaUrl: resetLink
+  });
 }
 
 export function getPaymentReminderEmailTemplate(
@@ -179,46 +129,26 @@ export function getPaymentReminderEmailTemplate(
   dueDate: Date,
   daysUntilDue: number
 ): string {
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: #000; color: #fff; padding: 30px; text-align: center; }
-    .content { background: #f9f9f9; padding: 30px; }
-    .highlight { background: #fff; border: 2px solid #000; padding: 20px; margin: 20px 0; text-align: center; }
-    .amount { font-size: 32px; font-weight: bold; color: #000; }
-    .button { display: inline-block; padding: 12px 24px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Recordatorio de Pago</h1>
+  const body = `
+    <p style="margin:0 0 16px;">Hola <strong>${userName}</strong>,</p>
+    <p style="margin:0 0 24px;">Te recordamos que tienes un pago próximo de tu cliente <strong>${clientName}</strong>.</p>
+    
+    <div style="background-color:#1a1a1f; border:1px solid #ff8c2b; border-radius:12px; padding:24px; text-align:center; margin:0 0 24px;">
+      <p style="margin:0 0 8px; font-size:13px; color:#8e8e93; text-transform:uppercase; letter-spacing:0.5px;">Monto a cobrar</p>
+      <p style="margin:0 0 16px; font-size:36px; font-weight:700; color:#ff8c2b;">$${amount}</p>
+      <p style="margin:0 0 4px; font-size:15px; color:#ffffff;">Vence en ${daysUntilDue} día${daysUntilDue !== 1 ? 's' : ''}</p>
+      <p style="margin:0; font-size:14px; color:#8e8e93;">${dueDate.toLocaleDateString('es-ES')}</p>
     </div>
-    <div class="content">
-      <h2>Hola ${userName},</h2>
-      <p>Te recordamos que tienes un pago próximo de tu cliente <strong>${clientName}</strong>.</p>
-      <div class="highlight">
-        <p style="margin: 0; color: #666;">Monto a cobrar:</p>
-        <div class="amount">$${amount}</div>
-        <p style="margin: 10px 0 0 0; color: #666;">Vence en ${daysUntilDue} día${daysUntilDue !== 1 ? 's' : ''}</p>
-        <p style="margin: 0; color: #666; font-size: 14px;">${dueDate.toLocaleDateString('es-ES')}</p>
-      </div>
-      <p>No olvides contactar a tu cliente para confirmar el pago.</p>
-      <a href="${process.env.APP_URL || 'http://localhost:3000'}/clients" class="button">Ver Detalles</a>
-    </div>
-    <div class="footer">
-      <p>© ${new Date().getFullYear()} WorkFlow. Todos los derechos reservados.</p>
-    </div>
-  </div>
-</body>
-</html>
+    
+    <p style="margin:0;">No olvides contactar a tu cliente para confirmar el pago.</p>
   `;
+
+  return getBaseEmailTemplate({
+    title: 'Recordatorio de Pago',
+    body,
+    ctaText: 'Ver Detalles',
+    ctaUrl: `${process.env.APP_URL || 'http://localhost:3000'}/clients`
+  });
 }
 
 export function getInvoiceCreatedEmailTemplate(
@@ -227,43 +157,22 @@ export function getInvoiceCreatedEmailTemplate(
   total: string,
   dueDate: Date
 ): string {
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: #000; color: #fff; padding: 30px; text-align: center; }
-    .content { background: #f9f9f9; padding: 30px; }
-    .invoice-details { background: #fff; padding: 20px; margin: 20px 0; border-left: 4px solid #000; }
-    .button { display: inline-block; padding: 12px 24px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; margin: 20px 0; }
-    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Nueva Factura Creada</h1>
+  const body = `
+    <p style="margin:0 0 16px;">Se ha creado una nueva factura exitosamente para <strong>${clientName}</strong>.</p>
+    
+    <div style="background-color:#1a1a1f; border-left:3px solid #ff8c2b; border-radius:8px; padding:20px; margin:0 0 24px;">
+      <p style="margin:0 0 12px;"><span style="color:#8e8e93;">Número de Factura:</span> <strong style="color:#ffffff;">${invoiceNumber}</strong></p>
+      <p style="margin:0 0 12px;"><span style="color:#8e8e93;">Total:</span> <strong style="color:#ffffff; font-size:18px;">$${total}</strong></p>
+      <p style="margin:0;"><span style="color:#8e8e93;">Fecha de Vencimiento:</span> <strong style="color:#ffffff;">${dueDate.toLocaleDateString('es-ES')}</strong></p>
     </div>
-    <div class="content">
-      <h2>Factura para ${clientName}</h2>
-      <p>Se ha creado una nueva factura exitosamente.</p>
-      <div class="invoice-details">
-        <p><strong>Número de Factura:</strong> ${invoiceNumber}</p>
-        <p><strong>Total:</strong> $${total}</p>
-        <p><strong>Fecha de Vencimiento:</strong> ${dueDate.toLocaleDateString('es-ES')}</p>
-      </div>
-      <a href="${process.env.APP_URL || 'http://localhost:3000'}/invoices" class="button">Ver Factura</a>
-    </div>
-    <div class="footer">
-      <p>© ${new Date().getFullYear()} WorkFlow. Todos los derechos reservados.</p>
-    </div>
-  </div>
-</body>
-</html>
   `;
+
+  return getBaseEmailTemplate({
+    title: 'Nueva Factura Creada',
+    body,
+    ctaText: 'Ver Factura',
+    ctaUrl: `${process.env.APP_URL || 'http://localhost:3000'}/invoices`
+  });
 }
 
 export function getLoginAlertEmailTemplate(
@@ -272,47 +181,26 @@ export function getLoginAlertEmailTemplate(
   userAgent: string,
   time: Date
 ): string {
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: #000; color: #fff; padding: 30px; text-align: center; }
-    .content { background: #f9f9f9; padding: 30px; }
-    .alert-box { background: #fff; border-left: 4px solid #000; padding: 20px; margin: 20px 0; }
-    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>Nuevo Inicio de Sesión Detectado</h1>
+  const body = `
+    <p style="margin:0 0 16px;">Hola <strong>${userName}</strong>,</p>
+    <p style="margin:0 0 24px;">Hemos detectado un nuevo inicio de sesión en tu cuenta de Finwrk.</p>
+    
+    <div style="background-color:#1a1a1f; border:1px solid #26262c; border-radius:8px; padding:20px; margin:0 0 24px;">
+      <p style="margin:0 0 12px;"><span style="color:#8e8e93;">Fecha y Hora:</span> <strong style="color:#ffffff;">${time.toLocaleString('es-ES')}</strong></p>
+      <p style="margin:0 0 12px;"><span style="color:#8e8e93;">Dirección IP:</span> <strong style="color:#ffffff;">${ipAddress}</strong></p>
+      <p style="margin:0;"><span style="color:#8e8e93;">Dispositivo:</span> <strong style="color:#ffffff;">${userAgent}</strong></p>
     </div>
-    <div class="content">
-      <h2>Hola ${userName},</h2>
-      <p>Hemos detectado un nuevo inicio de sesión en tu cuenta de WorkFlow.</p>
-      
-      <div class="alert-box">
-        <p><strong>Fecha y Hora:</strong> ${time.toLocaleString('es-ES')}</p>
-        <p><strong>Dirección IP:</strong> ${ipAddress}</p>
-        <p><strong>Dispositivo:</strong> ${userAgent}</p>
-      </div>
-
-      <p>Si fuiste tú, puedes ignorar este mensaje.</p>
-      <p><strong>¿No fuiste tú?</strong> Te recomendamos cambiar tu contraseña inmediatamente para proteger tu cuenta.</p>
-      
-      <a href="${process.env.APP_URL || 'http://localhost:3000'}/settings" style="display: inline-block; padding: 12px 24px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; margin: 20px 0;">Revisar Seguridad</a>
-    </div>
-    <div class="footer">
-      <p>© ${new Date().getFullYear()} WorkFlow. Todos los derechos reservados.</p>
-    </div>
-  </div>
-</body>
-</html>
+    
+    <p style="margin:0 0 16px;">Si fuiste tú, puedes ignorar este mensaje.</p>
+    <p style="margin:0; color:#ff8c2b;"><strong>¿No fuiste tú?</strong> Te recomendamos cambiar tu contraseña inmediatamente para proteger tu cuenta.</p>
   `;
+
+  return getBaseEmailTemplate({
+    title: 'Nuevo Inicio de Sesión Detectado',
+    body,
+    ctaText: 'Revisar Seguridad',
+    ctaUrl: `${process.env.APP_URL || 'http://localhost:3000'}/settings`
+  });
 }
 
 export function getPriceAlertEmailTemplate(
@@ -323,47 +211,26 @@ export function getPriceAlertEmailTemplate(
   condition: 'above' | 'below'
 ): string {
   const conditionText = condition === 'above' ? 'superado' : 'caído por debajo de';
-  const arrow = condition === 'above' ? '📈' : '📉';
+  const arrow = condition === 'above' ? '↑' : '↓';
   const color = condition === 'above' ? '#16a34a' : '#dc2626';
   
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: #000; color: #fff; padding: 30px; text-align: center; }
-    .content { background: #f9f9f9; padding: 30px; }
-    .price-box { background: #fff; border: 2px solid #000; padding: 20px; margin: 20px 0; text-align: center; }
-    .price { font-size: 36px; font-weight: bold; color: ${color}; }
-    .target { color: #666; font-size: 14px; margin-top: 5px; }
-    .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>${arrow} Alerta de Precio: ${symbol}</h1>
+  const body = `
+    <p style="margin:0 0 16px;">Hola <strong>${userName}</strong>,</p>
+    <p style="margin:0 0 24px;">El precio de <strong>${symbol}</strong> ha ${conditionText} tu precio objetivo.</p>
+    
+    <div style="background-color:#1a1a1f; border:2px solid ${color}; border-radius:12px; padding:24px; text-align:center; margin:0 0 24px;">
+      <p style="margin:0 0 8px; font-size:13px; color:#8e8e93; text-transform:uppercase; letter-spacing:0.5px;">${symbol}</p>
+      <p style="margin:0 0 16px; font-size:42px; font-weight:700; color:${color};">${arrow} $${price.toFixed(2)}</p>
+      <p style="margin:0; font-size:14px; color:#8e8e93;">Precio objetivo: <strong style="color:#ffffff;">$${targetPrice.toFixed(2)}</strong></p>
     </div>
-    <div class="content">
-      <h2>Hola ${userName},</h2>
-      <p>Tu alerta de precio para <strong>${symbol}</strong> se ha activado.</p>
-      
-      <div class="price-box">
-        <p style="margin: 0; color: #666;">El precio ha ${conditionText}:</p>
-        <div class="price">$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
-        <div class="target">Objetivo: $${targetPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
-      </div>
-
-      <a href="${process.env.APP_URL || 'http://localhost:3000'}/markets" style="display: inline-block; padding: 12px 24px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; margin: 20px 0;">Ver Mercado</a>
-    </div>
-    <div class="footer">
-      <p>© ${new Date().getFullYear()} WorkFlow. Todos los derechos reservados.</p>
-    </div>
-  </div>
-</body>
-</html>
+    
+    <p style="margin:0;">Esta alerta se disparó automáticamente según tus configuraciones.</p>
   `;
+
+  return getBaseEmailTemplate({
+    title: `Alerta de Precio: ${symbol}`,
+    body,
+    ctaText: 'Ver en Mercados',
+    ctaUrl: `${process.env.APP_URL || 'http://localhost:3000'}/markets`
+  });
 }
