@@ -2353,6 +2353,214 @@ export const appRouter = router({
           message: `${insertedIds.length} alertas de prueba generadas exitosamente` 
         };
       }),
+
+    // AI Analysis endpoint - Get AI-powered analysis for an alert
+    analyzeWithAI: protectedProcedure
+      .input(z.object({
+        alertId: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { getDb } = await import("./db");
+        const { alerts, invoices, clients, companyProfiles, transactions } = await import("../drizzle/schema");
+        const { eq, and, desc, sql, gte, lte } = await import("drizzle-orm");
+        const { alertAIService } = await import("./services/alertAIService");
+        const { startOfMonth, endOfMonth, subMonths } = await import("date-fns");
+        
+        const database = await getDb();
+        const userId = ctx.user!.id;
+        
+        // Get the alert
+        const alertResults = await database
+          .select()
+          .from(alerts)
+          .where(and(
+            eq(alerts.id, input.alertId),
+            eq(alerts.user_id, userId)
+          ))
+          .limit(1);
+        
+        if (alertResults.length === 0) {
+          throw new Error('Alerta no encontrada');
+        }
+        
+        const alert = alertResults[0];
+        
+        // Only analyze CRITICAL or WARNING alerts
+        if (alert.type === 'info') {
+          throw new Error('El análisis de IA solo está disponible para alertas críticas y de advertencia');
+        }
+        
+        // Get user's company profile
+        const profileResults = await database
+          .select()
+          .from(companyProfiles)
+          .where(eq(companyProfiles.user_id, userId))
+          .limit(1);
+        
+        const profile = profileResults[0];
+        
+        // Build context
+        const context: any = {
+          alertId: alert.id,
+          alertType: alert.type,
+          event: alert.event,
+          message: alert.message,
+          relatedId: alert.related_id,
+          relatedType: alert.related_type,
+          businessType: profile?.business_type || 'freelancer',
+          baseCurrency: profile?.base_currency || 'USD',
+          monthlyIncomeGoal: profile?.monthly_income_goal ? parseFloat(profile.monthly_income_goal.toString()) : undefined,
+        };
+        
+        // If alert is related to an invoice, get invoice data
+        if (alert.related_type === 'invoice' && alert.related_id) {
+          const invoiceResults = await database
+            .select()
+            .from(invoices)
+            .where(eq(invoices.id, alert.related_id))
+            .limit(1);
+          
+          if (invoiceResults.length > 0) {
+            const invoice = invoiceResults[0];
+            const dueDate = new Date(invoice.due_date);
+            const now = new Date();
+            const daysOverdue = invoice.status === 'sent' && dueDate < now
+              ? Math.floor((now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24))
+              : undefined;
+            
+            context.invoiceData = {
+              id: invoice.id,
+              clientName: invoice.client_name,
+              total: parseFloat(invoice.total.toString()),
+              dueDate: invoice.due_date.toISOString().split('T')[0],
+              status: invoice.status,
+              daysOverdue,
+            };
+            
+            // Get client history if we have client_id
+            if (invoice.client_id) {
+              const clientInvoices = await database
+                .select()
+                .from(invoices)
+                .where(and(
+                  eq(invoices.user_id, userId),
+                  eq(invoices.client_id, invoice.client_id)
+                ));
+              
+              const paidInvoices = clientInvoices.filter(i => i.status === 'paid');
+              let totalPaymentDays = 0;
+              let latePayments = 0;
+              
+              for (const inv of paidInvoices) {
+                if (inv.paid_at && inv.due_date) {
+                  const paymentDays = Math.floor(
+                    (new Date(inv.paid_at).getTime() - new Date(inv.created_at).getTime()) / (1000 * 60 * 60 * 24)
+                  );
+                  totalPaymentDays += paymentDays;
+                  
+                  if (new Date(inv.paid_at) > new Date(inv.due_date)) {
+                    latePayments++;
+                  }
+                }
+              }
+              
+              context.clientHistory = {
+                totalInvoices: clientInvoices.length,
+                paidInvoices: paidInvoices.length,
+                averagePaymentDays: paidInvoices.length > 0 ? Math.round(totalPaymentDays / paidInvoices.length) : 0,
+                latePayments,
+                totalRevenue: paidInvoices.reduce((sum, i) => sum + parseFloat(i.total.toString()), 0),
+              };
+            }
+          }
+        }
+        
+        // Get financial context
+        if (profile?.monthly_income_goal) {
+          const now = new Date();
+          const currentMonthStart = startOfMonth(now);
+          const currentMonthEnd = endOfMonth(now);
+          const lastMonthStart = startOfMonth(subMonths(now, 1));
+          const lastMonthEnd = endOfMonth(subMonths(now, 1));
+          
+          // Current month income from paid invoices
+          const currentMonthInvoices = await database
+            .select()
+            .from(invoices)
+            .where(and(
+              eq(invoices.user_id, userId),
+              eq(invoices.status, 'paid'),
+              gte(invoices.paid_at, currentMonthStart),
+              lte(invoices.paid_at, currentMonthEnd)
+            ));
+          
+          const currentIncome = currentMonthInvoices.reduce((sum, i) => sum + parseFloat(i.total.toString()), 0);
+          
+          // Last month income
+          const lastMonthInvoices = await database
+            .select()
+            .from(invoices)
+            .where(and(
+              eq(invoices.user_id, userId),
+              eq(invoices.status, 'paid'),
+              gte(invoices.paid_at, lastMonthStart),
+              lte(invoices.paid_at, lastMonthEnd)
+            ));
+          
+          const lastIncome = lastMonthInvoices.reduce((sum, i) => sum + parseFloat(i.total.toString()), 0);
+          const goal = parseFloat(profile.monthly_income_goal.toString());
+          
+          context.financialContext = {
+            monthlyIncome: currentIncome,
+            monthlyGoal: goal,
+            percentageOfGoal: goal > 0 ? Math.round((currentIncome / goal) * 100) : 0,
+            previousMonthIncome: lastIncome,
+            trend: currentIncome > lastIncome ? 'up' : currentIncome < lastIncome ? 'down' : 'stable',
+          };
+        }
+        
+        // Get similar alerts count
+        const similarAlerts = await database
+          .select()
+          .from(alerts)
+          .where(and(
+            eq(alerts.user_id, userId),
+            eq(alerts.event, alert.event)
+          ))
+          .orderBy(desc(alerts.created_at));
+        
+        if (similarAlerts.length > 1) {
+          context.similarAlerts = {
+            count: similarAlerts.length - 1, // Exclude current alert
+            lastOccurrence: similarAlerts[1]?.created_at?.toISOString().split('T')[0] || '',
+            resolved: similarAlerts.filter(a => a.is_read === 1).length,
+          };
+        }
+        
+        // Call AI service
+        const analysis = await alertAIService.analyzeAlert(context, userId);
+        
+        return analysis;
+      }),
+
+    // Get AI usage stats
+    aiStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { alertAIService } = await import("./services/alertAIService");
+        return await alertAIService.getUserStats(ctx.user!.id);
+      }),
+
+    // Mark AI analysis as used (for metrics)
+    markAIAnalysisUsed: protectedProcedure
+      .input(z.object({
+        alertId: z.number(),
+        actionTaken: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { alertAIService } = await import("./services/alertAIService");
+        await alertAIService.markAnalysisUsed(input.alertId, input.actionTaken);
+        return { success: true };
+      }),
   }),
 });
 export type AppRouter = typeof appRouter;

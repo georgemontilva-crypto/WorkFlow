@@ -6,6 +6,7 @@
 
 import { useState } from 'react';
 import { X, Info, AlertTriangle, AlertCircle, Check, Trash2, Filter, Bell } from 'lucide-react';
+import { AlertAIAnalysis } from './AlertAIAnalysis';
 import { trpc } from '@/lib/trpc';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -256,6 +257,27 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
                             <Bell className="w-4 h-4" />
                             Ver
                           </button>
+                        )}
+
+                        {/* AI Analysis - Solo para alertas critical y warning */}
+                        {(alert.type === 'critical' || alert.type === 'warning') && (
+                          <div onClick={(e) => e.stopPropagation()}>
+                            <AlertAIAnalysis 
+                              alertId={alert.id} 
+                              alertType={alert.type as 'critical' | 'warning'}
+                              onActionClick={(action) => {
+                                // Handle AI suggested actions
+                                if (action === 'view_invoice' && alert.action_url) {
+                                  handleAction(alert);
+                                } else if (action === 'send_reminder') {
+                                  // Could trigger a reminder action
+                                  handleAction(alert);
+                                } else if (action === 'mark_resolved') {
+                                  handleMarkAsRead(alert.id);
+                                }
+                              }}
+                            />
+                          </div>
                         )}
                       </div>
                       
