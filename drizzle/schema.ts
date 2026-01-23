@@ -312,6 +312,13 @@ export const companyProfiles = mysqlTable("company_profiles", {
   bank_routing: varchar("bank_routing", { length: 100 }),
   payment_instructions: text("payment_instructions"), // Custom payment instructions
   invoice_footer: text("invoice_footer"), // Custom footer text for invoices
+  
+  // Financial Profile fields
+  business_type: mysqlEnum("business_type", ["freelancer", "empresa", "agencia"]), // Type of activity
+  base_currency: varchar("base_currency", { length: 3 }).default("USD"), // ISO currency code
+  monthly_income_goal: decimal("monthly_income_goal", { precision: 15, scale: 2 }), // Monthly income target
+  goal_currency: varchar("goal_currency", { length: 3 }), // Currency for the goal (defaults to base_currency)
+  
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 });

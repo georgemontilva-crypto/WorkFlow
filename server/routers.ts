@@ -1850,6 +1850,11 @@ export const appRouter = router({
         bank_routing: z.string().optional(),
         payment_instructions: z.string().optional(),
         invoice_footer: z.string().optional(),
+        // Financial Profile fields
+        business_type: z.enum(["freelancer", "empresa", "agencia"]).optional(),
+        base_currency: z.string().length(3).optional(),
+        monthly_income_goal: z.number().optional(),
+        goal_currency: z.string().length(3).optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const profile = await db.upsertCompanyProfile(ctx.user.id, input);

@@ -3,9 +3,10 @@
  * Genera alertas automáticamente basado en eventos del sistema
  */
 
-import { getDb } from "./db";
-import { alerts, invoices, clients, users, transactions } from "../drizzle/schema";
-import { eq, and, sql, gte, lte, desc } from "drizzle-orm";
+import { db as getDb } from "./db";
+import { alerts, invoices, transactions, clients } from "../drizzle/schema";
+import { eq, and, sql, desc } from "drizzle-orm";
+import { generateFinancialAlerts, shouldGenerateAlerts } from "./financial-alerts-service";
 import { differenceInDays, startOfMonth, endOfMonth, subMonths } from "date-fns";
 
 type AlertType = "info" | "warning" | "critical";
@@ -337,6 +338,34 @@ export async function checkProFeatureBlocked(user_id: number, feature: string) {
     action_text: "Ver planes",
     required_plan: "pro",
   });
+}
+
+/**
+ * Generate financial goal alerts based on user profile
+ */
+export async function generateFinancialGoalAlerts(user_id: number) {
+  // Check if user has financial profile configured
+  const shouldGenerate = await shouldGenerateAlerts(user_id);
+  
+  if (!shouldGenerate) {
+    return; // Skip if profile not complete
+  }
+
+  // Generate personalized financial alerts
+  const financialAlerts = await generateFinancialAlerts(user_id);
+  
+  // Create alerts in database
+  for (const alert of financialAlerts) {
+    await createAlert({
+      user_id,
+      type: alert.type,
+      event: alert.title,
+      message: alert.message,
+      shown_as_toast: alert.shown_as_toast,
+      action_url: "/dashboard",
+      action_text: "Ver progreso",
+    });
+  }
 }
 
 /**
