@@ -125,22 +125,18 @@ export default function Invoices() {
   
   // Apply filters
   const filteredInvoices = useMemo(() => {
-    // If 'archived' filter is selected, use archived invoices
-    if (statusFilter === 'archived') {
-      return archivedInvoices || [];
-    }
-    
-    if (!allInvoices) return [];
-    
-    let filtered = allInvoices;
+    // Determine which dataset to use based on status filter
+    let filtered = statusFilter === 'archived' 
+      ? (archivedInvoices || []) 
+      : (allInvoices || []);
     
     // Client filter
     if (clientFilter !== 'all') {
       filtered = filtered.filter(inv => inv.client_id === parseInt(clientFilter));
     }
     
-    // Status filter (for non-archived invoices)
-    if (statusFilter !== 'all') {
+    // Status filter (only for non-archived status values)
+    if (statusFilter !== 'all' && statusFilter !== 'archived') {
       filtered = filtered.filter(inv => inv.status === statusFilter);
     }
     
