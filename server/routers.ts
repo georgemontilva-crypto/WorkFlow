@@ -1654,6 +1654,7 @@ export const appRouter = router({
         type: z.enum(["crypto", "stock", "forex", "commodity"]),
         target_price: z.number(),
         condition: z.enum(["above", "below"]),
+        notify_email: z.boolean().optional().default(true),
       }))
       .mutation(async ({ ctx, input }) => {
         const { createPriceAlert } = await import("./db");
@@ -1661,6 +1662,7 @@ export const appRouter = router({
           ...input,
           user_id: ctx.user.id,
           target_price: input.target_price.toString(), // Store as string for decimal precision
+          notify_email: input.notify_email ? 1 : 0,
         });
       }),
 

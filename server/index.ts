@@ -47,16 +47,29 @@ async function startServer() {
     // Start overdue invoices scheduler
     startOverdueInvoicesScheduler();
     
-    // Initialize Bull Queue worker for reminders
-    // This starts processing jobs from the queue
+    // Initialize Bull Queue workers
+    // This starts processing jobs from the queues
     if (redisConnected) {
+      // Reminder worker
       import("./workers/reminder-worker.js").then(() => {
         console.log('[Server] ✅ Reminder worker initialized');
       }).catch((err) => {
         console.error('[Server] ❌ Failed to initialize reminder worker:', err);
       });
+      
+      // Price alerts worker and scheduler
+      Promise.all([
+        import("./workers/priceAlertsWorker.js"),
+        import("./queues/price-alerts-queue.js")
+      ]).then(([worker, queue]) => {
+        worker.initializePriceAlertsWorker();
+        queue.initializePriceAlertsScheduler();
+        console.log('[Server] ✅ Price alerts worker and scheduler initialized');
+      }).catch((err) => {
+        console.error('[Server] ❌ Failed to initialize price alerts worker:', err);
+      });
     } else {
-      console.log('[Server] ⏭️  Skipping reminder worker initialization (Redis not available)');
+      console.log('[Server] ⏭️  Skipping workers initialization (Redis not available)');
     }
   });
 }

@@ -255,6 +255,7 @@ export const priceAlerts = mysqlTable("price_alerts", {
   target_price: decimal("target_price", { precision: 20, scale: 8 }).notNull(),
   condition: mysqlEnum("condition", ["above", "below"]).notNull(),
   is_active: int("is_active").notNull().default(1),
+  notify_email: int("notify_email").notNull().default(1),
   last_triggered_at: timestamp("last_triggered_at"),
   created_at: timestamp("created_at").defaultNow().notNull(),
 });

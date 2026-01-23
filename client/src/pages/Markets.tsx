@@ -21,6 +21,7 @@ import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
 import DashboardLayout from '@/components/DashboardLayout';
 import ScenarioSimulator from '@/components/ScenarioSimulator';
 import CurrencyCalculator from '@/components/CurrencyCalculator';
+import { PriceAlertDialog } from '@/components/PriceAlertDialog';
 
 interface MarketAsset {
   symbol: string;
@@ -437,54 +438,18 @@ export default function Markets() {
           </div>
         )}
 
-        <Dialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
-          <DialogContent className="sm:max-w-[425px] bg-card border-white/10">
-            <DialogHeader>
-              <DialogTitle>Crear Alerta de Precio</DialogTitle>
-              <DialogDescription>
-                Recibe una notificación cuando {selectedAssetForAlert?.name} alcance el precio objetivo.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label>Activo</Label>
-                <div className="flex items-center gap-2 p-2 border rounded-md bg-background/50">
-                  <span className="font-bold">{selectedAssetForAlert?.symbol}</span>
-                  <span className="text-muted-foreground text-sm">{selectedAssetForAlert?.name}</span>
-                  <span className="ml-auto font-mono">${selectedAssetForAlert?.price.toLocaleString()}</span>
-                </div>
-              </div>
-              <div className="grid gap-2">
-                <Label>Condición</Label>
-                <Select value={alertCondition} onValueChange={(v: 'above' | 'below') => setAlertCondition(v)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="above">El precio sube por encima de</SelectItem>
-                    <SelectItem value="below">El precio cae por debajo de</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-2">
-                <Label>Precio Objetivo ($)</Label>
-                <Input
-                  type="number"
-                  step="0.000001"
-                  value={alertTargetPrice}
-                  onChange={(e) => setAlertTargetPrice(e.target.value)}
-                  placeholder="0.00"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setAlertDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={handleCreateAlert} disabled={createAlertMutation.isPending}>
-                {createAlertMutation.isPending ? 'Creando...' : 'Crear Alerta'}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <PriceAlertDialog
+          open={alertDialogOpen}
+          onOpenChange={(open) => {
+            setAlertDialogOpen(open);
+            if (!open) {
+              refetchAlerts();
+            }
+          }}
+          symbol={selectedAssetForAlert?.symbol || ''}
+          type={selectedAssetForAlert?.type || 'crypto'}
+          currentPrice={selectedAssetForAlert?.price}
+        />
 
         {/* Search */}
         <div className="relative mb-6">
