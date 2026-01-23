@@ -68,6 +68,14 @@ async function startServer() {
       }).catch((err) => {
         console.error('[Server] ❌ Failed to initialize price alerts worker:', err);
       });
+      
+      // Alerts processor worker (processes events from Redis queue)
+      import("./workers/alertsProcessorWorker.js").then((worker) => {
+        worker.initializeAlertsProcessorWorker();
+        console.log('[Server] ✅ Alerts processor worker initialized');
+      }).catch((err) => {
+        console.error('[Server] ❌ Failed to initialize alerts processor worker:', err);
+      });
     } else {
       console.log('[Server] ⏭️  Skipping workers initialization (Redis not available)');
     }
