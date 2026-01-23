@@ -406,8 +406,6 @@ export const appRouter = router({
           
           // Send email
           const emailHtml = getPasswordResetEmailTemplate(user.name, resetLink);
-          console.log('[Auth] Sending password reset email to:', user.email);
-          console.log('[Auth] Reset link:', resetLink);
           
           const emailSent = await sendEmail({
             to: user.email,
@@ -418,8 +416,6 @@ export const appRouter = router({
           if (!emailSent) {
             console.error('[Auth] Failed to send password reset email');
             // Still return success to prevent email enumeration
-          } else {
-            console.log('[Auth] Password reset email sent successfully');
           }
           
           return { success: true, message: "If the email exists, a reset link has been sent" };
@@ -755,10 +751,6 @@ export const appRouter = router({
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        console.log('[Invoice Update] ========== START ==========');
-        console.log('[Invoice Update] Input received:', JSON.stringify(input));
-        console.log('[Invoice Update] User ID:', ctx.user.id);
-        
         const { id, ...data } = input;
         const updateData: any = { ...data, updated_at: new Date() };
         
@@ -803,17 +795,6 @@ export const appRouter = router({
         const wasNotPaid = invoice.status !== 'paid';
         const isBeingMarkedAsPaid = data.status === 'paid' || (paid >= total && total > 0);
         
-        console.log('[Invoice Update] Payment calculation:', {
-          invoiceId: id,
-          previousPaid,
-          newPaid: paid,
-          newPaymentAmount,
-          wasNotPaid,
-          isBeingMarkedAsPaid,
-          currentStatus: invoice.status,
-          requestedStatus: data.status
-        });
-        
         if (paid >= total && total > 0) {
           updateData.status = "paid";
         } else if (data.status === 'paid') {
@@ -843,16 +824,6 @@ export const appRouter = router({
         const statusChangingToPaid = (data.status === 'paid' || updateData.status === 'paid') && wasNotPaid;
         const hasNewPayment = newPaymentAmount > 0;
         
-        console.log('[Invoice Update] Transaction check:', {
-          dataStatus: data.status,
-          updateDataStatus: updateData.status,
-          wasNotPaid,
-          statusChangingToPaid,
-          hasNewPayment,
-          newPaymentAmount,
-          total
-        });
-        
         // Create transaction if there's a new payment (partial or full)
         if (hasNewPayment && newPaymentAmount > 0) {
           try {
@@ -867,8 +838,6 @@ export const appRouter = router({
               ? `Abono factura ${invoice.invoice_number} - ${clientName}`
               : `Pago de factura ${invoice.invoice_number} - ${clientName}`;
             
-            console.log('[Invoice Update] Creating transaction with amount:', transactionAmount, 'isPartial:', isPartial);
-            
             await db.createTransaction({
               type: 'income',
               category: 'freelance',
@@ -878,13 +847,10 @@ export const appRouter = router({
               user_id: ctx.user.id,
               created_at: new Date(),
             });
-            console.log(`[Invoice Update] Created finance transaction for invoice ${invoice.invoice_number}: $${transactionAmount.toFixed(2)}`);
           } catch (transactionError: any) {
             console.error('[Invoice Update] Error creating finance transaction:', transactionError?.message || transactionError);
             // Don't throw - invoice was already updated successfully
           }
-        } else {
-          console.log('[Invoice Update] Skipping transaction creation - no new payment');
         }
         
         return { success: true };
@@ -995,10 +961,7 @@ export const appRouter = router({
           };
           
           // Generate PDF
-          console.log('[Invoice] Generating PDF for invoice:', invoice.invoice_number);
           const pdfBase64 = await generateInvoicePDF(invoiceData);
-          console.log('[Invoice] PDF generated successfully, size:', pdfBase64.length, 'chars');
-          console.log('[Invoice] Sending email to:', client.email);
           
           // Send email with PDF attachment
           const emailHtml = `
@@ -1149,17 +1112,8 @@ export const appRouter = router({
             throw new Error('Invoice not found');
           }
           
-          console.log('[uploadPaymentProof] Processing payment proof:', {
-            invoice_id: invoice.id,
-            user_id: invoice.user_id,
-            proof_length: input.proof?.length || 0,
-            current_status: invoice.status,
-            new_status: 'payment_sent'
-          });
-          
           // Update invoice status to payment_sent (without saving the proof)
           await db.updateInvoiceStatus(invoice.id, invoice.user_id, 'payment_sent');
-          console.log('[uploadPaymentProof] Status updated to payment_sent for invoice:', invoice.id);
           
           // Send notification email to user with proof attached
           try {
@@ -1213,13 +1167,10 @@ export const appRouter = router({
                   contentId: 'payment-proof', // For inline display with cid:payment-proof
                 }],
               });
-              
-              console.log('[uploadPaymentProof] Email sent successfully to:', user.email);
             }
           } catch (emailError) {
             console.error('[Invoice] Error sending payment proof notification:', emailError);
             // Don't throw - status was already updated, email is secondary
-            console.log('[uploadPaymentProof] Status updated but email failed');
           }
           
           return { success: true, message: 'Payment proof uploaded and email sent' };
@@ -1310,7 +1261,6 @@ export const appRouter = router({
               user_id: invoice.user_id,
               created_at: new Date(),
             });
-            console.log(`[Stripe Payment] Created finance transaction for invoice ${invoice.invoice_number}: $${input.amount.toFixed(2)}`);
           } catch (transactionError) {
             console.error('[Stripe Payment] Error creating finance transaction:', transactionError);
           }
@@ -1434,7 +1384,7 @@ export const appRouter = router({
               updated_at: new Date(),
             });
           } catch (e) {
-            console.log('Could not update invoice status:', e);
+            // Silently fail - invoice status update is not critical
           }
         }
         
