@@ -125,17 +125,6 @@ export default function Invoices() {
   const { data: clients, isLoading: clientsLoading } = trpc.clients.list.useQuery();
   const { data: companyProfile } = trpc.companyProfile.get.useQuery();
   
-  // Debug: Log data on load
-  useEffect(() => {
-    if (allInvoices) {
-      console.log('[Invoices Debug] allInvoices count:', allInvoices.length);
-      console.log('[Invoices Debug] allInvoices sample:', allInvoices[0]);
-    }
-    if (archivedInvoices) {
-      console.log('[Invoices Debug] archivedInvoices count:', archivedInvoices.length);
-    }
-  }, [allInvoices, archivedInvoices]);
-  
   // Apply filters
   const filteredInvoices = useMemo(() => {
     // Determine which dataset to use based on status filter
