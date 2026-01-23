@@ -173,11 +173,23 @@ export const appRouter = router({
       const { TOTP, generateSecret } = await import('otplib');
       const QRCode = await import('qrcode');
       
+      // Get user to check email verification
+      const user = await db.getUserById(ctx.user.id);
+      
+      if (!user) {
+        throw new Error('User not found');
+      }
+      
+      // Check if email is verified
+      if (user.email_verified !== 1) {
+        throw new Error('EMAIL_NOT_VERIFIED');
+      }
+      
       // Generate secret
       const secret = generateSecret();
       
       // Generate QR code URL
-      const otpauth = `otpauth://totp/HiWork:${encodeURIComponent(ctx.user.email)}?secret=${secret}&issuer=HiWork`;
+      const otpauth = `otpauth://totp/Finwrk:${encodeURIComponent(ctx.user.email)}?secret=${secret}&issuer=Finwrk`;
       
       const qrCode = await QRCode.toDataURL(otpauth);
       
@@ -191,6 +203,7 @@ export const appRouter = router({
       .input(z.object({ token: z.string().length(6) }))
       .mutation(async ({ ctx, input }) => {
         const { verify } = await import('otplib');
+        const { send2FAStatusEmail } = await import('./emails/service');
         const user = await db.getUserById(ctx.user.id);
         
         if (!user || !user.two_factor_secret) {
@@ -206,13 +219,51 @@ export const appRouter = router({
         // Enable 2FA
         await db.enable2FA(ctx.user.id);
         
+        // Send notification email
+        await send2FAStatusEmail(user.email, user.name, 'enabled');
+        
         return { success: true };
       }),
 
-    disable2FA: protectedProcedure.mutation(async ({ ctx }) => {
-      await db.disable2FA(ctx.user.id);
-      return { success: true };
-    }),
+    disable2FA: protectedProcedure
+      .input(z.object({
+        password: z.string().min(1),
+        code: z.string().length(6),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const bcrypt = await import('bcryptjs');
+        const { verify } = await import('otplib');
+        const { send2FAStatusEmail } = await import('./emails/service');
+        const user = await db.getUserById(ctx.user.id);
+        
+        if (!user) {
+          throw new Error('User not found');
+        }
+        
+        // Verify password
+        const isValidPassword = await bcrypt.compare(input.password, user.password_hash);
+        if (!isValidPassword) {
+          throw new Error('Incorrect password');
+        }
+        
+        // Verify 2FA code
+        if (!user.two_factor_secret || user.two_factor_enabled !== 1) {
+          throw new Error('2FA is not enabled');
+        }
+        
+        const isValidCode = verify({ token: input.code, secret: user.two_factor_secret });
+        if (!isValidCode) {
+          throw new Error('Invalid 2FA code');
+        }
+        
+        // Disable 2FA
+        await db.disable2FA(ctx.user.id);
+        
+        // Send notification email
+        await send2FAStatusEmail(user.email, user.name, 'disabled');
+        
+        return { success: true };
+      }),
 
     verify2FALogin: publicProcedure
       .input(z.object({
@@ -373,6 +424,7 @@ export const appRouter = router({
       }))
       .mutation(async ({ ctx, input }) => {
         const bcrypt = await import('bcryptjs');
+        const { sendPasswordChangedEmail } = await import('./emails/service');
         const user = await db.getUserById(ctx.user.id);
         
         if (!user) {
@@ -390,6 +442,9 @@ export const appRouter = router({
         
         // Update password
         await db.updateUserPassword(ctx.user.id, newHash);
+        
+        // Send notification email
+        await sendPasswordChangedEmail(user.email, user.name);
         
         return { success: true };
       }),
