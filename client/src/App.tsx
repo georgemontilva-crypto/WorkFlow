@@ -33,7 +33,7 @@ import Markets from "./pages/Markets";
 import PricingPage from "./pages/PricingPage";
 import CompanyProfile from "./pages/CompanyProfile";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { CrispChat } from "./components/CrispChat";
+
 import { ReminderNotificationProvider } from "./components/ReminderNotificationProvider";
 import { PaymentReceivedNotificationProvider } from "./components/PaymentReceivedNotification";
 function Router() {
@@ -131,7 +131,7 @@ function App() {
                 <Router />
               </PaymentReceivedNotificationProvider>
             </ReminderNotificationProvider>
-            <CrispChat />
+
           </TooltipProvider>
         </ThemeProvider>
       </LanguageProvider>
