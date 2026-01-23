@@ -19,8 +19,12 @@ interface UpcomingReminder {
   priority: string;
 }
 
-export function useUpcomingReminders() {
-  const { data: reminders } = trpc.reminders.list.useQuery();
+export function useUpcomingReminders(isAuthenticated: boolean = false) {
+  // Only fetch reminders if user is authenticated
+  const { data: reminders } = trpc.reminders.list.useQuery(undefined, {
+    enabled: isAuthenticated,
+    retry: false,
+  });
   const [notifiedReminders, setNotifiedReminders] = useState<Set<number>>(new Set());
   const audioRef = useRef<HTMLAudioElement | null>(null);
 

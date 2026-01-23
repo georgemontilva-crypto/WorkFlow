@@ -25,7 +25,11 @@ export function PaymentReceivedNotificationProvider({ children }: { children: Re
   const [, setLocation] = useLocation();
   
   // Get user to check if authenticated
-  const { data: user } = trpc.auth.me.useQuery();
+  // Use retry: false to prevent multiple failed requests on public pages
+  const { data: user } = trpc.auth.me.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
   
   // Get invoices to check for payment_sent status
   const { data: invoices, refetch } = trpc.invoices.list.useQuery(undefined, {

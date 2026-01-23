@@ -9,10 +9,15 @@ import { trpc } from '@/lib/trpc';
 
 export function ReminderNotificationProvider({ children }: { children: React.ReactNode }) {
   // Verificar si el usuario está autenticado
-  const { data: user } = trpc.auth.me.useQuery();
+  // Use retry: false to prevent multiple failed requests on public pages
+  const { data: user, isLoading } = trpc.auth.me.useQuery(undefined, {
+    retry: false,
+    refetchOnWindowFocus: false,
+  });
   
   // Solo activar las notificaciones si el usuario está autenticado
-  useUpcomingReminders();
+  // Pass the user to the hook so it can conditionally run
+  useUpcomingReminders(!!user);
 
   return <>{children}</>;
 }
