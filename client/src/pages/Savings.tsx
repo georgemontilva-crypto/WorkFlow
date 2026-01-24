@@ -29,7 +29,7 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CurrencySelect } from '@/components/CurrencySelect';
 import { formatCurrency, getCurrencySymbol } from '@shared/currencies';
 import { useCurrency } from '@/hooks/useCurrency';
@@ -93,10 +93,17 @@ export default function Savings() {
     name: '',
     target_amount: '',
     current_amount: '',
-    currency: primaryCurrency,
+    currency: primaryCurrency || 'USD',
     target_date: '',
     status: 'active' as 'active' | 'completed' | 'cancelled',
   });
+
+  // Update currency when primaryCurrency loads
+  useEffect(() => {
+    if (primaryCurrency && !editingGoal) {
+      setFormData(prev => ({ ...prev, currency: primaryCurrency }));
+    }
+  }, [primaryCurrency, editingGoal]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -394,9 +401,14 @@ export default function Savings() {
 
                   <div className="space-y-3">
                     <div className="flex justify-between items-baseline">
-                      <span className="text-2xl font-bold text-white font-mono">
-                        {formatCurrency(currentAmount, goal.currency)}
-                      </span>
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-bold text-white font-mono">
+                          {formatCurrency(currentAmount, goal.currency)}
+                        </span>
+                        <span className="text-sm font-semibold text-[#EBFF57]">
+                          {goal.currency}
+                        </span>
+                      </div>
                       <span className="text-sm text-gray-400 font-mono">
                          de {formatCurrency(targetAmount, goal.currency)}
                       </span>
@@ -420,9 +432,14 @@ export default function Savings() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-xs text-gray-400">Falta</p>
-                          <p className="text-lg font-semibold text-white font-mono">
-                            {formatCurrency(remaining, goal.currency)}
-                          </p>
+                          <div className="flex items-baseline gap-2">
+                            <p className="text-lg font-semibold text-white font-mono">
+                              {formatCurrency(remaining, goal.currency)}
+                            </p>
+                            <span className="text-xs font-semibold text-[#EBFF57]">
+                              {goal.currency}
+                            </span>
+                          </div>
                         </div>
                         <Button
                           size="sm"
