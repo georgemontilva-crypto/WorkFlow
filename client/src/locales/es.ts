@@ -19,6 +19,8 @@ export const es = {
     date: 'Fecha',
     description: 'Descripción',
     dismiss: 'Descartar',
+    create: 'Crear',
+    update: 'Actualizar',
   },
 
   // Notifications
