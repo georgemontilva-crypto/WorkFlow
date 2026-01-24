@@ -274,11 +274,6 @@
     padding-right: var(--spacing-md);
   }
 
-  .flex {
-    min-height: 0;
-    min-width: 0;
-  }
-
   @media (min-width: 640px) {
     .container {
       padding-left: var(--spacing-lg);
