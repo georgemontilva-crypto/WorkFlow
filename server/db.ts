@@ -26,6 +26,7 @@ export async function createUser(data: {
   name: string;
   email: string;
   password: string;
+  primaryCurrency?: string;
 }) {
   const db = await getDb();
   if (!db) {
@@ -53,6 +54,7 @@ export async function createUser(data: {
       subscription_plan: "free",
       subscription_status: "active",
       has_lifetime_access: 0,
+      primary_currency: data.primaryCurrency || "USD",
       created_at: new Date(),
       updated_at: new Date(),
       last_signed_in: new Date(),

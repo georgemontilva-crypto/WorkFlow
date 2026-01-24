@@ -31,7 +31,8 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState } from 'react';
 import { CurrencySelect } from '@/components/CurrencySelect';
-import { formatCurrency, Currency } from '@/lib/currency';
+import { formatCurrency, getCurrencySymbol } from '@shared/currencies';
+import { useCurrency } from '@/hooks/useCurrency';
 
 // SavingsGoal type based on backend schema
 type SavingsGoal = {
@@ -50,6 +51,7 @@ type SavingsGoal = {
 export default function Savings() {
   const { t } = useLanguage();
   const utils = trpc.useUtils();
+  const { primaryCurrency } = useCurrency();
   
   // Fetch savings goals using tRPC
   const { data: savingsGoals, isLoading } = trpc.savingsGoals.list.useQuery();
@@ -91,7 +93,7 @@ export default function Savings() {
     name: '',
     target_amount: '',
     current_amount: '',
-    currency: 'USD',
+    currency: primaryCurrency,
     target_date: '',
     status: 'active' as 'active' | 'completed' | 'cancelled',
   });
@@ -240,11 +242,12 @@ export default function Savings() {
                 </div>
 
                 <CurrencySelect
-                  value={formData.currency as Currency}
+                  value={formData.currency}
                   onChange={(currency) => setFormData({ ...formData, currency })}
                   label="Moneda"
                   required
                 />
+                <p className="text-xs text-gray-400">Esta moneda solo afectará a esta meta de ahorro</p>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -392,10 +395,10 @@ export default function Savings() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-baseline">
                       <span className="text-2xl font-bold text-white font-mono">
-                        {formatCurrency(currentAmount, goal.currency as Currency)}
+                        {formatCurrency(currentAmount, goal.currency)}
                       </span>
                       <span className="text-sm text-gray-400 font-mono">
-                        de {formatCurrency(targetAmount, goal.currency as Currency)}
+                         de {formatCurrency(targetAmount, goal.currency)}
                       </span>
                     </div>
                     
@@ -418,7 +421,7 @@ export default function Savings() {
                         <div>
                           <p className="text-xs text-gray-400">Falta</p>
                           <p className="text-lg font-semibold text-white font-mono">
-                            {formatCurrency(remaining, goal.currency as Currency)}
+                            {formatCurrency(remaining, goal.currency)}
                           </p>
                         </div>
                         <Button

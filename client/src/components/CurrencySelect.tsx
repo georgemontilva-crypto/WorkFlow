@@ -1,18 +1,18 @@
 /**
  * CurrencySelect Component
- * Reusable currency selector for forms
+ * Reusable currency selector for forms - uses comprehensive currency catalog
  */
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Currency, CURRENCY_NAMES, getAvailableCurrencies } from '@/lib/currency';
+import CurrencySelector from './CurrencySelector';
 
 interface CurrencySelectProps {
-  value: Currency;
-  onChange: (value: Currency) => void;
+  value: string;
+  onChange: (value: string) => void;
   label?: string;
   required?: boolean;
   disabled?: boolean;
+  placeholder?: string;
+  error?: string;
 }
 
 export function CurrencySelect({ 
@@ -20,34 +20,18 @@ export function CurrencySelect({
   onChange, 
   label = 'Moneda',
   required = false,
-  disabled = false 
+  disabled = false,
+  placeholder,
+  error
 }: CurrencySelectProps) {
-  const currencies = getAvailableCurrencies();
-
   return (
-    <div className="space-y-2">
-      {label && (
-        <Label>
-          {label}
-          {required && <span className="text-destructive ml-1">*</span>}
-        </Label>
-      )}
-      <Select 
-        value={value} 
-        onValueChange={(val) => onChange(val as Currency)}
-        disabled={disabled}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Selecciona moneda" />
-        </SelectTrigger>
-        <SelectContent>
-          {currencies.map((currency) => (
-            <SelectItem key={currency} value={currency}>
-              {CURRENCY_NAMES[currency]}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <CurrencySelector
+      selectedCurrency={value}
+      onSelect={onChange}
+      label={label}
+      required={required}
+      placeholder={placeholder}
+      error={error}
+    />
   );
 }

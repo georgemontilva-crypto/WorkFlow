@@ -41,6 +41,8 @@ export const users = mysqlTable("user", {
   two_factor_secret: varchar("two_factor_secret", { length: 255 }),
   /** Whether 2FA is enabled for this user */
   two_factor_enabled: int("two_factor_enabled").notNull().default(0),
+  /** Primary currency for the user - used globally across the platform */
+  primary_currency: varchar("primary_currency", { length: 3 }).notNull().default("USD"),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
   last_signed_in: timestamp("last_signed_in").defaultNow().notNull(),

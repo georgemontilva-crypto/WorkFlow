@@ -18,6 +18,7 @@ export const appRouter = router({
         email: z.string().email("Invalid email address"),
         password: z.string().min(8, "Password must be at least 8 characters"),
         businessType: z.enum(["freelancer", "agencia", "empresa"]).optional(),
+        primaryCurrency: z.string().length(3, "Currency code must be 3 characters").default("USD"),
       }))
       .mutation(async ({ input }) => {
         try {
@@ -29,6 +30,7 @@ export const appRouter = router({
             name: input.name,
             email: input.email,
             password: input.password,
+            primaryCurrency: input.primaryCurrency,
           });
 
           // Create company profile with business type if provided

@@ -10,6 +10,8 @@ import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Loader2, User, Building2, Users } from 'lucide-react';
+import CurrencySelector from '@/components/CurrencySelector';
+import { DEFAULT_CURRENCY } from '@shared/currencies';
 
 export default function Signup() {
   const [, setLocation] = useLocation();
@@ -17,6 +19,7 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [businessType, setBusinessType] = useState<'freelancer' | 'agencia' | 'empresa' | ''>('');
+  const [primaryCurrency, setPrimaryCurrency] = useState(DEFAULT_CURRENCY);
   const [error, setError] = useState('');
 
   // Password strength calculator
@@ -66,6 +69,7 @@ export default function Signup() {
       email,
       password,
       businessType,
+      primaryCurrency,
     });
   };
 
@@ -196,6 +200,20 @@ export default function Signup() {
                 )}
                 <p className="text-xs text-muted-foreground">
                   Must be at least 8 characters long
+                </p>
+              </div>
+
+              {/* Primary Currency Selection */}
+              <div className="space-y-2">
+                <CurrencySelector
+                  selectedCurrency={primaryCurrency}
+                  onSelect={setPrimaryCurrency}
+                  label="Moneda Principal"
+                  placeholder="Seleccionar moneda"
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  Esta será la moneda base para toda tu plataforma
                 </p>
               </div>
 
