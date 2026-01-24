@@ -720,13 +720,31 @@ export const appRouter = router({
           }
         }
 
-        await db.createClient({
-          ...input,
-          next_payment_date: input.next_payment_date ? new Date(input.next_payment_date) : new Date(),
+        // Prepare client data
+        const clientData: any = {
+          name: input.name,
+          email: input.email,
+          phone: input.phone || "",
+          company: input.company,
+          has_recurring_billing: input.has_recurring_billing,
+          status: input.status,
+          archived: input.archived,
+          notes: input.notes,
           user_id: ctx.user.id,
           created_at: new Date(),
           updated_at: new Date(),
-        });
+        };
+
+        // Only add billing fields if client is recurring
+        if (input.has_recurring_billing) {
+          clientData.billing_cycle = input.billing_cycle || "monthly";
+          clientData.custom_cycle_days = input.custom_cycle_days;
+          clientData.amount = input.amount || "0";
+          clientData.next_payment_date = input.next_payment_date ? new Date(input.next_payment_date) : new Date();
+          clientData.reminder_days = input.reminder_days;
+        }
+
+        await db.createClient(clientData);
         return { success: true };
       }),
     

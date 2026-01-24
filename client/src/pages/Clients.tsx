@@ -411,6 +411,26 @@ export default function Clients() {
                 <div className="space-y-4">
                   <h3 className="text-white font-semibold text-sm uppercase tracking-wide text-gray-400 border-b border-white/10 pb-2">Facturación</h3>
                   
+                  {/* Toggle Cliente Recurrente */}
+                  <div className="flex items-center justify-between p-4 bg-[#2A2A2A] rounded-lg border border-white/10">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="has_recurring_billing" className="text-white font-medium text-sm cursor-pointer">
+                        Cliente Recurrente
+                      </Label>
+                      <p className="text-xs text-gray-400">
+                        Activa si el cliente tiene pagos periódicos (mensual, trimestral, etc.)
+                      </p>
+                    </div>
+                    <Switch
+                      id="has_recurring_billing"
+                      checked={formData.has_recurring_billing}
+                      onCheckedChange={(checked) => setFormData({ ...formData, has_recurring_billing: checked })}
+                      className="data-[state=checked]:bg-[#FF9500]"
+                    />
+                  </div>
+
+                  {formData.has_recurring_billing && (
+                  <>
                   <div className="space-y-2">
                     <Label htmlFor="billing_cycle" className="text-white font-medium text-sm">{t.clients.billingCycle}</Label>
                     <Select
@@ -481,6 +501,8 @@ export default function Clients() {
                     />
                     <p className="text-xs text-gray-400">Días antes del vencimiento para enviar recordatorio</p>
                   </div>
+                  </>
+                  )}
                 </div>
 
                 {/* Notas Adicionales */}
