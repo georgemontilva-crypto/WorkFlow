@@ -470,15 +470,43 @@ export const appRouter = router({
         try {
           const { nanoid } = await import('nanoid');
           const { sendEmail, getPasswordResetEmailTemplate } = await import('./_core/email');
+          const redis = await getRedisClient();
           
           // Get user by email
           const user = await db.getUserByEmail(input.email);
           
           // Always return success to prevent email enumeration
           if (!user) {
-            return { success: true, message: "If the email exists, a reset link has been sent" };
+            return { success: true, message: "If the email exists, a reset link has been sent", requires2FA: false };
           }
           
+          // Check if user has 2FA enabled
+          if (user.two_factor_enabled === 1) {
+            // Store temporary token in Redis for 2FA verification
+            const tempToken = nanoid(32);
+            await redis.setex(
+              `password_reset_2fa:${tempToken}`,
+              300, // 5 minutes
+              JSON.stringify({
+                userId: user.id,
+                email: user.email,
+                timestamp: Date.now(),
+                attempts: 0
+              })
+            );
+            
+            // Log security event
+            console.log(`[Security] Password reset requested for user ${user.id} with 2FA enabled`);
+            
+            return {
+              success: true,
+              message: "If your account has additional security enabled, you will need to verify it to continue",
+              requires2FA: true,
+              tempToken
+            };
+          }
+          
+          // User does not have 2FA - proceed with normal flow
           // Generate secure token
           const token = nanoid(64);
           
@@ -502,11 +530,103 @@ export const appRouter = router({
             // Still return success to prevent email enumeration
           }
           
-          return { success: true, message: "If the email exists, a reset link has been sent" };
+          // Log security event
+          console.log(`[Security] Password reset email sent to user ${user.id}`);
+          
+          return { success: true, message: "If the email exists, a reset link has been sent", requires2FA: false };
         } catch (error: any) {
           console.error("[Auth] Password reset request failed:", error);
           console.error("[Auth] Error details:", error.stack);
-          return { success: true, message: "If the email exists, a reset link has been sent" };
+          return { success: true, message: "If the email exists, a reset link has been sent", requires2FA: false };
+        }
+      }),
+
+    verifyPasswordReset2FA: publicProcedure
+      .input(z.object({
+        tempToken: z.string(),
+        code: z.string().length(6, "2FA code must be 6 digits"),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const { nanoid } = await import('nanoid');
+          const { sendEmail, getPasswordResetEmailTemplate } = await import('./_core/email');
+          const redis = await getRedisClient();
+          const speakeasy = await import('speakeasy');
+          
+          // Get temp token from Redis
+          const tempData = await redis.get(`password_reset_2fa:${input.tempToken}`);
+          
+          if (!tempData) {
+            return { success: false, message: "Invalid or expired verification token" };
+          }
+          
+          const data = JSON.parse(tempData);
+          
+          // Check attempts
+          if (data.attempts >= 3) {
+            await redis.del(`password_reset_2fa:${input.tempToken}`);
+            console.log(`[Security] Password reset 2FA max attempts reached for user ${data.userId}`);
+            return { success: false, message: "Too many failed attempts. Please try again." };
+          }
+          
+          // Get user
+          const user = await db.getUserById(data.userId);
+          
+          if (!user || !user.two_factor_secret) {
+            return { success: false, message: "Invalid verification" };
+          }
+          
+          // Verify 2FA code
+          const verified = speakeasy.default.totp.verify({
+            secret: user.two_factor_secret,
+            encoding: 'base32',
+            token: input.code,
+            window: 1
+          });
+          
+          if (!verified) {
+            // Increment attempts
+            data.attempts += 1;
+            await redis.setex(
+              `password_reset_2fa:${input.tempToken}`,
+              300,
+              JSON.stringify(data)
+            );
+            
+            console.log(`[Security] Password reset 2FA failed for user ${data.userId} (attempt ${data.attempts})`);
+            return { success: false, message: "Invalid 2FA code" };
+          }
+          
+          // 2FA verified - generate password reset token
+          const token = nanoid(64);
+          await db.createPasswordResetToken(user.id, token);
+          
+          // Create reset link
+          const resetLink = `${process.env.APP_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
+          
+          // Send email
+          const emailHtml = getPasswordResetEmailTemplate(user.name, resetLink);
+          
+          const emailSent = await sendEmail({
+            to: user.email,
+            subject: "Recuperación de Contraseña - Finwrk",
+            html: emailHtml,
+          });
+          
+          if (!emailSent) {
+            console.error('[Auth] Failed to send password reset email');
+          }
+          
+          // Delete temp token
+          await redis.del(`password_reset_2fa:${input.tempToken}`);
+          
+          // Log security event
+          console.log(`[Security] Password reset 2FA verified for user ${user.id}, email sent`);
+          
+          return { success: true, message: "Verification successful. Check your email for the reset link." };
+        } catch (error: any) {
+          console.error("[Auth] Password reset 2FA verification failed:", error);
+          return { success: false, message: "Verification failed. Please try again." };
         }
       }),
 
