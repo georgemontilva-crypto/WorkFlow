@@ -619,3 +619,157 @@
 .reminder-status-completed {
   @apply bg-muted text-muted-foreground border border-border;
 }
+
+
+/* ================================================
+   TOAST NOTIFICATIONS - MOBILE RESPONSIVE
+   ================================================ */
+
+/* Toast container base styles */
+[data-sonner-toaster] {
+  /* Position at bottom with safe area support */
+  bottom: env(safe-area-inset-bottom, 0px) !important;
+}
+
+/* Toast item base styles */
+[data-sonner-toast] {
+  /* Border radius matching Finwrk cards */
+  border-radius: var(--radius-card) !important;
+  
+  /* Padding for better readability */
+  padding: 14px 16px !important;
+  
+  /* Typography */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  font-size: var(--font-size-sm) !important;
+  line-height: var(--line-height-normal) !important;
+  
+  /* Ensure text wraps properly */
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: normal !important;
+  
+  /* Shadow matching Finwrk design */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Toast title */
+[data-sonner-toast] [data-title] {
+  font-weight: var(--font-weight-semibold) !important;
+  font-size: var(--font-size-sm) !important;
+  line-height: var(--line-height-snug) !important;
+}
+
+/* Toast description */
+[data-sonner-toast] [data-description] {
+  font-size: var(--font-size-xs) !important;
+  line-height: var(--line-height-normal) !important;
+  margin-top: 4px !important;
+  opacity: 0.9 !important;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 640px) {
+  /* Toast container positioning */
+  [data-sonner-toaster] {
+    /* Center horizontally with margins */
+    left: 16px !important;
+    right: 16px !important;
+    width: auto !important;
+    
+    /* Bottom positioning with safe area */
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px) !important;
+  }
+  
+  /* Toast item width */
+  [data-sonner-toast] {
+    /* Full width minus margins */
+    width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
+    min-width: calc(100vw - 32px) !important;
+    
+    /* Ensure proper height */
+    min-height: 56px !important;
+    height: auto !important;
+    
+    /* Padding for mobile */
+    padding: 12px 14px !important;
+  }
+  
+  /* Toast content */
+  [data-sonner-toast] [data-content] {
+    width: 100% !important;
+    flex: 1 !important;
+  }
+  
+  /* Toast icon */
+  [data-sonner-toast] [data-icon] {
+    flex-shrink: 0 !important;
+    margin-right: 12px !important;
+  }
+  
+  /* Toast close button */
+  [data-sonner-toast] [data-close-button] {
+    flex-shrink: 0 !important;
+    margin-left: 8px !important;
+  }
+}
+
+/* Desktop styles - maintain current behavior */
+@media (min-width: 641px) {
+  [data-sonner-toaster] {
+    /* Default positioning for desktop */
+    right: 16px !important;
+    bottom: 16px !important;
+    left: auto !important;
+    width: auto !important;
+  }
+  
+  [data-sonner-toast] {
+    /* Desktop width */
+    min-width: 356px !important;
+    max-width: 420px !important;
+    width: auto !important;
+  }
+}
+
+/* Toast variants - maintain Finwrk color scheme */
+[data-sonner-toast][data-type="success"] {
+  background: var(--card) !important;
+  border: 1px solid #2ECC71 !important;
+  color: var(--card-foreground) !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+  background: var(--card) !important;
+  border: 1px solid var(--destructive) !important;
+  color: var(--card-foreground) !important;
+}
+
+[data-sonner-toast][data-type="warning"] {
+  background: var(--card) !important;
+  border: 1px solid #FFA500 !important;
+  color: var(--card-foreground) !important;
+}
+
+[data-sonner-toast][data-type="info"] {
+  background: var(--card) !important;
+  border: 1px solid var(--primary) !important;
+  color: var(--card-foreground) !important;
+}
+
+/* Toast animation - smooth appearance */
+[data-sonner-toast] {
+  animation: slideUp 0.3s ease-out !important;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
