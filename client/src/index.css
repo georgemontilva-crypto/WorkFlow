@@ -46,10 +46,28 @@
   --spacing-xl: 2rem;      /* 32px */
   --spacing-2xl: 3rem;     /* 48px */
   
+  /* Mobile-First Spacing */
+  --mobile-padding-h: 1rem;      /* 16px - Horizontal padding base */
+  --mobile-padding-v: 0.75rem;   /* 12px - Vertical padding base */
+  --mobile-gap-sm: 0.75rem;      /* 12px - Small gap */
+  --mobile-gap-md: 1rem;         /* 16px - Medium gap */
+  --mobile-gap-lg: 1.25rem;      /* 20px - Large gap */
+  
+  /* Touch Targets */
+  --touch-target-min: 2.75rem;   /* 44px - Minimum touch target size */
+  --input-height-mobile: 2.75rem; /* 44px - Mobile input height */
+  --button-height-mobile: 2.75rem; /* 44px - Mobile button height */
+  
   /* Shadows - Sutiles */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  
+  /* Breakpoints (for reference in JS) */
+  --breakpoint-sm: 640px;   /* Mobile */
+  --breakpoint-md: 768px;   /* Tablet */
+  --breakpoint-lg: 1024px;  /* Desktop */
+  --breakpoint-xl: 1280px;  /* Large Desktop */
   
   /* Tailwind compatibility */
   --radius-sm: var(--radius-input);
@@ -335,6 +353,141 @@
   .transition-smooth {
     @apply transition-all duration-300 ease-out;
   }
+  
+  /* ================================================
+     MOBILE-FIRST UTILITIES
+     ================================================ */
+  
+  /* Mobile padding */
+  .mobile-padding {
+    padding: var(--mobile-padding-v) var(--mobile-padding-h);
+  }
+  
+  .mobile-padding-h {
+    padding-left: var(--mobile-padding-h);
+    padding-right: var(--mobile-padding-h);
+  }
+  
+  .mobile-padding-v {
+    padding-top: var(--mobile-padding-v);
+    padding-bottom: var(--mobile-padding-v);
+  }
+  
+  /* Mobile gaps */
+  .mobile-gap-sm {
+    gap: var(--mobile-gap-sm);
+  }
+  
+  .mobile-gap-md {
+    gap: var(--mobile-gap-md);
+  }
+  
+  .mobile-gap-lg {
+    gap: var(--mobile-gap-lg);
+  }
+  
+  /* Touch targets */
+  .touch-target {
+    min-height: var(--touch-target-min);
+    min-width: var(--touch-target-min);
+  }
+  
+  /* Mobile-first responsive text */
+  .text-mobile-sm {
+    font-size: var(--font-size-xs);
+  }
+  
+  @media (min-width: 640px) {
+    .text-mobile-sm {
+      font-size: var(--font-size-sm);
+    }
+  }
+  
+  .text-mobile-base {
+    font-size: var(--font-size-sm);
+  }
+  
+  @media (min-width: 640px) {
+    .text-mobile-base {
+      font-size: var(--font-size-base);
+    }
+  }
+  
+  /* Mobile-first container */
+  .mobile-container {
+    width: 100%;
+    padding-left: var(--mobile-padding-h);
+    padding-right: var(--mobile-padding-h);
+  }
+  
+  @media (min-width: 640px) {
+    .mobile-container {
+      padding-left: var(--spacing-lg);
+      padding-right: var(--spacing-lg);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .mobile-container {
+      padding-left: var(--spacing-xl);
+      padding-right: var(--spacing-xl);
+      max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+  
+  /* Mobile-first grid */
+  .mobile-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--mobile-gap-md);
+  }
+  
+  @media (min-width: 768px) {
+    .mobile-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .mobile-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  /* Hide on mobile */
+  .hide-mobile {
+    display: none;
+  }
+  
+  @media (min-width: 640px) {
+    .hide-mobile {
+      display: block;
+    }
+  }
+  
+  /* Show only on mobile */
+  .show-mobile {
+    display: block;
+  }
+  
+  @media (min-width: 640px) {
+    .show-mobile {
+      display: none;
+    }
+  }
+  
+  /* Full width on mobile */
+  .mobile-full {
+    width: 100%;
+  }
+  
+  @media (min-width: 640px) {
+    .mobile-full {
+      width: auto;
+    }
+  }
 }
 
 
@@ -364,12 +517,12 @@
 
 /* Dashboard Stat Cards */
 .dashboard-stat-card {
-  @apply bg-card border border-border rounded-lg p-6 transition-all duration-200;
+  @apply bg-card border border-border rounded-lg p-4 sm:p-6 transition-all duration-200;
   @apply hover:border-primary/30;
 }
 
 .dashboard-stat-number {
-  @apply text-3xl font-bold text-foreground mb-2;
+  @apply text-2xl sm:text-3xl font-bold text-foreground mb-2;
 }
 
 .dashboard-stat-change {
