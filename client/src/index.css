@@ -240,10 +240,7 @@
     @apply cursor-pointer;
   }
   
-  /* Bordes consistentes - 1px */
-  * {
-    border-width: var(--border-width);
-  }
+  /* Bordes solo en elementos interactivos - aplicados específicamente en cada componente */
 }
 
 /* ================================================
