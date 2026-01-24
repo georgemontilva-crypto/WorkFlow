@@ -320,7 +320,7 @@ export default function Clients() {
                 {t.clients.newClient}
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-[#1C1C1C] border-white/10 max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="bg-[#1C1C1C] border-white/10 max-w-3xl max-h-[90vh] flex flex-col">
               <DialogHeader className="pb-4">
                 <DialogTitle className="text-white text-xl sm:text-2xl">
                   {editingClient ? t.clients.editClient : t.clients.addClient}
@@ -329,7 +329,8 @@ export default function Clients() {
                   {editingClient ? t.clients.updateClientInfo : t.clients.completeClientInfo}
                 </DialogDescription>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+                <div className="flex-1 overflow-y-auto space-y-5 pr-2">
                 {/* Información Básica */}
                 <div className="space-y-4">
                   <h3 className="text-white font-semibold text-sm uppercase tracking-wide text-gray-400 border-b border-white/10 pb-2">Información Básica</h3>
@@ -497,8 +498,9 @@ export default function Clients() {
                     />
                   </div>
                 </div>
+                </div>
 
-                <div className="flex gap-3 pt-6 border-t border-white/10">
+                <div className="flex gap-3 pt-6 border-t border-white/10 mt-4 flex-shrink-0">
                   <Button
                     type="button"
                     variant="outline"
