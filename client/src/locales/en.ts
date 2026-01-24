@@ -32,9 +32,9 @@ export const en = {
 
   // Welcome Dialog
   welcome: {
-    title: 'Welcome to HiWork!',
-    subtitle: 'We\'re excited to have you here. Your 7-day trial period has started.',
-    trialInfo: '🎉 You have 7 days of full access for free',
+    title: 'Welcome to Finwrk!',
+    subtitle: 'We\'re excited to have you here. Start managing your finances professionally.',
+    planInfo: 'You\'re using the Free Plan',
     featuresTitle: 'What you can do:',
     feature1: 'Manage your clients and payments',
     feature2: 'Create professional invoices',
@@ -42,17 +42,7 @@ export const en = {
     feature4: 'Set savings goals',
     feature5: 'Receive automatic reminders',
     startButton: 'Get Started!',
-    footerNote: 'You can access all features during your trial period',
-  },
-
-  // Trial Banner
-  trial: {
-    lastDay: 'Last day of trial',
-    oneDayLeft: '1 day of trial left',
-    daysLeft: '{days} days of trial left',
-    description: 'Enjoy all features during your trial period',
-    day: 'day',
-    days: 'days',
+    footerNote: 'You can upgrade to Pro anytime to unlock unlimited features',
   },
 
   // Navigation
@@ -348,19 +338,18 @@ export const en = {
   },
 
   // Access Blocker
-  accessBlocker: {
-    lastDay: 'Last day of trial!',
-    daysRemaining: '{days} days remaining',
-    trialEnding: 'Your trial period is ending soon. Get lifetime access now.',
-    getLifetime: 'Get Lifetime Access',
-    expired: 'Your Trial Has Expired',
-    expiredMessage: 'To continue using HiWork, get lifetime access with a single payment of $49 USD',
+  planUpgrade: {
+    freePlan: 'Free Plan',
+    proPlan: 'Pro Plan',
+    businessPlan: 'Business Plan',
+    upgradeMessage: 'Upgrade your plan to unlock this feature',
+    getProAccess: 'Upgrade to Pro',
     includes: 'Includes:',
-    benefit1: 'Unlimited lifetime access',
-    benefit2: 'All future updates',
-    benefit3: 'Priority technical support',
-    benefit4: 'No monthly subscriptions',
-    ctaButton: 'Get Lifetime Access - $49 USD',
+    benefit1: 'Unlimited clients and invoices',
+    benefit2: 'Multi-currency (USD, COP, EUR, USDT)',
+    benefit3: 'Payment links per invoice',
+    benefit4: 'Financial reports and automations',
+    ctaButton: 'Upgrade Plan',
     securePayment: 'Secure payment processed by Stripe',
   },
 
@@ -424,8 +413,8 @@ export const en = {
     usersRegistered: 'Registered users',
     activeUsers: 'Active Users',
     usersWithAccess: 'Users with full access',
-    trialUsers: 'Trial Users',
-    usersInTrial: 'Users in trial period',
+    freeUsers: 'Free Users',
+    usersOnFreePlan: 'Users on free plan',
     searchPlaceholder: 'Search by name or email...',
     filterByRole: 'Filter by Role',
     allRoles: 'All',
@@ -437,10 +426,10 @@ export const en = {
     registered: 'Registered',
     actions: 'Actions',
     fullAccess: 'Full Access',
-    trialAccess: 'Trial Access',
+    freePlan: 'Free Plan',
+    proPlan: 'Pro Plan',
+    businessPlan: 'Business Plan',
     noAccess: 'No access',
-    daysRemaining: '{days} days remaining',
-    expired: 'Expired',
     noUsersFound: 'No users found',
     adjustFilters: 'Try adjusting your search filters',
   },

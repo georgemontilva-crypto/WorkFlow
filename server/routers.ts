@@ -164,8 +164,21 @@ export const appRouter = router({
     }),
     
     accessStatus: protectedProcedure.query(async ({ ctx }) => {
-      const { getUserAccessStatus } = await import("./access");
-      return getUserAccessStatus(ctx.user);
+      const user = await db.getUserById(ctx.user.id);
+      
+      if (!user) {
+        throw new Error('User not found');
+      }
+      
+      // Return access based on subscription plan only
+      return {
+        has_lifetime_access: user.has_lifetime_access === 1,
+        subscription_plan: user.subscription_plan,
+        subscription_status: user.subscription_status,
+        subscription_ends_at: user.subscription_ends_at,
+        trialDaysRemaining: null, // No trial system
+        trialExpired: false,
+      };
     }),
 
     // 2FA endpoints

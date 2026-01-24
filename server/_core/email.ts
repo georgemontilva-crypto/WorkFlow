@@ -78,19 +78,19 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
  * Email Templates
  */
 
-export function getWelcomeEmailTemplate(userName: string, trialEndDate: Date): string {
+export function getWelcomeEmailTemplate(userName: string): string {
   const body = `
     <p style="margin:0 0 16px;">Hola <strong>${userName}</strong>,</p>
     <p style="margin:0 0 16px;">Gracias por registrarte en Finwrk. Tu cuenta ha sido creada exitosamente.</p>
-    <p style="margin:0 0 16px;">Tu período de prueba gratuito termina el <strong>${trialEndDate.toLocaleDateString('es-ES')}</strong>.</p>
-    <p style="margin:0 0 12px;">Durante este tiempo, tendrás acceso completo a todas las funcionalidades:</p>
+    <p style="margin:0 0 16px;">Estás usando el <strong>Plan Free</strong> y tienes acceso a las funcionalidades básicas:</p>
     <ul style="margin:0 0 16px; padding-left:20px; color:#d1d1d6;">
-      <li style="margin-bottom:8px;">Gestión de clientes</li>
-      <li style="margin-bottom:8px;">Creación de facturas profesionales</li>
-      <li style="margin-bottom:8px;">Control de ingresos y gastos</li>
-      <li style="margin-bottom:8px;">Metas de ahorro</li>
-      <li style="margin-bottom:8px;">Soporte técnico</li>
+      <li style="margin-bottom:8px;">Dashboard financiero básico</li>
+      <li style="margin-bottom:8px;">Hasta 3 clientes</li>
+      <li style="margin-bottom:8px;">Máximo 5 facturas</li>
+      <li style="margin-bottom:8px;">Visualización de cripto</li>
+      <li style="margin-bottom:8px;">Seguridad bancaria</li>
     </ul>
+    <p style="margin:0 0 16px;">Puedes actualizar a <strong>Pro</strong> en cualquier momento para desbloquear funciones ilimitadas.</p>
   `;
 
   return getBaseEmailTemplate({

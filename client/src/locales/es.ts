@@ -32,9 +32,9 @@ export const es = {
 
   // Welcome Dialog
   welcome: {
-    title: '¡Bienvenido a HiWork!',
-    subtitle: 'Estamos emocionados de tenerte aquí. Tu período de prueba de 7 días ha comenzado.',
-    trialInfo: '🎉 Tienes 7 días de acceso completo gratis',
+    title: '¡Bienvenido a Finwrk!',
+    subtitle: 'Estamos emocionados de tenerte aquí. Comienza a gestionar tus finanzas de forma profesional.',
+    planInfo: 'Estás usando el Plan Free',
     featuresTitle: 'Lo que puedes hacer:',
     feature1: 'Gestiona tus clientes y pagos',
     feature2: 'Crea facturas profesionales',
@@ -42,17 +42,7 @@ export const es = {
     feature4: 'Establece metas de ahorro',
     feature5: 'Recibe recordatorios automáticos',
     startButton: '¡Comenzar Ahora!',
-    footerNote: 'Puedes acceder a todas las funcionalidades durante tu período de prueba',
-  },
-
-  // Trial Banner
-  trial: {
-    lastDay: 'Último día de prueba',
-    oneDayLeft: 'Queda 1 día de prueba',
-    daysLeft: 'Quedan {days} días de prueba',
-    description: 'Disfruta de todas las funcionalidades durante tu período de prueba',
-    day: 'día',
-    days: 'días',
+    footerNote: 'Puedes actualizar a Pro en cualquier momento para desbloquear funciones ilimitadas',
   },
 
   // Navigation
@@ -347,20 +337,19 @@ export const es = {
     urgentAlert: '¡Facturas Próximas a Vencer!',
   },
 
-  // Access Blocker
-  accessBlocker: {
-    lastDay: '¡Último día de prueba!',
-    daysRemaining: '{days} días restantes',
-    trialEnding: 'Tu período de prueba está por terminar. Obtén acceso lifetime ahora.',
-    getLifetime: 'Obtener Acceso Lifetime',
-    expired: 'Tu Prueba Ha Expirado',
-    expiredMessage: 'Para continuar usando HiWork, obtén acceso lifetime con un solo pago de $49 USD',
+  // Plan Upgrade
+  planUpgrade: {
+    freePlan: 'Plan Free',
+    proPlan: 'Plan Pro',
+    businessPlan: 'Plan Business',
+    upgradeMessage: 'Actualiza tu plan para desbloquear esta función',
+    getProAccess: 'Actualizar a Pro',
     includes: 'Incluye:',
-    benefit1: 'Acceso ilimitado de por vida',
-    benefit2: 'Todas las actualizaciones futuras',
-    benefit3: 'Soporte técnico prioritario',
-    benefit4: 'Sin suscripciones mensuales',
-    ctaButton: 'Obtener Acceso Lifetime - $49 USD',
+    benefit1: 'Clientes y facturas ilimitados',
+    benefit2: 'Multi-moneda (USD, COP, EUR, USDT)',
+    benefit3: 'Links de pago por factura',
+    benefit4: 'Reportes financieros y automatizaciones',
+    ctaButton: 'Actualizar Plan',
     securePayment: 'Pago seguro procesado por Stripe',
   },
 
@@ -424,8 +413,8 @@ export const es = {
     usersRegistered: 'Usuarios registrados',
     activeUsers: 'Usuarios Activos',
     usersWithAccess: 'Usuarios con acceso completo',
-    trialUsers: 'Usuarios en Prueba',
-    usersInTrial: 'Usuarios en período de prueba',
+    freeUsers: 'Usuarios Free',
+    usersOnFreePlan: 'Usuarios en plan gratuito',
     searchPlaceholder: 'Buscar por nombre o email...',
     filterByRole: 'Filtrar por Rol',
     allRoles: 'Todos',
@@ -437,10 +426,10 @@ export const es = {
     registered: 'Registro',
     actions: 'Acciones',
     fullAccess: 'Acceso Completo',
-    trialAccess: 'Acceso de Prueba',
+    freePlan: 'Plan Free',
+    proPlan: 'Plan Pro',
+    businessPlan: 'Plan Business',
     noAccess: 'Sin acceso',
-    daysRemaining: '{days} días restantes',
-    expired: 'Expirado',
     noUsersFound: 'No se encontraron usuarios',
     adjustFilters: 'Intenta ajustar los filtros de búsqueda',
   },

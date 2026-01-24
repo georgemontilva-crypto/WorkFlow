@@ -42,10 +42,6 @@ export async function createUser(data: {
     // Hash password
     const passwordHash = await bcrypt.hash(data.password, 10);
 
-    // Set trial end date (7 days from now)
-    const trialEnd = new Date();
-    trialEnd.setDate(trialEnd.getDate() + 7);
-
     // Insert user
     const result = await db.insert(users).values({
       name: data.name,
@@ -54,7 +50,8 @@ export async function createUser(data: {
       email_verified: 0,
       login_method: "email",
       role: "user",
-      trial_ends_at: trialEnd,
+      subscription_plan: "free",
+      subscription_status: "active",
       has_lifetime_access: 0,
       created_at: new Date(),
       updated_at: new Date(),
@@ -158,7 +155,7 @@ export async function grantLifetimeAccess(user_id: number, stripeCustomerId?: st
 }
 
 /**
- * Check if user has active access (trial or lifetime)
+ * Check if user has active access based on subscription plan
  */
 export async function hasActiveAccess(user_id: number): Promise<boolean> {
   const user = await getUserById(user_id);
@@ -169,10 +166,9 @@ export async function hasActiveAccess(user_id: number): Promise<boolean> {
     return true;
   }
 
-  // Check if trial is still active
-  if (user.trial_ends_at) {
-    const now = new Date();
-    return now < user.trial_ends_at;
+  // Check if subscription is active
+  if (user.subscription_status === 'active') {
+    return true;
   }
 
   return false;
@@ -921,7 +917,8 @@ export async function getAllUsers() {
       name: users.name,
       email: users.email,
       role: users.role,
-      trial_ends_at: users.trial_ends_at,
+      subscription_plan: users.subscription_plan,
+      subscription_status: users.subscription_status,
       has_lifetime_access: users.has_lifetime_access,
       created_at: users.created_at,
 

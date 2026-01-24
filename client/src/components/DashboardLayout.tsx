@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PaymentNotifications } from '@/components/PaymentNotifications';
 import { WelcomeDialog } from '@/components/WelcomeDialog';
-import { AccessBlocker } from './AccessBlocker';
+
 import { AlertCenter } from '@/components/AlertCenter';
 import { AlertToast } from '@/components/AlertToast';
 
@@ -189,13 +189,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      {/* Access Blocker */}
-      {accessStatus && !accessStatus.has_lifetime_access && (
-        <AccessBlocker 
-          trialDaysRemaining={accessStatus.trialDaysRemaining}
-          onUpgrade={handleUpgrade}
-        />
-      )}
+
       {/* Overlay for mobile */}
       {isMobileMenuOpen && (
         <div
@@ -279,22 +273,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </nav>
 
-        {/* Trial Status Indicator */}
-        {accessStatus && !accessStatus.has_lifetime_access && accessStatus.trialDaysRemaining !== null && (
+        {/* Subscription Plan Indicator */}
+        {accessStatus && accessStatus.subscription_plan && (
           <div className="mx-3 mb-4">
             <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 space-y-2">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-primary" />
                 <p className="text-sm font-semibold text-foreground">
-                  {accessStatus.trialDaysRemaining > 0 
-                    ? `Quedan ${accessStatus.trialDaysRemaining} día${accessStatus.trialDaysRemaining !== 1 ? 's' : ''} de prueba`
-                    : 'Período de prueba finalizado'
-                  }
+                  Plan {accessStatus.subscription_plan === 'free' ? 'Free' : accessStatus.subscription_plan === 'pro' ? 'Pro' : 'Business'}
                 </p>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Disfruta de todas las funcionalidades durante tu período de prueba
-              </p>
+              {accessStatus.subscription_plan === 'free' && (
+                <p className="text-xs text-muted-foreground">
+                  Actualiza a Pro para desbloquear funciones ilimitadas
+                </p>
+              )}
             </div>
           </div>
         )}

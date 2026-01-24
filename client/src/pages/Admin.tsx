@@ -81,24 +81,20 @@ export default function Admin() {
     }
   };
 
-  const getAccessBadge = (hasAccess: number, trialEndsAt: Date | null) => {
+  const getAccessBadge = (hasAccess: number, subscriptionPlan: string) => {
     if (hasAccess === 1) {
       return <Badge className="bg-green-500 hover:bg-green-600">✓ Acceso de por vida</Badge>;
     }
     
-    if (trialEndsAt) {
-      const now = new Date();
-      const trialEnd = new Date(trialEndsAt);
-      const daysLeft = Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (daysLeft > 0) {
-        return <Badge className="bg-amber-500 hover:bg-amber-600">⏱ {daysLeft} días de prueba</Badge>;
-      } else {
-        return <Badge variant="destructive">✕ Prueba expirada</Badge>;
-      }
+    switch (subscriptionPlan) {
+      case 'pro':
+        return <Badge className="bg-blue-500 hover:bg-blue-600">Plan Pro</Badge>;
+      case 'business':
+        return <Badge className="bg-purple-500 hover:bg-purple-600">Plan Business</Badge>;
+      case 'free':
+      default:
+        return <Badge variant="secondary">Plan Free</Badge>;
     }
-    
-    return <Badge variant="secondary">Sin acceso</Badge>;
   };
 
   // Show loading while checking authentication
@@ -181,9 +177,9 @@ export default function Admin() {
             </CardHeader>
             <CardContent>
               <div className="text-4xl font-bold text-amber-600">
-                {users?.filter(u => u.has_lifetime_access === 0 && u.trial_ends_at).length || 0}
+                {users?.filter(u => u.has_lifetime_access === 0 && u.subscription_plan === 'free').length || 0}
               </div>
-              <p className="text-xs text-muted-foreground mt-2">Usuarios en período de prueba</p>
+              <p className="text-xs text-muted-foreground mt-2">Usuarios en plan gratuito</p>
             </CardContent>
           </Card>
         </div>
@@ -283,7 +279,7 @@ export default function Admin() {
                       {/* Badges */}
                       <div className="flex flex-wrap gap-2">
                         {getRoleBadge(user.role)}
-                        {getAccessBadge(user.has_lifetime_access, user.trial_ends_at)}
+                        {getAccessBadge(user.has_lifetime_access, user.subscription_plan)}
                       </div>
 
                       {/* Date */}
@@ -353,7 +349,7 @@ export default function Admin() {
                         {getRoleBadge(user.role)}
                       </td>
                       <td className="py-4 px-4">
-                        {getAccessBadge(user.has_lifetime_access, user.trial_ends_at)}
+                        {getAccessBadge(user.has_lifetime_access, user.subscription_plan)}
                       </td>
                       <td className="py-4 px-4 text-sm text-muted-foreground">
                         {format(new Date(user.created_at), 'dd MMM yyyy', { locale: es })}
