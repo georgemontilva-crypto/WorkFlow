@@ -9,8 +9,25 @@ import { get2FAStatusEmailHtml } from './2fa-notification';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM_EMAIL = process.env.EMAIL_FROM || 'noreply@finwrk.app';
 const APP_URL = process.env.APP_URL || 'https://finwrk.app';
+
+/**
+ * Get properly formatted 'from' email address
+ * Handles both formats:
+ * - Simple email: "noreply@finwrk.app" -> "Finwrk <noreply@finwrk.app>"
+ * - Already formatted: "Finwrk <noreply@finwrk.app>" -> "Finwrk <noreply@finwrk.app>"
+ */
+function getFromEmail(): string {
+  const emailFrom = process.env.EMAIL_FROM || 'noreply@finwrk.app';
+  
+  // If EMAIL_FROM already contains '<', it's already formatted
+  if (emailFrom.includes('<')) {
+    return emailFrom;
+  }
+  
+  // Otherwise, format it as "Finwrk <email>"
+  return `Finwrk <${emailFrom}>`;
+}
 
 export async function sendVerificationEmail(
   to: string,
@@ -21,7 +38,7 @@ export async function sendVerificationEmail(
     const verificationUrl = `${APP_URL}/verify-email?token=${token}`;
     
     const { data, error } = await resend.emails.send({
-      from: `Finwrk <${FROM_EMAIL}>`,
+      from: getFromEmail(),
       to: [to],
       subject: 'Welcome to Finwrk - Verify your email',
       html: getVerificationEmailHtml(verificationUrl, userName),
@@ -49,7 +66,7 @@ export async function sendPasswordChangedEmail(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const { data, error } = await resend.emails.send({
-      from: `Finwrk <${FROM_EMAIL}>`,
+      from: getFromEmail(),
       to: [to],
       subject: 'Password Changed - Finwrk',
       html: getPasswordChangedEmailHtml(userName),
@@ -78,7 +95,7 @@ export async function send2FAStatusEmail(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const { data, error } = await resend.emails.send({
-      from: `Finwrk <${FROM_EMAIL}>`,
+      from: getFromEmail(),
       to: [to],
       subject: `2FA ${action === 'enabled' ? 'Enabled' : 'Disabled'} - Finwrk`,
       html: get2FAStatusEmailHtml(userName, action),
