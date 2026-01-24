@@ -627,12 +627,22 @@
 
 /* Toast container base styles */
 [data-sonner-toaster] {
+  /* High z-index to ensure toasts are always on top */
+  z-index: 9999 !important;
+  
   /* Position at bottom with safe area support */
   bottom: env(safe-area-inset-bottom, 0px) !important;
+  
+  /* Ensure it's positioned */
+  position: fixed !important;
 }
 
 /* Toast item base styles */
 [data-sonner-toast] {
+  /* Ensure toast is visible above all content */
+  z-index: 10000 !important;
+  position: relative !important;
+  
   /* Border radius matching Finwrk cards */
   border-radius: var(--radius-card) !important;
   
@@ -672,21 +682,26 @@
 @media (max-width: 640px) {
   /* Toast container positioning */
   [data-sonner-toaster] {
-    /* Center horizontally with margins */
-    left: 16px !important;
-    right: 16px !important;
-    width: auto !important;
+    /* Center horizontally */
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
     
-    /* Bottom positioning with safe area */
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px) !important;
+    /* Bottom positioning with safe area and extra spacing */
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 80px) !important;
+    
+    /* Ensure high z-index */
+    z-index: 9999 !important;
   }
   
   /* Toast item width */
   [data-sonner-toast] {
-    /* Full width minus margins */
-    width: calc(100vw - 32px) !important;
-    max-width: calc(100vw - 32px) !important;
-    min-width: calc(100vw - 32px) !important;
+    /* Full width */
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
     
     /* Ensure proper height */
     min-height: 56px !important;
