@@ -26,7 +26,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
           color: "var(--card-foreground)",
           border: "1px solid var(--border)",
           borderRadius: "var(--radius-card)",
+          width: "100%",
+          maxWidth: "calc(100vw - 32px)",
+          minWidth: "320px",
         },
+        className: "toast-item",
       }}
       {...props}
     />

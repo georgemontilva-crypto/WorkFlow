@@ -850,7 +850,9 @@
   }
   
   /* Toast item width */
-  [data-sonner-toast] {
+  [data-sonner-toast],
+  [data-sonner-toast] > *,
+  .toast-item {
     /* Full width */
     width: 100% !important;
     max-width: 100% !important;
@@ -862,6 +864,14 @@
     
     /* Padding for mobile */
     padding: 12px 14px !important;
+    
+    /* Box sizing */
+    box-sizing: border-box !important;
+    
+    /* Display */
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
   }
   
   /* Toast content */
@@ -893,11 +903,17 @@
     width: auto !important;
   }
   
-  [data-sonner-toast] {
+  [data-sonner-toast],
+  [data-sonner-toast] > *,
+  .toast-item {
     /* Desktop width */
     min-width: 356px !important;
     max-width: 420px !important;
-    width: auto !important;
+    width: 400px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
   }
 }
 
