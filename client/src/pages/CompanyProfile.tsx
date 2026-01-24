@@ -188,17 +188,11 @@ export default function CompanyProfile() {
     <DashboardLayout>
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Perfil Empresarial</h1>
-            <p className="text-muted-foreground mt-1">
-              Configura tu identidad y perfil financiero para personalizar tu experiencia
-            </p>
-          </div>
-          <Button onClick={handleSave} disabled={upsertMutation.isPending}>
-            <Save className="w-4 h-4 mr-2" />
-            {upsertMutation.isPending ? 'Guardando...' : 'Guardar Cambios'}
-          </Button>
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Perfil Empresarial</h1>
+          <p className="text-muted-foreground mt-1">
+            Configura tu identidad y perfil financiero para personalizar tu experiencia
+          </p>
         </div>
 
         {/* Progress Indicator */}
