@@ -58,7 +58,7 @@ export default function VerifyEmail() {
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center px-4 pt-24 pb-12" style={{ paddingTop: 'calc(6rem + env(safe-area-inset-top))' }}>
         <div className="w-full max-w-md">
-          <div className="bg-card border border-border rounded-2xl p-8 shadow-sm text-center">
+          <div className="bg-card border border-border rounded-lg p-8 shadow-sm text-center">
             {status === 'verifying' && (
               <>
                 <div className="inline-flex items-center justify-center w-16 h-16 mb-6 bg-primary/10 rounded-full">

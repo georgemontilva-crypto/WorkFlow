@@ -309,7 +309,7 @@ export default function Markets() {
     const favorite = isFavorite(asset.symbol);
 
     return (
-      <div className="flex items-center justify-between p-2 border rounded-xl bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-200 shadow-sm gap-2">
+      <div className="flex items-center justify-between p-2 border rounded-lg bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-200 shadow-sm gap-2">
         {/* Left: Symbol & Name */}
         <div className="flex items-center gap-3 text-left min-w-0 flex-1">
           <div className="flex flex-col min-w-0">

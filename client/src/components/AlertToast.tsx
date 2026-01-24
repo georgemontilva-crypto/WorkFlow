@@ -227,7 +227,7 @@ export function AlertToast() {
     >
       <div 
         className={`
-          bg-[#1a1a1a] ${styles.borderColor} border rounded-2xl shadow-2xl 
+          bg-[#1a1a1a] ${styles.borderColor} border rounded-lg shadow-2xl 
           max-w-sm w-full sm:w-96 p-4
           backdrop-blur-sm
         `}

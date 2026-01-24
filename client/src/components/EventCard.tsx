@@ -44,7 +44,7 @@ export default function EventCard({
 
   return (
     <div 
-      className="relative overflow-hidden rounded-xl bg-card border border-border transition-all duration-200 hover:border-primary/30"
+      className="relative overflow-hidden rounded-lg bg-card border border-border transition-all duration-200 hover:border-primary/30"
       style={{ borderLeftWidth: '4px', borderLeftColor: borderColors[category] }}
     >
       {/* Content */}
@@ -66,7 +66,7 @@ export default function EventCard({
             <p>{date}</p>
             <p>{attendees} asistentes</p>
           </div>
-          <span className={`text-xs font-medium px-3 py-1 rounded-full ${badgeStyles[category]}`}>
+          <span className={`text-xs font-medium px-3 py-1 rounded-md ${badgeStyles[category]}`}>
             {categoryNames[category]}
           </span>
         </div>

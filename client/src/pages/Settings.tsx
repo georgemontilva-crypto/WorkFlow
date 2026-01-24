@@ -296,7 +296,7 @@ export default function Settings() {
                 <div className="space-y-3">
                   {!show2FADisable ? (
                     <>
-                      <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/30 rounded-xl">
+                      <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
                         <span className="text-sm font-medium text-foreground">2FA Enabled</span>
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       </div>
@@ -311,7 +311,7 @@ export default function Settings() {
                     </>
                   ) : (
                     <div className="space-y-3">
-                      <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+                      <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
                         <div className="flex items-start gap-2 mb-3">
                           <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                           <div>
@@ -374,11 +374,11 @@ export default function Settings() {
               ) : show2FASetup ? (
                 <div className="space-y-4">
                   {qrCodeUrl && (
-                    <div className="flex justify-center p-6 bg-card border border-border rounded-xl">
+                    <div className="flex justify-center p-6 bg-card border border-border rounded-lg">
                       <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48" />
                     </div>
                   )}
-                  <div className="p-3 bg-muted/50 border border-border rounded-xl">
+                  <div className="p-3 bg-muted/50 border border-border rounded-lg">
                     <p className="text-xs text-muted-foreground text-center">
                       Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)
                     </p>

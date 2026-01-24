@@ -75,9 +75,9 @@ export default function VerificationPending() {
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center px-4 pt-24 pb-12" style={{ paddingTop: 'calc(6rem + env(safe-area-inset-top))' }}>
         <div className="w-full max-w-md">
-          <div className="bg-card border border-border rounded-2xl p-8 shadow-sm text-center">
+          <div className="bg-card border border-border rounded-lg p-8 shadow-sm text-center">
             {/* Icon */}
-            <div className="inline-flex items-center justify-center w-20 h-20 mb-6 bg-primary/10 rounded-2xl border border-primary/20">
+            <div className="inline-flex items-center justify-center w-20 h-20 mb-6 bg-primary/10 rounded-lg border border-primary/20">
               <Mail className="w-10 h-10 text-primary" />
             </div>
 
@@ -100,7 +100,7 @@ export default function VerificationPending() {
 
             {/* Success message */}
             {resendSuccess && (
-              <div className="flex items-center justify-center gap-2 mb-6 p-3 bg-green-500/10 border border-green-500/20 rounded-xl">
+              <div className="flex items-center justify-center gap-2 mb-6 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
                 <CheckCircle2 className="w-4 h-4 text-green-500" />
                 <span className="text-sm text-green-500">Verification email sent!</span>
               </div>

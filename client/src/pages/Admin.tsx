@@ -120,7 +120,7 @@ export default function Admin() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-3 bg-primary/10 rounded-xl">
+            <div className="p-3 bg-primary/10 rounded-lg">
               <Shield className="w-8 h-8 text-primary" />
             </div>
             <div>

@@ -104,7 +104,7 @@ export function PaymentReceivedNotificationProvider({ children }: { children: Re
           style={{ maxWidth: '420px', width: 'calc(100vw - 2rem)' }}
         >
           <Card 
-            className="bg-[#1A1A1A] border border-border rounded-2xl"
+            className="bg-[#1A1A1A] border border-border rounded-lg"
           >
             <CardContent className="p-4">
               <div className="flex items-start gap-3">

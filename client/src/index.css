@@ -4,10 +4,16 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* Finwrk Border Radius Standard */
+  --radius-input: 0.375rem;  /* 6px - Inputs, buttons, dropdowns */
+  --radius-card: 0.5rem;     /* 8px - Cards, containers */
+  --radius-modal: 0.625rem;  /* 10px - Modals, popups */
+  
+  /* Tailwind compatibility */
+  --radius-sm: var(--radius-input);
+  --radius-md: var(--radius-card);
+  --radius-lg: var(--radius-modal);
+  --radius-xl: var(--radius-modal);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -63,8 +69,10 @@
   --accent-blue: #3498DB;
   --accent-purple: #9B59B6;
   
-  /* Border radius */
-  --radius: 0.75rem;
+  /* Border radius - Finwrk Standard */
+  --radius: 0.5rem; /* 8px - Default for cards */
+  --radius-input: 0.375rem; /* 6px - Inputs/buttons */
+  --radius-modal: 0.625rem; /* 10px - Modals */
   
   /* Backgrounds */
   --background: #0A0A0A;
@@ -260,7 +268,7 @@
 
 /* Sidebar Navigation Items */
 .sidebar-item {
-  @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer;
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer;
   @apply text-muted-foreground hover:text-foreground;
   @apply border border-transparent;
   @apply hover:border-border hover:bg-transparent;
@@ -278,7 +286,7 @@
 
 /* Dashboard Stat Cards */
 .dashboard-stat-card {
-  @apply bg-card border border-border rounded-xl p-6 transition-all duration-200;
+  @apply bg-card border border-border rounded-lg p-6 transition-all duration-200;
   @apply hover:border-primary/30;
 }
 
@@ -301,7 +309,7 @@
 
 /* Dashboard Chart Cards */
 .dashboard-chart-card {
-  @apply bg-card border border-border rounded-xl p-6 transition-all duration-200;
+  @apply bg-card border border-border rounded-lg p-6 transition-all duration-200;
   @apply hover:border-primary/30;
 }
 
@@ -338,17 +346,17 @@
 
 /* Savings Goal Cards */
 .savings-goal-card {
-  @apply bg-card border border-border rounded-xl p-6 transition-all duration-200;
+  @apply bg-card border border-border rounded-lg p-6 transition-all duration-200;
   @apply hover:border-primary/30;
 }
 
 /* Progress Container */
 .progress-container {
-  @apply w-full h-2 bg-secondary rounded-full overflow-hidden;
+  @apply w-full h-2 bg-secondary rounded-md overflow-hidden;
 }
 
 .progress-bar-orange {
-  @apply h-full bg-primary transition-all duration-300 rounded-full;
+  @apply h-full bg-primary transition-all duration-300 rounded-md;
 }
 
 /* Amount Missing */
@@ -359,7 +367,7 @@
 
 /* Crypto Cards */
 .crypto-card {
-  @apply relative bg-card border border-border rounded-xl p-6 transition-all duration-200;
+  @apply relative bg-card border border-border rounded-lg p-6 transition-all duration-200;
   @apply hover:border-primary/30;
 }
 
@@ -457,7 +465,7 @@
 
 /* Resume Card */
 .resume-card {
-  @apply bg-card border border-border rounded-xl p-6 transition-all duration-200;
+  @apply bg-card border border-border rounded-lg p-6 transition-all duration-200;
   @apply hover:border-primary/30;
 }
 
@@ -466,7 +474,7 @@
 
 /* Reminder Summary Cards - Full color backgrounds */
 .reminder-summary-card {
-  @apply relative rounded-xl p-6 transition-all duration-200;
+  @apply relative rounded-lg p-6 transition-all duration-200;
   min-width: 280px;
   flex-shrink: 0;
   scroll-snap-align: start;
@@ -496,7 +504,7 @@
 
 /* Reminder Icon Circle */
 .reminder-icon-circle {
-  @apply w-12 h-12 rounded-full flex items-center justify-center;
+  @apply w-12 h-12 rounded-md flex items-center justify-center;
 }
 
 .reminder-icon-circle.overdue {
@@ -513,7 +521,7 @@
 
 /* Reminder List Item - Card style with left border */
 .reminder-list-item {
-  @apply relative overflow-hidden rounded-xl bg-card border border-border/50 p-5;
+  @apply relative overflow-hidden rounded-lg bg-card border border-border/50 p-5;
   @apply transition-all duration-200 hover:border-primary/30;
   border-left-width: 4px;
   border-left-color: #9B59B6;
@@ -533,7 +541,7 @@
 
 /* Reminder Badges */
 .reminder-badge {
-  @apply text-xs font-medium px-2 py-1 rounded-full;
+  @apply text-xs font-medium px-2 py-1 rounded-md;
 }
 
 .reminder-badge.vencido {
@@ -563,7 +571,7 @@
 }
 
 .alert-icon {
-  @apply w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0;
+  @apply w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0;
   background: rgba(239, 68, 68, 0.2);
 }
 

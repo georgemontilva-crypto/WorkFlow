@@ -113,7 +113,7 @@ export function AlertAIAnalysis({ alertId, alertType, onActionClick }: AlertAIAn
   // Loading state
   if (analyzeMutation.isPending) {
     return (
-      <div className="mt-3 p-4 rounded-xl border-2 border-dashed border-border bg-[#141414]">
+      <div className="mt-3 p-4 rounded-lg border-2 border-dashed border-border bg-[#141414]">
         <div className="flex items-center justify-center gap-3 py-4">
           <Loader2 className="w-5 h-5 animate-spin text-primary" />
           <span className="text-sm text-muted-foreground">Analizando contexto...</span>
@@ -125,7 +125,7 @@ export function AlertAIAnalysis({ alertId, alertType, onActionClick }: AlertAIAn
   // Error state
   if (analyzeMutation.isError) {
     return (
-      <div className="mt-3 p-4 rounded-xl border-2 border-red-500/30 bg-red-500/5">
+      <div className="mt-3 p-4 rounded-lg border-2 border-red-500/30 bg-red-500/5">
         <div className="flex items-start gap-3">
           <XCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
           <div>
@@ -150,7 +150,7 @@ export function AlertAIAnalysis({ alertId, alertType, onActionClick }: AlertAIAn
   
   return (
     <div className={`
-      mt-3 rounded-xl border-2 overflow-hidden
+      mt-3 rounded-lg border-2 overflow-hidden
       ${alertType === 'critical' ? 'border-red-500/30' : 'border-yellow-500/30'}
       bg-[#141414]
     `}>

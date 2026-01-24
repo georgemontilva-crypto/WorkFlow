@@ -98,7 +98,7 @@ export default function Login() {
             </p>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
+          <div className="bg-card border border-border rounded-lg p-8 shadow-sm">
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
                 <div className="bg-destructive/10 border border-destructive/30 text-destructive rounded-lg p-3 text-sm flex items-start gap-2">
@@ -108,7 +108,7 @@ export default function Login() {
               )}
 
               {showVerificationMessage && (
-                <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
                   <div className="flex items-start gap-3">
                     <div className="p-2 bg-amber-500/20 rounded-lg">
                       <Mail className="w-5 h-5 text-amber-500" />

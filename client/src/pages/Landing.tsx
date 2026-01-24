@@ -308,7 +308,7 @@ export default function Landing() {
       {/* Hero Section */}
       <section className="pt-40 pb-20 px-4" style={{ paddingTop: 'calc(8rem + env(safe-area-inset-top))' }}>
         <div className="container mx-auto max-w-5xl text-center">
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-primary/10 text-primary rounded-md text-sm font-medium">
             <Sparkles className="w-4 h-4" />
             <span>Now accepting crypto payments</span>
           </div>
@@ -378,7 +378,7 @@ export default function Landing() {
       <section id="security" className="py-20 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium">
+            <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 text-primary rounded-md text-sm font-medium">
               <Shield className="w-4 h-4" />
               <span>Security First</span>
             </div>

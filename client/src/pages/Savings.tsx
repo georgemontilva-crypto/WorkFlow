@@ -434,7 +434,7 @@ export default function Savings() {
                   )}
 
                   {goal.status === 'completed' && (
-                    <div className="p-3 bg-green-500/10 rounded-xl border border-green-500/20 mt-4">
+                    <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20 mt-4">
                       <p className="text-sm text-green-400 font-medium text-center">
                         ¡Meta completada!
                       </p>

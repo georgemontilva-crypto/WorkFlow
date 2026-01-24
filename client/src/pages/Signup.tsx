@@ -124,7 +124,7 @@ export default function Signup() {
             </p>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-8 shadow-sm">
+          <div className="bg-card border border-border rounded-lg p-8 shadow-sm">
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
                 <div className="bg-destructive/10 border border-destructive/30 text-destructive rounded-lg p-3 text-sm">
@@ -182,7 +182,7 @@ export default function Signup() {
                 {password.length > 0 && (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+                      <div className="flex-1 h-2 bg-muted rounded-md overflow-hidden">
                         <div 
                           className={`h-full transition-all duration-300 ${passwordStrength.color}`}
                           style={{ width: `${passwordStrength.strength}%` }}
@@ -215,7 +215,7 @@ export default function Signup() {
                         onClick={() => setBusinessType(type.value)}
                         disabled={signupMutation.isPending}
                         className={`
-                          flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all
+                          flex flex-col items-center justify-center p-4 rounded-lg border-2 transition-all
                           ${isSelected 
                             ? 'border-primary bg-primary/5' 
                             : 'border-border hover:border-muted-foreground/50 bg-background'

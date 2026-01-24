@@ -186,9 +186,9 @@ function LandingContent() {
             {features.map((feature, index) => (
               <div 
                 key={index}
-                className="bg-card border border-border rounded-2xl p-8 hover:border-primary/50 transition-all duration-300"
+                className="bg-card border border-border rounded-lg p-8 hover:border-primary/50 transition-all duration-300"
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                   <feature.icon className="w-6 h-6 text-primary" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-xl font-bold text-foreground mb-2">{feature.title}</h3>
@@ -262,8 +262,8 @@ function LandingContent() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* AES-256-GCM Encryption */}
-            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+            <div className="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">
@@ -275,8 +275,8 @@ function LandingContent() {
             </div>
 
             {/* Bcrypt Password Hashing */}
-            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+            <div className="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">
@@ -288,8 +288,8 @@ function LandingContent() {
             </div>
 
             {/* JWT Tokens */}
-            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+            <div className="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">
@@ -301,8 +301,8 @@ function LandingContent() {
             </div>
 
             {/* HTTPS & TLS */}
-            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+            <div className="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">
@@ -314,8 +314,8 @@ function LandingContent() {
             </div>
 
             {/* Rate Limiting */}
-            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+            <div className="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">
@@ -327,8 +327,8 @@ function LandingContent() {
             </div>
 
             {/* Security Audits */}
-            <div className="bg-card border border-border rounded-2xl p-6 hover:border-primary/50 transition-colors">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+            <div className="bg-card border border-border rounded-lg p-6 hover:border-primary/50 transition-colors">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-primary" />
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">

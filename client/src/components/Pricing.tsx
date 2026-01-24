@@ -81,7 +81,7 @@ export function Pricing() {
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`relative rounded-2xl border ${
+              className={`relative rounded-lg border ${
                 plan.highlighted
                   ? 'border-primary shadow-lg scale-105'
                   : 'border-border'
@@ -90,7 +90,7 @@ export function Pricing() {
               {/* Badge for highlighted plan */}
               {plan.highlighted && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-primary text-primary-foreground text-sm font-medium px-4 py-1 rounded-full">
+                  <span className="bg-primary text-primary-foreground text-sm font-medium px-4 py-1 rounded-md">
                     Most Popular
                   </span>
                 </div>

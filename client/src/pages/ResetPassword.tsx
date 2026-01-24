@@ -180,7 +180,7 @@ export default function ResetPassword() {
                 {/* Password Strength Indicator */}
                 {password && (
                   <div className="space-y-1">
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="h-2 bg-muted rounded-md overflow-hidden">
                       <div 
                         className={`h-full transition-all ${passwordStrength.color}`}
                         style={{ width: `${passwordStrength.strength}%` }}

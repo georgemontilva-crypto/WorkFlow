@@ -522,7 +522,7 @@ export default function Clients() {
         </div>
 
         {/* Search and Filter Bar */}
-        <div className="bg-[#1C1C1C] rounded-2xl border border-white/5 p-4 mb-4">
+        <div className="bg-[#1C1C1C] rounded-lg border border-white/5 p-4 mb-4">
           <div className="flex flex-col sm:flex-row gap-3">
             {/* Search Input */}
             <div className="relative flex-1">
@@ -558,7 +558,7 @@ export default function Clients() {
         </div>
 
         {/* Desktop Table View */}
-        <div className="hidden lg:block bg-[#1C1C1C] rounded-2xl border border-white/5 overflow-hidden">
+        <div className="hidden lg:block bg-[#1C1C1C] rounded-lg border border-white/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -694,7 +694,7 @@ export default function Clients() {
         {/* Mobile Collapsible List View */}
         <div className="lg:hidden space-y-3">
           {paginatedClients.length === 0 ? (
-            <div className="bg-[#1C1C1C] rounded-2xl border border-white/5 p-8 text-center">
+            <div className="bg-[#1C1C1C] rounded-lg border border-white/5 p-8 text-center">
               <p className="text-gray-400">
                 {searchQuery || statusFilter !== 'all' 
                   ? 'No se encontraron clientes con los filtros aplicados'
@@ -706,7 +706,7 @@ export default function Clients() {
               const statusBadge = getStatusBadge(client);
               return (
                 <Collapsible key={client.id}>
-                  <div className="bg-[#1C1C1C] rounded-2xl border border-white/5 overflow-hidden">
+                  <div className="bg-[#1C1C1C] rounded-lg border border-white/5 overflow-hidden">
                     <CollapsibleTrigger className="w-full p-4 hover:bg-white/5 transition-colors">
                       <div className="flex items-center justify-between">
                         <div className="flex-1 text-left">

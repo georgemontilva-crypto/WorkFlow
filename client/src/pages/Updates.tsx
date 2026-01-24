@@ -135,7 +135,7 @@ export default function Updates() {
             return (
               <div
                 key={update.version}
-                className="bg-card border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                className="bg-card border border-border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
               >
                 {/* Version Header */}
                 <div className="flex items-start justify-between mb-4">

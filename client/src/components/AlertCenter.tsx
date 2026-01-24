@@ -285,7 +285,7 @@ export function AlertCenter({ isOpen, onClose }: AlertCenterProps) {
                   <div
                     key={alert.id}
                     className={`
-                      bg-[#1a1a1a] ${styles.borderColor} border rounded-2xl p-4
+                      bg-[#1a1a1a] ${styles.borderColor} border rounded-lg p-4
                       transition-all cursor-pointer
                       ${alert.is_read === 0 ? 'border-l-4' : 'opacity-75'}
                     `}

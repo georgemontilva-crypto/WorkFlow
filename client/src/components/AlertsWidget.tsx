@@ -63,7 +63,7 @@ export function AlertsWidget() {
   };
 
   return (
-    <div className="bg-card border border-border rounded-xl p-5 h-full">
+    <div className="bg-card border border-border rounded-lg p-5 h-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-foreground">Alertas de Hoy</h3>
