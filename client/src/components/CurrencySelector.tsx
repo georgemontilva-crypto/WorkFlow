@@ -31,6 +31,7 @@ export default function CurrencySelector({
   );
 
   const handleSelect = (code: string) => {
+    console.log('[CurrencySelector] Selected:', code);
     onSelect(code);
     setOpen(false);
     setSearchQuery('');
@@ -97,13 +98,17 @@ export default function CurrencySelector({
             ) : (
               <div className="space-y-1">
                 {filteredCurrencies.map((currency) => (
-                  <Button
+                  <button
                     key={currency.code}
-                    variant="ghost"
-                    className={`w-full justify-between h-auto py-3 px-4 hover:bg-white/5 ${
+                    type="button"
+                    className={`w-full flex items-center justify-between h-auto py-3 px-4 rounded-md hover:bg-white/5 transition-colors ${
                       selectedCurrency === currency.code ? 'bg-[#EBFF57]/10' : ''
                     }`}
-                    onClick={() => handleSelect(currency.code)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleSelect(currency.code);
+                    }}
                   >
                     <div className="flex items-center gap-3">
                       <span className={`font-mono font-semibold ${
@@ -117,7 +122,7 @@ export default function CurrencySelector({
                     {selectedCurrency === currency.code && (
                       <Check className="w-5 h-5 text-[#EBFF57]" />
                     )}
-                  </Button>
+                  </button>
                 ))}
               </div>
             )}
