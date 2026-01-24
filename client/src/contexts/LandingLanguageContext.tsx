@@ -73,7 +73,6 @@ const translations = {
         'Export your data anytime',
       ],
       cta: 'Get Started',
-      afterTrial: 'After 7 days, decide if you want to continue',
     },
     compliance: {
       title: 'Compliance and Security',

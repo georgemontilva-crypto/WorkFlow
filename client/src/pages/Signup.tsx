@@ -120,7 +120,7 @@ export default function Signup() {
               Create your account
             </h1>
             <p className="text-muted-foreground">
-              Start your 7-day free trial. No credit card required.
+              Start for free. No credit card required.
             </p>
           </div>
 
