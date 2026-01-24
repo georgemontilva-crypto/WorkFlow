@@ -274,7 +274,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* Subscription Plan Indicator */}
-        {accessStatus && accessStatus.subscription_plan && (
+        {accessStatus && accessStatus.subscription_plan && user?.role !== 'admin' && (
           <div className="mx-3 mb-4">
             <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 space-y-2">
               <div className="flex items-center gap-2">
