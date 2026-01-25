@@ -12,6 +12,7 @@ import { DashboardLayout } from '../components/DashboardLayout';
 import { Download, TrendingUp, TrendingDown, DollarSign, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { trpc } from '../lib/trpc';
+import { useToast } from '../contexts/ToastContext';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { getCurrency, formatCurrency as formatCurrencyUtil } from '@shared/currencies';
@@ -20,6 +21,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Finances() {
+  const { success, error: showError } = useToast();
+  
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -70,12 +73,12 @@ export default function Finances() {
       const amount = parseFloat(formData.amount);
       
       if (isNaN(amount) || amount <= 0) {
-        alert('El monto debe ser mayor a 0');
+        showError('El monto debe ser mayor a 0');
         return;
       }
       
       if (!formData.description.trim()) {
-        alert('La descripción es requerida');
+        showError('La descripción es requerida');
         return;
       }
       
@@ -88,7 +91,7 @@ export default function Finances() {
         date: formData.date,
       });
       
-      alert('Transacción creada exitosamente');
+      success('Transacción creada exitosamente');
       handleCloseModal();
       
       // Invalidate queries to refresh data
@@ -97,7 +100,7 @@ export default function Finances() {
       utils.finances.getHistory.invalidate();
     } catch (error: any) {
       console.error('Error al crear transacción:', error);
-      alert(error.message || 'Error al crear transacción');
+      showError(error.message || 'Error al crear transacción');
     }
   };
   
@@ -199,7 +202,7 @@ export default function Finances() {
   // Export history handler
   const handleExportHistory = () => {
     if (history.length === 0) {
-      alert('No hay transacciones para exportar');
+      showError('No hay transacciones para exportar');
       return;
     }
 

@@ -11,6 +11,7 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { ToastProvider } from "./contexts/ToastContext";
 import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
@@ -120,10 +121,11 @@ function App() {
     <ErrorBoundary>
       <LanguageProvider>
         <ThemeProvider defaultTheme="dark">
-          <TooltipProvider>
-            <Router />
-
-          </TooltipProvider>
+          <ToastProvider>
+            <TooltipProvider>
+              <Router />
+            </TooltipProvider>
+          </ToastProvider>
         </ThemeProvider>
       </LanguageProvider>
     </ErrorBoundary>

@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import { trpc } from '../lib/trpc';
-// import { toast } from 'sonner';
+import { useToast } from '../contexts/ToastContext';
 import { format } from 'date-fns';
 import { getCurrency } from '@shared/currencies';
 import { Badge } from '../components/ui/badge';
@@ -46,6 +46,8 @@ type InvoiceItem = {
 };
 
 export default function Invoices() {
+  const { success, error: showError } = useToast();
+  
   const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled'>('all');
   const [clientFilter, setClientFilter] = useState<'all' | number>('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -187,11 +189,11 @@ export default function Invoices() {
     try {
       console.log('[Invoices] Sending email for invoice:', id);
       await sendEmailMutation.mutateAsync({ id });
-      alert('Factura enviada por email exitosamente');
+      success('Factura enviada por email exitosamente');
       utils.invoices.list.invalidate();
     } catch (error: any) {
       console.error('Error al enviar email:', error);
-      alert('Error al enviar email: ' + (error.message || 'Error desconocido'));
+      showError('Error al enviar email: ' + (error.message || 'Error desconocido'));
     }
   };
   
@@ -208,10 +210,10 @@ export default function Invoices() {
       link.download = result.filename;
       link.click();
       
-      alert('PDF descargado exitosamente');
+      success('PDF descargado exitosamente');
     } catch (error: any) {
       console.error('Error al descargar PDF:', error);
-      alert('Error al descargar PDF: ' + (error.message || 'Error desconocido'));
+      showError('Error al descargar PDF: ' + (error.message || 'Error desconocido'));
     }
   };
   
@@ -232,7 +234,7 @@ export default function Invoices() {
       utils.invoices.list.invalidate();
     } catch (error: any) {
       console.error('Error al actualizar estado:', error);
-      alert('Error al actualizar estado: ' + (error.message || 'Error desconocido'));
+      showError('Error al actualizar estado: ' + (error.message || 'Error desconocido'));
     }
   };
   
@@ -290,7 +292,7 @@ export default function Invoices() {
       const amount = parseFloat(paymentFormData.amount);
       
       if (isNaN(amount) || amount <= 0) {
-        alert('El monto debe ser mayor a 0');
+        showError('El monto debe ser mayor a 0');
         return;
       }
       
@@ -303,14 +305,14 @@ export default function Invoices() {
         notes: paymentFormData.notes || undefined,
       });
       
-      alert('Pago registrado exitosamente');
+      success('Pago registrado exitosamente');
       handleClosePaymentModal();
       utils.invoices.list.invalidate();
       utils.payments.listByInvoice.invalidate();
       utils.payments.getSummary.invalidate();
     } catch (error: any) {
       console.error('Error al registrar pago:', error);
-      alert(error.message || 'Error al registrar pago');
+      showError(error.message || 'Error al registrar pago');
     }
   };
   
