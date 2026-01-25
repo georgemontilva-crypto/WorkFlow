@@ -18,7 +18,7 @@ import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
 import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
-import DashboardLayout from '@/components/DashboardLayout';
+import { DashboardLayout } from '@/components/DashboardLayout';
 import ScenarioSimulator from '@/components/ScenarioSimulator';
 import CurrencyCalculator from '@/components/CurrencyCalculator';
 import { PriceAlertDialog } from '@/components/PriceAlertDialog';

@@ -3,7 +3,7 @@
  * Changelog and platform updates history
  */
 
-import DashboardLayout from '@/components/DashboardLayout';
+import { DashboardLayout } from '@/components/DashboardLayout';
 import { Calendar, CheckCircle2, Sparkles, Bug, Zap, Shield } from 'lucide-react';
 
 interface Update {
