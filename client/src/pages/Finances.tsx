@@ -460,7 +460,7 @@ export default function Finances() {
       {/* Nueva Transacción Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0A0A0A] rounded-2xl border border-[rgba(255,255,255,0.06)] w-full max-w-md">
+          <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-md">
             <div className="p-6">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
@@ -490,10 +490,10 @@ export default function Finances() {
                           category: 'other_income'
                         }));
                       }}
-                      className={`p-3 rounded-lg border transition-colors ${
+                      className={`p-3 rounded-[9999px] border transition-colors ${
                         formData.type === 'income'
-                          ? 'bg-green-500/20 border-green-500 text-green-400'
-                          : 'bg-[#14161B] border-[rgba(255,255,255,0.06)] text-[#8B92A8] hover:border-gray-600'
+                          ? 'bg-[#C4FF3D]/10 border-[#C4FF3D]/30 text-[#C4FF3D]'
+                          : 'bg-transparent border-[rgba(255,255,255,0.06)] text-[#8B92A8] hover:border-[#C4FF3D]/30'
                       }`}
                     >
                       Ingreso
@@ -507,10 +507,10 @@ export default function Finances() {
                           category: 'other_expense'
                         }));
                       }}
-                      className={`p-3 rounded-lg border transition-colors ${
+                      className={`p-3 rounded-[9999px] border transition-colors ${
                         formData.type === 'expense'
-                          ? 'bg-red-500/20 border-red-500 text-red-400'
-                          : 'bg-[#14161B] border-[rgba(255,255,255,0.06)] text-[#8B92A8] hover:border-gray-600'
+                          ? 'bg-red-400/10 border-red-400/30 text-red-400'
+                          : 'bg-transparent border-[rgba(255,255,255,0.06)] text-[#8B92A8] hover:border-[#C4FF3D]/30'
                       }`}
                     >
                       Gasto
@@ -526,7 +526,7 @@ export default function Finances() {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
+                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-[9999px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]"
                     required
                   >
                     {getCategories().map(cat => (
@@ -545,7 +545,7 @@ export default function Finances() {
                     step="0.01"
                     value={formData.amount}
                     onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
-                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
+                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-[9999px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]"
                     placeholder="0.00"
                     required
                   />
@@ -560,7 +560,7 @@ export default function Finances() {
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
+                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-[9999px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]"
                     required
                   />
                 </div>
@@ -573,7 +573,7 @@ export default function Finances() {
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57] resize-none"
+                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-[20px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D] resize-none"
                     rows={3}
                     placeholder="Descripción de la transacción..."
                     required
@@ -585,14 +585,14 @@ export default function Finances() {
                   <button
                     type="button"
                     onClick={handleCloseModal}
-                    className="flex-1 px-4 py-2 bg-[#14161B] border border-[rgba(255,255,255,0.06)] text-white rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex-1 px-4 py-2 bg-transparent border border-[rgba(255,255,255,0.06)] text-white rounded-[9999px] hover:border-[#C4FF3D]/30 transition-colors"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={createTransactionMutation.isLoading}
-                    className="flex-1 px-4 py-2 bg-[#EBFF57] text-black rounded-lg hover:bg-[#EBFF57]/90 transition-colors disabled:opacity-50"
+                    className="flex-1 px-4 py-2 bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 text-[#C4FF3D] rounded-[9999px] hover:bg-[#C4FF3D]/20 transition-colors disabled:opacity-50"
                   >
                     {createTransactionMutation.isLoading ? 'Guardando...' : 'Guardar'}
                   </button>

@@ -838,7 +838,7 @@ export default function Invoices() {
       {/* View Invoice Modal */}
       {viewingInvoice && viewInvoiceData && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0A0A0A] rounded-lg border border-[rgba(255,255,255,0.06)] w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">Detalle de Factura</h2>
@@ -866,7 +866,7 @@ export default function Invoices() {
                 
                 <div>
                   <p className="text-[#8B92A8] text-sm">Estado</p>
-                  <span className={`inline-block px-2 py-1 rounded text-xs font-medium text-white ${getStatusBadge(viewInvoiceData.status).color}`}>
+                  <span className={`inline-block px-4 py-1.5 rounded-[9999px] text-sm font-medium border ${getStatusBadge(viewInvoiceData.status).color === 'bg-green-500' ? 'text-[#C4FF3D] bg-[#C4FF3D]/10 border-[#C4FF3D]/30' : getStatusBadge(viewInvoiceData.status).color === 'bg-yellow-500' ? 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30' : getStatusBadge(viewInvoiceData.status).color === 'bg-red-500' ? 'text-red-400 bg-red-400/10 border-red-400/30' : 'text-[#8B92A8] bg-[#8B92A8]/10 border-[#8B92A8]/30'}`}>
                     {getStatusBadge(viewInvoiceData.status).label}
                   </span>
                 </div>
@@ -875,7 +875,7 @@ export default function Invoices() {
                   <p className="text-[#8B92A8] text-sm mb-2">Ítems</p>
                   <div className="space-y-2">
                     {viewInvoiceData.items.map((item: any, index: number) => (
-                      <div key={index} className="bg-[#0A0A0A] p-3 rounded border border-[rgba(255,255,255,0.06)]">
+                       <div key={index} className="bg-[#14161B] p-4 rounded-[20px] border border-[rgba(255,255,255,0.06)]">
                         <p className="text-white font-medium">{item.description}</p>
                         <p className="text-[#8B92A8] text-sm">
                           {item.quantity} x ${item.unit_price} = ${item.total}
@@ -914,7 +914,7 @@ export default function Invoices() {
                 {paymentSummary && (
                   <div className="border-t border-[rgba(255,255,255,0.06)] pt-4">
                     <h3 className="text-white font-semibold mb-3">Resumen de Pagos</h3>
-                    <div className="bg-[#0A0A0A] p-4 rounded border border-[rgba(255,255,255,0.06)] space-y-2">
+                    <div className="bg-[#14161B] p-4 rounded-[20px] border border-[rgba(255,255,255,0.06)] space-y-2">
                       <div className="flex justify-between">
                         <span className="text-[#8B92A8]">Total Factura:</span>
                         <span className="text-white">${paymentSummary.invoice_total.toFixed(2)} {viewInvoiceData.currency}</span>
@@ -937,7 +937,7 @@ export default function Invoices() {
                     {viewInvoiceData.status !== 'paid' && viewInvoiceData.status !== 'cancelled' && (
                       <button
                         onClick={() => handleOpenPaymentModal(viewInvoiceData.id)}
-                        className="w-full mt-4 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                        className="w-full mt-4 px-4 py-2 text-[#C4FF3D] bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 hover:bg-[#C4FF3D]/20 rounded-[9999px] transition-colors font-medium"
                       >
                         Registrar Pago
                       </button>
