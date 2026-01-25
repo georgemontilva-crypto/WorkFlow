@@ -33,7 +33,7 @@ export default function PublicInvoice() {
     },
   });
 
-  const downloadPDF = trpc.invoices.generatePDF.useMutation({
+  const downloadPDF = trpc.invoices.generatePDFByToken.useMutation({
     onSuccess: (data) => {
       if (data?.pdf) {
         const link = document.createElement('a');
@@ -169,7 +169,7 @@ export default function PublicInvoice() {
             </div>
             <Button
               variant="outline"
-              onClick={() => downloadPDF.mutate({ id: invoice.id })}
+              onClick={() => downloadPDF.mutate({ token: token! })}
               disabled={downloadPDF.isLoading}
               className="w-full sm:w-auto"
             >

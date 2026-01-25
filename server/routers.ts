@@ -1418,6 +1418,49 @@ export const appRouter = router({
           companyProfile: companyProfile || undefined,
         };
       }),
+
+    // Public endpoint to generate PDF by token
+    generatePDFByToken: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .mutation(async ({ input }) => {
+        try {
+          const { generateInvoicePDF } = await import('./_core/pdf');
+          const { getInvoiceByPaymentToken, getClientById, getCompanyProfile } = await import('./db');
+          
+          // Get invoice by token
+          const invoice = await getInvoiceByPaymentToken(input.token);
+          if (!invoice) {
+            throw new Error('Invoice not found');
+          }
+          
+          // Get client data
+          const client = await getClientById(invoice.client_id, invoice.user_id);
+          if (!client) {
+            throw new Error('Client not found');
+          }
+          
+          // Get company profile
+          const companyProfile = await getCompanyProfile(invoice.user_id);
+          
+          // Prepare invoice data for PDF
+          const invoiceData = {
+            ...invoice,
+            clientName: client.name,
+            clientEmail: client.email,
+            clientPhone: client.phone,
+            companyName: client.company || undefined,
+            items: typeof invoice.items === 'string' ? JSON.parse(invoice.items) : invoice.items,
+            companyProfile: companyProfile || undefined,
+          };
+          
+          // Generate PDF
+          const pdfBase64 = await generateInvoicePDF(invoiceData);
+          
+          return { success: true, pdf: pdfBase64 };
+        } catch (error: any) {
+          throw new Error(error.message || 'Failed to generate PDF');
+        }
+      }),
       
     // Public endpoint to confirm payment
     confirmPayment: publicProcedure
