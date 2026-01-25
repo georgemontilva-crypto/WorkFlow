@@ -33,7 +33,10 @@ export const appRouter = router({
         email: z.string().email("Invalid email address"),
         password: z.string().min(8, "Password must be at least 8 characters"),
         businessType: z.enum(["freelancer", "agencia", "empresa"]).optional(),
-        primaryCurrency: z.string().length(3, "Currency code must be 3 characters").default("USD"),
+        primaryCurrency: z.string()
+          .length(3, "Currency code must be 3 characters")
+          .toUpperCase()
+          .default("USD"),
       }))
       .mutation(async ({ input }) => {
         try {
@@ -41,6 +44,16 @@ export const appRouter = router({
           const { sendVerificationEmail } = await import("./emails/service");
           
           console.log(`[Auth] Signup attempt: ${input.email}`);
+          
+          // Validate currency exists in catalog
+          const { CURRENCIES } = await import("../shared/currencies");
+          const validCurrency = CURRENCIES.find(c => c.code === input.primaryCurrency);
+          if (!validCurrency) {
+            console.error(`[Auth] Invalid currency code: ${input.primaryCurrency}`);
+            throw new Error(`Invalid currency code: ${input.primaryCurrency}`);
+          }
+          
+          console.log(`[Auth] Currency validated: ${input.primaryCurrency} - ${validCurrency.name}`);
           
           // Create user (email_verified = 0 by default)
           const user = await createUser({
@@ -509,13 +522,25 @@ export const appRouter = router({
     // Update primary currency
     updatePrimaryCurrency: protectedProcedure
       .input(z.object({
-        currency: z.string().length(3, "Currency code must be 3 characters"),
+        currency: z.string()
+          .length(3, "Currency code must be 3 characters")
+          .toUpperCase(),
       }))
       .mutation(async ({ ctx, input }) => {
         try {
           const { updateUserPrimaryCurrency } = await import("./db");
           
           console.log(`[Auth] Currency change request from user ${ctx.user.id}: ${ctx.user.primary_currency} -> ${input.currency}`);
+          
+          // Validate currency exists in catalog
+          const { CURRENCIES } = await import("../shared/currencies");
+          const validCurrency = CURRENCIES.find(c => c.code === input.currency);
+          if (!validCurrency) {
+            console.error(`[Auth] Invalid currency code: ${input.currency}`);
+            throw new Error(`Invalid currency code: ${input.currency}`);
+          }
+          
+          console.log(`[Auth] Currency validated: ${input.currency} - ${validCurrency.name}`);
           
           // Update currency
           await updateUserPrimaryCurrency(ctx.user.id, input.currency);
