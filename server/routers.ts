@@ -505,6 +505,29 @@ export const appRouter = router({
         
         return { success: true };
       }),
+
+    // Update primary currency
+    updatePrimaryCurrency: protectedProcedure
+      .input(z.object({
+        currency: z.string().length(3, "Currency code must be 3 characters"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        try {
+          const { updateUserPrimaryCurrency } = await import("./db");
+          
+          console.log(`[Auth] Currency change request from user ${ctx.user.id}: ${ctx.user.primary_currency} -> ${input.currency}`);
+          
+          // Update currency
+          await updateUserPrimaryCurrency(ctx.user.id, input.currency);
+          
+          console.log(`[Auth] Primary currency updated successfully for user ${ctx.user.id}: ${input.currency}`);
+          
+          return { success: true };
+        } catch (error: any) {
+          console.error(`[Auth] Update currency error:`, error.message);
+          throw new Error(error.message || "Failed to update currency");
+        }
+      }),
   }),
 
   /**

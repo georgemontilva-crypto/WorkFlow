@@ -267,6 +267,28 @@ export async function updateUserPassword(user_id: number, password_hash: string)
   }
 }
 
+/**
+ * Update user's primary currency
+ */
+export async function updateUserPrimaryCurrency(user_id: number, currency: string) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  try {
+    await db.update(users)
+      .set({
+        primary_currency: currency,
+        updated_at: new Date(),
+      })
+      .where(eq(users.id, user_id));
+  } catch (error) {
+    console.error("[Database] Failed to update primary currency:", error);
+    throw error;
+  }
+}
+
 export { users, clients, invoices, transactions, savingsGoals, priceAlerts };
 
 // ============================================

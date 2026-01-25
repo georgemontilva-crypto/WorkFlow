@@ -13,8 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
-import { Languages, Database, Download, Upload, Trash2, Shield, Key, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Languages, Database, Download, Upload, Trash2, Shield, Key, AlertCircle, CheckCircle2, DollarSign } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import CurrencySelector from '@/components/CurrencySelector';
+import { getCurrency } from '@shared/currencies';
 
 export default function Settings() {
   const { language, setLanguage, t } = useLanguage();
@@ -27,6 +29,10 @@ export default function Settings() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // Currency State
+  const [showCurrencyChange, setShowCurrencyChange] = useState(false);
+  const [newCurrency, setNewCurrency] = useState(user?.primary_currency || 'USD');
+
   // 2FA State
   const [show2FASetup, setShow2FASetup] = useState(false);
   const [show2FADisable, setShow2FADisable] = useState(false);
@@ -36,6 +42,7 @@ export default function Settings() {
   const [disable2FACode, setDisable2FACode] = useState('');
 
   // Mutations
+  const updateCurrencyMutation = trpc.auth.updatePrimaryCurrency.useMutation();
   const generate2FAMutation = trpc.auth.generate2FA.useMutation();
   const verify2FAMutation = trpc.auth.verify2FA.useMutation();
   const disable2FAMutation = trpc.auth.disable2FA.useMutation();
@@ -78,6 +85,24 @@ export default function Settings() {
     if (window.confirm('Are you sure you want to delete all data? This action cannot be undone.')) {
       // Add clear logic here
       toast.success('All data cleared');
+    }
+  };
+
+  // Currency Change Function
+  const handleChangeCurrency = async () => {
+    if (!newCurrency || newCurrency === user?.primary_currency) {
+      toast.error('Please select a different currency');
+      return;
+    }
+
+    try {
+      await updateCurrencyMutation.mutateAsync({ currency: newCurrency });
+      toast.success('Currency updated successfully. Please refresh the page.');
+      setShowCurrencyChange(false);
+      // Refresh page to update all currency displays
+      setTimeout(() => window.location.reload(), 1500);
+    } catch (error: any) {
+      toast.error(error.message || 'Error updating currency');
     }
   };
 
@@ -218,6 +243,99 @@ export default function Settings() {
                   </SelectItem>
                 </SelectContent>
               </Select>
+            </CardContent>
+          </Card>
+
+          {/* Currency Settings */}
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between text-foreground text-base sm:text-lg">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-5 h-5" strokeWidth={1.5} />
+                  Moneda Principal
+                </div>
+                {user?.primary_currency && (
+                  <Badge className="bg-[#EBFF57]/10 hover:bg-[#EBFF57]/20 text-[#EBFF57] border border-[#EBFF57]/30">
+                    {user.primary_currency}
+                  </Badge>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Tu moneda principal se usa en todas las facturas y reportes financieros
+              </p>
+              
+              {showCurrencyChange ? (
+                <div className="space-y-4">
+                  <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium text-foreground mb-1">
+                          Advertencia Importante
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Cambiar la moneda NO recalcula los datos históricos. Las facturas y transacciones existentes mantendrán su moneda original.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-foreground">
+                      Moneda Actual: {getCurrency(user?.primary_currency || 'USD')?.name}
+                    </label>
+                  </div>
+                  
+                  <CurrencySelector
+                    selectedCurrency={newCurrency}
+                    onSelect={setNewCurrency}
+                    label="Nueva Moneda"
+                    required
+                  />
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleChangeCurrency}
+                      variant="outline"
+                      className="flex-1 border-[#EBFF57] text-[#EBFF57] hover:bg-[#EBFF57] hover:text-black"
+                      disabled={updateCurrencyMutation.isPending}
+                    >
+                      {updateCurrencyMutation.isPending ? 'Actualizando...' : 'Confirmar Cambio'}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setShowCurrencyChange(false);
+                        setNewCurrency(user?.primary_currency || 'USD');
+                      }}
+                      variant="outline"
+                      className="border-border"
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-[#EBFF57]/10 border border-[#EBFF57]/30 rounded-lg">
+                    <span className="text-sm font-medium text-foreground">
+                      {getCurrency(user?.primary_currency || 'USD')?.name}
+                    </span>
+                    <span className="text-lg font-bold text-[#EBFF57]">
+                      {getCurrency(user?.primary_currency || 'USD')?.symbol}
+                    </span>
+                  </div>
+                  <Button
+                    onClick={() => setShowCurrencyChange(true)}
+                    variant="outline"
+                    className="w-full border-border text-foreground hover:bg-accent"
+                  >
+                    <DollarSign className="w-4 h-4 mr-2" />
+                    Cambiar Moneda
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
