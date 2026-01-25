@@ -233,11 +233,11 @@ export default function Finances() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white">Finanzas</h1>
-            <p className="text-gray-400 mt-1">Control de ingresos y gastos</p>
+            <p className="text-[#8B92A8] mt-1">Control de ingresos y gastos</p>
           </div>
           <Button 
             onClick={handleOpenModal}
-            className="bg-[#EBFF57] hover:bg-[#EBFF57]/90 text-black"
+            className="variant="default""
           >
             + Nueva Transacción
           </Button>
@@ -246,9 +246,9 @@ export default function Finances() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Total Income */}
-          <div className="bg-[#1B1E24] border border-gray-800 rounded-2xl p-4 md:p-6">
+          <div className="bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-gray-400 text-sm">Total Ingresos</p>
+              <p className="text-[#8B92A8] text-sm">Total Ingresos</p>
               <TrendingUp className="w-5 h-5 text-green-500" />
             </div>
             {summaryLoading ? (
@@ -261,9 +261,9 @@ export default function Finances() {
           </div>
 
           {/* Total Expenses */}
-          <div className="bg-[#1B1E24] border border-gray-800 rounded-2xl p-4 md:p-6">
+          <div className="bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-gray-400 text-sm">Total Gastos</p>
+              <p className="text-[#8B92A8] text-sm">Total Gastos</p>
               <TrendingDown className="w-5 h-5 text-red-500" />
             </div>
             <p className="text-3xl font-bold text-white">
@@ -272,9 +272,9 @@ export default function Finances() {
           </div>
 
           {/* Balance */}
-          <div className="bg-[#1B1E24] border border-gray-800 rounded-2xl p-4 md:p-6">
+          <div className="bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-gray-400 text-sm">Balance</p>
+              <p className="text-[#8B92A8] text-sm">Balance</p>
               <DollarSign className="w-5 h-5 text-blue-500" />
             </div>
             <p className="text-3xl font-bold text-white">
@@ -286,7 +286,7 @@ export default function Finances() {
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Tendencia Mensual (Line Chart) */}
-          <div className="bg-[#1B1E24] border border-gray-800 rounded-2xl p-6">
+          <div className="bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Tendencia Mensual</h2>
             {monthLoading ? (
               <div className="h-80 bg-gray-700 animate-pulse rounded"></div>
@@ -331,7 +331,7 @@ export default function Finances() {
           </div>
 
           {/* Comparativa Mensual (Bar Chart) */}
-          <div className="bg-[#1B1E24] border border-gray-800 rounded-2xl p-6">
+          <div className="bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Comparativa Mensual</h2>
             {monthLoading ? (
               <div className="h-80 bg-gray-700 animate-pulse rounded"></div>
@@ -371,7 +371,7 @@ export default function Finances() {
         </div>
 
         {/* Transacciones Recientes */}
-        <div className="bg-[#1B1E24] border border-gray-800 rounded-2xl p-6">
+        <div className="bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-white">Transacciones Recientes</h2>
             <div className="flex items-center gap-4">
@@ -379,21 +379,21 @@ export default function Finances() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePreviousMonth}
-                  className="p-2 md:p-1 text-gray-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  className="p-2 md:p-1 text-[#8B92A8] hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                   title="Mes anterior"
                 >
                   <ChevronLeft className="w-5 h-5 md:w-4 md:h-4" />
                 </button>
                 <button
                   onClick={handleResetMonth}
-                  className="text-sm md:text-sm text-gray-400 hover:text-white transition-colors min-w-[100px] text-center min-h-[44px] flex items-center justify-center"
+                  className="text-sm md:text-sm text-[#8B92A8] hover:text-white transition-colors min-w-[100px] text-center min-h-[44px] flex items-center justify-center"
                   title="Volver al mes actual"
                 >
                   {format(selectedMonth, 'MMMM yyyy', { locale: es })}
                 </button>
                 <button
                   onClick={handleNextMonth}
-                  className="p-2 md:p-1 text-gray-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  className="p-2 md:p-1 text-[#8B92A8] hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                   title="Mes siguiente"
                 >
                   <ChevronRight className="w-5 h-5 md:w-4 md:h-4" />
@@ -401,7 +401,7 @@ export default function Finances() {
               </div>
               <button
                 onClick={handleExportHistory}
-                className="text-sm text-gray-400 hover:text-white transition-colors"
+                className="text-sm text-[#8B92A8] hover:text-white transition-colors"
               >
                 Exportar historial
               </button>
@@ -423,7 +423,7 @@ export default function Finances() {
                 return (
                   <div 
                     key={transaction.id} 
-                    className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-colors"
+                    className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4 hover:border-[rgba(255,255,255,0.06)] transition-colors"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -438,7 +438,7 @@ export default function Finances() {
                         </div>
                         <div>
                           <p className="text-white font-semibold">{transaction.client_name}</p>
-                          <p className="text-gray-400 text-sm">
+                          <p className="text-[#8B92A8] text-sm">
                             {transaction.invoice_number || transaction.category || 'Transacción manual'} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
                           </p>
                         </div>
@@ -460,14 +460,14 @@ export default function Finances() {
       {/* Nueva Transacción Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] rounded-2xl border border-gray-700 w-full max-w-md">
+          <div className="bg-[#0A0A0A] rounded-2xl border border-[rgba(255,255,255,0.06)] w-full max-w-md">
             <div className="p-6">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">Nueva Transacción</h2>
                 <button
                   onClick={handleCloseModal}
-                  className="text-gray-400 hover:text-white transition-colors"
+                  className="text-[#8B92A8] hover:text-white transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -493,7 +493,7 @@ export default function Finances() {
                       className={`p-3 rounded-lg border transition-colors ${
                         formData.type === 'income'
                           ? 'bg-green-500/20 border-green-500 text-green-400'
-                          : 'bg-[#1B1E24] border-gray-700 text-gray-400 hover:border-gray-600'
+                          : 'bg-[#14161B] border-[rgba(255,255,255,0.06)] text-[#8B92A8] hover:border-gray-600'
                       }`}
                     >
                       Ingreso
@@ -510,7 +510,7 @@ export default function Finances() {
                       className={`p-3 rounded-lg border transition-colors ${
                         formData.type === 'expense'
                           ? 'bg-red-500/20 border-red-500 text-red-400'
-                          : 'bg-[#1B1E24] border-gray-700 text-gray-400 hover:border-gray-600'
+                          : 'bg-[#14161B] border-[rgba(255,255,255,0.06)] text-[#8B92A8] hover:border-gray-600'
                       }`}
                     >
                       Gasto
@@ -526,7 +526,7 @@ export default function Finances() {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full bg-[#1B1E24] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
+                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
                     required
                   >
                     {getCategories().map(cat => (
@@ -545,7 +545,7 @@ export default function Finances() {
                     step="0.01"
                     value={formData.amount}
                     onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
-                    className="w-full bg-[#1B1E24] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
+                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
                     placeholder="0.00"
                     required
                   />
@@ -560,7 +560,7 @@ export default function Finances() {
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                    className="w-full bg-[#1B1E24] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
+                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
                     required
                   />
                 </div>
@@ -573,7 +573,7 @@ export default function Finances() {
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full bg-[#1B1E24] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57] resize-none"
+                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57] resize-none"
                     rows={3}
                     placeholder="Descripción de la transacción..."
                     required
@@ -585,7 +585,7 @@ export default function Finances() {
                   <button
                     type="button"
                     onClick={handleCloseModal}
-                    className="flex-1 px-4 py-2 bg-[#1B1E24] border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex-1 px-4 py-2 bg-[#14161B] border border-[rgba(255,255,255,0.06)] text-white rounded-lg hover:bg-gray-800 transition-colors"
                   >
                     Cancelar
                   </button>

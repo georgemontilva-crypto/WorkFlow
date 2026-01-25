@@ -353,7 +353,7 @@ export default function Invoices() {
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-4 h-4" />
               <Input
                 type="text"
                 placeholder="Buscar por número de factura..."
@@ -390,11 +390,11 @@ export default function Invoices() {
         </div>
         
         {/* Invoices List */}
-        <div className="bg-[#1a1a1a] rounded-2xl border border-gray-800 overflow-hidden">
+        <div className="bg-[#0A0A0A] rounded-2xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
           <div className="h-[calc(100vh-320px)] overflow-y-auto p-4 space-y-4">
             {filteredInvoices.length === 0 ? (
-            <div className="text-center py-12 bg-[#222222] rounded-lg border border-gray-700">
-              <p className="text-gray-400">No hay facturas</p>
+            <div className="text-center py-12 bg-[#0A0A0A] rounded-lg border border-[rgba(255,255,255,0.06)]">
+              <p className="text-[#8B92A8]">No hay facturas</p>
             </div>
           ) : (
             filteredInvoices.map((invoice) => {
@@ -469,7 +469,7 @@ export default function Invoices() {
                             />
                             
                             {/* Dropdown Menu */}
-                            <div className="absolute right-0 mt-2 w-56 bg-[#0E0F12] border border-[#C4FF3D]/30 rounded-[9999px] shadow-lg z-20 py-1">
+                            <div className="absolute right-0 mt-2 w-56 bg-[#0E0F12] border border-[#C4FF3D]/30 rounded-[28px] shadow-lg z-20 py-1">
                               {/* Ver Factura */}
                               <button
                                 onClick={() => {
@@ -541,7 +541,7 @@ export default function Invoices() {
                               
                               {/* Divider */}
                               {invoice.status !== 'cancelled' && (
-                                <div className="border-t border-gray-700 my-1" />
+                                <div className="border-t border-[rgba(255,255,255,0.06)] my-1" />
                               )}
                               
                               {/* Cancelar Factura */}
@@ -588,11 +588,11 @@ export default function Invoices() {
       {/* Create Invoice Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] rounded-lg border border-gray-700 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#0A0A0A] rounded-lg border border-[rgba(255,255,255,0.06)] w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">Nueva Factura</h2>
-                <button onClick={handleCloseModal} className="text-gray-400 hover:text-white">
+                <button onClick={handleCloseModal} className="text-[#8B92A8] hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -602,7 +602,7 @@ export default function Invoices() {
                 <div>
                   <Label className="text-white">Cliente *</Label>
                   <Select value={formData.client_id} onValueChange={(value) => setFormData({ ...formData, client_id: value })}>
-                    <SelectTrigger className="bg-[#222222] border-gray-700 text-white">
+                    <SelectTrigger className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white">
                       <SelectValue placeholder="Seleccionar cliente" />
                     </SelectTrigger>
                     <SelectContent>
@@ -623,7 +623,7 @@ export default function Invoices() {
                       type="date"
                       value={formData.issue_date}
                       onChange={(e) => setFormData({ ...formData, issue_date: e.target.value })}
-                      className="bg-[#222222] border-gray-700 text-white"
+                      className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
                     />
                   </div>
                   <div>
@@ -632,20 +632,20 @@ export default function Invoices() {
                       type="date"
                       value={formData.due_date}
                       onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                      className="bg-[#222222] border-gray-700 text-white"
+                      className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
                     />
                   </div>
                 </div>
                 
                 {/* Recurring Invoice */}
-                <div className="space-y-4 p-4 bg-[#1a1a1a] border border-gray-800 rounded-lg">
+                <div className="space-y-4 p-4 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg">
                   <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
                       id="is_recurring"
                       checked={formData.is_recurring}
                       onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
-                      className="w-4 h-4 bg-[#222222] border-gray-700 rounded"
+                      className="w-4 h-4 bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] rounded"
                     />
                     <Label htmlFor="is_recurring" className="text-white cursor-pointer">
                       Factura Recurrente
@@ -660,10 +660,10 @@ export default function Invoices() {
                           value={formData.recurrence_frequency} 
                           onValueChange={(value: any) => setFormData({ ...formData, recurrence_frequency: value })}
                         >
-                          <SelectTrigger className="bg-[#222222] border-gray-700 text-white">
+                          <SelectTrigger className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-[#1a1a1a] border-gray-700">
+                          <SelectContent className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)]">
                             <SelectItem value="weekly">Semanal</SelectItem>
                             <SelectItem value="biweekly">Quincenal</SelectItem>
                             <SelectItem value="monthly">Mensual</SelectItem>
@@ -679,7 +679,7 @@ export default function Invoices() {
                           type="date"
                           value={formData.recurrence_end_date}
                           onChange={(e) => setFormData({ ...formData, recurrence_end_date: e.target.value })}
-                          className="bg-[#222222] border-gray-700 text-white"
+                          className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
                           placeholder="Sin fecha de fin"
                         />
                       </div>
@@ -697,7 +697,7 @@ export default function Invoices() {
                 <div className="p-3 bg-[#EBFF57]/10 border border-[#EBFF57]/30 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-gray-400 mb-1">Moneda de la factura</p>
+                      <p className="text-xs text-[#8B92A8] mb-1">Moneda de la factura</p>
                       <p className="text-sm font-medium text-white">
                         {getCurrency(user?.primary_currency || 'USD')?.name}
                       </p>
@@ -731,7 +731,7 @@ export default function Invoices() {
                               placeholder="Descripción del servicio o producto"
                               value={item.description}
                               onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                              className="bg-[#222222] border-gray-700 text-white"
+                              className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
                             />
                           </div>
                           <div className="col-span-2">
@@ -741,7 +741,7 @@ export default function Invoices() {
                               placeholder="1"
                               value={item.quantity}
                               onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
-                              className="bg-[#222222] border-gray-700 text-white"
+                              className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
                             />
                           </div>
                           <div className="col-span-2">
@@ -751,7 +751,7 @@ export default function Invoices() {
                               placeholder="0.00"
                               value={item.unit_price}
                               onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                              className="bg-[#222222] border-gray-700 text-white"
+                              className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
                             />
                           </div>
                           <div className="col-span-2">
@@ -761,7 +761,7 @@ export default function Invoices() {
                               placeholder="0.00"
                               value={item.total}
                               readOnly
-                              className="bg-[#2a2a2a] border-gray-700 text-white"
+                              className="bg-[#2a2a2a] border-[rgba(255,255,255,0.06)] text-white"
                             />
                           </div>
                         </div>
@@ -795,7 +795,7 @@ export default function Invoices() {
                   <textarea
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="w-full min-h-[80px] bg-[#222222] border border-gray-700 rounded-md p-2 text-white"
+                    className="w-full min-h-[80px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2 text-white"
                     placeholder="Notas adicionales..."
                   />
                 </div>
@@ -806,14 +806,14 @@ export default function Invoices() {
                   <textarea
                     value={formData.terms}
                     onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
-                    className="w-full min-h-[80px] bg-[#222222] border border-gray-700 rounded-md p-2 text-white"
+                    className="w-full min-h-[80px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2 text-white"
                     placeholder="Términos y condiciones..."
                   />
                 </div>
                 
                 {/* Actions */}
                 <div className="flex gap-3 justify-end">
-                  <Button type="button" variant="outline" onClick={handleCloseModal} className="border-gray-700 text-white hover:bg-gray-800">
+                  <Button type="button" variant="outline" onClick={handleCloseModal} className="border-[rgba(255,255,255,0.06)] text-white hover:bg-gray-800">
                     Cancelar
                   </Button>
                   <Button type="submit" variant="default">
@@ -829,46 +829,46 @@ export default function Invoices() {
       {/* View Invoice Modal */}
       {viewingInvoice && viewInvoiceData && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] rounded-lg border border-gray-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#0A0A0A] rounded-lg border border-[rgba(255,255,255,0.06)] w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">Detalle de Factura</h2>
-                <button onClick={() => setViewingInvoice(null)} className="text-gray-400 hover:text-white">
+                <button onClick={() => setViewingInvoice(null)} className="text-[#8B92A8] hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
               </div>
               
               <div className="space-y-4">
                 <div>
-                  <p className="text-gray-400 text-sm">Número de Factura</p>
+                  <p className="text-[#8B92A8] text-sm">Número de Factura</p>
                   <p className="text-white font-semibold">{viewInvoiceData.invoice_number}</p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-gray-400 text-sm">Fecha de Emisión</p>
+                    <p className="text-[#8B92A8] text-sm">Fecha de Emisión</p>
                     <p className="text-white">{format(new Date(viewInvoiceData.issue_date), 'dd/MM/yyyy')}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-sm">Fecha de Vencimiento</p>
+                    <p className="text-[#8B92A8] text-sm">Fecha de Vencimiento</p>
                     <p className="text-white">{format(new Date(viewInvoiceData.due_date), 'dd/MM/yyyy')}</p>
                   </div>
                 </div>
                 
                 <div>
-                  <p className="text-gray-400 text-sm">Estado</p>
+                  <p className="text-[#8B92A8] text-sm">Estado</p>
                   <span className={`inline-block px-2 py-1 rounded text-xs font-medium text-white ${getStatusBadge(viewInvoiceData.status).color}`}>
                     {getStatusBadge(viewInvoiceData.status).label}
                   </span>
                 </div>
                 
                 <div>
-                  <p className="text-gray-400 text-sm mb-2">Ítems</p>
+                  <p className="text-[#8B92A8] text-sm mb-2">Ítems</p>
                   <div className="space-y-2">
                     {viewInvoiceData.items.map((item: any, index: number) => (
-                      <div key={index} className="bg-[#222222] p-3 rounded border border-gray-700">
+                      <div key={index} className="bg-[#0A0A0A] p-3 rounded border border-[rgba(255,255,255,0.06)]">
                         <p className="text-white font-medium">{item.description}</p>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-[#8B92A8] text-sm">
                           {item.quantity} x ${item.unit_price} = ${item.total}
                         </p>
                       </div>
@@ -876,9 +876,9 @@ export default function Invoices() {
                   </div>
                 </div>
                 
-                <div className="border-t border-gray-700 pt-4">
+                <div className="border-t border-[rgba(255,255,255,0.06)] pt-4">
                   <div className="flex justify-between">
-                    <p className="text-gray-400">Subtotal</p>
+                    <p className="text-[#8B92A8]">Subtotal</p>
                     <p className="text-white">${viewInvoiceData.subtotal}</p>
                   </div>
                   <div className="flex justify-between mt-2">
@@ -889,38 +889,38 @@ export default function Invoices() {
                 
                 {viewInvoiceData.notes && (
                   <div>
-                    <p className="text-gray-400 text-sm">Notas</p>
+                    <p className="text-[#8B92A8] text-sm">Notas</p>
                     <p className="text-white">{viewInvoiceData.notes}</p>
                   </div>
                 )}
                 
                 {viewInvoiceData.terms && (
                   <div>
-                    <p className="text-gray-400 text-sm">Términos</p>
+                    <p className="text-[#8B92A8] text-sm">Términos</p>
                     <p className="text-white">{viewInvoiceData.terms}</p>
                   </div>
                 )}
                 
                 {/* Payment Summary */}
                 {paymentSummary && (
-                  <div className="border-t border-gray-700 pt-4">
+                  <div className="border-t border-[rgba(255,255,255,0.06)] pt-4">
                     <h3 className="text-white font-semibold mb-3">Resumen de Pagos</h3>
-                    <div className="bg-[#222222] p-4 rounded border border-gray-700 space-y-2">
+                    <div className="bg-[#0A0A0A] p-4 rounded border border-[rgba(255,255,255,0.06)] space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Total Factura:</span>
+                        <span className="text-[#8B92A8]">Total Factura:</span>
                         <span className="text-white">${paymentSummary.invoice_total.toFixed(2)} {viewInvoiceData.currency}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Total Pagado:</span>
+                        <span className="text-[#8B92A8]">Total Pagado:</span>
                         <span className="text-green-500">${paymentSummary.total_paid.toFixed(2)} {viewInvoiceData.currency}</span>
                       </div>
-                      <div className="flex justify-between border-t border-gray-700 pt-2">
+                      <div className="flex justify-between border-t border-[rgba(255,255,255,0.06)] pt-2">
                         <span className="text-white font-semibold">Restante:</span>
                         <span className="text-white font-semibold">${paymentSummary.remaining.toFixed(2)} {viewInvoiceData.currency}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-400 text-sm">Pagos Registrados:</span>
-                        <span className="text-gray-400 text-sm">{paymentSummary.payment_count}</span>
+                        <span className="text-[#8B92A8] text-sm">Pagos Registrados:</span>
+                        <span className="text-[#8B92A8] text-sm">{paymentSummary.payment_count}</span>
                       </div>
                     </div>
                     
@@ -938,18 +938,18 @@ export default function Invoices() {
                 
                 {/* Payment History */}
                 {invoicePayments.length > 0 && (
-                  <div className="border-t border-gray-700 pt-4">
+                  <div className="border-t border-[rgba(255,255,255,0.06)] pt-4">
                     <h3 className="text-white font-semibold mb-3">Historial de Pagos</h3>
                     <div className="space-y-2">
                       {invoicePayments.map((payment: any) => (
-                        <div key={payment.id} className="bg-[#222222] p-3 rounded border border-gray-700">
+                        <div key={payment.id} className="bg-[#0A0A0A] p-3 rounded border border-[rgba(255,255,255,0.06)]">
                           <div className="flex justify-between items-start">
                             <div>
                               <p className="text-white font-medium">${parseFloat(payment.amount).toFixed(2)} {viewInvoiceData.currency}</p>
-                              <p className="text-gray-400 text-sm">
+                              <p className="text-[#8B92A8] text-sm">
                                 {format(new Date(payment.payment_date), 'dd/MM/yyyy')}
                               </p>
-                              <p className="text-gray-400 text-sm capitalize">
+                              <p className="text-[#8B92A8] text-sm capitalize">
                                 Método: {payment.method === 'cash' ? 'Efectivo' : payment.method === 'transfer' ? 'Transferencia' : payment.method === 'card' ? 'Tarjeta' : 'Otro'}
                               </p>
                             </div>
@@ -958,7 +958,7 @@ export default function Invoices() {
                             )}
                           </div>
                           {payment.notes && (
-                            <p className="text-gray-400 text-sm mt-2">{payment.notes}</p>
+                            <p className="text-[#8B92A8] text-sm mt-2">{payment.notes}</p>
                           )}
                         </div>
                       ))}
@@ -974,11 +974,11 @@ export default function Invoices() {
       {/* Register Payment Modal */}
       {registeringPaymentFor && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a1a1a] rounded-lg border border-gray-700 w-full max-w-md">
+          <div className="bg-[#0A0A0A] rounded-lg border border-[rgba(255,255,255,0.06)] w-full max-w-md">
             <form onSubmit={handleRegisterPayment} className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">Registrar Pago</h2>
-                <button type="button" onClick={handleClosePaymentModal} className="text-gray-400 hover:text-white">
+                <button type="button" onClick={handleClosePaymentModal} className="text-[#8B92A8] hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -991,7 +991,7 @@ export default function Invoices() {
                     step="0.01"
                     value={paymentFormData.amount}
                     onChange={(e) => setPaymentFormData({ ...paymentFormData, amount: e.target.value })}
-                    className="w-full px-4 py-2 bg-[#222222] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
+                    className="w-full px-4 py-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
                     placeholder="0.00"
                     required
                   />
@@ -1003,7 +1003,7 @@ export default function Invoices() {
                     type="date"
                     value={paymentFormData.payment_date}
                     onChange={(e) => setPaymentFormData({ ...paymentFormData, payment_date: e.target.value })}
-                    className="w-full px-4 py-2 bg-[#222222] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
+                    className="w-full px-4 py-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
                     required
                   />
                 </div>
@@ -1013,7 +1013,7 @@ export default function Invoices() {
                   <select
                     value={paymentFormData.method}
                     onChange={(e) => setPaymentFormData({ ...paymentFormData, method: e.target.value as any })}
-                    className="w-full px-4 py-2 bg-[#222222] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
+                    className="w-full px-4 py-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
                     required
                   >
                     <option value="transfer">Transferencia</option>
@@ -1029,7 +1029,7 @@ export default function Invoices() {
                     type="text"
                     value={paymentFormData.reference}
                     onChange={(e) => setPaymentFormData({ ...paymentFormData, reference: e.target.value })}
-                    className="w-full px-4 py-2 bg-[#222222] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
+                    className="w-full px-4 py-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
                     placeholder="Número de referencia o transacción"
                   />
                 </div>
@@ -1039,7 +1039,7 @@ export default function Invoices() {
                   <textarea
                     value={paymentFormData.notes}
                     onChange={(e) => setPaymentFormData({ ...paymentFormData, notes: e.target.value })}
-                    className="w-full px-4 py-2 bg-[#222222] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
+                    className="w-full px-4 py-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
                     rows={3}
                     placeholder="Notas adicionales sobre el pago"
                   />

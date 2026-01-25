@@ -213,7 +213,7 @@ export default function Savings() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Metas de Ahorro</h1>
-            <p className="text-sm sm:text-base text-gray-400">
+            <p className="text-sm sm:text-base text-[#8B92A8]">
               Define y alcanza tus objetivos financieros
             </p>
           </div>
@@ -243,7 +243,7 @@ export default function Savings() {
                 <DialogTitle className="text-white text-2xl">
                   {editingGoal ? 'Editar Meta de Ahorro' : 'Nueva Meta de Ahorro'}
                 </DialogTitle>
-                <DialogDescription className="text-gray-400">
+                <DialogDescription className="text-[#8B92A8]">
                   {editingGoal ? 'Actualiza los detalles de tu meta' : 'Define un nuevo objetivo financiero'}
                 </DialogDescription>
               </DialogHeader>
@@ -260,7 +260,7 @@ export default function Savings() {
                     placeholder="Ej: Fondo de emergencia, Vacaciones, etc."
                     required
                   />
-                  <p className="text-xs text-gray-400">Dale un nombre descriptivo a tu objetivo</p>
+                  <p className="text-xs text-[#8B92A8]">Dale un nombre descriptivo a tu objetivo</p>
                 </div>
 
                 <CurrencySelect
@@ -273,7 +273,7 @@ export default function Savings() {
                 {editingGoal ? (
                   <p className="text-xs text-amber-400">La moneda NO se puede cambiar después de crear la meta</p>
                 ) : (
-                  <p className="text-xs text-gray-400">Esta moneda solo afectará a esta meta de ahorro</p>
+                  <p className="text-xs text-[#8B92A8]">Esta moneda solo afectará a esta meta de ahorro</p>
                 )}
 
                 <div className="grid grid-cols-2 gap-4">
@@ -291,7 +291,7 @@ export default function Savings() {
                       className="bg-[#14161B] border-white/10 text-white font-mono h-11"
                       required
                     />
-                    <p className="text-xs text-gray-400">Meta a alcanzar</p>
+                    <p className="text-xs text-[#8B92A8]">Meta a alcanzar</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="current_amount" className="text-white font-semibold">
@@ -306,7 +306,7 @@ export default function Savings() {
                       onChange={(e) => setFormData({ ...formData, current_amount: e.target.value })}
                       className="bg-[#14161B] border-white/10 text-white font-mono h-11"
                     />
-                    <p className="text-xs text-gray-400">Ahorro actual</p>
+                    <p className="text-xs text-[#8B92A8]">Ahorro actual</p>
                   </div>
                 </div>
 
@@ -321,7 +321,7 @@ export default function Savings() {
                     onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
                     className="bg-[#14161B] border-white/10 text-white h-11"
                   />
-                  <p className="text-xs text-gray-400">Fecha objetivo para completar la meta</p>
+                  <p className="text-xs text-[#8B92A8]">Fecha objetivo para completar la meta</p>
                 </div>
 
                 <div className="space-y-2">
@@ -335,7 +335,7 @@ export default function Savings() {
                     className="bg-[#14161B] border-white/10 text-white h-11"
                     placeholder="Describe tu meta de ahorro..."
                   />
-                  <p className="text-xs text-gray-400">Información adicional sobre tu meta</p>
+                  <p className="text-xs text-[#8B92A8]">Información adicional sobre tu meta</p>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
@@ -365,7 +365,7 @@ export default function Savings() {
           <Card className="bg-[#14161B] border-white/5">
             <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
               <div className="text-red-500">Error al cargar metas</div>
-              <div className="text-gray-400 text-sm">{error.message}</div>
+              <div className="text-[#8B92A8] text-sm">{error.message}</div>
               <Button
                 onClick={() => utils.savings.list.invalidate()}
                 variant="outline"
@@ -378,7 +378,7 @@ export default function Savings() {
         ) : isLoading ? (
           <Card className="bg-[#14161B] border-white/5">
             <CardContent className="flex items-center justify-center py-16">
-              <div className="text-gray-400">Cargando metas...</div>
+              <div className="text-[#8B92A8]">Cargando metas...</div>
             </CardContent>
           </Card>
         ) : !savingsGoals || savingsGoals.length === 0 ? (
@@ -390,7 +390,7 @@ export default function Savings() {
               <h3 className="text-xl font-semibold text-white mb-2">
                 No hay metas de ahorro aún
               </h3>
-              <p className="text-gray-400 mb-6">
+              <p className="text-[#8B92A8] mb-6">
                 Comienza definiendo tu primera meta financiera
               </p>
             </CardContent>
@@ -406,7 +406,7 @@ export default function Savings() {
               return (
                 <div 
                   key={goal.id} 
-                  className="bg-[#1B1E24] rounded-[9999px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#C4FF3D]/5 hover:border-[rgba(74,222,128,0.15)] transition-colors-smooth group"
+                  className="bg-[#14161B] rounded-[28px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#C4FF3D]/5 hover:border-[#C4FF3D]/20 transition-colors-smooth group"
                 >
                   <div className="flex items-center justify-between gap-6">
                     {/* Información Principal - Izquierda */}
@@ -527,7 +527,7 @@ export default function Savings() {
                   </div>
 
                   {goal.status === 'completed' && (
-                    <div className="mt-4 p-3 bg-[#C4FF3D]/10 rounded-[9999px] border border-[#C4FF3D]/20">
+                    <div className="mt-4 p-3 bg-[#C4FF3D]/10 rounded-[28px] border border-[#C4FF3D]/20">
                       <p className="text-sm text-[#C4FF3D] font-medium text-center">
                         ¡Meta completada!
                       </p>
