@@ -139,14 +139,7 @@ export default function Clients() {
     email: '',
     phone: '',
     company: '',
-    has_recurring_billing: false,
-    billing_cycle: 'monthly',
-    amount: '0',
-    next_payment_date: '',
-    currency: 'USD',
-    reminder_days: 7,
     status: 'active',
-    archived: false,
     notes: '',
   });
 
@@ -198,18 +191,6 @@ export default function Clients() {
       return;
     }
 
-    // Validar campos de facturación recurrente
-    if (formData.has_recurring_billing) {
-      if (!formData.amount || parseFloat(formData.amount) <= 0) {
-        toast.error('El monto debe ser mayor a 0 para clientes recurrentes');
-        return;
-      }
-      if (!formData.next_payment_date) {
-        toast.error('La fecha del próximo pago es requerida para clientes recurrentes');
-        return;
-      }
-    }
-
     try {
       // Normalizar datos antes de enviar
       const normalizedData = {
@@ -238,14 +219,7 @@ export default function Clients() {
         email: '',
         phone: '',
         company: '',
-        has_recurring_billing: false,
-        billing_cycle: 'monthly',
-        amount: '0',
-        next_payment_date: '',
-        currency: 'USD',
-        reminder_days: 7,
         status: 'active',
-        archived: false,
         notes: '',
       });
     } catch (error: any) {
@@ -259,17 +233,9 @@ export default function Clients() {
     setFormData({
       name: client.name,
       email: client.email,
-      phone: client.phone,
+      phone: client.phone || '',
       company: client.company || '',
-      has_recurring_billing: client.has_recurring_billing || false,
-      billing_cycle: client.billing_cycle,
-      custom_cycle_days: client.custom_cycle_days,
-      amount: client.amount,
-      next_payment_date: client.next_payment_date ? format(new Date(client.next_payment_date), 'yyyy-MM-dd') : '',
-      currency: client.currency || 'USD',
-      reminder_days: client.reminder_days,
       status: client.status,
-      archived: client.archived || false,
       notes: client.notes || '',
     });
     setIsDialogOpen(true);

@@ -742,18 +742,10 @@ export async function createClient(data: {
   user_id: number;
   name: string;
   email: string;
-  phone?: string | null;
-  company?: string | null;
-  has_recurring_billing: boolean;
-  billing_cycle?: string | null;
-  custom_cycle_days?: number | null;
-  amount?: string | null;
-  next_payment_date?: Date | null;
-  currency: string;
-  reminder_days?: number | null;
-  status: string;
-  archived: boolean;
-  notes?: string | null;
+  phone?: string;
+  company?: string;
+  status?: string;
+  notes?: string;
 }) {
   const db = await getDb();
   if (!db) {
@@ -761,7 +753,7 @@ export async function createClient(data: {
   }
 
   try {
-    // Normalizar email
+    // Normalizar datos
     const normalizedEmail = data.email.toLowerCase().trim();
     
     // Verificar duplicados
@@ -774,33 +766,20 @@ export async function createClient(data: {
       .limit(1);
     
     if (existing.length > 0) {
-      logClientDuplicate(normalizedEmail, data.user_id);
-      throw new Error("DUPLICATE_CLIENT");
+      throw new Error("Ya existe un cliente con este email");
     }
     
-    // Preparar datos normalizados
-    const clientData = {
+    // Insertar cliente
+    const result = await db.insert(clients).values({
       user_id: data.user_id,
       name: data.name.trim(),
       email: normalizedEmail,
       phone: data.phone?.trim() || null,
       company: data.company?.trim() || null,
-      has_recurring_billing: data.has_recurring_billing,
-      billing_cycle: data.has_recurring_billing ? data.billing_cycle : null,
-      custom_cycle_days: data.has_recurring_billing ? data.custom_cycle_days : null,
-      amount: data.has_recurring_billing ? data.amount : null,
-      next_payment_date: data.has_recurring_billing ? data.next_payment_date : null,
-      currency: data.currency || "USD",
-      reminder_days: data.has_recurring_billing ? data.reminder_days : null,
-      status: data.status,
-      archived: data.archived,
+      status: data.status || "active",
+      archived: false,
       notes: data.notes?.trim() || null,
-      created_at: new Date(),
-      updated_at: new Date(),
-    };
-    
-    // Insertar cliente
-    const result = await db.insert(clients).values(clientData);
+    });
     
     // Obtener cliente creado
     const insertId = (result as any)[0]?.insertId || (result as any).insertId;
@@ -810,13 +789,10 @@ export async function createClient(data: {
       .where(eq(clients.id, insertId))
       .limit(1);
     
-    logClientCreated(newClient[0].id, newClient[0].name, newClient[0].email, data.user_id);
+    console.log(`[DB] Cliente creado: ${newClient[0].id} - ${newClient[0].name}`);
     
     return newClient[0];
   } catch (error: any) {
-    if (error.message === "DUPLICATE_CLIENT") {
-      throw new Error("Ya existe un cliente con este email");
-    }
     console.error("[DB] Error al crear cliente:", error);
     throw error;
   }

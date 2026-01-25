@@ -691,27 +691,18 @@ export const appRouter = router({
     
     create: protectedProcedure
       .input(z.object({
-        name: z.string().min(2, "El nombre debe tener al menos 2 caracteres").max(255, "El nombre es demasiado largo"),
-        email: z.string().email("Email inválido").max(320, "Email demasiado largo"),
+        name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+        email: z.string().email("Email inválido"),
         phone: z.string().optional(),
         company: z.string().optional(),
-        has_recurring_billing: z.boolean().default(false),
-        billing_cycle: z.enum(["monthly", "quarterly", "yearly", "custom"]).optional(),
-        custom_cycle_days: z.number().optional(),
-        amount: z.string().optional(),
-        next_payment_date: z.string().optional(),
-        currency: z.string().length(3, "Código de moneda inválido").default("USD"),
-        reminder_days: z.number().optional(),
-        status: z.enum(["active", "inactive", "overdue"]).default("active"),
+        status: z.enum(["active", "inactive"]).default("active"),
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        const { logClientCreateAttempt, logClientCreateError, logValidationError } = await import("./utils/logger");
-        
         try {
-          logClientCreateAttempt(input.email, ctx.user.id);
+          console.log(`[API] Creando cliente: ${input.email}`);
           
-          // Verificar límites de plan (excepto super admins)
+          // Verificar límites de plan
           if (ctx.user.role !== 'super_admin') {
             const { getPlanLimit } = await import("./plans");
             const clientLimit = getPlanLimit(ctx.user.subscription_plan as any, 'clients');
@@ -719,44 +710,20 @@ export const appRouter = router({
             if (clientLimit !== Infinity) {
               const existingClients = await db.getClientsByUserId(ctx.user.id);
               if (existingClients.length >= clientLimit) {
-                throw new Error(`Has alcanzado el límite de ${clientLimit} clientes en el plan Free. Actualiza a Pro para clientes ilimitados.`);
+                throw new Error(`Has alcanzado el límite de ${clientLimit} clientes en el plan Free.`);
               }
             }
           }
           
-          // Validar campos de billing si es recurrente
-          if (input.has_recurring_billing) {
-            if (!input.billing_cycle) {
-              logValidationError('billing_cycle', 'Ciclo de facturación requerido', ctx.user.id);
-              throw new Error("El ciclo de facturación es requerido para clientes recurrentes");
-            }
-            if (!input.amount || parseFloat(input.amount) <= 0) {
-              logValidationError('amount', 'Monto debe ser mayor a 0', ctx.user.id);
-              throw new Error("El monto debe ser mayor a 0 para clientes recurrentes");
-            }
-            if (!input.next_payment_date) {
-              logValidationError('next_payment_date', 'Fecha de pago requerida', ctx.user.id);
-              throw new Error("La fecha del próximo pago es requerida para clientes recurrentes");
-            }
-          }
-          
-          // Crear cliente con validación de duplicados
+          // Crear cliente
           const client = await db.createClient({
             user_id: ctx.user.id,
             name: input.name,
             email: input.email,
-            phone: input.phone || null,
-            company: input.company || null,
-            has_recurring_billing: input.has_recurring_billing,
-            billing_cycle: input.billing_cycle || null,
-            custom_cycle_days: input.custom_cycle_days || null,
-            amount: input.amount || null,
-            next_payment_date: input.next_payment_date ? new Date(input.next_payment_date) : null,
-            currency: input.currency,
-            reminder_days: input.reminder_days || null,
+            phone: input.phone,
+            company: input.company,
             status: input.status,
-            archived: false,
-            notes: input.notes || null,
+            notes: input.notes,
           });
           
           return { 
@@ -764,7 +731,7 @@ export const appRouter = router({
             client: client 
           };
         } catch (error: any) {
-          logClientCreateError(input.email, ctx.user.id, error);
+          console.error(`[API] Error al crear cliente:`, error.message);
           throw new Error(error.message || "Error al crear cliente");
         }
       }),

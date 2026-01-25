@@ -56,19 +56,12 @@ export type InsertUser = typeof users.$inferInsert;
  */
 export const clients = mysqlTable("clients", {
   id: serial("id").primaryKey(),
-  user_id: int("user_id").notNull(), // Owner of the client
+  user_id: int("user_id").notNull(),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 320 }).notNull(),
-  phone: varchar("phone", { length: 50 }).notNull(),
+  phone: varchar("phone", { length: 50 }),
   company: varchar("company", { length: 255 }),
-  has_recurring_billing: boolean("has_recurring_billing").notNull().default(false),
-  billing_cycle: mysqlEnum("billing_cycle", ["monthly", "quarterly", "yearly", "custom"]),
-  custom_cycle_days: int("custom_cycle_days"),
-  amount: decimal("amount", { precision: 10, scale: 2 }),
-  next_payment_date: timestamp("next_payment_date"),
-  currency: varchar("currency", { length: 3 }).notNull().default("USD"),
-  reminder_days: int("reminder_days"),
-  status: mysqlEnum("status", ["active", "inactive", "overdue"]).notNull().default("active"),
+  status: mysqlEnum("status", ["active", "inactive"]).notNull().default("active"),
   archived: boolean("archived").notNull().default(false),
   notes: text("notes"),
   created_at: timestamp("created_at").defaultNow().notNull(),
