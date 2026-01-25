@@ -28,15 +28,13 @@ import Invoices from "./pages/Invoices";
 import Finances from "./pages/Finances";
 import Savings from "./pages/Savings";
 import Settings from "./pages/Settings";
-import AlertTesting from "./pages/AlertTesting";
 import Admin from "./pages/Admin";
 import Markets from "./pages/Markets";
 import PricingPage from "./pages/PricingPage";
 import CompanyProfile from "./pages/CompanyProfile";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
-import { ReminderNotificationProvider } from "./components/ReminderNotificationProvider";
-import { PaymentReceivedNotificationProvider } from "./components/PaymentReceivedNotification";
+
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -109,11 +107,7 @@ function Router() {
           <Updates />
         </ProtectedRoute>
       </Route>
-      <Route path="/alert-testing">
-        <ProtectedRoute>
-          <AlertTesting />
-        </ProtectedRoute>
-      </Route>
+
 
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
@@ -128,11 +122,7 @@ function App() {
         <ThemeProvider defaultTheme="dark">
           <TooltipProvider>
             <Toaster />
-            <ReminderNotificationProvider>
-              <PaymentReceivedNotificationProvider>
-                <Router />
-              </PaymentReceivedNotificationProvider>
-            </ReminderNotificationProvider>
+            <Router />
 
           </TooltipProvider>
         </ThemeProvider>

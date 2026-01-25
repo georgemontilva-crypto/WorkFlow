@@ -8,6 +8,7 @@ import { getRedisClient } from "./config/redis";
 import { invoicesRouter } from "./routers_invoices";
 import { financesRouter } from "./routers_finances";
 import { savingsRouter } from "./routers_savings";
+import { notificationsRouter } from "./routers_notifications";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -720,6 +721,12 @@ export const appRouter = router({
    * Independent savings goals module with own currency per goal
    */
   savings: savingsRouter,
+  
+  /**
+   * Notifications router - PERSISTENT NOTIFICATIONS SYSTEM
+   * Side panel only, no auto-popups, no toasts
+   */
+  notifications: notificationsRouter,
 });
 
 export type AppRouter = typeof appRouter;

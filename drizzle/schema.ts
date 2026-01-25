@@ -392,34 +392,38 @@ export type Alert = typeof alerts.$inferSelect;
 export type InsertAlert = typeof alerts.$inferInsert;
 
 /**
- * Notifications table - Sistema de notificaciones V2
- * Limpio, predecible y escalable con Redis
+ * Notifications table - PERSISTENT NOTIFICATIONS SYSTEM
+ * Built from scratch - Clean, reliable, side panel only
+ * NO auto-popups, NO toasts, NO AI (yet)
  */
 export const notifications = mysqlTable("notifications", {
   id: serial("id").primaryKey(),
   user_id: bigint("user_id", { mode: "number", unsigned: true }).notNull(),
   
-  /** Tipo de notificación: info, success, warning, error */
+  /** Notification type: info, success, warning, error */
   type: mysqlEnum("type", ["info", "success", "warning", "error"]).notNull(),
   
-  /** Título de la notificación (obligatorio) */
+  /** Notification title (REQUIRED - NO optional) */
   title: varchar("title", { length: 255 }).notNull(),
   
-  /** Mensaje descriptivo de la notificación (obligatorio) */
+  /** Notification message (REQUIRED - NO optional) */
   message: text("message").notNull(),
   
-  /** Prioridad de la notificación */
-  priority: mysqlEnum("priority", ["low", "normal", "high"]).notNull().default("normal"),
+  /** Source of notification: invoice, savings, system */
+  source: mysqlEnum("source", ["invoice", "savings", "system"]).notNull(),
   
-  /** Si la notificación fue leída por el usuario */
+  /** Source ID (nullable) - ID of the related entity (invoice_id, savings_goal_id, etc) */
+  source_id: bigint("source_id", { mode: "number", unsigned: true }),
+  
+  /** Whether the notification was read by the user */
   is_read: int("is_read").notNull().default(0),
   
-  /** Fecha de creación */
+  /** Creation timestamp */
   created_at: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({
   userReadIdx: index("idx_user_read").on(table.user_id, table.is_read),
   userCreatedIdx: index("idx_user_created").on(table.user_id, table.created_at),
-  priorityIdx: index("idx_priority").on(table.priority),
+  sourceIdx: index("idx_source").on(table.source, table.source_id),
 }));
 
 export type Notification = typeof notifications.$inferSelect;

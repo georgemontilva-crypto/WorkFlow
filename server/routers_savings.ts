@@ -192,6 +192,7 @@ export const savingsRouter = router({
         }
 
         const targetAmount = parseFloat(goal.target_amount);
+        const previousStatus = goal.status;
         const newStatus = input.current_amount >= targetAmount ? 'completed' : 'active';
 
         // Update progress
@@ -205,6 +206,18 @@ export const savingsRouter = router({
           .where(eq(savingsGoals.id, input.id));
 
         console.log(`[Savings] Progress updated for goal ${input.id}: ${input.current_amount}/${targetAmount} (${newStatus})`);
+
+        // Create notification if goal just completed
+        if (newStatus === 'completed' && previousStatus !== 'completed') {
+          const { notifySavingsGoalCompleted } = await import('../helpers/notificationHelpers');
+          await notifySavingsGoalCompleted(
+            userId,
+            input.id,
+            goal.name,
+            targetAmount,
+            goal.currency
+          );
+        }
 
         return { success: true };
       } catch (error: any) {

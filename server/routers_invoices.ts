@@ -281,6 +281,18 @@ export const invoicesRouter = router({
         
         console.log(`[Invoices] Status updated: ${currentStatus} → ${newStatus}`);
         
+        // Create notification if marked as paid
+        if (newStatus === 'paid') {
+          const { notifyInvoicePaid } = await import('../helpers/notificationHelpers');
+          await notifyInvoicePaid(
+            ctx.user.id,
+            input.id,
+            invoice.invoice_number,
+            parseFloat(invoice.total_amount),
+            invoice.currency
+          );
+        }
+        
         return { success: true };
       } catch (error: any) {
         console.error(`[Invoices] UpdateStatus error:`, error.message);
