@@ -1,12 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { Plus, Search, Mail, Phone, Building2, MoreVertical, Archive, Trash2, Edit, X } from 'lucide-react';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
+import { Card, CardHeader } from '../components/ui/Card';
 import {
   Select,
   SelectContent,
@@ -20,8 +19,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../components/ui/dialog';
 import { trpc } from '../lib/trpc';
-// import { toast } from 'sonner';
 
 type Client = {
   id: number;
@@ -103,27 +107,22 @@ export default function Clients() {
           id: editingClient.id,
           ...formData,
         });
-        // toast.success('Cliente actualizado exitosamente');
       } else {
         await createClientMutation.mutateAsync(formData);
-        // toast.success('Cliente creado exitosamente');
       }
       handleCloseModal();
       refetch();
     } catch (error: any) {
       console.error('Error al guardar cliente:', error);
-      // toast.error(error.message || 'Error al guardar cliente');
     }
   };
 
   const handleArchive = async (id: number) => {
     try {
       await updateClientMutation.mutateAsync({ id, archived: 1 });
-      // toast.success('Cliente archivado exitosamente');
       refetch();
     } catch (error: any) {
       console.error('Error al archivar cliente:', error);
-      // toast.error(error.message || 'Error al archivar cliente');
     }
   };
 
@@ -134,11 +133,9 @@ export default function Clients() {
     
     try {
       await deleteClientMutation.mutateAsync({ id });
-      // toast.success('Cliente eliminado exitosamente');
       refetch();
     } catch (error: any) {
       console.error('Error al eliminar cliente:', error);
-      // toast.error(error.message || 'Error al eliminar cliente');
     }
   };
 
@@ -155,239 +152,251 @@ export default function Clients() {
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusBadge = (status: string) => {
-    if (status === 'inactive') {
-      return { label: 'Inactivo', color: 'bg-gray-500' };
-    }
-    return { label: 'Activo', color: 'bg-green-500' };
-  };
-
   return (
     <DashboardLayout>
-      <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-white">{t.clients.title}</h1>
-          <p className="text-gray-400 mt-1">{t.clients.subtitle}</p>
-        </div>
-        <Button
-          onClick={() => handleOpenModal()}
-          variant="default"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          {t.clients.addClient}
-        </Button>
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <Input
-            type="text"
-            placeholder={t.clients.search}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-[#14161B] border-white/10 text-white h-11"
-          />
-        </div>
-        <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
-          <SelectTrigger className="w-full sm:w-[200px] bg-[#14161B] border-white/10 text-white h-11">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos los estados</SelectItem>
-            <SelectItem value="active">Activo</SelectItem>
-            <SelectItem value="inactive">Inactivo</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Lista de Clientes - Filas tipo tarjeta (FASE 4) */}
-      <div className="space-y-4">
-        {filteredClients.length === 0 ? (
-          <div className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-12 text-center">
-            <p className="text-[#9AA0AA] text-base">No se encontraron clientes</p>
+      {/* Main Container - Max Width 1280px */}
+      <div className="max-w-[1280px] mx-auto p-6 space-y-6">
+        
+        {/* Header Card */}
+        <Card>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold text-[#EDEDED]">{t.clients.title}</h1>
+              <p className="text-[#9AA0AA] mt-1">{t.clients.subtitle}</p>
+            </div>
+            <Button
+              onClick={() => handleOpenModal()}
+              variant="default"
+              className="w-full md:w-auto"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              {t.clients.addClient}
+            </Button>
           </div>
-        ) : (
-          filteredClients.map((client) => {
-            const statusBadge = getStatusBadge(client.status);
-            
-            return (
-              <div 
-                key={client.id} 
-                className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#4ADE80]/5 hover:border-[rgba(74,222,128,0.15)] transition-colors-smooth cursor-pointer group"
-              >
-                <div className="flex items-center justify-between gap-6">
-                  {/* Información Principal - Izquierda */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-white font-medium text-lg mb-1">{client.name}</h3>
-                    {client.company && (
-                      <p className="text-[#9AA0AA] flex items-center gap-2 text-base">
-                        <Building2 className="w-4 h-4 flex-shrink-0" />
-                        {client.company}
-                      </p>
-                    )}
+        </Card>
+
+        {/* Filters Card */}
+        <Card>
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9AA0AA] w-5 h-5" />
+              <Input
+                type="text"
+                placeholder={t.clients.search}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 h-12 text-base"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
+              <SelectTrigger className="w-full md:w-[220px] h-12 text-base">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos los estados</SelectItem>
+                <SelectItem value="active">Activo</SelectItem>
+                <SelectItem value="inactive">Inactivo</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </Card>
+
+        {/* Clients List Card */}
+        <Card>
+          <CardHeader
+            title="Clientes"
+            subtitle={`${filteredClients.length} cliente${filteredClients.length !== 1 ? 's' : ''}`}
+          />
+          
+          <div className="space-y-3">
+            {filteredClients.length === 0 ? (
+              <div className="py-16 text-center">
+                <p className="text-[#6B7280] text-base">No se encontraron clientes</p>
+              </div>
+            ) : (
+              filteredClients.map((client) => (
+                <div
+                  key={client.id}
+                  className="bg-[#14161B] rounded-[20px] border border-[rgba(255,255,255,0.06)] p-6 hover:bg-[#4ADE80]/5 hover:border-[#4ADE80]/20 transition-colors-smooth cursor-pointer group"
+                >
+                  <div className="flex items-start md:items-center justify-between gap-6">
+                    {/* Left: Client Info */}
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-[16px] bg-[#4ADE80]/10 border border-[#4ADE80]/20 flex items-center justify-center flex-shrink-0">
+                          <Building2 className="w-6 h-6 text-[#4ADE80]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-[#EDEDED] font-medium text-lg leading-tight">
+                            {client.name}
+                          </h3>
+                          {client.company && (
+                            <p className="text-[#9AA0AA] text-sm mt-0.5 truncate">
+                              {client.company}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Center: Contact Info (Desktop) */}
+                    <div className="hidden md:flex flex-col gap-2 flex-1">
+                      <div className="flex items-center gap-2 text-[#9AA0AA]">
+                        <Mail className="w-4 h-4 flex-shrink-0" />
+                        <span className="text-sm truncate">{client.email}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[#9AA0AA]">
+                        <Phone className="w-4 h-4 flex-shrink-0" />
+                        <span className="text-sm">{client.phone}</span>
+                      </div>
+                    </div>
+
+                    {/* Right: Status & Actions */}
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`px-4 py-2 rounded-[12px] text-sm font-medium ${
+                          client.status === 'active'
+                            ? 'bg-[#4ADE80]/10 text-[#4ADE80] border border-[#4ADE80]/20'
+                            : 'bg-[#6B7280]/10 text-[#6B7280] border border-[#6B7280]/20'
+                        }`}
+                      >
+                        {client.status === 'active' ? 'Activo' : 'Inactivo'}
+                      </span>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-[#9AA0AA] hover:text-[#EDEDED] md:opacity-0 md:group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px]"
+                          >
+                            <MoreVertical className="w-5 h-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-[#0E0F12] border-[#4ADE80]/30">
+                          <DropdownMenuItem
+                            onClick={() => handleOpenModal(client)}
+                            className="text-[#EDEDED] hover:bg-[#4ADE80]/10 cursor-pointer"
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleArchive(client.id)}
+                            className="text-[#EDEDED] hover:bg-[#4ADE80]/10 cursor-pointer"
+                          >
+                            <Archive className="w-4 h-4 mr-2" />
+                            Archivar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(client.id)}
+                            className="text-[#EF4444] hover:bg-[#EF4444]/10 cursor-pointer"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
 
-                  {/* Contacto - Centro */}
-                  <div className="hidden md:flex flex-col gap-2 flex-1">
+                  {/* Mobile: Contact Info */}
+                  <div className="md:hidden mt-4 pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-2">
                     <div className="flex items-center gap-2 text-[#9AA0AA]">
                       <Mail className="w-4 h-4 flex-shrink-0" />
-                      <span className="text-base truncate">{client.email}</span>
+                      <span className="text-sm truncate">{client.email}</span>
                     </div>
                     <div className="flex items-center gap-2 text-[#9AA0AA]">
                       <Phone className="w-4 h-4 flex-shrink-0" />
-                      <span className="text-base">{client.phone}</span>
+                      <span className="text-sm">{client.phone}</span>
                     </div>
                   </div>
-
-                  {/* Estado y Acciones - Derecha */}
-                  <div className="flex items-center gap-2 md:gap-4">
-                    <span className={`inline-flex items-center px-3 py-1.5 rounded-[6px] text-sm font-medium ${statusBadge.color} text-white`}>
-                      {statusBadge.label}
-                    </span>
-                    
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-[#9AA0AA] hover:text-white md:opacity-0 md:group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px]">
-                          <MoreVertical className="w-5 h-5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-[#0E0F12] border-[#4ADE80]/30">
-                        <DropdownMenuItem
-                          onClick={() => handleOpenModal(client)}
-                          className="text-white hover:bg-[#4ADE80]/10 cursor-pointer"
-                        >
-                          <Edit className="w-4 h-4 mr-2" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleArchive(client.id)}
-                          className="text-white hover:bg-[#4ADE80]/10 cursor-pointer"
-                        >
-                          <Archive className="w-4 h-4 mr-2" />
-                          Archivar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDelete(client.id)}
-                          className="text-[#EF4444] hover:bg-[#EF4444]/10 cursor-pointer"
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
                 </div>
-
-                {/* Contacto Mobile - Debajo */}
-                <div className="md:hidden mt-4 pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-2">
-                  <div className="flex items-center gap-2 text-[#9AA0AA]">
-                    <Mail className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-sm truncate">{client.email}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-[#9AA0AA]">
-                    <Phone className="w-4 h-4 flex-shrink-0" />
-                    <span className="text-sm">{client.phone}</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })
-        )}
+              ))
+            )}
+          </div>
+        </Card>
       </div>
 
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-[#1B1E24] rounded-lg border border-white/10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-[#1B1E24] border-b border-white/10 p-6 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-white">
-                {editingClient ? 'Editar Cliente' : t.clients.addClient}
-              </h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCloseModal}
-                className="text-gray-400 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
+      {/* Modal para Crear/Editar Cliente */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="bg-[#1B1E24] border-[rgba(255,255,255,0.06)] max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-[#EDEDED] text-2xl font-semibold">
+              {editingClient ? 'Editar Cliente' : 'Nuevo Cliente'}
+            </DialogTitle>
+          </DialogHeader>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-white font-medium text-sm">
-                    {t.clients.name} *
-                  </Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="bg-[#14161B] border-white/10 text-white h-11"
-                    placeholder="Nombre completo"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-white font-medium text-sm">
-                    {t.clients.email} *
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="bg-[#14161B] border-white/10 text-white h-11"
-                    placeholder="correo@ejemplo.com"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="phone" className="text-white font-medium text-sm">
-                    {t.clients.phone} *
-                  </Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="bg-[#14161B] border-white/10 text-white h-11"
-                    placeholder="+1 (555) 000-0000"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="company" className="text-white font-medium text-sm">
-                    {t.clients.company}
-                  </Label>
-                  <Input
-                    id="company"
-                    type="text"
-                    value={formData.company}
-                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                    className="bg-[#14161B] border-white/10 text-white h-11"
-                    placeholder="Nombre de la empresa"
-                  />
-                </div>
+          <form onSubmit={handleSubmit} className="space-y-6 mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-[#EDEDED]">
+                  Nombre completo
+                </Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Ej: Juan Pérez"
+                  required
+                  className="h-12"
+                />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="status" className="text-white font-medium text-sm">Estado</Label>
+                <Label htmlFor="company" className="text-[#EDEDED]">
+                  Empresa
+                </Label>
+                <Input
+                  id="company"
+                  value={formData.company}
+                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                  placeholder="Ej: Acme Corp"
+                  className="h-12"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-[#EDEDED]">
+                  Correo electrónico
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="correo@ejemplo.com"
+                  required
+                  className="h-12"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-[#EDEDED]">
+                  Teléfono
+                </Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="+1 234 567 8900"
+                  required
+                  className="h-12"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status" className="text-[#EDEDED]">
+                  Estado
+                </Label>
                 <Select
                   value={formData.status}
-                  onValueChange={(value: 'active' | 'inactive') => setFormData({ ...formData, status: value })}
+                  onValueChange={(value: 'active' | 'inactive') =>
+                    setFormData({ ...formData, status: value })
+                  }
                 >
-                  <SelectTrigger className="bg-[#14161B] border-white/10 text-white h-11">
+                  <SelectTrigger className="h-12">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -396,41 +405,43 @@ export default function Clients() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="notes" className="text-white font-medium text-sm">Notas Adicionales</Label>
-                <textarea
-                  id="notes"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full min-h-[100px] bg-[#14161B] border border-white/10 rounded-md p-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF9500]"
-                  placeholder="Información adicional sobre el cliente..."
-                />
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="notes" className="text-[#EDEDED]">
+                Notas (opcional)
+              </Label>
+              <textarea
+                id="notes"
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                placeholder="Información adicional sobre el cliente..."
+                rows={4}
+                className="w-full bg-[#14161B] border border-[#4ADE80] rounded-[16px] px-4 py-3 text-[#EDEDED] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-colors-smooth resize-none"
+              />
+            </div>
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCloseModal}
-                  className="flex-1 border-white/10 text-white hover:bg-white/10"
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  variant="default"
-                  className="flex-1"
-                  disabled={createClientMutation.isPending || updateClientMutation.isPending}
-                >
-                  {createClientMutation.isPending || updateClientMutation.isPending ? 'Guardando...' : 'Guardar'}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-      </div>
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleCloseModal}
+                className="flex-1 h-12"
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                variant="default"
+                disabled={createClientMutation.isPending || updateClientMutation.isPending}
+                className="flex-1 h-12"
+              >
+                {editingClient ? 'Actualizar' : 'Crear'} Cliente
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
