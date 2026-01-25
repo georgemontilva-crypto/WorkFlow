@@ -166,8 +166,9 @@ export default function Savings() {
       name: goal.name,
       target_amount: goal.target_amount,
       current_amount: goal.current_amount,
-      currency: goal.currency || 'USD',
-      target_date: goal.target_date ? format(new Date(goal.target_date), 'yyyy-MM-dd') : '',
+      currency: goal.currency, // Cannot be changed
+      deadline: goal.deadline ? format(new Date(goal.deadline), 'yyyy-MM-dd') : '',
+      description: goal.description || '',
       status: goal.status,
     });
     setIsDialogOpen(true);
@@ -185,20 +186,11 @@ export default function Savings() {
 
     const currentAmount = parseFloat(goal.current_amount) || 0;
     const newAmount = currentAmount + parseFloat(amount);
-    const targetAmount = parseFloat(goal.target_amount) || 0;
-    const newStatus = newAmount >= targetAmount ? 'completed' : 'active';
     
-    updateGoal.mutate({
+    updateProgress.mutate({
       id: goal.id,
-      current_amount: newAmount.toString(),
-      status: newStatus,
+      current_amount: newAmount,
     });
-    
-    if (newStatus === 'completed') {
-      toast.success('¡Felicidades! Meta completada');
-    } else {
-      toast.success('Monto actualizado');
-    }
   };
 
   return (
@@ -220,8 +212,9 @@ export default function Savings() {
                 name: '',
                 target_amount: '',
                 current_amount: '',
-                currency: 'USD',
-                target_date: '',
+                currency: '',
+                deadline: '',
+                description: '',
                 status: 'active',
               });
             }
@@ -262,8 +255,13 @@ export default function Savings() {
                   onChange={(currency) => setFormData({ ...formData, currency })}
                   label="Moneda"
                   required
+                  disabled={!!editingGoal}
                 />
-                <p className="text-xs text-gray-400">Esta moneda solo afectará a esta meta de ahorro</p>
+                {editingGoal ? (
+                  <p className="text-xs text-amber-400">La moneda NO se puede cambiar después de crear la meta</p>
+                ) : (
+                  <p className="text-xs text-gray-400">Esta moneda solo afectará a esta meta de ahorro</p>
+                )}
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -300,18 +298,31 @@ export default function Savings() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="target_date" className="text-white font-semibold">
-                    Fecha Límite <span className="text-red-500">*</span>
+                  <Label htmlFor="deadline" className="text-white font-semibold">
+                    Fecha Límite (Opcional)
                   </Label>
                   <Input
-                    id="target_date"
+                    id="deadline"
                     type="date"
-                    value={formData.target_date}
-                    onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
+                    value={formData.deadline}
+                    onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
                     className="bg-[#2A2A2A] border-white/10 text-white h-11"
-                    required
                   />
                   <p className="text-xs text-gray-400">Fecha objetivo para completar la meta</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-white font-semibold">
+                    Descripción (Opcional)
+                  </Label>
+                  <Input
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                    placeholder="Describe tu meta de ahorro..."
+                  />
+                  <p className="text-xs text-gray-400">Información adicional sobre tu meta</p>
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
@@ -381,7 +392,7 @@ export default function Savings() {
                       <div className="min-w-0 flex-1">
                         <h3 className="text-white text-lg font-bold truncate">{goal.name}</h3>
                         <p className="text-sm text-gray-400">
-                          {goal.target_date && `Fecha límite: ${format(new Date(goal.target_date), 'dd MMM yyyy', { locale: es })}`}
+                          {goal.deadline && `Fecha límite: ${format(new Date(goal.deadline), 'dd MMM yyyy', { locale: es })}`}
                         </p>
                       </div>
                     </div>
