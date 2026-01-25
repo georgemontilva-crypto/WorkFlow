@@ -46,6 +46,7 @@ type InvoiceItem = {
 
 export default function Invoices() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled'>('all');
+  const [clientFilter, setClientFilter] = useState<'all' | number>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewingInvoice, setViewingInvoice] = useState<number | null>(null);
@@ -325,7 +326,8 @@ export default function Invoices() {
   
   const filteredInvoices = invoices.filter(invoice => {
     const matchesSearch = invoice.invoice_number.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesSearch;
+    const matchesClient = clientFilter === 'all' || invoice.client_id === clientFilter;
+    return matchesSearch && matchesClient;
   });
   
   return (
@@ -360,6 +362,17 @@ export default function Invoices() {
               />
             </div>
           </div>
+          <Select value={clientFilter.toString()} onValueChange={(value: any) => setClientFilter(value === 'all' ? 'all' : parseInt(value))}>
+            <SelectTrigger className="w-full sm:w-48 bg-[#222222] border-gray-700 text-white">
+              <SelectValue placeholder="Filtrar por cliente" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los clientes</SelectItem>
+              {clients.map(client => (
+                <SelectItem key={client.id} value={client.id.toString()}>{client.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
             <SelectTrigger className="w-full sm:w-48 bg-[#222222] border-gray-700 text-white">
               <SelectValue />
@@ -369,14 +382,16 @@ export default function Invoices() {
               <SelectItem value="draft">Borradores</SelectItem>
               <SelectItem value="sent">Enviadas</SelectItem>
               <SelectItem value="paid">Pagadas</SelectItem>
+              <SelectItem value="partial">Pago Parcial</SelectItem>
               <SelectItem value="cancelled">Canceladas</SelectItem>
             </SelectContent>
           </Select>
         </div>
         
         {/* Invoices List */}
-        <div className="grid gap-4">
-          {filteredInvoices.length === 0 ? (
+        <div className="bg-[#1a1a1a] rounded-2xl border border-gray-800 overflow-hidden">
+          <div className="h-[calc(100vh-320px)] overflow-y-auto p-4 space-y-4">
+            {filteredInvoices.length === 0 ? (
             <div className="text-center py-12 bg-[#222222] rounded-lg border border-gray-700">
               <p className="text-gray-400">No hay facturas</p>
             </div>
@@ -559,6 +574,7 @@ export default function Invoices() {
               );
             })
           )}
+          </div>
         </div>
       </div>
       
