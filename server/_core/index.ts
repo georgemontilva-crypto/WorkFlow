@@ -7,8 +7,16 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { testRedisConnection } from "../config/redis";
+import { runMigrations } from "../migrate";
 
 async function startServer() {
+  // Run database migrations first
+  try {
+    await runMigrations();
+  } catch (error) {
+    console.error('[Server] Failed to run migrations, continuing anyway...');
+  }
+  
   const app = express();
   const server = createServer(app);
   
