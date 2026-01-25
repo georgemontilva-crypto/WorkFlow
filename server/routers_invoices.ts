@@ -16,6 +16,8 @@ import { getDb } from "./db";
 import * as dbHelpers from "./db";
 import { invoices, invoiceItems } from "../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
+import { generateInvoicePDF } from "./services/invoicePDF";
+import { sendEmail } from "./_core/email";
 
 /**
  * Validation schemas
@@ -354,9 +356,6 @@ export const invoicesRouter = router({
       
       try {
         const db = await getDb();
-        // Import email service
-        const { sendEmail } = await import("../_core/email");
-        const { generateInvoicePDF } = await import("../services/invoicePDF");
         
         // Get invoice with items
         const [invoice] = await db
@@ -490,7 +489,6 @@ export const invoicesRouter = router({
       
       try {
         const db = await getDb();
-        const { generateInvoicePDF } = await import("../services/invoicePDF");
         
         // Get invoice with items
         const [invoice] = await db
