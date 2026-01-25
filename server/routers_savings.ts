@@ -102,6 +102,7 @@ export const savingsRouter = router({
     .input(z.object({
       name: z.string().min(1, "El nombre es obligatorio"),
       target_amount: z.number().positive("El monto objetivo debe ser mayor a 0"),
+      current_amount: z.number().min(0, "El monto actual no puede ser negativo").optional(),
       currency: z.string()
         .length(3, "El código de moneda debe tener 3 caracteres")
         .toUpperCase(),
@@ -134,7 +135,7 @@ export const savingsRouter = router({
           user_id: userId,
           name: input.name,
           target_amount: input.target_amount.toString(),
-          current_amount: "0",
+          current_amount: (input.current_amount || 0).toString(),
           currency: input.currency,
           deadline: input.deadline ? new Date(input.deadline) : null,
           description: input.description || null,

@@ -149,6 +149,7 @@ export default function Savings() {
       createGoal.mutate({
         name: formData.name,
         target_amount: parseFloat(formData.target_amount),
+        current_amount: parseFloat(formData.current_amount) || 0,
         currency: formData.currency,
         deadline: formData.deadline || undefined,
         description: formData.description || undefined,
