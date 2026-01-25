@@ -19,6 +19,8 @@ import {
 import { trpc } from '../lib/trpc';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { getCurrency } from '@shared/currencies';
+import { Badge } from '../components/ui/badge';
 
 type Invoice = {
   id: number;
@@ -62,6 +64,7 @@ export default function Invoices() {
   ]);
   
   // Queries
+  const { data: user } = trpc.auth.me.useQuery();
   const { data: invoices = [], refetch } = trpc.invoices.list.useQuery({ status: statusFilter });
   const { data: clients = [] } = trpc.clients.list.useQuery();
   const { data: viewInvoiceData } = trpc.invoices.getById.useQuery(
@@ -423,6 +426,24 @@ export default function Invoices() {
                       className="bg-[#222222] border-gray-700 text-white"
                     />
                   </div>
+                </div>
+                
+                {/* Currency Info */}
+                <div className="p-3 bg-[#EBFF57]/10 border border-[#EBFF57]/30 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-400 mb-1">Moneda de la factura</p>
+                      <p className="text-sm font-medium text-white">
+                        {getCurrency(user?.primary_currency || 'USD')?.name}
+                      </p>
+                    </div>
+                    <Badge className="bg-[#EBFF57]/10 text-[#EBFF57] border border-[#EBFF57]/30">
+                      {getCurrency(user?.primary_currency || 'USD')?.symbol} {user?.primary_currency || 'USD'}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    La moneda se asigna automáticamente desde tu perfil
+                  </p>
                 </div>
                 
                 {/* Items */}
