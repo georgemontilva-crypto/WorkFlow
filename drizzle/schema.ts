@@ -387,3 +387,37 @@ export const alerts = mysqlTable("alerts", {
 
 export type Alert = typeof alerts.$inferSelect;
 export type InsertAlert = typeof alerts.$inferInsert;
+
+/**
+ * Notifications table - Sistema de notificaciones V2
+ * Limpio, predecible y escalable con Redis
+ */
+export const notifications = mysqlTable("notifications", {
+  id: serial("id").primaryKey(),
+  user_id: bigint("user_id", { mode: "number", unsigned: true }).notNull(),
+  
+  /** Tipo de notificación: info, success, warning, error */
+  type: mysqlEnum("type", ["info", "success", "warning", "error"]).notNull(),
+  
+  /** Título de la notificación (obligatorio) */
+  title: varchar("title", { length: 255 }).notNull(),
+  
+  /** Mensaje descriptivo de la notificación (obligatorio) */
+  message: text("message").notNull(),
+  
+  /** Prioridad de la notificación */
+  priority: mysqlEnum("priority", ["low", "normal", "high"]).notNull().default("normal"),
+  
+  /** Si la notificación fue leída por el usuario */
+  is_read: int("is_read").notNull().default(0),
+  
+  /** Fecha de creación */
+  created_at: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  userReadIdx: index("idx_user_read").on(table.user_id, table.is_read),
+  userCreatedIdx: index("idx_user_created").on(table.user_id, table.created_at),
+  priorityIdx: index("idx_priority").on(table.priority),
+}));
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = typeof notifications.$inferInsert;
