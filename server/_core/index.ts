@@ -6,10 +6,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { startPriceMonitor } from "../services/priceMonitor";
-import { startRecurringInvoicesScheduler } from "./recurring-invoices-job";
 import { testRedisConnection } from "../config/redis";
-import { initializeReminderWorker } from "../workers/reminder-worker";
 
 async function startServer() {
   const app = express();
@@ -58,23 +55,18 @@ async function startServer() {
   server.listen(port, "0.0.0.0", () => {
     console.log(`Server running on port ${port}`);
     console.log(`Environment: ${process.env.NODE_ENV}`);
+    console.log('[Server] ✅ Simplified mode: Only auth and clients modules active');
     
-    // Start background services
-    startPriceMonitor();
-    startRecurringInvoicesScheduler();
-    
-    // Initialize reminder worker with Redis
+    // Test Redis connection (for auth password reset)
     testRedisConnection().then((connected) => {
       if (connected) {
-        initializeReminderWorker();
-        console.log('[Server] ✅ Reminder worker initialized');
+        console.log('[Server] ✅ Redis connected (for auth)');
       } else {
         console.error('[Server] ⚠️  WARNING: Redis connection failed!');
-        console.error('[Server] ⚠️  Reminders will NOT work without Redis.');
-        console.error('[Server] 💡 Please configure REDIS_URL in Railway environment variables.');
+        console.error('[Server] ⚠️  Password reset will NOT work without Redis.');
       }
     }).catch((err) => {
-      console.error('[Server] ❌ Failed to initialize reminder worker:', err);
+      console.error('[Server] ❌ Failed to test Redis connection:', err);
     });
   });
 }
