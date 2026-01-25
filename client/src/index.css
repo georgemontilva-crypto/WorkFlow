@@ -497,18 +497,17 @@
 .sidebar-item {
   @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium cursor-pointer;
   @apply text-muted-foreground hover:text-foreground;
-  @apply border border-transparent;
-  @apply hover:border-border hover:bg-transparent;
+  @apply hover:bg-transparent;
   transition: all 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-/* Sidebar Item Active - Solo outline naranja, sin fondo */
+/* Sidebar Item Active - Solo color amarillo-verde, sin bordes */
 .sidebar-item-active {
-  @apply border-primary text-primary bg-transparent;
+  @apply text-primary bg-transparent;
 }
 
 .sidebar-item-active:hover {
-  @apply border-primary text-primary bg-transparent;
+  @apply text-primary bg-transparent;
 }
 
 
