@@ -14,9 +14,13 @@ import { Button } from '../components/ui/button';
 import { trpc } from '../lib/trpc';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { getCurrency, formatCurrency as formatCurrencyUtil } from '@shared/currencies';
+import { Badge } from '../components/ui/badge';
 
 export default function Finances() {
-  const [currency] = useState('USD'); // TODO: Get from user settings
+  // Get user data
+  const { data: user } = trpc.auth.me.useQuery();
+  const currency = user?.primary_currency || 'USD';
   
   // Queries
   const { data: summary, isLoading: summaryLoading } = trpc.finances.getSummary.useQuery({ currency });
@@ -25,10 +29,7 @@ export default function Finances() {
   const { data: history = [], isLoading: historyLoading } = trpc.finances.getHistory.useQuery({});
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: currency,
-    }).format(amount);
+    return formatCurrencyUtil(amount, currency);
   };
 
   const formatMonth = (month: number, year: number) => {
@@ -42,7 +43,12 @@ export default function Finances() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Finanzas</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-white">Finanzas</h1>
+              <Badge className="bg-[#EBFF57]/10 text-[#EBFF57] border border-[#EBFF57]/30">
+                {getCurrency(currency)?.symbol} {currency}
+              </Badge>
+            </div>
             <p className="text-gray-400 mt-1">Vista general de tus ingresos desde facturas pagadas</p>
           </div>
           <Button 
