@@ -140,3 +140,27 @@ export async function notifyPrimaryCurrencyNotSet(userId: number) {
     source: "system",
   });
 }
+
+/**
+ * PAYMENT NOTIFICATIONS
+ */
+
+export async function notifyPaymentRegistered(
+  userId: number, 
+  invoiceId: number, 
+  invoiceNumber: string, 
+  amount: number, 
+  currency: string,
+  newStatus: "partial" | "paid"
+) {
+  const statusText = newStatus === "paid" ? "completamente pagada" : "parcialmente pagada";
+  
+  return createNotification({
+    user_id: userId,
+    type: "success",
+    title: `Pago registrado para ${invoiceNumber}`,
+    message: `Se registró un pago de ${amount} ${currency}. La factura ${invoiceNumber} está ahora ${statusText}.`,
+    source: "invoice",
+    source_id: invoiceId,
+  });
+}

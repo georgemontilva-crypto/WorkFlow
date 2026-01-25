@@ -80,7 +80,7 @@ export const invoices = mysqlTable("invoices", {
   user_id: int("user_id").notNull(),
   client_id: int("client_id").notNull(),
   invoice_number: varchar("invoice_number", { length: 50 }).notNull().unique(),
-  status: mysqlEnum("status", ["draft", "sent", "paid", "cancelled"]).notNull().default("draft"),
+  status: mysqlEnum("status", ["draft", "sent", "paid", "partial", "cancelled"]).notNull().default("draft"),
   currency: varchar("currency", { length: 3 }).notNull().default("USD"),
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
@@ -120,6 +120,26 @@ export const invoiceItems = mysqlTable("invoice_items", {
 
 export type InvoiceItem = typeof invoiceItems.$inferSelect;
 export type InsertInvoiceItem = typeof invoiceItems.$inferInsert;
+
+/**
+ * Payments table - MANUAL PAYMENT REGISTRATION SYSTEM
+ * Records payments received outside the system
+ * Each payment is linked to an invoice
+ */
+export const payments = mysqlTable("payments", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull(),
+  invoice_id: int("invoice_id").notNull(),
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  payment_date: timestamp("payment_date").notNull(),
+  method: mysqlEnum("method", ["cash", "transfer", "card", "other"]).notNull(),
+  reference: varchar("reference", { length: 255 }),
+  notes: text("notes"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;
 
 /**
  * Transactions table - stores income and expense records

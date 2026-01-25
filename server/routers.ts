@@ -9,6 +9,7 @@ import { invoicesRouter } from "./routers_invoices";
 import { financesRouter } from "./routers_finances";
 import { savingsRouter } from "./routers_savings";
 import { notificationsRouter } from "./routers_notifications";
+import { paymentsRouter } from "./routers_payments";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -723,10 +724,17 @@ export const appRouter = router({
   savings: savingsRouter,
   
   /**
-   * Notifications router - PERSISTENT NOTIFICATIONS SYSTEM
+   * Notifications Router - Persistent notifications system
    * Side panel only, no auto-popups, no toasts
    */
   notifications: notificationsRouter,
+  
+  /**
+   * Payments Router - Manual payment registration system
+   * Records payments received outside the system
+   * Updates invoice status automatically
+   */
+  payments: paymentsRouter,
 });
 
 export type AppRouter = typeof appRouter;

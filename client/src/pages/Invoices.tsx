@@ -26,7 +26,7 @@ type Invoice = {
   id: number;
   invoice_number: string;
   client_id: number;
-  status: 'draft' | 'sent' | 'paid' | 'cancelled';
+  status: 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled';
   currency: string;
   subtotal: string;
   total: string;
@@ -45,10 +45,18 @@ type InvoiceItem = {
 };
 
 export default function Invoices() {
-  const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'sent' | 'paid' | 'cancelled'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewingInvoice, setViewingInvoice] = useState<number | null>(null);
+  const [registeringPaymentFor, setRegisteringPaymentFor] = useState<number | null>(null);
+  const [paymentFormData, setPaymentFormData] = useState({
+    amount: '',
+    payment_date: new Date().toISOString().split('T')[0],
+    method: 'transfer' as 'cash' | 'transfer' | 'card' | 'other',
+    reference: '',
+    notes: '',
+  });
   
   // Form state
   const [formData, setFormData] = useState({
@@ -75,6 +83,14 @@ export default function Invoices() {
     { id: viewingInvoice! },
     { enabled: viewingInvoice !== null }
   );
+  const { data: paymentSummary } = trpc.payments.getSummary.useQuery(
+    { invoice_id: viewingInvoice! },
+    { enabled: viewingInvoice !== null }
+  );
+  const { data: invoicePayments = [] } = trpc.payments.listByInvoice.useQuery(
+    { invoice_id: viewingInvoice! },
+    { enabled: viewingInvoice !== null }
+  );
   
   // Mutations
   const createInvoiceMutation = trpc.invoices.create.useMutation();
@@ -82,6 +98,7 @@ export default function Invoices() {
   const downloadPDFMutation = trpc.invoices.downloadPDF.useMutation();
   const updateStatusMutation = trpc.invoices.updateStatus.useMutation();
   const deleteInvoiceMutation = trpc.invoices.delete.useMutation();
+  const registerPaymentMutation = trpc.payments.register.useMutation();
   
   // Handlers
   const handleOpenModal = () => {
@@ -236,11 +253,60 @@ export default function Invoices() {
     }
   };
   
+  const handleOpenPaymentModal = (invoiceId: number) => {
+    setRegisteringPaymentFor(invoiceId);
+    setPaymentFormData({
+      amount: '',
+      payment_date: new Date().toISOString().split('T')[0],
+      method: 'transfer',
+      reference: '',
+      notes: '',
+    });
+  };
+  
+  const handleClosePaymentModal = () => {
+    setRegisteringPaymentFor(null);
+  };
+  
+  const handleRegisterPayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!registeringPaymentFor) return;
+    
+    try {
+      const amount = parseFloat(paymentFormData.amount);
+      
+      if (isNaN(amount) || amount <= 0) {
+        alert('El monto debe ser mayor a 0');
+        return;
+      }
+      
+      await registerPaymentMutation.mutateAsync({
+        invoice_id: registeringPaymentFor,
+        amount,
+        payment_date: paymentFormData.payment_date,
+        method: paymentFormData.method,
+        reference: paymentFormData.reference || undefined,
+        notes: paymentFormData.notes || undefined,
+      });
+      
+      alert('Pago registrado exitosamente');
+      handleClosePaymentModal();
+      utils.invoices.list.invalidate();
+      utils.payments.listByInvoice.invalidate();
+      utils.payments.getSummary.invalidate();
+    } catch (error: any) {
+      console.error('Error al registrar pago:', error);
+      alert(error.message || 'Error al registrar pago');
+    }
+  };
+  
   const getStatusBadge = (status: string) => {
     const badges = {
       draft: { label: 'Borrador', color: 'bg-gray-500' },
       sent: { label: 'Enviada', color: 'bg-blue-500' },
       paid: { label: 'Pagada', color: 'bg-green-500' },
+      partial: { label: 'Pago Parcial', color: 'bg-yellow-500' },
       cancelled: { label: 'Cancelada', color: 'bg-red-500' },
     };
     return badges[status as keyof typeof badges] || badges.draft;
@@ -704,8 +770,169 @@ export default function Invoices() {
                     <p className="text-white">{viewInvoiceData.terms}</p>
                   </div>
                 )}
+                
+                {/* Payment Summary */}
+                {paymentSummary && (
+                  <div className="border-t border-gray-700 pt-4">
+                    <h3 className="text-white font-semibold mb-3">Resumen de Pagos</h3>
+                    <div className="bg-[#222222] p-4 rounded border border-gray-700 space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Total Factura:</span>
+                        <span className="text-white">${paymentSummary.invoice_total.toFixed(2)} {viewInvoiceData.currency}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Total Pagado:</span>
+                        <span className="text-green-500">${paymentSummary.total_paid.toFixed(2)} {viewInvoiceData.currency}</span>
+                      </div>
+                      <div className="flex justify-between border-t border-gray-700 pt-2">
+                        <span className="text-white font-semibold">Restante:</span>
+                        <span className="text-white font-semibold">${paymentSummary.remaining.toFixed(2)} {viewInvoiceData.currency}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400 text-sm">Pagos Registrados:</span>
+                        <span className="text-gray-400 text-sm">{paymentSummary.payment_count}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Register Payment Button */}
+                    {viewInvoiceData.status !== 'paid' && viewInvoiceData.status !== 'cancelled' && (
+                      <button
+                        onClick={() => handleOpenPaymentModal(viewInvoiceData.id)}
+                        className="w-full mt-4 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                      >
+                        Registrar Pago
+                      </button>
+                    )}
+                  </div>
+                )}
+                
+                {/* Payment History */}
+                {invoicePayments.length > 0 && (
+                  <div className="border-t border-gray-700 pt-4">
+                    <h3 className="text-white font-semibold mb-3">Historial de Pagos</h3>
+                    <div className="space-y-2">
+                      {invoicePayments.map((payment: any) => (
+                        <div key={payment.id} className="bg-[#222222] p-3 rounded border border-gray-700">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="text-white font-medium">${parseFloat(payment.amount).toFixed(2)} {viewInvoiceData.currency}</p>
+                              <p className="text-gray-400 text-sm">
+                                {format(new Date(payment.payment_date), 'dd/MM/yyyy')}
+                              </p>
+                              <p className="text-gray-400 text-sm capitalize">
+                                Método: {payment.method === 'cash' ? 'Efectivo' : payment.method === 'transfer' ? 'Transferencia' : payment.method === 'card' ? 'Tarjeta' : 'Otro'}
+                              </p>
+                            </div>
+                            {payment.reference && (
+                              <span className="text-xs text-gray-500">Ref: {payment.reference}</span>
+                            )}
+                          </div>
+                          {payment.notes && (
+                            <p className="text-gray-400 text-sm mt-2">{payment.notes}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Register Payment Modal */}
+      {registeringPaymentFor && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1a1a1a] rounded-lg border border-gray-700 w-full max-w-md">
+            <form onSubmit={handleRegisterPayment} className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-white">Registrar Pago</h2>
+                <button type="button" onClick={handleClosePaymentModal} className="text-gray-400 hover:text-white">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Monto *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={paymentFormData.amount}
+                    onChange={(e) => setPaymentFormData({ ...paymentFormData, amount: e.target.value })}
+                    className="w-full px-4 py-2 bg-[#222222] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
+                    placeholder="0.00"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Fecha de Pago *</label>
+                  <input
+                    type="date"
+                    value={paymentFormData.payment_date}
+                    onChange={(e) => setPaymentFormData({ ...paymentFormData, payment_date: e.target.value })}
+                    className="w-full px-4 py-2 bg-[#222222] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Método de Pago *</label>
+                  <select
+                    value={paymentFormData.method}
+                    onChange={(e) => setPaymentFormData({ ...paymentFormData, method: e.target.value as any })}
+                    className="w-full px-4 py-2 bg-[#222222] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
+                    required
+                  >
+                    <option value="transfer">Transferencia</option>
+                    <option value="cash">Efectivo</option>
+                    <option value="card">Tarjeta</option>
+                    <option value="other">Otro</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Referencia (opcional)</label>
+                  <input
+                    type="text"
+                    value={paymentFormData.reference}
+                    onChange={(e) => setPaymentFormData({ ...paymentFormData, reference: e.target.value })}
+                    className="w-full px-4 py-2 bg-[#222222] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
+                    placeholder="Número de referencia o transacción"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Notas (opcional)</label>
+                  <textarea
+                    value={paymentFormData.notes}
+                    onChange={(e) => setPaymentFormData({ ...paymentFormData, notes: e.target.value })}
+                    className="w-full px-4 py-2 bg-[#222222] border border-gray-700 rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
+                    rows={3}
+                    placeholder="Notas adicionales sobre el pago"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={handleClosePaymentModal}
+                  className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={registerPaymentMutation.isLoading}
+                  className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {registerPaymentMutation.isLoading ? 'Registrando...' : 'Registrar Pago'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
