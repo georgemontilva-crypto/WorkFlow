@@ -14,21 +14,6 @@ import { useState } from 'react';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
 
-
-
-/**
- * UnreadAlertBadge - Badge que muestra el número de alertas sin leer
- * 
- * FUENTE ÚNICA DE VERDAD: Lee directamente desde la base de datos.
- * Se sincroniza cada 10 segundos y también se invalida cuando:
- * - Se marca una alerta como leída
- * - Se borran alertas
- * - Se crean nuevas alertas
- * 
- * El contador NO depende de los toasts visibles.
- */
-// UnreadAlertBadge removed - alerts system disabled
-
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -40,11 +25,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     enabled: isAuthenticated,
     refetchInterval: 60000, // Check every minute
   });
-  
-  // Simplified - no alerts for now
-  
-  // Simplified - no alerts for now
-  // Simplified - no handlers needed
 
   // Navigation organized by sections
   const navigationSections = [
@@ -61,11 +41,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const settingsItems = [
     { name: t.nav.settings, href: '/settings', icon: Settings },
   ];
-
-  // Handle upgrade action
-  const handleUpgrade = () => {
-    window.location.href = '/#pricing';
-  };
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -153,8 +128,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
         </nav>
 
-
-
         {/* Logout Button */}
         <div className="mx-3 mb-3">
           <Button
@@ -166,8 +139,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             {t.nav?.logout || 'Cerrar Sesión'}
           </Button>
         </div>
-
-
 
         {/* Footer */}
         <div className="p-4 border-t border-border">
@@ -191,8 +162,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </Button>
           
           <div className="flex-1" />
-          
-
         </header>
 
         {/* Scrollable Content */}
@@ -200,17 +169,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
-      
-      {/* Alert Popups */}
-      {/* Payment Notifications */}
-      <PaymentNotifications />
-      
-      {/* Welcome Dialog for new users */}
-      <WelcomeDialog />
-      
-      {/* Alert System */}
-      <AlertToast />
-      <AlertCenter isOpen={isAlertCenterOpen} onClose={() => setIsAlertCenterOpen(false)} />
     </div>
   );
 }
