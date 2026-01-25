@@ -89,6 +89,7 @@ function Input({
       style={{
         fontFamily: 'var(--font-family-base)',
         fontWeight: 'var(--font-weight-normal)',
+        borderWidth: '0.3px',
       }}
       onCompositionStart={handleCompositionStart}
       onCompositionEnd={handleCompositionEnd}

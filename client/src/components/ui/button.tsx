@@ -79,6 +79,7 @@ function Button({
       style={{
         fontFamily: 'var(--font-family-base)',
         fontWeight: 'var(--font-weight-medium)',
+        borderWidth: variant !== 'ghost' && variant !== 'link' ? '0.3px' : undefined,
       }}
       {...props}
     />

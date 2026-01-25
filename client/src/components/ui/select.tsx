@@ -75,6 +75,7 @@ function SelectTrigger({
       style={{
         fontFamily: 'var(--font-family-base)',
         fontWeight: 'var(--font-weight-normal)',
+        borderWidth: '0.3px',
       }}
       {...props}
     >
