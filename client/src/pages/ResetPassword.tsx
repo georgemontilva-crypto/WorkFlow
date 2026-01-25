@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 
 export default function ResetPassword() {
   const [, setLocation] = useLocation();
@@ -35,31 +35,31 @@ export default function ResetPassword() {
     e.preventDefault();
 
     if (!token) {
-      toast.error('Invalid reset link');
+      // toast.error('Invalid reset link');
       return;
     }
 
     if (password.length < 8) {
-      toast.error('Password must be at least 8 characters');
+      // toast.error('Password must be at least 8 characters');
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+      // toast.error('Passwords do not match');
       return;
     }
 
     try {
       await resetPassword.mutateAsync({ token, newPassword: password });
       setSuccess(true);
-      toast.success('Password reset successfully');
+      // toast.success('Password reset successfully');
       
       // Redirect to login after 2 seconds
       setTimeout(() => {
         setLocation('/login');
       }, 2000);
     } catch (error: any) {
-      toast.error(error.message || 'Failed to reset password');
+      // toast.error(error.message || 'Failed to reset password');
     }
   };
 

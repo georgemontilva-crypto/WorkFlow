@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { trpc } from '@/lib/trpc';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 import { Languages, Database, Download, Upload, Trash2, Shield, Key, AlertCircle, CheckCircle2, DollarSign } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import CurrencySelector from '@/components/CurrencySelector';
@@ -61,7 +61,7 @@ export default function Settings() {
     a.download = `finwrk-export-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('Data exported successfully');
+    // toast.success('Data exported successfully');
   };
 
   const importData = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,9 +72,9 @@ export default function Settings() {
         try {
           const data = JSON.parse(event.target?.result as string);
           // Add import logic here
-          toast.success('Data imported successfully');
+          // toast.success('Data imported successfully');
         } catch (error) {
-          toast.error('Invalid file format');
+          // toast.error('Invalid file format');
         }
       };
       reader.readAsText(file);
@@ -84,25 +84,25 @@ export default function Settings() {
   const clearAllData = () => {
     if (window.confirm('Are you sure you want to delete all data? This action cannot be undone.')) {
       // Add clear logic here
-      toast.success('All data cleared');
+      // toast.success('All data cleared');
     }
   };
 
   // Currency Change Function
   const handleChangeCurrency = async () => {
     if (!newCurrency || newCurrency === user?.primary_currency) {
-      toast.error('Please select a different currency');
+      // toast.error('Please select a different currency');
       return;
     }
 
     try {
       await updateCurrencyMutation.mutateAsync({ currency: newCurrency });
-      toast.success('Currency updated successfully. Please refresh the page.');
+      // toast.success('Currency updated successfully. Please refresh the page.');
       setShowCurrencyChange(false);
       // Refresh page to update all currency displays
       setTimeout(() => window.location.reload(), 1500);
     } catch (error: any) {
-      toast.error(error.message || 'Error updating currency');
+      // toast.error(error.message || 'Error updating currency');
     }
   };
 
@@ -114,38 +114,38 @@ export default function Settings() {
       setShow2FASetup(true);
     } catch (error: any) {
       if (error.message === 'EMAIL_NOT_VERIFIED') {
-        toast.error('You must verify your email before enabling 2FA');
+        // toast.error('You must verify your email before enabling 2FA');
       } else {
-        toast.error('Error generating 2FA code');
+        // toast.error('Error generating 2FA code');
       }
     }
   };
 
   const handleVerify2FA = async () => {
     if (twoFactorCode.length !== 6) {
-      toast.error('Please enter a 6-digit code');
+      // toast.error('Please enter a 6-digit code');
       return;
     }
 
     try {
       await verify2FAMutation.mutateAsync({ token: twoFactorCode });
-      toast.success('2FA enabled successfully');
+      // toast.success('2FA enabled successfully');
       setShow2FASetup(false);
       setQrCodeUrl('');
       setTwoFactorCode('');
     } catch (error) {
-      toast.error('Invalid 2FA code. Please try again.');
+      // toast.error('Invalid 2FA code. Please try again.');
     }
   };
 
   const handleDisable2FA = async () => {
     if (!disable2FAPassword || !disable2FACode) {
-      toast.error('Please enter your password and 2FA code');
+      // toast.error('Please enter your password and 2FA code');
       return;
     }
 
     if (disable2FACode.length !== 6) {
-      toast.error('Please enter a 6-digit code');
+      // toast.error('Please enter a 6-digit code');
       return;
     }
 
@@ -154,17 +154,17 @@ export default function Settings() {
         password: disable2FAPassword,
         code: disable2FACode,
       });
-      toast.success('2FA disabled successfully');
+      // toast.success('2FA disabled successfully');
       setShow2FADisable(false);
       setDisable2FAPassword('');
       setDisable2FACode('');
     } catch (error: any) {
       if (error.message === 'Incorrect password') {
-        toast.error('Incorrect password');
+        // toast.error('Incorrect password');
       } else if (error.message === 'Invalid 2FA code') {
-        toast.error('Invalid 2FA code');
+        // toast.error('Invalid 2FA code');
       } else {
-        toast.error('Error disabling 2FA');
+        // toast.error('Error disabling 2FA');
       }
     }
   };
@@ -172,17 +172,17 @@ export default function Settings() {
   // Password Change Functions
   const handleChangePassword = async () => {
     if (!oldPassword || !newPassword || !confirmPassword) {
-      toast.error('Please complete all fields');
+      // toast.error('Please complete all fields');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match');
+      // toast.error('Passwords do not match');
       return;
     }
 
     if (newPassword.length < 8) {
-      toast.error('Password must be at least 8 characters');
+      // toast.error('Password must be at least 8 characters');
       return;
     }
 
@@ -191,16 +191,16 @@ export default function Settings() {
         oldPassword,
         newPassword,
       });
-      toast.success('Password updated successfully. A confirmation email has been sent.');
+      // toast.success('Password updated successfully. A confirmation email has been sent.');
       setShowPasswordChange(false);
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (error: any) {
       if (error.message === 'Current password is incorrect') {
-        toast.error('Current password is incorrect');
+        // toast.error('Current password is incorrect');
       } else {
-        toast.error('Error changing password');
+        // toast.error('Error changing password');
       }
     }
   };

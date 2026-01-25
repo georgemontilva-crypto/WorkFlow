@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { trpc } from '@/lib/trpc';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 import { Building2, Upload, Save, Image as ImageIcon, TrendingUp, CheckCircle2, AlertCircle, DollarSign, Briefcase } from 'lucide-react';
 
 export default function CompanyProfile() {
@@ -123,21 +123,21 @@ export default function CompanyProfile() {
 
   const upsertMutation = trpc.companyProfile.upsert.useMutation({
     onSuccess: () => {
-      toast.success('Perfil actualizado exitosamente');
+      // toast.success('Perfil actualizado exitosamente');
       refetch();
     },
     onError: (error) => {
-      toast.error('Error al guardar: ' + error.message);
+      // toast.error('Error al guardar: ' + error.message);
     },
   });
 
   const uploadLogoMutation = trpc.companyProfile.uploadLogo.useMutation({
     onSuccess: () => {
-      toast.success('Logo actualizado');
+      // toast.success('Logo actualizado');
       refetch();
     },
     onError: () => {
-      toast.error('Error al subir logo');
+      // toast.error('Error al subir logo');
     },
   });
 
@@ -146,12 +146,12 @@ export default function CompanyProfile() {
     if (!file) return;
 
     if (file.size > 2 * 1024 * 1024) {
-      toast.error('El logo debe ser menor a 2MB');
+      // toast.error('El logo debe ser menor a 2MB');
       return;
     }
 
     if (!file.type.startsWith('image/')) {
-      toast.error('El archivo debe ser una imagen');
+      // toast.error('El archivo debe ser una imagen');
       return;
     }
 

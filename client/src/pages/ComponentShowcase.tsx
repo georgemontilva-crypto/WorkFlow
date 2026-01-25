@@ -170,7 +170,7 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
-import { toast as sonnerToast } from "sonner";
+// import { toast as sonnerToast } from "sonner";
 import { AIChatBox, type Message } from "@/components/AIChatBox";
 
 export default function ComponentsShowcase() {
@@ -195,7 +195,7 @@ export default function ComponentsShowcase() {
 
   const handleDialogSubmit = () => {
     console.log("Dialog submitted with value:", dialogInput);
-    sonnerToast.success("Submitted successfully", {
+    // sonnerToast.success("Submitted successfully", {
       description: `Input: ${dialogInput}`,
     });
     setDialogInput("");
@@ -1321,7 +1321,7 @@ export default function ComponentsShowcase() {
                     <Button
                       variant="outline"
                       onClick={() => {
-                        sonnerToast.success("Operation successful", {
+                        // sonnerToast.success("Operation successful", {
                           description: "Your changes have been saved",
                         });
                       }}
@@ -1331,7 +1331,7 @@ export default function ComponentsShowcase() {
                     <Button
                       variant="outline"
                       onClick={() => {
-                        sonnerToast.error("Operation failed", {
+                        // sonnerToast.error("Operation failed", {
                           description:
                             "Cannot complete operation, please try again",
                         });
@@ -1342,7 +1342,7 @@ export default function ComponentsShowcase() {
                     <Button
                       variant="outline"
                       onClick={() => {
-                        sonnerToast.info("Information", {
+                        // sonnerToast.info("Information", {
                           description: "This is an information message",
                         });
                       }}
@@ -1352,7 +1352,7 @@ export default function ComponentsShowcase() {
                     <Button
                       variant="outline"
                       onClick={() => {
-                        sonnerToast.warning("Warning", {
+                        // sonnerToast.warning("Warning", {
                           description:
                             "Please note the impact of this operation",
                         });
@@ -1363,7 +1363,7 @@ export default function ComponentsShowcase() {
                     <Button
                       variant="outline"
                       onClick={() => {
-                        sonnerToast.loading("Loading", {
+                        // sonnerToast.loading("Loading", {
                           description: "Please wait",
                         });
                       }}
@@ -1376,7 +1376,7 @@ export default function ComponentsShowcase() {
                         const promise = new Promise(resolve =>
                           setTimeout(resolve, 2000)
                         );
-                        sonnerToast.promise(promise, {
+                        // sonnerToast.promise(promise, {
                           loading: "Processing...",
                           success: "Processing complete!",
                           error: "Processing failed",

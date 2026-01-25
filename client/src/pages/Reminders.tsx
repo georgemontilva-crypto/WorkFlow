@@ -34,7 +34,7 @@ import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useLocation } from 'wouter';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -84,41 +84,41 @@ export default function Reminders() {
   // Mutations
   const createReminderMutation = trpc.reminders.create.useMutation({
     onSuccess: () => {
-      toast.success('Recordatorio creado exitosamente');
+      // toast.success('Recordatorio creado exitosamente');
       setIsCreateDialogOpen(false);
       resetForm();
       refetchReminders();
     },
     onError: (error) => {
-      toast.error(error.message || 'Error al crear recordatorio');
+      // toast.error(error.message || 'Error al crear recordatorio');
     },
   });
 
   const updateReminderMutation = trpc.reminders.update.useMutation({
     onSuccess: () => {
-      toast.success('Recordatorio actualizado');
+      // toast.success('Recordatorio actualizado');
       setEditingReminder(null);
       resetForm();
       refetchReminders();
     },
     onError: (error) => {
-      toast.error(error.message || 'Error al actualizar');
+      // toast.error(error.message || 'Error al actualizar');
     },
   });
 
   const deleteReminderMutation = trpc.reminders.delete.useMutation({
     onSuccess: () => {
-      toast.success('Recordatorio eliminado');
+      // toast.success('Recordatorio eliminado');
       refetchReminders();
     },
     onError: (error) => {
-      toast.error(error.message || 'Error al eliminar');
+      // toast.error(error.message || 'Error al eliminar');
     },
   });
 
   const completeReminderMutation = trpc.reminders.complete.useMutation({
     onSuccess: () => {
-      toast.success('Recordatorio completado');
+      // toast.success('Recordatorio completado');
       refetchReminders();
     },
   });
@@ -135,19 +135,19 @@ export default function Reminders() {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      toast.success('Archivo de calendario descargado');
+      // toast.success('Archivo de calendario descargado');
     },
     onError: (error) => {
-      toast.error(error.message || 'Error al exportar');
+      // toast.error(error.message || 'Error al exportar');
     },
   });
 
   const sendEmailMutation = trpc.reminders.sendEmailNotification.useMutation({
     onSuccess: () => {
-      toast.success('Notificación enviada por correo');
+      // toast.success('Notificación enviada por correo');
     },
     onError: (error) => {
-      toast.error(error.message || 'Error al enviar correo');
+      // toast.error(error.message || 'Error al enviar correo');
     },
   });
 
@@ -166,7 +166,7 @@ export default function Reminders() {
 
   const handleSubmit = () => {
     if (!formData.title || !formData.reminder_date) {
-      toast.error('Título y fecha son requeridos');
+      // toast.error('Título y fecha son requeridos');
       return;
     }
 

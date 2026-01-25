@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, CheckCircle2, ExternalLink, Upload, AlertCircle, FileText } from 'lucide-react';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 
 interface InvoiceData {
   id: number;
@@ -54,11 +54,11 @@ export default function PayInvoice() {
     onSuccess: () => {
       setUploadSuccess(true);
       setIsUploading(false);
-      toast.success('Comprobante enviado exitosamente');
+      // toast.success('Comprobante enviado exitosamente');
       refetch();
     },
     onError: (error) => {
-      toast.error(error.message);
+      // toast.error(error.message);
       setIsUploading(false);
     },
   });
@@ -68,7 +68,7 @@ export default function PayInvoice() {
       const file = e.target.files[0];
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('El archivo no debe superar 5MB');
+        // toast.error('El archivo no debe superar 5MB');
         return;
       }
       setProofFile(file);

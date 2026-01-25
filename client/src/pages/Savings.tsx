@@ -27,7 +27,7 @@ import { trpc } from '@/lib/trpc';
 import { Target, Plus, TrendingUp, MoreVertical, Pencil, Trash2, CheckCircle2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState, useEffect } from 'react';
 import { CurrencySelect } from '@/components/CurrencySelect';
@@ -69,40 +69,40 @@ export default function Savings() {
   const createGoal = trpc.savings.create.useMutation({
     onSuccess: () => {
       utils.savings.list.invalidate();
-      toast.success('Meta creada exitosamente');
+      // toast.success('Meta creada exitosamente');
     },
     onError: (error) => {
-      toast.error('Error al crear la meta: ' + error.message);
+      // toast.error('Error al crear la meta: ' + error.message);
     },
   });
   
   const updateGoal = trpc.savings.update.useMutation({
     onSuccess: () => {
       utils.savings.list.invalidate();
-      toast.success('Meta actualizada exitosamente');
+      // toast.success('Meta actualizada exitosamente');
     },
     onError: (error) => {
-      toast.error('Error al actualizar la meta: ' + error.message);
+      // toast.error('Error al actualizar la meta: ' + error.message);
     },
   });
   
   const updateProgress = trpc.savings.updateProgress.useMutation({
     onSuccess: () => {
       utils.savings.list.invalidate();
-      toast.success('Progreso actualizado exitosamente');
+      // toast.success('Progreso actualizado exitosamente');
     },
     onError: (error) => {
-      toast.error('Error al actualizar progreso: ' + error.message);
+      // toast.error('Error al actualizar progreso: ' + error.message);
     },
   });
   
   const deleteGoal = trpc.savings.delete.useMutation({
     onSuccess: () => {
       utils.savings.list.invalidate();
-      toast.success('Meta eliminada exitosamente');
+      // toast.success('Meta eliminada exitosamente');
     },
     onError: (error) => {
-      toast.error('Error al eliminar la meta: ' + error.message);
+      // toast.error('Error al eliminar la meta: ' + error.message);
     },
   });
   
@@ -125,13 +125,13 @@ export default function Savings() {
 
     // Validate required fields
     if (!formData.name || !formData.target_amount) {
-      toast.error('Por favor completa los campos requeridos');
+      // toast.error('Por favor completa los campos requeridos');
       return;
     }
 
     // Validate currency is selected
     if (!formData.currency) {
-      toast.error('Debe seleccionar una moneda');
+      // toast.error('Debe seleccionar una moneda');
       return;
     }
 

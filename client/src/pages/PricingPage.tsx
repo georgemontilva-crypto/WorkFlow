@@ -10,7 +10,7 @@ import { Check, Sparkles, Zap, Crown, Loader2, ArrowLeft } from 'lucide-react';
 import { useLocation } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { useState } from 'react';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 
 export default function PricingPage() {
   const [, setLocation] = useLocation();
@@ -93,7 +93,7 @@ export default function PricingPage() {
         window.location.href = result.url;
       }
     } catch (error: any) {
-      toast.error(error.message || 'No se pudo iniciar el proceso de pago');
+      // toast.error(error.message || 'No se pudo iniciar el proceso de pago');
       setLoadingPlan(null);
     }
   };

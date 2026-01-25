@@ -4,7 +4,7 @@
  * Tema oscuro por defecto
  */
 
-import { Toaster } from "@/components/ui/sonner";
+
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
@@ -121,7 +121,6 @@ function App() {
       <LanguageProvider>
         <ThemeProvider defaultTheme="dark">
           <TooltipProvider>
-            <Toaster />
             <Router />
 
           </TooltipProvider>

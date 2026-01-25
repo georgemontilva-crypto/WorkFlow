@@ -9,7 +9,7 @@ import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Upload, Download, CheckCircle2, Clock, FileText, Building2 } from 'lucide-react';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 
 export default function PublicInvoice() {
   const [, params] = useRoute('/invoice/:token');
@@ -25,11 +25,11 @@ export default function PublicInvoice() {
 
   const uploadProof = trpc.invoices.uploadPaymentProof.useMutation({
     onSuccess: () => {
-      toast.success('Comprobante enviado exitosamente');
+      // toast.success('Comprobante enviado exitosamente');
       setSelectedFile(null);
     },
     onError: (error) => {
-      toast.error('Error al enviar comprobante: ' + error.message);
+      // toast.error('Error al enviar comprobante: ' + error.message);
     },
   });
 
@@ -40,11 +40,11 @@ export default function PublicInvoice() {
         link.href = `data:application/pdf;base64,${data.pdf}`;
         link.download = `factura-${invoice?.invoice_number}.pdf`;
         link.click();
-        toast.success('PDF descargado');
+        // toast.success('PDF descargado');
       }
     },
     onError: () => {
-      toast.error('Error al descargar PDF');
+      // toast.error('Error al descargar PDF');
     },
   });
 
@@ -72,7 +72,7 @@ export default function PublicInvoice() {
       reader.readAsDataURL(selectedFile);
     } catch (error) {
       setUploading(false);
-      toast.error('Error al procesar archivo');
+      // toast.error('Error al procesar archivo');
     }
   };
 

@@ -15,7 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { trpc } from '@/lib/trpc';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 import { useLocation } from 'wouter';
 import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
 import { DashboardLayout } from '@/components/DashboardLayout';
@@ -100,7 +100,7 @@ export default function Markets() {
   const createAlertMutation = trpc.priceAlerts.create.useMutation({
     onSuccess: () => {
       refetchAlerts();
-      toast.success('Alerta creada exitosamente');
+      // toast.success('Alerta creada exitosamente');
       setAlertDialogOpen(false);
     },
     onError: (error) => toast.error(error.message),
@@ -109,7 +109,7 @@ export default function Markets() {
   const deleteAlertMutation = trpc.priceAlerts.delete.useMutation({
     onSuccess: () => {
       refetchAlerts();
-      toast.success('Alerta eliminada');
+      // toast.success('Alerta eliminada');
     },
   });
 
@@ -140,24 +140,24 @@ export default function Markets() {
   const addFavoriteMutation = trpc.markets.addFavorite.useMutation({
     onSuccess: () => {
       refetchFavorites();
-      toast.success('Agregado a favoritos');
+      // toast.success('Agregado a favoritos');
     },
     onError: (error) => {
-      toast.error(error.message);
+      // toast.error(error.message);
     },
   });
 
   const removeFavoriteMutation = trpc.markets.removeFavorite.useMutation({
     onSuccess: () => {
       refetchFavorites();
-      toast.success('Eliminado de favoritos');
+      // toast.success('Eliminado de favoritos');
     },
   });
 
   const toggleWidgetMutation = trpc.markets.toggleDashboardWidget.useMutation({
     onSuccess: (data) => {
       refetchFavorites();
-      toast.success(data.is_dashboard_widget ? 'Añadido al Dashboard' : 'Quitado del Dashboard');
+      // toast.success(data.is_dashboard_widget ? 'Añadido al Dashboard' : 'Quitado del Dashboard');
     },
   });
 
@@ -190,7 +190,7 @@ export default function Markets() {
         console.error('Error fetching crypto data:', error);
         // Fallback data if API fails
         setCryptoData(MOCK_CRYPTO_FALLBACK);
-        toast.error('Usando datos de respaldo (API limitada)');
+        // toast.error('Usando datos de respaldo (API limitada)');
       } finally {
         setLoading(false);
       }

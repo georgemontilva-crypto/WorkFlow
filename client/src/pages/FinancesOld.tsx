@@ -41,7 +41,7 @@ import {
 import { trpc } from '@/lib/trpc';
 import { Plus, TrendingUp, TrendingDown, MoreVertical, Ban, FileDown, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, parseISO, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, addMonths, isWithinInterval } from 'date-fns';
@@ -74,7 +74,7 @@ export default function Finances() {
   const createTransaction = trpc.transactions.create.useMutation({
     onSuccess: () => {
       utils.transactions.list.invalidate();
-      toast.success('Transacción registrada exitosamente');
+      // toast.success('Transacción registrada exitosamente');
       setIsDialogOpen(false);
       setFormData({
         type: 'income',
@@ -85,7 +85,7 @@ export default function Finances() {
       });
     },
     onError: (error) => {
-      toast.error('Error al registrar la transacción: ' + error.message);
+      // toast.error('Error al registrar la transacción: ' + error.message);
     },
   });
 
@@ -93,12 +93,12 @@ export default function Finances() {
   const voidTransaction = trpc.transactions.void.useMutation({
     onSuccess: () => {
       utils.transactions.list.invalidate();
-      toast.success('Transacción anulada exitosamente');
+      // toast.success('Transacción anulada exitosamente');
       setVoidDialogOpen(false);
       setSelectedTransaction(null);
     },
     onError: (error) => {
-      toast.error('Error al anular la transacción: ' + error.message);
+      // toast.error('Error al anular la transacción: ' + error.message);
     },
   });
   
@@ -211,7 +211,7 @@ export default function Finances() {
     e.preventDefault();
 
     if (!formData.category || !formData.amount || !formData.description) {
-      toast.error('Por favor completa todos los campos');
+      // toast.error('Por favor completa todos los campos');
       return;
     }
 
@@ -240,7 +240,7 @@ export default function Finances() {
 
   const exportToExcel = () => {
     if (!filteredTransactions || filteredTransactions.length === 0) {
-      toast.error('No hay transacciones en el periodo seleccionado para exportar');
+      // toast.error('No hay transacciones en el periodo seleccionado para exportar');
       return;
     }
 
@@ -279,7 +279,7 @@ export default function Finances() {
     const fileName = `transacciones_${periodLabel}.xlsx`;
     XLSX.writeFile(workbook, fileName);
     
-    toast.success('Historial exportado exitosamente');
+    // toast.success('Historial exportado exitosamente');
   };
 
   return (

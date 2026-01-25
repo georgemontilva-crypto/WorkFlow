@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import { trpc } from '../lib/trpc';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { getCurrency } from '@shared/currencies';
 import { Badge } from '../components/ui/badge';
@@ -128,12 +128,12 @@ export default function Invoices() {
     try {
       // Validate
       if (!formData.client_id) {
-        toast.error('Debe seleccionar un cliente');
+        // toast.error('Debe seleccionar un cliente');
         return;
       }
       
       if (items.length === 0 || items.every(item => !item.description)) {
-        toast.error('Debe agregar al menos un ítem');
+        // toast.error('Debe agregar al menos un ítem');
         return;
       }
       
@@ -147,23 +147,23 @@ export default function Invoices() {
         terms: formData.terms || undefined,
       });
       
-      toast.success('Factura creada exitosamente');
+      // toast.success('Factura creada exitosamente');
       handleCloseModal();
       refetch();
     } catch (error: any) {
       console.error('Error al crear factura:', error);
-      toast.error(error.message || 'Error al crear factura');
+      // toast.error(error.message || 'Error al crear factura');
     }
   };
   
   const handleSendEmail = async (id: number) => {
     try {
       await sendEmailMutation.mutateAsync({ id });
-      toast.success('Factura enviada por email');
+      // toast.success('Factura enviada por email');
       refetch();
     } catch (error: any) {
       console.error('Error al enviar email:', error);
-      toast.error(error.message || 'Error al enviar email');
+      // toast.error(error.message || 'Error al enviar email');
     }
   };
   
@@ -177,21 +177,21 @@ export default function Invoices() {
       link.download = result.filename;
       link.click();
       
-      toast.success('PDF descargado');
+      // toast.success('PDF descargado');
     } catch (error: any) {
       console.error('Error al descargar PDF:', error);
-      toast.error(error.message || 'Error al descargar PDF');
+      // toast.error(error.message || 'Error al descargar PDF');
     }
   };
   
   const handleMarkAsPaid = async (id: number) => {
     try {
       await updateStatusMutation.mutateAsync({ id, status: 'paid' });
-      toast.success('Factura marcada como pagada');
+      // toast.success('Factura marcada como pagada');
       refetch();
     } catch (error: any) {
       console.error('Error al marcar como pagada:', error);
-      toast.error(error.message || 'Error al marcar como pagada');
+      // toast.error(error.message || 'Error al marcar como pagada');
     }
   };
   
@@ -202,11 +202,11 @@ export default function Invoices() {
     
     try {
       await updateStatusMutation.mutateAsync({ id, status: 'cancelled' });
-      toast.success('Factura cancelada');
+      // toast.success('Factura cancelada');
       refetch();
     } catch (error: any) {
       console.error('Error al cancelar factura:', error);
-      toast.error(error.message || 'Error al cancelar factura');
+      // toast.error(error.message || 'Error al cancelar factura');
     }
   };
   
@@ -217,11 +217,11 @@ export default function Invoices() {
     
     try {
       await deleteInvoiceMutation.mutateAsync({ id });
-      toast.success('Factura eliminada');
+      // toast.success('Factura eliminada');
       refetch();
     } catch (error: any) {
       console.error('Error al eliminar factura:', error);
-      toast.error(error.message || 'Error al eliminar factura');
+      // toast.error(error.message || 'Error al eliminar factura');
     }
   };
   

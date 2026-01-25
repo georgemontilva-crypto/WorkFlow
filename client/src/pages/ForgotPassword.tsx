@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Mail, Loader2, Shield } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 
 type Step = 'email' | '2fa' | 'success';
 
@@ -29,7 +29,7 @@ export default function ForgotPassword() {
     e.preventDefault();
     
     if (!email) {
-      toast.error('Por favor ingresa tu correo electrónico');
+      // toast.error('Por favor ingresa tu correo electrónico');
       return;
     }
 
@@ -40,14 +40,14 @@ export default function ForgotPassword() {
         // User has 2FA enabled - show 2FA verification step
         setTempToken(result.tempToken);
         setStep('2fa');
-        toast.info('Se requiere verificación adicional');
+        // toast.info('Se requiere verificación adicional');
       } else {
         // User does not have 2FA - show success
         setStep('success');
-        toast.success('Si tu correo existe, recibirás un enlace de recuperación');
+        // toast.success('Si tu correo existe, recibirás un enlace de recuperación');
       }
     } catch (error: any) {
-      toast.error(error.message || 'Error al enviar el correo de recuperación');
+      // toast.error(error.message || 'Error al enviar el correo de recuperación');
     }
   };
 
@@ -55,7 +55,7 @@ export default function ForgotPassword() {
     e.preventDefault();
     
     if (!code || code.length !== 6) {
-      toast.error('Por favor ingresa un código de 6 dígitos');
+      // toast.error('Por favor ingresa un código de 6 dígitos');
       return;
     }
 
@@ -64,10 +64,10 @@ export default function ForgotPassword() {
       
       if (result.success) {
         setStep('success');
-        toast.success('Verificación exitosa. Revisa tu correo.');
+        // toast.success('Verificación exitosa. Revisa tu correo.');
       } else {
         setAttempts(prev => prev + 1);
-        toast.error(result.message || 'Código inválido');
+        // toast.error(result.message || 'Código inválido');
         
         if (attempts >= 2) {
           // Max attempts reached
@@ -76,12 +76,12 @@ export default function ForgotPassword() {
           setCode('');
           setTempToken('');
           setAttempts(0);
-          toast.error('Demasiados intentos fallidos. Por favor intenta nuevamente.');
+          // toast.error('Demasiados intentos fallidos. Por favor intenta nuevamente.');
         }
       }
     } catch (error: any) {
       setAttempts(prev => prev + 1);
-      toast.error(error.message || 'Error en la verificación');
+      // toast.error(error.message || 'Error en la verificación');
       
       if (attempts >= 2) {
         setStep('email');

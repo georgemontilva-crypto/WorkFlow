@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
 import { trpc } from '../lib/trpc';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 
 type Client = {
   id: number;
@@ -103,27 +103,27 @@ export default function Clients() {
           id: editingClient.id,
           ...formData,
         });
-        toast.success('Cliente actualizado exitosamente');
+        // toast.success('Cliente actualizado exitosamente');
       } else {
         await createClientMutation.mutateAsync(formData);
-        toast.success('Cliente creado exitosamente');
+        // toast.success('Cliente creado exitosamente');
       }
       handleCloseModal();
       refetch();
     } catch (error: any) {
       console.error('Error al guardar cliente:', error);
-      toast.error(error.message || 'Error al guardar cliente');
+      // toast.error(error.message || 'Error al guardar cliente');
     }
   };
 
   const handleArchive = async (id: number) => {
     try {
       await updateClientMutation.mutateAsync({ id, archived: 1 });
-      toast.success('Cliente archivado exitosamente');
+      // toast.success('Cliente archivado exitosamente');
       refetch();
     } catch (error: any) {
       console.error('Error al archivar cliente:', error);
-      toast.error(error.message || 'Error al archivar cliente');
+      // toast.error(error.message || 'Error al archivar cliente');
     }
   };
 
@@ -134,11 +134,11 @@ export default function Clients() {
     
     try {
       await deleteClientMutation.mutateAsync({ id });
-      toast.success('Cliente eliminado exitosamente');
+      // toast.success('Cliente eliminado exitosamente');
       refetch();
     } catch (error: any) {
       console.error('Error al eliminar cliente:', error);
-      toast.error(error.message || 'Error al eliminar cliente');
+      // toast.error(error.message || 'Error al eliminar cliente');
     }
   };
 
