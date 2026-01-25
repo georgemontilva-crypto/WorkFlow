@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
-import { Download, TrendingUp, TrendingDown, DollarSign, X } from 'lucide-react';
+import { Download, TrendingUp, TrendingDown, DollarSign, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { trpc } from '../lib/trpc';
 import { format } from 'date-fns';
@@ -28,6 +28,9 @@ export default function Finances() {
     description: '',
     date: new Date().toISOString().split('T')[0],
   });
+  
+  // Month filter state
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
   
   // Get user data
   const { data: user } = trpc.auth.me.useQuery();
@@ -117,6 +120,36 @@ export default function Finances() {
       ];
     }
   };
+  
+  // Month navigation handlers
+  const handlePreviousMonth = () => {
+    setSelectedMonth(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(newDate.getMonth() - 1);
+      return newDate;
+    });
+  };
+  
+  const handleNextMonth = () => {
+    setSelectedMonth(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(newDate.getMonth() + 1);
+      return newDate;
+    });
+  };
+  
+  const handleResetMonth = () => {
+    setSelectedMonth(new Date());
+  };
+  
+  // Filter transactions by selected month
+  const filteredHistory = history.filter((transaction: any) => {
+    const transactionDate = new Date(transaction.date);
+    return (
+      transactionDate.getMonth() === selectedMonth.getMonth() &&
+      transactionDate.getFullYear() === selectedMonth.getFullYear()
+    );
+  });
 
   const formatCurrency = (amount: number) => {
     return formatCurrencyUtil(amount, currency);
@@ -341,23 +374,49 @@ export default function Finances() {
         <div className="bg-[#222222] border border-gray-800 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-white">Transacciones Recientes</h2>
-            <button
-              onClick={handleExportHistory}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              Exportar historial
-            </button>
+            <div className="flex items-center gap-4">
+              {/* Month Navigation */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handlePreviousMonth}
+                  className="p-1 text-gray-400 hover:text-white transition-colors"
+                  title="Mes anterior"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleResetMonth}
+                  className="text-sm text-gray-400 hover:text-white transition-colors min-w-[100px] text-center"
+                  title="Volver al mes actual"
+                >
+                  {format(selectedMonth, 'MMMM yyyy', { locale: es })}
+                </button>
+                <button
+                  onClick={handleNextMonth}
+                  className="p-1 text-gray-400 hover:text-white transition-colors"
+                  title="Mes siguiente"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+              <button
+                onClick={handleExportHistory}
+                className="text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                Exportar historial
+              </button>
+            </div>
           </div>
           
           {historyLoading ? (
             <div className="h-96 bg-gray-700 animate-pulse rounded"></div>
-          ) : history.length === 0 ? (
+          ) : filteredHistory.length === 0 ? (
             <div className="h-96 flex items-center justify-center text-gray-500">
-              No hay transacciones registradas
+              No hay transacciones en {format(selectedMonth, 'MMMM yyyy', { locale: es })}
             </div>
           ) : (
             <div className="h-96 overflow-y-auto pr-2 space-y-2">
-              {history.map((transaction: any) => {
+              {filteredHistory.map((transaction: any) => {
                 const isExpense = transaction.type === 'manual-expense';
                 const isIncome = transaction.type === 'invoice' || transaction.type === 'manual-income';
                 
