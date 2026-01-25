@@ -208,15 +208,16 @@ export default function Savings() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 sm:p-6 lg:p-8">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 lg:mb-8">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Metas de Ahorro</h1>
-            <p className="text-sm sm:text-base text-[#8B92A8]">
-              Define y alcanza tus objetivos financieros
-            </p>
-          </div>
+      <div className="p-4 sm:p-6 lg:p-8 max-w-[1440px] mx-auto space-y-6">
+        {/* Header Card - Isla 1 */}
+        <Card>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Metas de Ahorro</h1>
+              <p className="text-sm sm:text-base text-[#8B92A8]">
+                Define y alcanza tus objetivos financieros
+              </p>
+            </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
             if (!open) {
@@ -238,7 +239,7 @@ export default function Savings() {
                 Nueva Meta
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-[#1C1C1C] border-white/10 max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogContent className="bg-[#0a0a0a] border-white/10 max-w-lg max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-white text-2xl">
                   {editingGoal ? 'Editar Meta de Ahorro' : 'Nueva Meta de Ahorro'}
@@ -358,43 +359,44 @@ export default function Savings() {
               </form>
             </DialogContent>
           </Dialog>
-        </div>
+          </div>
+        </Card>
 
-        {/* Savings Goals */}
-        {error ? (
-          <Card className="bg-[#121212] border-white/5">
-            <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
-              <div className="text-red-500">Error al cargar metas</div>
-              <div className="text-[#8B92A8] text-sm">{error.message}</div>
-              <Button
-                onClick={() => utils.savings.list.invalidate()}
-                variant="outline"
-                size="sm"
-              >
-                Reintentar
-              </Button>
-            </CardContent>
-          </Card>
+        {/* Savings Goals Card - Isla 2 */}
+        <Card>
+          {/* Contador */}
+          <div className="mb-6">
+            <p className="text-[#8B92A8] text-sm">{savingsGoals?.length || 0} meta{(savingsGoals?.length || 0) !== 1 ? 's' : ''}</p>
+          </div>
+
+          {error ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-4">
+            <div className="text-red-500">Error al cargar metas</div>
+            <div className="text-[#8B92A8] text-sm">{error.message}</div>
+            <Button
+              onClick={() => utils.savings.list.invalidate()}
+              variant="outline"
+              size="sm"
+            >
+              Reintentar
+            </Button>
+          </div>
         ) : isLoading ? (
-          <Card className="bg-[#121212] border-white/5">
-            <CardContent className="flex items-center justify-center py-16">
-              <div className="text-[#8B92A8]">Cargando metas...</div>
-            </CardContent>
-          </Card>
+          <div className="flex items-center justify-center py-16">
+            <div className="text-[#8B92A8]">Cargando metas...</div>
+          </div>
         ) : !savingsGoals || savingsGoals.length === 0 ? (
-          <Card className="bg-[#121212] border-white/5">
-            <CardContent className="flex flex-col items-center justify-center py-16">
-              <div className="w-32 h-32 rounded-full bg-white/5 flex items-center justify-center mb-6">
-                <Target className="w-16 h-16 text-[#FF9500]" strokeWidth={1} />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">
-                No hay metas de ahorro aún
-              </h3>
-              <p className="text-[#8B92A8] mb-6">
-                Comienza definiendo tu primera meta financiera
-              </p>
-            </CardContent>
-          </Card>
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="w-32 h-32 rounded-full bg-white/5 flex items-center justify-center mb-6">
+              <Target className="w-16 h-16 text-[#C4FF3D]" strokeWidth={1} />
+            </div>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              No hay metas de ahorro aún
+            </h3>
+            <p className="text-[#8B92A8] mb-6">
+              Comienza definiendo tu primera meta financiera
+            </p>
+          </div>
         ) : (
           <div className="space-y-4">
             {savingsGoals.map((goal) => {
@@ -538,6 +540,7 @@ export default function Savings() {
             })}
           </div>
         )}
+        </Card>
       </div>
     </DashboardLayout>
   );
