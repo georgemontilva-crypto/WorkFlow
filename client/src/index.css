@@ -8,10 +8,10 @@
      FINWRK DESIGN SYSTEM - DESIGN TOKENS
      ================================================ */
   
-  /* Border Radius - Curvas suaves y redondeadas */
-  --radius-input: 0.75rem;   /* 12px - Inputs, buttons, dropdowns */
-  --radius-card: 1.25rem;    /* 20px - Cards, containers */
-  --radius-modal: 1.5rem;    /* 24px - Modals, popups */
+  /* Border Radius - Ultra redondeado tipo pill */
+  --radius-input: 9999px;    /* Pill shape - Inputs, buttons, dropdowns */
+  --radius-card: 1.75rem;    /* 28px - Cards, containers */
+  --radius-modal: 2rem;      /* 32px - Modals, popups */
   
   /* Border Width - Líneas finas consistentes */
   --border-width: 1px;
@@ -70,13 +70,14 @@
   --breakpoint-xl: 1280px;  /* Large Desktop */
   
   /* Tailwind compatibility */
-  --radius-sm: 0.75rem;  /* 12px */
-  --radius-md: 1rem;     /* 16px */
-  --radius-lg: 1.25rem;  /* 20px */
-  --radius-xl: 1.5rem;   /* 24px */
-  --radius-medium: 0.875rem; /* 14px */
-  --radius-large: 1.25rem;   /* 20px */
-  --radius-small: 0.625rem;  /* 10px */
+  --radius-sm: 1rem;     /* 16px */
+  --radius-md: 1.25rem;  /* 20px */
+  --radius-lg: 1.5rem;   /* 24px */
+  --radius-xl: 1.75rem;  /* 28px */
+  --radius-medium: 1.25rem; /* 20px */
+  --radius-large: 1.75rem;  /* 28px */
+  --radius-small: 0.75rem;  /* 12px */
+  --radius-pill: 9999px;    /* Pill shape */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -115,29 +116,30 @@
    FINWRK COLOR SYSTEM - Premium Dark Theme
    ================================================ */
 :root {
-  /* Primary - Green accent */
-  --primary: #4ADE80;
-  --primary-foreground: #FFFFFF;
-  --sidebar-primary: #4ADE80;
-  --sidebar-primary-foreground: #FFFFFF;
+  /* Primary - Yellow-green accent */
+  --primary: #C4FF3D;
+  --primary-foreground: #000000;
+  --sidebar-primary: #C4FF3D;
+  --sidebar-primary-foreground: #000000;
   
   /* Charts */
-  --chart-1: #4ADE80;
-  --chart-2: #5EF590;
-  --chart-3: #3DD56D;
-  --chart-4: #2ECC71;
-  --chart-5: #27AE60;
+  --chart-1: #C4FF3D;
+  --chart-2: #D4FF6D;
+  --chart-3: #B4EF2D;
+  --chart-4: #A4DF1D;
+  --chart-5: #94CF0D;
   
   /* Accent colors */
+  --accent-primary: #C4FF3D;
   --accent-green: #4ADE80;
   --accent-blue: #3498DB;
   --accent-purple: #9B59B6;
   --accent-red: #EF4444;
   
   /* Border radius - Finwrk Standard */
-  --radius: 1.25rem; /* 20px - Default for cards */
-  --radius-input: 0.75rem; /* 12px - Inputs/buttons */
-  --radius-modal: 1.5rem; /* 24px - Modals */
+  --radius: 1.75rem; /* 28px - Default for cards */
+  --radius-input: 9999px; /* Pill shape - Inputs/buttons */
+  --radius-modal: 2rem; /* 32px - Modals */
   
   /* Backgrounds - Ultra Dark theme */
   --background: #000000;
@@ -157,11 +159,11 @@
   
   /* Muted */
   --muted: #1A1A1A;
-  --muted-foreground: #A0A0A0;
+  --muted-foreground: #8B92A8;
   
   /* Accent */
-  --accent: #4ADE80;
-  --accent-foreground: #FFFFFF;
+  --accent: #C4FF3D;
+  --accent-foreground: #000000;
   
   /* Destructive */
   --destructive: #FF3B30;
@@ -170,15 +172,15 @@
   /* Borders - Líneas finas */
   --border: #1A1A1A;
   --input: #0F0F0F;
-  --ring: #4ADE80;
+  --ring: #C4FF3D;
   
   /* Sidebar */
   --sidebar: #000000;
   --sidebar-foreground: #F5F5F5;
-  --sidebar-accent: #4ADE80;
-  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-accent: #C4FF3D;
+  --sidebar-accent-foreground: #000000;
   --sidebar-border: #1A1A1A;
-  --sidebar-ring: #4ADE80;
+  --sidebar-ring: #C4FF3D;
 }
 
 /* ================================================

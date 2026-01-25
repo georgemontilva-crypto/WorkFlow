@@ -162,7 +162,7 @@ export default function Clients() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-2xl font-semibold text-[#EDEDED]">{t.clients.title}</h1>
-              <p className="text-[#9AA0AA] mt-1">{t.clients.subtitle}</p>
+              <p className="text-[#8B92A8] mt-1">{t.clients.subtitle}</p>
             </div>
             <Button
               onClick={() => handleOpenModal()}
@@ -179,7 +179,7 @@ export default function Clients() {
         <Card>
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#9AA0AA] w-5 h-5" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
               <Input
                 type="text"
                 placeholder={t.clients.search}
@@ -211,27 +211,27 @@ export default function Clients() {
           <div className="space-y-3">
             {filteredClients.length === 0 ? (
               <div className="py-16 text-center">
-                <p className="text-[#6B7280] text-base">No se encontraron clientes</p>
+                <p className="text-[#8B92A8] text-base">No se encontraron clientes</p>
               </div>
             ) : (
               filteredClients.map((client) => (
                 <div
                   key={client.id}
-                  className="bg-[#14161B] rounded-[20px] border border-[rgba(255,255,255,0.06)] p-6 hover:bg-[#4ADE80]/5 hover:border-[#4ADE80]/20 transition-colors-smooth cursor-pointer group"
+                  className="bg-[#14161B] rounded-[28px] border border-[rgba(255,255,255,0.06)] p-6 hover:bg-[#C4FF3D]/5 hover:border-[#C4FF3D]/20 transition-colors-smooth cursor-pointer group"
                 >
                   <div className="flex items-start md:items-center justify-between gap-6">
                     {/* Left: Client Info */}
                     <div className="flex-1 min-w-0 space-y-2">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-[16px] bg-[#4ADE80]/10 border border-[#4ADE80]/20 flex items-center justify-center flex-shrink-0">
-                          <Building2 className="w-6 h-6 text-[#4ADE80]" />
+                        <div className="w-12 h-12 rounded-[20px] bg-[#C4FF3D]/10 border border-[#C4FF3D]/20 flex items-center justify-center flex-shrink-0">
+                          <Building2 className="w-6 h-6 text-[#C4FF3D]" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="text-[#EDEDED] font-medium text-lg leading-tight">
                             {client.name}
                           </h3>
                           {client.company && (
-                            <p className="text-[#9AA0AA] text-sm mt-0.5 truncate">
+                            <p className="text-[#8B92A8] text-sm mt-0.5 truncate">
                               {client.company}
                             </p>
                           )}
@@ -241,11 +241,11 @@ export default function Clients() {
 
                     {/* Center: Contact Info (Desktop) */}
                     <div className="hidden md:flex flex-col gap-2 flex-1">
-                      <div className="flex items-center gap-2 text-[#9AA0AA]">
+                      <div className="flex items-center gap-2 text-[#8B92A8]">
                         <Mail className="w-4 h-4 flex-shrink-0" />
                         <span className="text-sm truncate">{client.email}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-[#9AA0AA]">
+                      <div className="flex items-center gap-2 text-[#8B92A8]">
                         <Phone className="w-4 h-4 flex-shrink-0" />
                         <span className="text-sm">{client.phone}</span>
                       </div>
@@ -254,10 +254,10 @@ export default function Clients() {
                     {/* Right: Status & Actions */}
                     <div className="flex items-center gap-3">
                       <span
-                        className={`px-4 py-2 rounded-[12px] text-sm font-medium ${
+                        className={`px-4 py-2 rounded-[9999px] text-sm font-medium ${
                           client.status === 'active'
-                            ? 'bg-[#4ADE80]/10 text-[#4ADE80] border border-[#4ADE80]/20'
-                            : 'bg-[#6B7280]/10 text-[#6B7280] border border-[#6B7280]/20'
+                            ? 'bg-[#C4FF3D]/10 text-[#C4FF3D] border border-[#C4FF3D]/20'
+                            : 'bg-[#8B92A8]/10 text-[#8B92A8] border border-[#8B92A8]/20'
                         }`}
                       >
                         {client.status === 'active' ? 'Activo' : 'Inactivo'}
@@ -268,22 +268,22 @@ export default function Clients() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-[#9AA0AA] hover:text-[#EDEDED] md:opacity-0 md:group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px]"
+                            className="text-[#8B92A8] hover:text-[#EDEDED] md:opacity-0 md:group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px]"
                           >
                             <MoreVertical className="w-5 h-5" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-[#0E0F12] border-[#4ADE80]/30">
+                        <DropdownMenuContent align="end" className="bg-[#0E0F12] border-[#C4FF3D]/30">
                           <DropdownMenuItem
                             onClick={() => handleOpenModal(client)}
-                            className="text-[#EDEDED] hover:bg-[#4ADE80]/10 cursor-pointer"
+                            className="text-[#EDEDED] hover:bg-[#C4FF3D]/10 cursor-pointer"
                           >
                             <Edit className="w-4 h-4 mr-2" />
                             Editar
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleArchive(client.id)}
-                            className="text-[#EDEDED] hover:bg-[#4ADE80]/10 cursor-pointer"
+                            className="text-[#EDEDED] hover:bg-[#C4FF3D]/10 cursor-pointer"
                           >
                             <Archive className="w-4 h-4 mr-2" />
                             Archivar
@@ -302,11 +302,11 @@ export default function Clients() {
 
                   {/* Mobile: Contact Info */}
                   <div className="md:hidden mt-4 pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-2">
-                    <div className="flex items-center gap-2 text-[#9AA0AA]">
+                    <div className="flex items-center gap-2 text-[#8B92A8]">
                       <Mail className="w-4 h-4 flex-shrink-0" />
                       <span className="text-sm truncate">{client.email}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-[#9AA0AA]">
+                    <div className="flex items-center gap-2 text-[#8B92A8]">
                       <Phone className="w-4 h-4 flex-shrink-0" />
                       <span className="text-sm">{client.phone}</span>
                     </div>
@@ -417,7 +417,7 @@ export default function Clients() {
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Información adicional sobre el cliente..."
                 rows={4}
-                className="w-full bg-[#14161B] border border-[#4ADE80] rounded-[16px] px-4 py-3 text-[#EDEDED] placeholder:text-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#4ADE80]/50 transition-colors-smooth resize-none"
+                className="w-full bg-[#14161B] border border-[#C4FF3D] rounded-[20px] px-4 py-3 text-[#EDEDED] placeholder:text-[#8B92A8] focus:outline-none focus:ring-2 focus:ring-[#C4FF3D]/50 transition-colors-smooth resize-none"
               />
             </div>
 

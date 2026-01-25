@@ -3,8 +3,8 @@
  * 
  * REGLAS ESTRICTAS:
  * - Fondo: #14161B (--color-bg-secondary)
- * - Border: 0.7px solid #4ADE80
- * - Bordes redondeados (--radius-medium: 10px)
+ * - Border: 0.7px solid #C4FF3D
+ * - Bordes redondeados tipo pill (9999px)
  * - Placeholder tenue (#6B7280)
  * - Focus: aumentar intensidad del verde
  */
@@ -68,12 +68,12 @@ function Input({
         // Base styles
         "min-h-[44px] h-10 w-full min-w-0 px-4 py-2 text-sm sm:text-base",
         // Background and border (FASE 3 specs)
-        "bg-[#14161B] border-[0.7px] border-[#4ADE80]",
-        "rounded-[var(--radius-medium)]",
+        "bg-[#14161B] border-[0.7px] border-[#C4FF3D]",
+        "rounded-[9999px]",
         // Text and placeholder
         "text-white placeholder:text-[#6B7280]",
         // Focus state
-        "focus-visible:outline-none focus-visible:border-[#5EF590] focus-visible:ring-2 focus-visible:ring-[#4ADE80]/20 focus-visible:shadow-[0_0_8px_rgba(74,222,128,0.2)]",
+        "focus-visible:outline-none focus-visible:border-[#D4FF6D] focus-visible:ring-2 focus-visible:ring-[#C4FF3D]/20 focus-visible:shadow-[0_0_12px_rgba(196,255,61,0.3)]",
         // Invalid state
         "aria-invalid:border-[#EF4444] aria-invalid:ring-[#EF4444]/20",
         // Disabled state
@@ -81,7 +81,7 @@ function Input({
         // File input
         "file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-white",
         // Selection
-        "selection:bg-[#4ADE80]/30 selection:text-white",
+        "selection:bg-[#C4FF3D]/30 selection:text-black",
         // Transition
         "transition-colors-smooth",
         className

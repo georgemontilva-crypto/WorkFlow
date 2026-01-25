@@ -4,7 +4,7 @@
  * REGLAS ESTRICTAS:
  * - Fondo: #1B1E24 (--color-bg-card)
  * - Border: 1px rgba(255,255,255,0.06)
- * - Radius: 20px (--radius-large ajustado)
+ * - Radius: 28px (--radius-large ultra-redondeado)
  * - Padding generoso (24px default)
  * - Todo el contenido debe estar dentro de Cards
  * - No debe existir contenido directamente sobre el fondo
@@ -37,7 +37,7 @@ export function Card({
       className={`
         bg-[var(--color-bg-card)]
         ${noBorder ? '' : 'border border-[var(--color-border-subtle)]'}
-        rounded-[20px]
+        rounded-[28px]
         transition-colors-smooth
         ${paddingClasses[padding]}
         ${className}
@@ -46,7 +46,7 @@ export function Card({
         backgroundColor: 'var(--color-bg-card)',
         borderColor: noBorder ? 'transparent' : 'var(--color-border-subtle)',
         borderWidth: noBorder ? '0' : '1px',
-        borderRadius: '20px',
+        borderRadius: '28px',
       }}
     >
       {children}

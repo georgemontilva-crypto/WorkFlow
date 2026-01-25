@@ -3,8 +3,8 @@
  * 
  * REGLAS ESTRICTAS:
  * - Fondo trigger: #14161B (--color-bg-secondary)
- * - Border: 0.7px solid #4ADE80
- * - Bordes redondeados (--radius-medium: 10px)
+ * - Border: 0.7px solid #C4FF3D
+ * - Bordes redondeados tipo pill (9999px)
  * - Placeholder tenue (#6B7280)
  * - Dropdown background: más oscuro que el contenedor (#0E0F12)
  * - Focus: aumentar intensidad del verde
@@ -50,14 +50,14 @@ function SelectTrigger({
         // Base styles
         "flex w-fit items-center justify-between gap-2 px-4 py-2 text-sm whitespace-nowrap",
         // Background and border (FASE 3 specs)
-        "bg-[#14161B] border-[0.7px] border-[#4ADE80]",
-        "rounded-[var(--radius-medium)]",
+        "bg-[#14161B] border-[0.7px] border-[#C4FF3D]",
+        "rounded-[9999px]",
         // Text
         "text-white data-[placeholder]:text-[#6B7280]",
         // Focus state
-        "focus-visible:outline-none focus-visible:border-[#5EF590] focus-visible:ring-2 focus-visible:ring-[#4ADE80]/20 focus-visible:shadow-[0_0_8px_rgba(74,222,128,0.2)]",
+        "focus-visible:outline-none focus-visible:border-[#D4FF6D] focus-visible:ring-2 focus-visible:ring-[#C4FF3D]/20 focus-visible:shadow-[0_0_12px_rgba(196,255,61,0.3)]",
         // Hover state
-        "hover:bg-[#14161B]/80 hover:border-[#5EF590]",
+        "hover:bg-[#14161B]/80 hover:border-[#D4FF6D]",
         // Invalid state
         "aria-invalid:border-[#EF4444] aria-invalid:ring-[#EF4444]/20",
         // Disabled state
