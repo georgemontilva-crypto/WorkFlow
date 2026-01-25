@@ -3,7 +3,7 @@
  * 
  * REGLAS ESTRICTAS:
  * - Fondo trigger: #121212 (--color-bg-secondary)
- * - Border: 0.3px solid #C4FF3D
+ * - Border: box-shadow inset 0.5px #C4FF3D
  * - Bordes redondeados tipo pill (9999px)
  * - Placeholder tenue (#6B7280)
  * - Dropdown background: más oscuro que el contenedor (#0E0F12)
@@ -50,16 +50,16 @@ function SelectTrigger({
         // Base styles
         "flex w-fit items-center justify-between gap-2 px-4 py-2 text-sm whitespace-nowrap",
         // Background and border (FASE 3 specs)
-        "bg-[#121212] border-[0.3px] border-[#C4FF3D]",
+        "bg-[#121212] border-0 shadow-[inset_0_0_0_0.5px_#C4FF3D]",
         "rounded-[9999px]",
         // Text
         "text-white data-[placeholder]:text-[#6B7280]",
         // Focus state
-        "focus-visible:outline-none focus-visible:border-[#D4FF6D] focus-visible:ring-2 focus-visible:ring-[#C4FF3D]/20 focus-visible:shadow-[0_0_12px_rgba(196,255,61,0.3)]",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C4FF3D]/20 focus-visible:shadow-[inset_0_0_0_0.5px_#D4FF6D,0_0_12px_rgba(196,255,61,0.3)]",
         // Hover state
-        "hover:bg-[#121212]/80 hover:border-[#D4FF6D]",
+        "hover:bg-[#121212]/80 hover:shadow-[inset_0_0_0_0.5px_#D4FF6D]",
         // Invalid state
-        "aria-invalid:border-[#EF4444] aria-invalid:ring-[#EF4444]/20",
+        "aria-invalid:shadow-[inset_0_0_0_0.5px_#EF4444] aria-invalid:ring-[#EF4444]/20]",
         // Disabled state
         "disabled:cursor-not-allowed disabled:opacity-50",
         // Size variants
@@ -75,7 +75,6 @@ function SelectTrigger({
       style={{
         fontFamily: 'var(--font-family-base)',
         fontWeight: 'var(--font-weight-normal)',
-        borderWidth: '0.3px',
       }}
       {...props}
     >
