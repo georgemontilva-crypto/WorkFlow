@@ -67,7 +67,7 @@ export const clients = mysqlTable("clients", {
   amount: decimal("amount", { precision: 10, scale: 2 }),
   next_payment_date: timestamp("next_payment_date"),
   currency: varchar("currency", { length: 3 }).notNull().default("USD"),
-  reminder_days: int("reminder_days").notNull().default(7),
+  reminder_days: int("reminder_days"),
   status: mysqlEnum("status", ["active", "inactive", "overdue"]).notNull().default("active"),
   archived: boolean("archived").notNull().default(false),
   notes: text("notes"),
