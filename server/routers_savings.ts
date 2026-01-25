@@ -212,16 +212,20 @@ export const savingsRouter = router({
 
         console.log(`[Savings] Progress updated for goal ${input.id}: ${input.current_amount}/${targetAmount} (${newStatus})`);
 
-        // Create notification if goal just completed
+        // Emit event if goal just completed
         if (newStatus === 'completed' && previousStatus !== 'completed') {
-          const { notifySavingsGoalCompleted } = await import('../helpers/notificationHelpers');
-          await notifySavingsGoalCompleted(
-            userId,
-            input.id,
-            goal.name,
-            targetAmount,
-            goal.currency
-          );
+          const { eventBus } = await import('../events/EventBus');
+          eventBus.emit({
+            type: 'savings.goal_completed',
+            payload: {
+              userId: userId,
+              goalId: input.id,
+              goalName: goal.name,
+              targetAmount: targetAmount,
+              currency: goal.currency,
+              timestamp: new Date(),
+            },
+          });
         }
 
         return { success: true };
@@ -303,16 +307,20 @@ export const savingsRouter = router({
 
         console.log(`[Savings] Goal ${input.id} updated successfully`);
 
-        // Create notification if goal just completed
+        // Emit event if goal just completed
         if (updateData.status === 'completed' && !wasCompleted) {
-          const { notifySavingsGoalCompleted } = await import('../helpers/notificationHelpers');
-          await notifySavingsGoalCompleted(
-            userId,
-            input.id,
-            goal.name,
-            finalTargetAmount,
-            goal.currency
-          );
+          const { eventBus } = await import('../events/EventBus');
+          eventBus.emit({
+            type: 'savings.goal_completed',
+            payload: {
+              userId: userId,
+              goalId: input.id,
+              goalName: goal.name,
+              targetAmount: finalTargetAmount,
+              currency: goal.currency,
+              timestamp: new Date(),
+            },
+          });
         }
 
         return { success: true };

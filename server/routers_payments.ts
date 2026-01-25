@@ -14,7 +14,7 @@ import { z } from "zod";
 import { getDb } from "./db";
 import { payments, invoices } from "../drizzle/schema";
 import { eq, and, sum } from "drizzle-orm";
-import { notifyPaymentRegistered } from "./helpers/notificationHelpers";
+// ✅ Removed direct notification import - now using events
 
 /**
  * Input validation schema for registering a payment
@@ -207,15 +207,21 @@ export const paymentsRouter = router({
         
         console.log(`[Payments] Invoice status updated successfully`);
         
-        // 8. Generate notification
-        await notifyPaymentRegistered(
-          ctx.user.id,
-          input.invoice_id,
-          invoiceData.invoice_number,
-          input.amount,
-          invoiceData.currency,
-          newStatus
-        );
+        // 8. Emit payment.registered event
+        const { eventBus } = await import('../events/EventBus');
+        eventBus.emit({
+          type: 'payment.registered',
+          payload: {
+            userId: ctx.user.id,
+            invoiceId: input.invoice_id,
+            invoiceNumber: invoiceData.invoice_number,
+            amount: input.amount,
+            currency: invoiceData.currency,
+            newStatus: newStatus,
+            paymentId: paymentId,
+            timestamp: new Date(),
+          },
+        });
         
         console.log(`[Payments] Payment registered successfully: ${paymentId}`);
         

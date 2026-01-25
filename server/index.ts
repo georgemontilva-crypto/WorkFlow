@@ -48,6 +48,12 @@ async function startServer() {
     // Start overdue invoices scheduler
     startOverdueInvoicesScheduler();
     
+    // Initialize event-driven notification listeners
+    console.log('[Server] Initializing event-driven notification system...');
+    const { initializeNotificationListeners } = await import('./events/notificationListeners.js');
+    initializeNotificationListeners();
+    console.log('[Server] ✅ Event-driven notification system initialized');
+    
     // Initialize Bull Queue workers
     // This starts processing jobs from the queues
     if (redisConnected) {

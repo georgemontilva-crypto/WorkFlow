@@ -269,12 +269,12 @@ export const invoicesRouter = router({
         const currentStatus = invoice.status;
         const newStatus = input.status;
         
-        const validTransitions: Record<string, string[]> = {
-          draft: ["sent", "cancelled"],
-          sent: ["paid", "cancelled"],
-          paid: [], // Cannot change from paid
-          cancelled: [], // Cannot change from cancelled
-        };
+    const validTransitions: Record<string, string[]> = {
+      draft: ["sent", "cancelled"],
+      sent: ["cancelled"], // ✅ SOLO puede cancelarse, NO pagarse (payments.register es la única fuente de verdad)
+      paid: [], // Cannot change from paid
+      cancelled: [], // Cannot change from cancelled
+    };
         
         if (!validTransitions[currentStatus]?.includes(newStatus)) {
           console.log(`[Invoices] Invalid transition: ${currentStatus} → ${newStatus}`);
@@ -292,17 +292,8 @@ export const invoicesRouter = router({
         
         console.log(`[Invoices] Status updated: ${currentStatus} → ${newStatus}`);
         
-        // Create notification if marked as paid
-        if (newStatus === 'paid') {
-          const { notifyInvoicePaid } = await import('../helpers/notificationHelpers');
-          await notifyInvoicePaid(
-            ctx.user.id,
-            input.id,
-            invoice.invoice_number,
-            parseFloat(invoice.total_amount),
-            invoice.currency
-          );
-        }
+        // ✅ NO emitimos eventos aquí porque invoices NO puede cambiar a 'paid'
+        // Solo payments.register puede marcar una factura como pagada
         
         return { success: true };
       } catch (error: any) {
