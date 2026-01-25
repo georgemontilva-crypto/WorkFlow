@@ -5,7 +5,6 @@
 
 import { useState } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
-import { Card, CardHeader } from '../components/ui/Card';
 import { Plus, Search, Send, Download, Trash2, Eye, X, MoreVertical, Clock, CheckCircle, DollarSign, AlertCircle, XCircle } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -333,16 +332,16 @@ export default function Invoices() {
   
   return (
     <DashboardLayout>
-      <div className="max-w-[1440px] mx-auto p-6 space-y-6">
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-[#EDEDED]">Facturas</h1>
-            <p className="text-[#8B92A8] mt-1">Gestiona tus facturas</p>
+            <h1 className="text-2xl font-bold text-white">Facturas</h1>
+            <p className="text-gray-400 mt-1">Gestiona tus facturas</p>
           </div>
           <Button
             onClick={handleOpenModal}
-            variant="default"
+            className="bg-[#EBFF57] hover:bg-[#EBFF57]/90 text-black"
           >
             <Plus className="w-4 h-4 mr-2" />
             Nueva Factura
@@ -359,12 +358,12 @@ export default function Invoices() {
                 placeholder="Buscar por número de factura..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-12 text-base"
+                className="pl-10 bg-[#222222] border-gray-700 text-white"
               />
             </div>
           </div>
           <Select value={clientFilter.toString()} onValueChange={(value: any) => setClientFilter(value === 'all' ? 'all' : parseInt(value))}>
-            <SelectTrigger className="w-full md:w-[220px] h-12 text-base">
+            <SelectTrigger className="w-full sm:w-48 bg-[#222222] border-gray-700 text-white">
               <SelectValue placeholder="Filtrar por cliente" />
             </SelectTrigger>
             <SelectContent>
@@ -375,7 +374,7 @@ export default function Invoices() {
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
-            <SelectTrigger className="w-full md:w-[220px] h-12 text-base">
+            <SelectTrigger className="w-full sm:w-48 bg-[#222222] border-gray-700 text-white">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -404,7 +403,7 @@ export default function Invoices() {
               return (
                 <div
                   key={invoice.id}
-                  className="bg-[#14161B] rounded-[28px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#C4FF3D]/5 hover:border-[#C4FF3D]/20 transition-colors-smooth cursor-pointer group"
+                  className="bg-[#1B1E24] rounded-[9999px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#C4FF3D]/5 hover:border-[rgba(74,222,128,0.15)] transition-colors-smooth cursor-pointer group"
                 >
                   <div className="flex items-center justify-between gap-6">
                     {/* Información Principal - Izquierda */}
@@ -715,7 +714,7 @@ export default function Invoices() {
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <Label className="text-white">Ítems *</Label>
-                    <Button type="button" size="sm" onClick={handleAddItem} variant="default">
+                    <Button type="button" size="sm" onClick={handleAddItem} className="bg-[#EBFF57] hover:bg-[#EBFF57]/90 text-black">
                       <Plus className="w-4 h-4 mr-1" />
                       Agregar Ítem
                     </Button>
@@ -816,7 +815,7 @@ export default function Invoices() {
                   <Button type="button" variant="outline" onClick={handleCloseModal} className="border-gray-700 text-white hover:bg-gray-800">
                     Cancelar
                   </Button>
-                  <Button type="submit" variant="default">
+                  <Button type="submit" className="bg-[#EBFF57] hover:bg-[#EBFF57]/90 text-black">
                     Crear Factura
                   </Button>
                 </div>
