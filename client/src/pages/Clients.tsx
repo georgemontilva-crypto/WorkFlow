@@ -173,7 +173,7 @@ export default function Clients() {
         </div>
         <Button
           onClick={() => handleOpenModal()}
-          className="bg-[#FF9500] hover:bg-[#FF9500]/90 text-white"
+          variant="default"
         >
           <Plus className="w-4 h-4 mr-2" />
           {t.clients.addClient}
@@ -189,11 +189,11 @@ export default function Clients() {
             placeholder={t.clients.search}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-[#2A2A2A] border-white/10 text-white h-11"
+            className="pl-10 bg-[#14161B] border-white/10 text-white h-11"
           />
         </div>
         <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
-          <SelectTrigger className="w-full sm:w-[200px] bg-[#2A2A2A] border-white/10 text-white h-11">
+          <SelectTrigger className="w-full sm:w-[200px] bg-[#14161B] border-white/10 text-white h-11">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -302,8 +302,8 @@ export default function Clients() {
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-[#1A1A1A] rounded-lg border border-white/10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-[#1A1A1A] border-b border-white/10 p-6 flex items-center justify-between">
+          <div className="bg-[#1B1E24] rounded-lg border border-white/10 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-[#1B1E24] border-b border-white/10 p-6 flex items-center justify-between">
               <h2 className="text-xl font-bold text-white">
                 {editingClient ? 'Editar Cliente' : t.clients.addClient}
               </h2>
@@ -328,7 +328,7 @@ export default function Clients() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                    className="bg-[#14161B] border-white/10 text-white h-11"
                     placeholder="Nombre completo"
                     required
                   />
@@ -343,7 +343,7 @@ export default function Clients() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                    className="bg-[#14161B] border-white/10 text-white h-11"
                     placeholder="correo@ejemplo.com"
                     required
                   />
@@ -360,7 +360,7 @@ export default function Clients() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                    className="bg-[#14161B] border-white/10 text-white h-11"
                     placeholder="+1 (555) 000-0000"
                     required
                   />
@@ -375,7 +375,7 @@ export default function Clients() {
                     type="text"
                     value={formData.company}
                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                    className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                    className="bg-[#14161B] border-white/10 text-white h-11"
                     placeholder="Nombre de la empresa"
                   />
                 </div>
@@ -387,7 +387,7 @@ export default function Clients() {
                   value={formData.status}
                   onValueChange={(value: 'active' | 'inactive') => setFormData({ ...formData, status: value })}
                 >
-                  <SelectTrigger className="bg-[#2A2A2A] border-white/10 text-white h-11">
+                  <SelectTrigger className="bg-[#14161B] border-white/10 text-white h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -403,7 +403,7 @@ export default function Clients() {
                   id="notes"
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full min-h-[100px] bg-[#2A2A2A] border border-white/10 rounded-md p-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF9500]"
+                  className="w-full min-h-[100px] bg-[#14161B] border border-white/10 rounded-md p-3 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF9500]"
                   placeholder="Información adicional sobre el cliente..."
                 />
               </div>
@@ -419,7 +419,8 @@ export default function Clients() {
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 bg-[#FF9500] hover:bg-[#FF9500]/90 text-white"
+                  variant="default"
+                  className="flex-1"
                   disabled={createClientMutation.isPending || updateClientMutation.isPending}
                 >
                   {createClientMutation.isPending || updateClientMutation.isPending ? 'Guardando...' : 'Guardar'}

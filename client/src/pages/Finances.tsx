@@ -246,7 +246,7 @@ export default function Finances() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Total Income */}
-          <div className="bg-[#222222] border border-gray-800 rounded-2xl p-4 md:p-6">
+          <div className="bg-[#1B1E24] border border-gray-800 rounded-2xl p-4 md:p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-gray-400 text-sm">Total Ingresos</p>
               <TrendingUp className="w-5 h-5 text-green-500" />
@@ -261,7 +261,7 @@ export default function Finances() {
           </div>
 
           {/* Total Expenses */}
-          <div className="bg-[#222222] border border-gray-800 rounded-2xl p-4 md:p-6">
+          <div className="bg-[#1B1E24] border border-gray-800 rounded-2xl p-4 md:p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-gray-400 text-sm">Total Gastos</p>
               <TrendingDown className="w-5 h-5 text-red-500" />
@@ -272,7 +272,7 @@ export default function Finances() {
           </div>
 
           {/* Balance */}
-          <div className="bg-[#222222] border border-gray-800 rounded-2xl p-4 md:p-6">
+          <div className="bg-[#1B1E24] border border-gray-800 rounded-2xl p-4 md:p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-gray-400 text-sm">Balance</p>
               <DollarSign className="w-5 h-5 text-blue-500" />
@@ -286,7 +286,7 @@ export default function Finances() {
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Tendencia Mensual (Line Chart) */}
-          <div className="bg-[#222222] border border-gray-800 rounded-2xl p-6">
+          <div className="bg-[#1B1E24] border border-gray-800 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Tendencia Mensual</h2>
             {monthLoading ? (
               <div className="h-80 bg-gray-700 animate-pulse rounded"></div>
@@ -331,7 +331,7 @@ export default function Finances() {
           </div>
 
           {/* Comparativa Mensual (Bar Chart) */}
-          <div className="bg-[#222222] border border-gray-800 rounded-2xl p-6">
+          <div className="bg-[#1B1E24] border border-gray-800 rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Comparativa Mensual</h2>
             {monthLoading ? (
               <div className="h-80 bg-gray-700 animate-pulse rounded"></div>
@@ -371,7 +371,7 @@ export default function Finances() {
         </div>
 
         {/* Transacciones Recientes */}
-        <div className="bg-[#222222] border border-gray-800 rounded-2xl p-6">
+        <div className="bg-[#1B1E24] border border-gray-800 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-white">Transacciones Recientes</h2>
             <div className="flex items-center gap-4">
@@ -493,7 +493,7 @@ export default function Finances() {
                       className={`p-3 rounded-lg border transition-colors ${
                         formData.type === 'income'
                           ? 'bg-green-500/20 border-green-500 text-green-400'
-                          : 'bg-[#222222] border-gray-700 text-gray-400 hover:border-gray-600'
+                          : 'bg-[#1B1E24] border-gray-700 text-gray-400 hover:border-gray-600'
                       }`}
                     >
                       Ingreso
@@ -510,7 +510,7 @@ export default function Finances() {
                       className={`p-3 rounded-lg border transition-colors ${
                         formData.type === 'expense'
                           ? 'bg-red-500/20 border-red-500 text-red-400'
-                          : 'bg-[#222222] border-gray-700 text-gray-400 hover:border-gray-600'
+                          : 'bg-[#1B1E24] border-gray-700 text-gray-400 hover:border-gray-600'
                       }`}
                     >
                       Gasto
@@ -526,7 +526,7 @@ export default function Finances() {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full bg-[#222222] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
+                    className="w-full bg-[#1B1E24] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
                     required
                   >
                     {getCategories().map(cat => (
@@ -545,7 +545,7 @@ export default function Finances() {
                     step="0.01"
                     value={formData.amount}
                     onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
-                    className="w-full bg-[#222222] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
+                    className="w-full bg-[#1B1E24] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
                     placeholder="0.00"
                     required
                   />
@@ -560,7 +560,7 @@ export default function Finances() {
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                    className="w-full bg-[#222222] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
+                    className="w-full bg-[#1B1E24] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
                     required
                   />
                 </div>
@@ -573,7 +573,7 @@ export default function Finances() {
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full bg-[#222222] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57] resize-none"
+                    className="w-full bg-[#1B1E24] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57] resize-none"
                     rows={3}
                     placeholder="Descripción de la transacción..."
                     required
@@ -585,7 +585,7 @@ export default function Finances() {
                   <button
                     type="button"
                     onClick={handleCloseModal}
-                    className="flex-1 px-4 py-2 bg-[#222222] border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex-1 px-4 py-2 bg-[#1B1E24] border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors"
                   >
                     Cancelar
                   </button>

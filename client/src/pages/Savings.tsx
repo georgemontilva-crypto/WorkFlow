@@ -233,7 +233,7 @@ export default function Savings() {
             }
           }}>
             <DialogTrigger asChild>
-              <Button className="bg-[#FF9500] text-black hover:bg-[#FFA500] font-semibold">
+              <Button variant="default">
                 <Plus className="w-4 h-4 mr-2" />
                 Nueva Meta
               </Button>
@@ -256,7 +256,7 @@ export default function Savings() {
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                    className="bg-[#14161B] border-white/10 text-white h-11"
                     placeholder="Ej: Fondo de emergencia, Vacaciones, etc."
                     required
                   />
@@ -288,7 +288,7 @@ export default function Savings() {
                       min="0"
                       value={formData.target_amount}
                       onChange={(e) => setFormData({ ...formData, target_amount: e.target.value })}
-                      className="bg-[#2A2A2A] border-white/10 text-white font-mono h-11"
+                      className="bg-[#14161B] border-white/10 text-white font-mono h-11"
                       required
                     />
                     <p className="text-xs text-gray-400">Meta a alcanzar</p>
@@ -304,7 +304,7 @@ export default function Savings() {
                       min="0"
                       value={formData.current_amount}
                       onChange={(e) => setFormData({ ...formData, current_amount: e.target.value })}
-                      className="bg-[#2A2A2A] border-white/10 text-white font-mono h-11"
+                      className="bg-[#14161B] border-white/10 text-white font-mono h-11"
                     />
                     <p className="text-xs text-gray-400">Ahorro actual</p>
                   </div>
@@ -319,7 +319,7 @@ export default function Savings() {
                     type="date"
                     value={formData.deadline}
                     onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                    className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                    className="bg-[#14161B] border-white/10 text-white h-11"
                   />
                   <p className="text-xs text-gray-400">Fecha objetivo para completar la meta</p>
                 </div>
@@ -332,7 +332,7 @@ export default function Savings() {
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="bg-[#2A2A2A] border-white/10 text-white h-11"
+                    className="bg-[#14161B] border-white/10 text-white h-11"
                     placeholder="Describe tu meta de ahorro..."
                   />
                   <p className="text-xs text-gray-400">Información adicional sobre tu meta</p>
@@ -349,7 +349,7 @@ export default function Savings() {
                   </Button>
                   <Button 
                     type="submit" 
-                    className="bg-[#FF9500] text-black hover:bg-[#FFA500] font-semibold"
+                    variant="default"
                     disabled={createGoal.isPending || updateGoal.isPending}
                   >
                     {editingGoal ? 'Actualizar' : 'Crear'} Meta
@@ -362,7 +362,7 @@ export default function Savings() {
 
         {/* Savings Goals */}
         {error ? (
-          <Card className="bg-[#2A2A2A] border-white/5">
+          <Card className="bg-[#14161B] border-white/5">
             <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
               <div className="text-red-500">Error al cargar metas</div>
               <div className="text-gray-400 text-sm">{error.message}</div>
@@ -376,13 +376,13 @@ export default function Savings() {
             </CardContent>
           </Card>
         ) : isLoading ? (
-          <Card className="bg-[#2A2A2A] border-white/5">
+          <Card className="bg-[#14161B] border-white/5">
             <CardContent className="flex items-center justify-center py-16">
               <div className="text-gray-400">Cargando metas...</div>
             </CardContent>
           </Card>
         ) : !savingsGoals || savingsGoals.length === 0 ? (
-          <Card className="bg-[#2A2A2A] border-white/5">
+          <Card className="bg-[#14161B] border-white/5">
             <CardContent className="flex flex-col items-center justify-center py-16">
               <div className="w-32 h-32 rounded-full bg-white/5 flex items-center justify-center mb-6">
                 <Target className="w-16 h-16 text-[#FF9500]" strokeWidth={1} />
