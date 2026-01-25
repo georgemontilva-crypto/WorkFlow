@@ -721,7 +721,7 @@ export const appRouter = router({
           }
         }
 
-        // Prepare client data
+        // Prepare client data - ALL fields must be present for Drizzle INSERT
         const clientData: any = {
           name: input.name,
           email: input.email,
@@ -735,16 +735,13 @@ export const appRouter = router({
           user_id: ctx.user.id,
           created_at: new Date(),
           updated_at: new Date(),
+          // Always include billing fields (null for non-recurring clients)
+          billing_cycle: input.has_recurring_billing ? (input.billing_cycle || "monthly") : null,
+          custom_cycle_days: input.has_recurring_billing ? input.custom_cycle_days : null,
+          amount: input.has_recurring_billing ? (input.amount || "0") : null,
+          next_payment_date: input.has_recurring_billing ? (input.next_payment_date ? new Date(input.next_payment_date) : new Date()) : null,
+          reminder_days: input.has_recurring_billing ? input.reminder_days : 7,
         };
-
-        // Only add billing fields if client is recurring
-        if (input.has_recurring_billing) {
-          clientData.billing_cycle = input.billing_cycle || "monthly";
-          clientData.custom_cycle_days = input.custom_cycle_days;
-          clientData.amount = input.amount || "0";
-          clientData.next_payment_date = input.next_payment_date ? new Date(input.next_payment_date) : new Date();
-          clientData.reminder_days = input.reminder_days;
-        }
 
         await db.createClient(clientData);
         return { success: true };
