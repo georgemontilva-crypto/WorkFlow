@@ -289,6 +289,7 @@ export const savingsRouter = router({
         }
 
         // Auto-complete if current_amount >= target_amount
+        const wasCompleted = goal.status === 'completed';
         if (finalCurrentAmount >= finalTargetAmount && goal.status !== 'completed') {
           updateData.status = 'completed';
           console.log(`[Savings] Goal ${input.id} auto-completed (current >= target)`);
@@ -301,6 +302,18 @@ export const savingsRouter = router({
           .where(eq(savingsGoals.id, input.id));
 
         console.log(`[Savings] Goal ${input.id} updated successfully`);
+
+        // Create notification if goal just completed
+        if (updateData.status === 'completed' && !wasCompleted) {
+          const { notifySavingsGoalCompleted } = await import('../helpers/notificationHelpers');
+          await notifySavingsGoalCompleted(
+            userId,
+            input.id,
+            goal.name,
+            finalTargetAmount,
+            goal.currency
+          );
+        }
 
         return { success: true };
       } catch (error: any) {
