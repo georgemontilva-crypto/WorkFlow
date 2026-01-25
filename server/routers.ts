@@ -5,6 +5,7 @@ import { publicProcedure, protectedProcedure, superAdminProcedure, router } from
 import { z } from "zod";
 import * as db from "./db";
 import { getRedisClient } from "./config/redis";
+import { invoicesRouter } from "./routers_invoices";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -506,8 +507,7 @@ export const appRouter = router({
   }),
 
   /**
-   * Clients router - ÚNICO MÓDULO ACTIVO
-   * CRUD operations for clients with strict validations
+   * Clients router - CRUD operations for clients with strict validations
    */
   clients: router({
     list: protectedProcedure.query(async ({ ctx }) => {
@@ -652,6 +652,12 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  /**
+   * Invoices router - REBUILT FROM SCRATCH
+   * Clean, stable, predictable invoice system
+   */
+  invoices: invoicesRouter,
 });
 
 export type AppRouter = typeof appRouter;

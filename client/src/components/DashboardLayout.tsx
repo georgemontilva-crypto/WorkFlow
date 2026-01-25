@@ -4,7 +4,7 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { Users, Settings, Menu, X, LogOut } from 'lucide-react';
+import { Users, Settings, Menu, X, LogOut, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -52,6 +52,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       title: 'GESTIÓN',
       items: [
         { name: t.nav.clients, href: '/clients', icon: Users },
+        { name: 'Facturas', href: '/invoices', icon: FileText },
       ]
     },
   ];

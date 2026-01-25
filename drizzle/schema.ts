@@ -72,52 +72,45 @@ export type Client = typeof clients.$inferSelect;
 export type InsertClient = typeof clients.$inferInsert;
 
 /**
- * Invoice items - stored as JSON in invoices table
- */
-export interface InvoiceItem {
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
-}
-
-/**
- * Invoices table - stores invoice information
+ * Invoices table - REBUILT FROM SCRATCH
+ * Clean, simple, predictable invoice system
  */
 export const invoices = mysqlTable("invoices", {
   id: serial("id").primaryKey(),
   user_id: int("user_id").notNull(),
   client_id: int("client_id").notNull(),
   invoice_number: varchar("invoice_number", { length: 50 }).notNull().unique(),
+  status: mysqlEnum("status", ["draft", "sent", "paid", "cancelled"]).notNull().default("draft"),
+  currency: varchar("currency", { length: 3 }).notNull().default("USD"),
+  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
+  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
   issue_date: timestamp("issue_date").notNull(),
   due_date: timestamp("due_date").notNull(),
-  items: text("items").notNull(), // JSON string of InvoiceItem[]
-  subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
-  tax: decimal("tax", { precision: 10, scale: 2 }).notNull().default("0"),
-  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
-  currency: varchar("currency", { length: 3 }).notNull().default("USD"),
-  paid_amount: decimal("paid_amount", { precision: 10, scale: 2 }).notNull().default("0"),
-  balance: decimal("balance", { precision: 10, scale: 2 }).notNull(),
-  status: mysqlEnum("status", ["draft", "sent", "payment_sent", "paid", "overdue", "cancelled"]).notNull().default("draft"),
-  archived: int("archived").notNull().default(0),
-  payment_token: varchar("payment_token", { length: 64 }).unique(),
-  payment_link: text("payment_link"),
-  client_comment: text("client_comment"),
   notes: text("notes"),
-  // Company profile snapshot at invoice creation time
-  company_profile_snapshot: text("company_profile_snapshot"), // JSON snapshot of company profile
-  // Recurring invoice fields
-  is_recurring: boolean("is_recurring").notNull().default(false),
-  recurrence_frequency: mysqlEnum("recurrence_frequency", ["every_minute", "monthly", "biweekly", "annual", "custom"]),
-  recurrence_interval: int("recurrence_interval"), // For custom frequency (days)
-  next_generation_date: timestamp("next_generation_date"),
-  parent_invoice_id: int("parent_invoice_id"), // Reference to original recurring invoice
+  terms: text("terms"),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export type Invoice = typeof invoices.$inferSelect;
 export type InsertInvoice = typeof invoices.$inferInsert;
+
+/**
+ * Invoice Items table - SEPARATE TABLE (not JSON)
+ * Each invoice can have multiple items
+ */
+export const invoiceItems = mysqlTable("invoice_items", {
+  id: serial("id").primaryKey(),
+  invoice_id: int("invoice_id").notNull(),
+  description: text("description").notNull(),
+  quantity: decimal("quantity", { precision: 10, scale: 2 }).notNull(),
+  unit_price: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  total: decimal("total", { precision: 10, scale: 2 }).notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type InvoiceItem = typeof invoiceItems.$inferSelect;
+export type InsertInvoiceItem = typeof invoiceItems.$inferInsert;
 
 /**
  * Transactions table - stores income and expense records
