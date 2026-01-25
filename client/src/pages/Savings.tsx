@@ -144,6 +144,7 @@ export default function Savings() {
         id: editingGoal.id,
         name: formData.name,
         target_amount: parseFloat(normalizeDecimal(formData.target_amount)),
+        current_amount: parseFloat(normalizeDecimal(formData.current_amount)),
         deadline: formData.deadline || undefined,
         description: formData.description || undefined,
       });

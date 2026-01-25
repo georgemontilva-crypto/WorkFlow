@@ -240,6 +240,7 @@ export const savingsRouter = router({
       id: z.number(),
       name: z.string().min(1, "El nombre es obligatorio").optional(),
       target_amount: z.number().positive("El monto objetivo debe ser mayor a 0").optional(),
+      current_amount: z.number().min(0, "El monto actual no puede ser negativo").optional(),
       deadline: z.string().optional(), // ISO date string
       description: z.string().optional(),
     }))
@@ -274,8 +275,24 @@ export const savingsRouter = router({
 
         if (input.name !== undefined) updateData.name = input.name;
         if (input.target_amount !== undefined) updateData.target_amount = input.target_amount.toString();
+        if (input.current_amount !== undefined) updateData.current_amount = input.current_amount.toString();
         if (input.deadline !== undefined) updateData.deadline = input.deadline ? new Date(input.deadline) : null;
         if (input.description !== undefined) updateData.description = input.description || null;
+
+        // Determine final amounts for validation
+        const finalCurrentAmount = input.current_amount !== undefined ? input.current_amount : parseFloat(goal.current_amount);
+        const finalTargetAmount = input.target_amount !== undefined ? input.target_amount : parseFloat(goal.target_amount);
+
+        // Validate: current_amount should not exceed target_amount
+        if (finalCurrentAmount > finalTargetAmount) {
+          throw new Error("El monto actual no puede ser mayor al monto objetivo");
+        }
+
+        // Auto-complete if current_amount >= target_amount
+        if (finalCurrentAmount >= finalTargetAmount && goal.status !== 'completed') {
+          updateData.status = 'completed';
+          console.log(`[Savings] Goal ${input.id} auto-completed (current >= target)`);
+        }
 
         // Update goal
         await db
