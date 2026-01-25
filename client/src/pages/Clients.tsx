@@ -144,6 +144,7 @@ export default function Clients() {
     currency: 'USD',
     reminder_days: 7,
     status: 'active',
+    archived: false,
     notes: '',
   });
 
@@ -216,6 +217,7 @@ export default function Clients() {
       currency: 'USD',
       reminder_days: 7,
       status: 'active',
+      archived: false,
       notes: '',
     });
   };
@@ -235,6 +237,7 @@ export default function Clients() {
       currency: client.currency || 'USD',
       reminder_days: client.reminder_days,
       status: client.status,
+      archived: client.archived || false,
       notes: client.notes || '',
     });
     setIsDialogOpen(true);

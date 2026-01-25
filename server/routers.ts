@@ -703,7 +703,7 @@ export const appRouter = router({
         currency: z.string().optional().default("USD"),
         reminder_days: z.number().default(7),
         status: z.enum(["active", "inactive", "overdue"]).default("active"),
-        archived: z.number().default(0),
+        archived: z.boolean().default(false),
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
