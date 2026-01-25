@@ -159,18 +159,22 @@ export default function Invoices() {
   
   const handleSendEmail = async (id: number) => {
     try {
+      console.log('[Invoices] Sending email for invoice:', id);
       await sendEmailMutation.mutateAsync({ id });
-      // toast.success('Factura enviada por email');
+      alert('Factura enviada por email exitosamente');
       utils.invoices.list.invalidate();
     } catch (error: any) {
       console.error('Error al enviar email:', error);
-      // toast.error(error.message || 'Error al enviar email');
+      alert('Error al enviar email: ' + (error.message || 'Error desconocido'));
     }
   };
   
   const handleDownloadPDF = async (id: number, invoice_number: string) => {
     try {
+      console.log('[Invoices] Downloading PDF for invoice:', id);
       const result = await downloadPDFMutation.mutateAsync({ id });
+      
+      console.log('[Invoices] PDF received, size:', result.pdf?.length);
       
       // Download PDF
       const link = document.createElement('a');
@@ -178,10 +182,10 @@ export default function Invoices() {
       link.download = result.filename;
       link.click();
       
-      // toast.success('PDF descargado');
+      alert('PDF descargado exitosamente');
     } catch (error: any) {
       console.error('Error al descargar PDF:', error);
-      // toast.error(error.message || 'Error al descargar PDF');
+      alert('Error al descargar PDF: ' + (error.message || 'Error desconocido'));
     }
   };
   
@@ -334,7 +338,8 @@ export default function Invoices() {
                         size="sm"
                         variant="outline"
                         onClick={() => handleDownloadPDF(invoice.id, invoice.invoice_number)}
-                        className="border-gray-700 text-white hover:bg-gray-800"
+                        disabled={downloadPDFMutation.isLoading}
+                        className="border-gray-700 text-white hover:bg-gray-800 disabled:opacity-50"
                       >
                         <Download className="w-4 h-4" />
                       </Button>
@@ -344,7 +349,8 @@ export default function Invoices() {
                           <Button
                             size="sm"
                             onClick={() => handleSendEmail(invoice.id)}
-                            className="bg-[#EBFF57] hover:bg-[#EBFF57]/90 text-black"
+                            disabled={sendEmailMutation.isLoading}
+                            className="bg-[#EBFF57] hover:bg-[#EBFF57]/90 text-black disabled:opacity-50"
                           >
                             <Send className="w-4 h-4" />
                           </Button>
