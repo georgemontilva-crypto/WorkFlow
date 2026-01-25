@@ -1,5 +1,5 @@
 import { createHash } from 'crypto';
-import { db } from '../db';
+import * as db from '../db';
 import { notifications } from '../../drizzle/schema';
 import type { Notification, InsertNotification } from '../../drizzle/schema';
 
@@ -174,7 +174,7 @@ export async function createNotification(
     }
     
     // 6. GUARDAR EN BASE DE DATOS (PERSISTENTE)
-    const [notification] = await db.insert(notifications).values({
+    const [notification] = await db.db.insert(notifications).values({
       user_id: input.user_id,
       type: input.type,
       title,
@@ -301,7 +301,7 @@ export async function getNotificationHistory(
   limit: number = 50
 ): Promise<Notification[]> {
   try {
-    const result = await db
+    const result = await db.db
       .select()
       .from(notifications)
       .where((t: any) => t.user_id.eq(user_id))
@@ -325,7 +325,7 @@ export async function markNotificationAsRead(
   user_id: number
 ): Promise<boolean> {
   try {
-    await db
+    await db.db
       .update(notifications)
       .set({ is_read: 1 })
       .where((t: any) => t.id.eq(notification_id).and(t.user_id.eq(user_id)));
@@ -345,7 +345,7 @@ export async function markNotificationAsRead(
 
 export async function markAllNotificationsAsRead(user_id: number): Promise<boolean> {
   try {
-    await db
+    await db.db
       .update(notifications)
       .set({ is_read: 1 })
       .where((t: any) => t.user_id.eq(user_id).and(t.is_read.eq(0)));

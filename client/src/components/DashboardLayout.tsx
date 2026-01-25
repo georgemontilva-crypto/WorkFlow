@@ -20,6 +20,7 @@ import { differenceInDays, parseISO } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
+import { useNotifications } from '@/hooks/useNotifications';
 
 
 
@@ -49,7 +50,9 @@ function UnreadAlertBadge() {
   );
 }
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  // Activar sistema de notificaciones V2
+  useNotifications();
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAlertCenterOpen, setIsAlertCenterOpen] = useState(false);
