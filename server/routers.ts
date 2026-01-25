@@ -691,60 +691,82 @@ export const appRouter = router({
     
     create: protectedProcedure
       .input(z.object({
-        name: z.string(),
-        email: z.string().email(),
-        phone: z.string().optional().default(""),
+        name: z.string().min(2, "El nombre debe tener al menos 2 caracteres").max(255, "El nombre es demasiado largo"),
+        email: z.string().email("Email inválido").max(320, "Email demasiado largo"),
+        phone: z.string().optional(),
         company: z.string().optional(),
-        has_recurring_billing: z.boolean().optional().default(false),
-        billing_cycle: z.enum(["monthly", "quarterly", "yearly", "custom"]).optional().default("monthly"),
+        has_recurring_billing: z.boolean().default(false),
+        billing_cycle: z.enum(["monthly", "quarterly", "yearly", "custom"]).optional(),
         custom_cycle_days: z.number().optional(),
-        amount: z.string().optional().default("0"),
+        amount: z.string().optional(),
         next_payment_date: z.string().optional(),
-        currency: z.string().optional().default("USD"),
-        reminder_days: z.number().default(7),
+        currency: z.string().length(3, "Código de moneda inválido").default("USD"),
+        reminder_days: z.number().optional(),
         status: z.enum(["active", "inactive", "overdue"]).default("active"),
-        archived: z.boolean().default(false),
         notes: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        // Check plan limits (skip for super admins)
-        if (ctx.user.role !== 'super_admin') {
-          const { getPlanLimit } = await import("./plans");
-          const clientLimit = getPlanLimit(ctx.user.subscription_plan as any, 'clients');
+        const { logClientCreateAttempt, logClientCreateError, logValidationError } = await import("./utils/logger");
+        
+        try {
+          logClientCreateAttempt(input.email, ctx.user.id);
           
-          if (clientLimit !== Infinity) {
-          const { getClientsByUserId } = await import("./db");
-          const existingClients = await getClientsByUserId(ctx.user.id);
-            if (existingClients.length >= clientLimit) {
-              throw new Error(`You've reached the limit of ${clientLimit} clients on the Free plan. Upgrade to Pro for unlimited clients.`);
+          // Verificar límites de plan (excepto super admins)
+          if (ctx.user.role !== 'super_admin') {
+            const { getPlanLimit } = await import("./plans");
+            const clientLimit = getPlanLimit(ctx.user.subscription_plan as any, 'clients');
+            
+            if (clientLimit !== Infinity) {
+              const existingClients = await db.getClientsByUserId(ctx.user.id);
+              if (existingClients.length >= clientLimit) {
+                throw new Error(`Has alcanzado el límite de ${clientLimit} clientes en el plan Free. Actualiza a Pro para clientes ilimitados.`);
+              }
             }
           }
+          
+          // Validar campos de billing si es recurrente
+          if (input.has_recurring_billing) {
+            if (!input.billing_cycle) {
+              logValidationError('billing_cycle', 'Ciclo de facturación requerido', ctx.user.id);
+              throw new Error("El ciclo de facturación es requerido para clientes recurrentes");
+            }
+            if (!input.amount || parseFloat(input.amount) <= 0) {
+              logValidationError('amount', 'Monto debe ser mayor a 0', ctx.user.id);
+              throw new Error("El monto debe ser mayor a 0 para clientes recurrentes");
+            }
+            if (!input.next_payment_date) {
+              logValidationError('next_payment_date', 'Fecha de pago requerida', ctx.user.id);
+              throw new Error("La fecha del próximo pago es requerida para clientes recurrentes");
+            }
+          }
+          
+          // Crear cliente con validación de duplicados
+          const client = await db.createClient({
+            user_id: ctx.user.id,
+            name: input.name,
+            email: input.email,
+            phone: input.phone || null,
+            company: input.company || null,
+            has_recurring_billing: input.has_recurring_billing,
+            billing_cycle: input.billing_cycle || null,
+            custom_cycle_days: input.custom_cycle_days || null,
+            amount: input.amount || null,
+            next_payment_date: input.next_payment_date ? new Date(input.next_payment_date) : null,
+            currency: input.currency,
+            reminder_days: input.reminder_days || null,
+            status: input.status,
+            archived: false,
+            notes: input.notes || null,
+          });
+          
+          return { 
+            success: true, 
+            client: client 
+          };
+        } catch (error: any) {
+          logClientCreateError(input.email, ctx.user.id, error);
+          throw new Error(error.message || "Error al crear cliente");
         }
-
-        // Prepare client data - ALL fields must be present for Drizzle INSERT
-        const clientData: any = {
-          name: input.name,
-          email: input.email,
-          phone: input.phone || "",
-          company: input.company,
-          has_recurring_billing: input.has_recurring_billing,
-          currency: input.currency || "USD",
-          status: input.status,
-          archived: input.archived,
-          notes: input.notes,
-          user_id: ctx.user.id,
-          created_at: new Date(),
-          updated_at: new Date(),
-          // Always include billing fields (null for non-recurring clients)
-          billing_cycle: input.has_recurring_billing ? (input.billing_cycle || "monthly") : null,
-          custom_cycle_days: input.has_recurring_billing ? input.custom_cycle_days : null,
-          amount: input.has_recurring_billing ? (input.amount || "0") : null,
-          next_payment_date: input.has_recurring_billing ? (input.next_payment_date ? new Date(input.next_payment_date) : new Date()) : null,
-          reminder_days: input.has_recurring_billing ? input.reminder_days : 7,
-        };
-
-        await db.createClient(clientData);
-        return { success: true };
       }),
     
     update: protectedProcedure

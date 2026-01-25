@@ -98,8 +98,10 @@ export default function Clients() {
       utils.clients.list.invalidate();
       toast.success(t.clients.clientAdded);
     },
-    onError: () => {
-      toast.error(t.clients.clientAddError);
+    onError: (error) => {
+      // Mostrar mensaje de error específico
+      const errorMessage = error.message || t.clients.clientAddError;
+      toast.error(errorMessage);
     },
   });
   
@@ -183,43 +185,73 @@ export default function Clients() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validar campos obligatorios
     if (!formData.name || !formData.email) {
       toast.error(t.clients.completeRequiredFields);
       return;
     }
 
-    // Validate recurring billing fields only if enabled
-    if (formData.has_recurring_billing && (!formData.amount || !formData.next_payment_date)) {
-      toast.error('Complete los campos de facturación recurrente');
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Email inválido');
       return;
     }
 
-    if (editingClient) {
-      await updateClient.mutateAsync({
-        id: editingClient.id,
-        ...formData,
-      });
-    } else {
-      await createClient.mutateAsync(formData);
+    // Validar campos de facturación recurrente
+    if (formData.has_recurring_billing) {
+      if (!formData.amount || parseFloat(formData.amount) <= 0) {
+        toast.error('El monto debe ser mayor a 0 para clientes recurrentes');
+        return;
+      }
+      if (!formData.next_payment_date) {
+        toast.error('La fecha del próximo pago es requerida para clientes recurrentes');
+        return;
+      }
     }
 
-    setIsDialogOpen(false);
-    setEditingClient(null);
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      company: '',
-      has_recurring_billing: false,
-      billing_cycle: 'monthly',
-      amount: '0',
-      next_payment_date: '',
-      currency: 'USD',
-      reminder_days: 7,
-      status: 'active',
-      archived: false,
-      notes: '',
-    });
+    try {
+      // Normalizar datos antes de enviar
+      const normalizedData = {
+        ...formData,
+        name: formData.name.trim(),
+        email: formData.email.toLowerCase().trim(),
+        phone: formData.phone?.trim() || '',
+        company: formData.company?.trim() || '',
+        notes: formData.notes?.trim() || '',
+      };
+
+      if (editingClient) {
+        await updateClient.mutateAsync({
+          id: editingClient.id,
+          ...normalizedData,
+        });
+      } else {
+        await createClient.mutateAsync(normalizedData);
+      }
+
+      // Cerrar diálogo y resetear formulario
+      setIsDialogOpen(false);
+      setEditingClient(null);
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        company: '',
+        has_recurring_billing: false,
+        billing_cycle: 'monthly',
+        amount: '0',
+        next_payment_date: '',
+        currency: 'USD',
+        reminder_days: 7,
+        status: 'active',
+        archived: false,
+        notes: '',
+      });
+    } catch (error: any) {
+      // El error ya se maneja en onError de la mutación
+      console.error('Error al guardar cliente:', error);
+    }
   };
 
   const handleEdit = (client: Client) => {

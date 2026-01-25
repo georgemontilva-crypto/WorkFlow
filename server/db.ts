@@ -1,9 +1,11 @@
+import { mysqlTable, serial, varchar, text, int, bigint, timestamp, decimal, mysqlEnum, boolean } from "drizzle-orm/mysql-core";
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { ENV } from "./_core/env";
 import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts, dashboardWidgets, verificationTokens, companyProfiles, reminders, alerts } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { logClientCreated, logClientDuplicate } from "./utils/logger";
 
 // Initialize MySQL connection pool
 const pool = mysql.createPool({
@@ -736,13 +738,88 @@ export async function getClientById(id: number, user_id: number) {
   return client;
 }
 
-export async function createClient(data: any) {
+export async function createClient(data: {
+  user_id: number;
+  name: string;
+  email: string;
+  phone?: string | null;
+  company?: string | null;
+  has_recurring_billing: boolean;
+  billing_cycle?: string | null;
+  custom_cycle_days?: number | null;
+  amount?: string | null;
+  next_payment_date?: Date | null;
+  currency: string;
+  reminder_days?: number | null;
+  status: string;
+  archived: boolean;
+  notes?: string | null;
+}) {
   const db = await getDb();
   if (!db) {
     throw new Error("Database not available");
   }
 
-  await db.insert(clients).values(data);
+  try {
+    // Normalizar email
+    const normalizedEmail = data.email.toLowerCase().trim();
+    
+    // Verificar duplicados
+    const existing = await db
+      .select()
+      .from(clients)
+      .where(
+        sql`${clients.user_id} = ${data.user_id} AND LOWER(${clients.email}) = ${normalizedEmail}`
+      )
+      .limit(1);
+    
+    if (existing.length > 0) {
+      logClientDuplicate(normalizedEmail, data.user_id);
+      throw new Error("DUPLICATE_CLIENT");
+    }
+    
+    // Preparar datos normalizados
+    const clientData = {
+      user_id: data.user_id,
+      name: data.name.trim(),
+      email: normalizedEmail,
+      phone: data.phone?.trim() || null,
+      company: data.company?.trim() || null,
+      has_recurring_billing: data.has_recurring_billing,
+      billing_cycle: data.has_recurring_billing ? data.billing_cycle : null,
+      custom_cycle_days: data.has_recurring_billing ? data.custom_cycle_days : null,
+      amount: data.has_recurring_billing ? data.amount : null,
+      next_payment_date: data.has_recurring_billing ? data.next_payment_date : null,
+      currency: data.currency || "USD",
+      reminder_days: data.has_recurring_billing ? data.reminder_days : null,
+      status: data.status,
+      archived: data.archived,
+      notes: data.notes?.trim() || null,
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
+    
+    // Insertar cliente
+    const result = await db.insert(clients).values(clientData);
+    
+    // Obtener cliente creado
+    const insertId = (result as any)[0]?.insertId || (result as any).insertId;
+    const newClient = await db
+      .select()
+      .from(clients)
+      .where(eq(clients.id, insertId))
+      .limit(1);
+    
+    logClientCreated(newClient[0].id, newClient[0].name, newClient[0].email, data.user_id);
+    
+    return newClient[0];
+  } catch (error: any) {
+    if (error.message === "DUPLICATE_CLIENT") {
+      throw new Error("Ya existe un cliente con este email");
+    }
+    console.error("[DB] Error al crear cliente:", error);
+    throw error;
+  }
 }
 
 export async function updateClient(id: number, user_id: number, data: any) {
