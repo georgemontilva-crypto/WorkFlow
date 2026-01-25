@@ -4,7 +4,7 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { Users, Settings, Menu, X, LogOut, FileText, TrendingUp } from 'lucide-react';
+import { Users, Settings, Menu, X, LogOut, FileText, TrendingUp, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         { name: t.nav.clients, href: '/clients', icon: Users },
         { name: 'Facturas', href: '/invoices', icon: FileText },
         { name: 'Finanzas', href: '/finances', icon: TrendingUp },
+        { name: 'Ahorros', href: '/savings', icon: Target },
       ]
     },
   ];
