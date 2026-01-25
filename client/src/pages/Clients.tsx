@@ -217,7 +217,7 @@ export default function Clients() {
               filteredClients.map((client) => (
                 <div
                   key={client.id}
-                  className="bg-[#14161B] rounded-[28px] border border-[rgba(255,255,255,0.06)] p-6 hover:bg-[#C4FF3D]/5 hover:border-[#C4FF3D]/20 transition-colors-smooth cursor-pointer group"
+                  className="bg-[#14161B] rounded-[28px] border border-[#C4FF3D]/20 p-6 bg-[#C4FF3D]/5 transition-colors-smooth cursor-pointer group"
                 >
                   <div className="flex items-start md:items-center justify-between gap-6">
                     {/* Left: Client Info */}
