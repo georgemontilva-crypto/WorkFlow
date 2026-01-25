@@ -857,3 +857,14 @@ select option:checked {
   background: #C4FF3D !important;
   color: #000 !important;
 }
+
+
+/* Calendar icon color for date inputs - Verde oliva #627f1e */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(46%) sepia(18%) saturate(1200%) hue-rotate(45deg) brightness(95%) contrast(90%);
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  filter: invert(46%) sepia(18%) saturate(1400%) hue-rotate(45deg) brightness(100%) contrast(95%);
+}
