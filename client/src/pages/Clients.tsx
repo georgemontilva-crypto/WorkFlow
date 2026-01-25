@@ -50,11 +50,11 @@ export default function Clients() {
     notes: '',
   });
 
-  const { data: clients = [], refetch } = trpc.getClients.useQuery();
-  const createClientMutation = trpc.createClient.useMutation();
-  const updateClientMutation = trpc.updateClient.useMutation();
-  const archiveClientMutation = trpc.archiveClient.useMutation();
-  const deleteClientMutation = trpc.deleteClient.useMutation();
+  const { data: clients = [], refetch } = trpc.clients.list.useQuery();
+  const createClientMutation = trpc.clients.create.useMutation();
+  const updateClientMutation = trpc.clients.update.useMutation();
+  const archiveClientMutation = trpc.clients.archive.useMutation();
+  const deleteClientMutation = trpc.clients.delete.useMutation();
 
   const handleOpenModal = (client?: Client) => {
     if (client) {
