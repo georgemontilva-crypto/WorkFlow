@@ -348,6 +348,14 @@ export default function Invoices() {
   const handleSubmit = async (e: React.FormEvent, action: 'create_only' | 'create_and_send' | 'download' | 'copy_link' = 'create_only') => {
     e.preventDefault();
 
+    console.log('[Invoices] handleSubmit called', {
+      action,
+      client_id: formData.client_id,
+      client_id_type: typeof formData.client_id,
+      items_count: formData.items?.length || 0,
+      formData,
+    });
+
     if (!formData.client_id || formData.client_id === 0 || !formData.items || formData.items.length === 0) {
       toast.error('Selecciona un cliente y agrega al menos un item');
       return;
@@ -1585,6 +1593,11 @@ export default function Invoices() {
                       key={client.id}
                       type="button"
                       onClick={() => {
+                        console.log('[Invoices] Cliente seleccionado', {
+                          client_id: client.id,
+                          client_name: client.name,
+                          current_formData: formData,
+                        });
                         setFormData({ ...formData, client_id: client.id });
                         setShowClientSelector(false);
                         setClientSearch('');
