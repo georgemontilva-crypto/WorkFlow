@@ -353,9 +353,10 @@ export default function Invoices() {
           </div>
         </Card>
 
-        {/* Filters Card - Isla 2 */}
+        {/* Invoices List Card with Filters */}
         <Card>
-          <div className="flex flex-col md:flex-row gap-4">
+          {/* Filters Section */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
               <Input
@@ -391,10 +392,8 @@ export default function Invoices() {
               </SelectContent>
             </Select>
           </div>
-        </Card>
-        
-        {/* Invoices List Card - Isla 3 */}
-        <Card>
+          
+          {/* Header */}
           <CardHeader
             title="Facturas"
             subtitle={`${filteredInvoices.length} factura${filteredInvoices.length !== 1 ? 's' : ''}`}
