@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Bell, TrendingUp, TrendingDown } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 
 interface PriceAlertDialogProps {
   open: boolean;
@@ -48,9 +48,9 @@ export function PriceAlertDialog({
 
   const createAlert = trpc.priceAlerts.create.useMutation({
     onSuccess: () => {
-      toast.success('Alerta de precio creada', {
-        description: `Recibirás una notificación cuando ${symbol} ${condition === 'above' ? 'supere' : 'baje de'} $${targetPrice}`,
-      });
+      // toast.success('Alerta de precio creada', {
+      //   description: `Recibirás una notificación cuando ${symbol} ${condition === 'above' ? 'supere' : 'baje de'} $${targetPrice}`,
+      // });
       onOpenChange(false);
       // Reset form
       setTargetPrice('');
@@ -58,9 +58,9 @@ export function PriceAlertDialog({
       setNotifyEmail(true);
     },
     onError: (error) => {
-      toast.error('Error al crear alerta', {
-        description: error.message,
-      });
+      // toast.error('Error al crear alerta', {
+      //   description: error.message,
+      // });
     },
   });
 
@@ -69,9 +69,9 @@ export function PriceAlertDialog({
 
     const price = parseFloat(targetPrice);
     if (isNaN(price) || price <= 0) {
-      toast.error('Precio inválido', {
-        description: 'Por favor ingresa un precio válido mayor a 0',
-      });
+      // toast.error('Precio inválido', {
+      //   description: 'Por favor ingresa un precio válido mayor a 0',
+      // });
       return;
     }
 
