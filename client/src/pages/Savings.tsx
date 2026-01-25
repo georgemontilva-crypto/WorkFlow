@@ -55,7 +55,14 @@ export default function Savings() {
   const { primaryCurrency } = useCurrency();
   
   // Fetch savings goals using tRPC
-  const { data: savingsGoals, isLoading } = trpc.savings.list.useQuery({ status: 'all' });
+  const { data: savingsGoals, isLoading, error } = trpc.savings.list.useQuery(
+    { status: 'all' },
+    {
+      retry: 1,
+      retryDelay: 1000,
+      staleTime: 30000, // 30 seconds
+    }
+  );
   
   // Mutations
   const createGoal = trpc.savings.create.useMutation({
@@ -348,7 +355,21 @@ export default function Savings() {
         </div>
 
         {/* Savings Goals */}
-        {isLoading ? (
+        {error ? (
+          <Card className="bg-[#2A2A2A] border-white/5">
+            <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
+              <div className="text-red-500">Error al cargar metas</div>
+              <div className="text-gray-400 text-sm">{error.message}</div>
+              <Button
+                onClick={() => utils.savings.list.invalidate()}
+                variant="outline"
+                size="sm"
+              >
+                Reintentar
+              </Button>
+            </CardContent>
+          </Card>
+        ) : isLoading ? (
           <Card className="bg-[#2A2A2A] border-white/5">
             <CardContent className="flex items-center justify-center py-16">
               <div className="text-gray-400">Cargando metas...</div>
