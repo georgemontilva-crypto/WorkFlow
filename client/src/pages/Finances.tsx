@@ -237,7 +237,7 @@ export default function Finances() {
           </div>
           <Button 
             onClick={handleOpenModal}
-            className="variant="default""
+            variant="default"
           >
             + Nueva Transacción
           </Button>
