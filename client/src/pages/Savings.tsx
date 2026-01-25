@@ -398,7 +398,7 @@ export default function Savings() {
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 px-6">
             {savingsGoals.map((goal) => {
               const targetAmount = parseFloat(goal.target_amount) || 0;
               const currentAmount = parseFloat(goal.current_amount) || 0;
