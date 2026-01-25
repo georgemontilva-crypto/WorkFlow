@@ -64,8 +64,9 @@ export default function Invoices() {
   ]);
   
   // Queries
+  const utils = trpc.useContext();
   const { data: user } = trpc.auth.me.useQuery();
-  const { data: invoices = [], refetch } = trpc.invoices.list.useQuery({ status: statusFilter });
+  const { data: invoices = [] } = trpc.invoices.list.useQuery({ status: statusFilter });
   const { data: clients = [] } = trpc.clients.list.useQuery();
   const { data: viewInvoiceData } = trpc.invoices.getById.useQuery(
     { id: viewingInvoice! },
@@ -149,7 +150,7 @@ export default function Invoices() {
       
       // toast.success('Factura creada exitosamente');
       handleCloseModal();
-      refetch();
+      utils.invoices.list.invalidate();
     } catch (error: any) {
       console.error('Error al crear factura:', error);
       // toast.error(error.message || 'Error al crear factura');
@@ -160,7 +161,7 @@ export default function Invoices() {
     try {
       await sendEmailMutation.mutateAsync({ id });
       // toast.success('Factura enviada por email');
-      refetch();
+      utils.invoices.list.invalidate();
     } catch (error: any) {
       console.error('Error al enviar email:', error);
       // toast.error(error.message || 'Error al enviar email');
@@ -188,7 +189,7 @@ export default function Invoices() {
     try {
       await updateStatusMutation.mutateAsync({ id, status: 'paid' });
       // toast.success('Factura marcada como pagada');
-      refetch();
+      utils.invoices.list.invalidate();
     } catch (error: any) {
       console.error('Error al marcar como pagada:', error);
       // toast.error(error.message || 'Error al marcar como pagada');
@@ -203,7 +204,7 @@ export default function Invoices() {
     try {
       await updateStatusMutation.mutateAsync({ id, status: 'cancelled' });
       // toast.success('Factura cancelada');
-      refetch();
+      utils.invoices.list.invalidate();
     } catch (error: any) {
       console.error('Error al cancelar factura:', error);
       // toast.error(error.message || 'Error al cancelar factura');
@@ -218,7 +219,7 @@ export default function Invoices() {
     try {
       await deleteInvoiceMutation.mutateAsync({ id });
       // toast.success('Factura eliminada');
-      refetch();
+      utils.invoices.list.invalidate();
     } catch (error: any) {
       console.error('Error al eliminar factura:', error);
       // toast.error(error.message || 'Error al eliminar factura');
