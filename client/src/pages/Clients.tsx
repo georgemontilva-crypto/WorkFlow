@@ -204,183 +204,94 @@ export default function Clients() {
         </Select>
       </div>
 
-      {/* Desktop Table */}
-      <div className="hidden md:block bg-[#1A1A1A] rounded-lg border border-white/10 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-white/10">
-                <th className="text-left p-4 text-sm font-medium text-gray-400">Cliente</th>
-                <th className="text-left p-4 text-sm font-medium text-gray-400">Contacto</th>
-                <th className="text-left p-4 text-sm font-medium text-gray-400">Estado</th>
-                <th className="text-left p-4 text-sm font-medium text-gray-400">Fecha de Creación</th>
-                <th className="text-right p-4 text-sm font-medium text-gray-400">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredClients.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="p-8 text-center text-gray-400">
-                    No se encontraron clientes
-                  </td>
-                </tr>
-              ) : (
-                filteredClients.map((client) => {
-                  const statusBadge = getStatusBadge(client.status);
-                  
-                  return (
-                    <tr key={client.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                      <td className="p-4">
-                        <div>
-                          <div className="font-medium text-white">{client.name}</div>
-                          {client.company && (
-                            <div className="text-sm text-gray-400 flex items-center gap-1 mt-1">
-                              <Building2 className="w-3 h-3" />
-                              {client.company}
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 text-gray-400">
-                            <Mail className="w-4 h-4" />
-                            <span className="text-sm">{client.email}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-gray-400">
-                            <Phone className="w-4 h-4" />
-                            <span className="text-sm">{client.phone}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge.color} text-white`}>
-                          {statusBadge.label}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <div className="text-white">
-                          {format(new Date(client.created_at), 'dd/MM/yyyy', { locale: es })}
-                        </div>
-                        <div className="text-sm text-gray-400">
-                          {format(new Date(client.created_at), 'hh:mm a')}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center justify-end gap-2">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                                <MoreVertical className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="bg-[#2A2A2A] border-white/10">
-                              <DropdownMenuItem
-                                onClick={() => handleOpenModal(client)}
-                                className="text-white hover:bg-white/10 cursor-pointer"
-                              >
-                                <Edit className="w-4 h-4 mr-2" />
-                                Editar
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleArchive(client.id)}
-                                className="text-white hover:bg-white/10 cursor-pointer"
-                              >
-                                <Archive className="w-4 h-4 mr-2" />
-                                Archivar
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => handleDelete(client.id)}
-                                className="text-red-500 hover:bg-white/10 cursor-pointer"
-                              >
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Eliminar
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Mobile Cards */}
-      <div className="md:hidden space-y-4">
+      {/* Lista de Clientes - Filas tipo tarjeta (FASE 4) */}
+      <div className="space-y-4">
         {filteredClients.length === 0 ? (
-          <div className="bg-[#1A1A1A] rounded-lg border border-white/10 p-8 text-center text-gray-400">
-            No se encontraron clientes
+          <div className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-12 text-center">
+            <p className="text-[#9AA0AA] text-base">No se encontraron clientes</p>
           </div>
         ) : (
           filteredClients.map((client) => {
             const statusBadge = getStatusBadge(client.status);
             
             return (
-              <div key={client.id} className="bg-[#1A1A1A] rounded-lg border border-white/10 p-4">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <h3 className="text-white font-medium">{client.name}</h3>
+              <div 
+                key={client.id} 
+                className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-6 hover:bg-[#4ADE80]/5 transition-colors cursor-pointer group"
+              >
+                <div className="flex items-center justify-between gap-6">
+                  {/* Información Principal - Izquierda */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-white font-medium text-lg mb-1">{client.name}</h3>
                     {client.company && (
-                      <p className="text-sm text-gray-400 flex items-center gap-1 mt-1">
-                        <Building2 className="w-3 h-3" />
+                      <p className="text-[#9AA0AA] flex items-center gap-2 text-base">
+                        <Building2 className="w-4 h-4 flex-shrink-0" />
                         {client.company}
                       </p>
                     )}
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-[#2A2A2A] border-white/10">
-                      <DropdownMenuItem
-                        onClick={() => handleOpenModal(client)}
-                        className="text-white hover:bg-white/10 cursor-pointer"
-                      >
-                        <Edit className="w-4 h-4 mr-2" />
-                        Editar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleArchive(client.id)}
-                        className="text-white hover:bg-white/10 cursor-pointer"
-                      >
-                        <Archive className="w-4 h-4 mr-2" />
-                        Archivar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleDelete(client.id)}
-                        className="text-red-500 hover:bg-white/10 cursor-pointer"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Eliminar
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+
+                  {/* Contacto - Centro */}
+                  <div className="hidden md:flex flex-col gap-2 flex-1">
+                    <div className="flex items-center gap-2 text-[#9AA0AA]">
+                      <Mail className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-base truncate">{client.email}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-[#9AA0AA]">
+                      <Phone className="w-4 h-4 flex-shrink-0" />
+                      <span className="text-base">{client.phone}</span>
+                    </div>
+                  </div>
+
+                  {/* Estado y Acciones - Derecha */}
+                  <div className="flex items-center gap-4">
+                    <span className={`inline-flex items-center px-3 py-1.5 rounded-[6px] text-sm font-medium ${statusBadge.color} text-white`}>
+                      {statusBadge.label}
+                    </span>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="text-[#9AA0AA] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                          <MoreVertical className="w-5 h-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-[#0E0F12] border-[#4ADE80]/30">
+                        <DropdownMenuItem
+                          onClick={() => handleOpenModal(client)}
+                          className="text-white hover:bg-[#4ADE80]/10 cursor-pointer"
+                        >
+                          <Edit className="w-4 h-4 mr-2" />
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleArchive(client.id)}
+                          className="text-white hover:bg-[#4ADE80]/10 cursor-pointer"
+                        >
+                          <Archive className="w-4 h-4 mr-2" />
+                          Archivar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(client.id)}
+                          className="text-[#EF4444] hover:bg-[#EF4444]/10 cursor-pointer"
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-gray-400 text-sm">
-                    <Mail className="w-4 h-4" />
-                    <span>{client.email}</span>
+                {/* Contacto Mobile - Debajo */}
+                <div className="md:hidden mt-4 pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-2">
+                  <div className="flex items-center gap-2 text-[#9AA0AA]">
+                    <Mail className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm truncate">{client.email}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-400 text-sm">
-                    <Phone className="w-4 h-4" />
-                    <span>{client.phone}</span>
+                  <div className="flex items-center gap-2 text-[#9AA0AA]">
+                    <Phone className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-sm">{client.phone}</span>
                   </div>
-                </div>
-
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusBadge.color} text-white`}>
-                    {statusBadge.label}
-                  </span>
-                  <span className="text-sm text-gray-400">
-                    {format(new Date(client.created_at), 'dd/MM/yyyy', { locale: es })}
-                  </span>
                 </div>
               </div>
             );

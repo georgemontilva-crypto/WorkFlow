@@ -403,54 +403,60 @@ export default function Invoices() {
               return (
                 <div
                   key={invoice.id}
-                  className="bg-[#222222] rounded-lg border border-gray-700 p-4 hover:border-gray-600 transition-colors"
+                  className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-6 hover:bg-[#4ADE80]/5 transition-colors cursor-pointer group"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div className="flex-1">
+                  <div className="flex items-center justify-between gap-6">
+                    {/* Información Principal - Izquierda */}
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-white">{invoice.invoice_number}</h3>
-                        <span className={`px-2 py-1 rounded text-xs font-medium text-white ${badge.color}`}>
+                        <h3 className="text-white font-medium text-lg">{invoice.invoice_number}</h3>
+                        <span className={`px-3 py-1.5 rounded-[6px] text-sm font-medium text-white ${badge.color}`}>
                           {badge.label}
                         </span>
                       </div>
-                      <p className="text-gray-400 text-sm mb-1">Cliente: {client?.name || 'Desconocido'}</p>
-                      <p className="text-gray-400 text-sm">
+                      <p className="text-[#9AA0AA] text-base mb-1">{client?.name || 'Desconocido'}</p>
+                      <p className="text-[#6B7280] text-sm">
                         Vencimiento: {format(new Date(invoice.due_date), 'dd/MM/yyyy')}
                       </p>
-                      <p className="text-white font-semibold mt-2">
+                    </div>
+
+                    {/* Monto - Centro */}
+                    <div className="hidden md:block">
+                      <p className="text-white font-semibold text-xl">
                         {new Intl.NumberFormat('es-ES', { style: 'currency', currency: invoice.currency }).format(parseFloat(invoice.total))}
                       </p>
                     </div>
                     
-                    <div className="flex gap-2">
+                    {/* Acciones - Derecha */}
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setViewingInvoice(invoice.id)}
-                        className="border-gray-700 text-white hover:bg-gray-800"
+                        size="icon"
+                        variant="ghost"
+                        onClick={(e) => { e.stopPropagation(); setViewingInvoice(invoice.id); }}
+                        className="text-[#9AA0AA] hover:text-white"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-5 h-5" />
                       </Button>
                       
                       <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDownloadPDF(invoice.id, invoice.invoice_number)}
+                        size="icon"
+                        variant="ghost"
+                        onClick={(e) => { e.stopPropagation(); handleDownloadPDF(invoice.id, invoice.invoice_number); }}
                         disabled={downloadPDFMutation.isLoading}
-                        className="border-gray-700 text-white hover:bg-gray-800 disabled:opacity-50"
+                        className="text-[#9AA0AA] hover:text-white disabled:opacity-50"
                       >
-                        <Download className="w-4 h-4" />
+                        <Download className="w-5 h-5" />
                       </Button>
                       
                       {/* Actions Dropdown */}
                       <div className="relative">
                         <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setOpenDropdownId(openDropdownId === invoice.id ? null : invoice.id)}
-                          className="border-gray-700 text-white hover:bg-gray-800"
+                          size="icon"
+                          variant="ghost"
+                          onClick={(e) => { e.stopPropagation(); setOpenDropdownId(openDropdownId === invoice.id ? null : invoice.id); }}
+                          className="text-[#9AA0AA] hover:text-white"
                         >
-                          <MoreVertical className="w-4 h-4" />
+                          <MoreVertical className="w-5 h-5" />
                         </Button>
                         
                         {openDropdownId === invoice.id && (
@@ -462,7 +468,7 @@ export default function Invoices() {
                             />
                             
                             {/* Dropdown Menu */}
-                            <div className="absolute right-0 mt-2 w-56 bg-[#1a1a1a] border border-gray-700 rounded-lg shadow-lg z-20 py-1">
+                            <div className="absolute right-0 mt-2 w-56 bg-[#0E0F12] border border-[#4ADE80]/30 rounded-[10px] shadow-lg z-20 py-1">
                               {/* Ver Factura */}
                               <button
                                 onClick={() => {

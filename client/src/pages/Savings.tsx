@@ -396,7 +396,7 @@ export default function Savings() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <div className="space-y-4">
             {savingsGoals.map((goal) => {
               const targetAmount = parseFloat(goal.target_amount) || 0;
               const currentAmount = parseFloat(goal.current_amount) || 0;
@@ -404,105 +404,131 @@ export default function Savings() {
               const remaining = targetAmount - currentAmount;
 
               return (
-                <div key={goal.id} className="savings-goal-card">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div 
+                  key={goal.id} 
+                  className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-6 hover:bg-[#4ADE80]/5 transition-colors group"
+                >
+                  <div className="flex items-center justify-between gap-6">
+                    {/* Información Principal - Izquierda */}
+                    <div className="flex items-center gap-4 flex-1 min-w-0">
                       {goal.status === 'completed' ? (
-                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                          <CheckCircle2 className="w-5 h-5 text-green-500" />
+                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#4ADE80]/20 flex items-center justify-center">
+                          <CheckCircle2 className="w-6 h-6 text-[#4ADE80]" />
                         </div>
                       ) : (
-                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#FF9500]/20 flex items-center justify-center">
-                          <Target className="w-5 h-5 text-[#FF9500]" />
+                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#4ADE80]/20 flex items-center justify-center">
+                          <Target className="w-6 h-6 text-[#4ADE80]" />
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
-                        <h3 className="text-white text-lg font-bold truncate">{goal.name}</h3>
-                        <p className="text-sm text-gray-400">
-                          {goal.deadline && `Fecha límite: ${format(new Date(goal.deadline), 'dd MMM yyyy', { locale: es })}`}
+                        <h3 className="text-white text-lg font-medium mb-1">{goal.name}</h3>
+                        <p className="text-[#6B7280] text-sm">
+                          {goal.deadline ? `Vencimiento: ${format(new Date(goal.deadline), 'dd MMM yyyy', { locale: es })}` : 'Sin fecha límite'}
                         </p>
                       </div>
                     </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="flex-shrink-0 text-primary hover:text-primary/80 hover:bg-white/5">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-[#1C1C1C] border-white/10">
-                        <DropdownMenuItem onClick={() => handleEdit(goal)} className="cursor-pointer text-white hover:bg-white/5">
-                          <Pencil className="w-4 h-4 mr-2" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-white/10" />
-                        <DropdownMenuItem 
-                          onClick={() => handleDelete(goal.id)} 
-                          className="cursor-pointer text-red-400 hover:bg-red-500/10"
-                        >
-                          <Trash2 className="w-4 h-4 mr-2" />
-                          Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
 
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-baseline">
+                    {/* Progreso y Monto - Centro */}
+                    <div className="hidden md:flex flex-col items-end gap-2 flex-1">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold text-white font-mono">
+                        <span className="text-2xl font-semibold text-white">
                           {formatCurrency(currentAmount, goal.currency)}
                         </span>
-                        <span className="text-sm font-semibold text-[#EBFF57]">
-                          {goal.currency}
+                        <span className="text-[#9AA0AA] text-base">
+                          / {formatCurrency(targetAmount, goal.currency)}
                         </span>
                       </div>
-                      <span className="text-sm text-gray-400 font-mono">
-                         de {formatCurrency(targetAmount, goal.currency)}
+                      <div className="w-full max-w-xs h-2 bg-[#14161B] rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-[#4ADE80] transition-all duration-300" 
+                          style={{ width: `${Math.min(progress, 100)}%` }}
+                        />
+                      </div>
+                      <p className="text-sm text-[#9AA0AA]">
+                        {progress.toFixed(1)}% completado
+                      </p>
+                    </div>
+
+                    {/* Acciones - Derecha */}
+                    <div className="flex items-center gap-2">
+                      {goal.status !== 'completed' && remaining > 0 && (
+                        <Button
+                          onClick={() => handleAddAmount(goal)}
+                          variant="default"
+                          size="sm"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <TrendingUp className="w-4 h-4 mr-2" />
+                          Agregar
+                        </Button>
+                      )}
+                      
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-[#9AA0AA] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                            <MoreVertical className="w-5 h-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-[#0E0F12] border-[#4ADE80]/30">
+                          <DropdownMenuItem onClick={() => handleEdit(goal)} className="cursor-pointer text-white hover:bg-[#4ADE80]/10">
+                            <Pencil className="w-4 h-4 mr-2" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.06)]" />
+                          <DropdownMenuItem 
+                            onClick={() => handleDelete(goal.id)} 
+                            className="cursor-pointer text-[#EF4444] hover:bg-[#EF4444]/10"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+
+                  {/* Progreso Mobile - Debajo */}
+                  <div className="md:hidden mt-4 pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-3">
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-xl font-semibold text-white">
+                        {formatCurrency(currentAmount, goal.currency)}
+                      </span>
+                      <span className="text-[#9AA0AA] text-sm">
+                        de {formatCurrency(targetAmount, goal.currency)}
                       </span>
                     </div>
-                    
-                    {/* Barra de progreso naranja */}
-                    <div className="progress-container">
+                    <div className="w-full h-2 bg-[#14161B] rounded-full overflow-hidden">
                       <div 
-                        className="progress-bar-orange" 
+                        className="h-full bg-[#4ADE80] transition-all duration-300" 
                         style={{ width: `${Math.min(progress, 100)}%` }}
                       />
                     </div>
-                    
-                    <p className="text-xs text-gray-400">
+                    <p className="text-sm text-[#9AA0AA]">
                       {progress.toFixed(1)}% completado
                     </p>
-                  </div>
-
-                  {goal.status !== 'completed' && remaining > 0 && (
-                    <div className="amount-missing">
-                      <div className="flex items-center justify-between">
+                    {goal.status !== 'completed' && remaining > 0 && (
+                      <div className="flex items-center justify-between pt-2">
                         <div>
-                          <p className="text-xs text-gray-400">Falta</p>
-                          <div className="flex items-baseline gap-2">
-                            <p className="text-lg font-semibold text-white font-mono">
-                              {formatCurrency(remaining, goal.currency)}
-                            </p>
-                            <span className="text-xs font-semibold text-[#EBFF57]">
-                              {goal.currency}
-                            </span>
-                          </div>
+                          <p className="text-xs text-[#6B7280]">Falta</p>
+                          <p className="text-lg font-semibold text-white">
+                            {formatCurrency(remaining, goal.currency)}
+                          </p>
                         </div>
                         <Button
-                          size="sm"
                           onClick={() => handleAddAmount(goal)}
-                          className="bg-[#FF9500] text-black hover:bg-[#FFA500] font-semibold"
+                          variant="default"
+                          size="sm"
                         >
                           <TrendingUp className="w-4 h-4 mr-2" />
                           Agregar
                         </Button>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
                   {goal.status === 'completed' && (
-                    <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20 mt-4">
-                      <p className="text-sm text-green-400 font-medium text-center">
+                    <div className="mt-4 p-3 bg-[#4ADE80]/10 rounded-[10px] border border-[#4ADE80]/20">
+                      <p className="text-sm text-[#4ADE80] font-medium text-center">
                         ¡Meta completada!
                       </p>
                     </div>
