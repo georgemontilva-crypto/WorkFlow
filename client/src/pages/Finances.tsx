@@ -247,7 +247,7 @@ export default function Finances() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Total Income */}
-          <div className="bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
+          <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-[#8B92A8] text-sm">Total Ingresos</p>
               <TrendingUp className="w-5 h-5 text-green-500" />
@@ -262,7 +262,7 @@ export default function Finances() {
           </div>
 
           {/* Total Expenses */}
-          <div className="bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
+          <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-[#8B92A8] text-sm">Total Gastos</p>
               <TrendingDown className="w-5 h-5 text-red-500" />
@@ -273,7 +273,7 @@ export default function Finances() {
           </div>
 
           {/* Balance */}
-          <div className="bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
+          <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-[#8B92A8] text-sm">Balance</p>
               <DollarSign className="w-5 h-5 text-blue-500" />
@@ -287,7 +287,7 @@ export default function Finances() {
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Tendencia Mensual (Line Chart) */}
-          <div className="bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
+          <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Tendencia Mensual</h2>
             {monthLoading ? (
               <div className="h-80 bg-gray-700 animate-pulse rounded"></div>
@@ -332,7 +332,7 @@ export default function Finances() {
           </div>
 
           {/* Comparativa Mensual (Bar Chart) */}
-          <div className="bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
+          <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Comparativa Mensual</h2>
             {monthLoading ? (
               <div className="h-80 bg-gray-700 animate-pulse rounded"></div>
@@ -372,7 +372,7 @@ export default function Finances() {
         </div>
 
         {/* Transacciones Recientes */}
-        <div className="bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
+        <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-white">Transacciones Recientes</h2>
             <div className="flex items-center gap-4">
@@ -549,7 +549,7 @@ export default function Finances() {
                     step="0.01"
                     value={formData.amount}
                     onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
-                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-[9999px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]"
+                    className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[9999px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]"
                     placeholder="0.00"
                     required
                   />
@@ -564,7 +564,7 @@ export default function Finances() {
                     type="date"
                     value={formData.date}
                     onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-[9999px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]"
+                    className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[9999px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]"
                     required
                   />
                 </div>
@@ -577,7 +577,7 @@ export default function Finances() {
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-[20px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D] resize-none"
+                    className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[20px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D] resize-none"
                     rows={3}
                     placeholder="Descripción de la transacción..."
                     required

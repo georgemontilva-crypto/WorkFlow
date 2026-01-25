@@ -256,7 +256,7 @@ export default function Savings() {
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="bg-[#14161B] border-white/10 text-white h-11"
+                    className="bg-[#121212] border-white/10 text-white h-11"
                     placeholder="Ej: Fondo de emergencia, Vacaciones, etc."
                     required
                   />
@@ -288,7 +288,7 @@ export default function Savings() {
                       min="0"
                       value={formData.target_amount}
                       onChange={(e) => setFormData({ ...formData, target_amount: e.target.value })}
-                      className="bg-[#14161B] border-white/10 text-white font-mono h-11"
+                      className="bg-[#121212] border-white/10 text-white font-mono h-11"
                       required
                     />
                     <p className="text-xs text-[#8B92A8]">Meta a alcanzar</p>
@@ -304,7 +304,7 @@ export default function Savings() {
                       min="0"
                       value={formData.current_amount}
                       onChange={(e) => setFormData({ ...formData, current_amount: e.target.value })}
-                      className="bg-[#14161B] border-white/10 text-white font-mono h-11"
+                      className="bg-[#121212] border-white/10 text-white font-mono h-11"
                     />
                     <p className="text-xs text-[#8B92A8]">Ahorro actual</p>
                   </div>
@@ -319,7 +319,7 @@ export default function Savings() {
                     type="date"
                     value={formData.deadline}
                     onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                    className="bg-[#14161B] border-white/10 text-white h-11"
+                    className="bg-[#121212] border-white/10 text-white h-11"
                   />
                   <p className="text-xs text-[#8B92A8]">Fecha objetivo para completar la meta</p>
                 </div>
@@ -332,7 +332,7 @@ export default function Savings() {
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="bg-[#14161B] border-white/10 text-white h-11"
+                    className="bg-[#121212] border-white/10 text-white h-11"
                     placeholder="Describe tu meta de ahorro..."
                   />
                   <p className="text-xs text-[#8B92A8]">Información adicional sobre tu meta</p>
@@ -362,7 +362,7 @@ export default function Savings() {
 
         {/* Savings Goals */}
         {error ? (
-          <Card className="bg-[#14161B] border-white/5">
+          <Card className="bg-[#121212] border-white/5">
             <CardContent className="flex flex-col items-center justify-center py-16 gap-4">
               <div className="text-red-500">Error al cargar metas</div>
               <div className="text-[#8B92A8] text-sm">{error.message}</div>
@@ -376,13 +376,13 @@ export default function Savings() {
             </CardContent>
           </Card>
         ) : isLoading ? (
-          <Card className="bg-[#14161B] border-white/5">
+          <Card className="bg-[#121212] border-white/5">
             <CardContent className="flex items-center justify-center py-16">
               <div className="text-[#8B92A8]">Cargando metas...</div>
             </CardContent>
           </Card>
         ) : !savingsGoals || savingsGoals.length === 0 ? (
-          <Card className="bg-[#14161B] border-white/5">
+          <Card className="bg-[#121212] border-white/5">
             <CardContent className="flex flex-col items-center justify-center py-16">
               <div className="w-32 h-32 rounded-full bg-white/5 flex items-center justify-center mb-6">
                 <Target className="w-16 h-16 text-[#FF9500]" strokeWidth={1} />
@@ -406,7 +406,7 @@ export default function Savings() {
               return (
                 <div 
                   key={goal.id} 
-                  className="bg-[#14161B] rounded-[28px] border border-[#C4FF3D]/20 p-4 md:p-6 bg-[#C4FF3D]/5 transition-colors-smooth group"
+                  className="bg-[#121212] rounded-[28px] border border-[#C4FF3D]/20 p-4 md:p-6 bg-[#C4FF3D]/5 transition-colors-smooth group"
                 >
                   <div className="flex items-center justify-between gap-6">
                     {/* Información Principal - Izquierda */}
@@ -438,7 +438,7 @@ export default function Savings() {
                           / {formatCurrency(targetAmount, goal.currency)}
                         </span>
                       </div>
-                      <div className="w-full max-w-xs h-2 bg-[#14161B] rounded-full overflow-hidden">
+                      <div className="w-full max-w-xs h-2 bg-[#121212] rounded-full overflow-hidden">
                         <div 
                           className="h-full bg-[#C4FF3D] transition-all duration-300" 
                           style={{ width: `${Math.min(progress, 100)}%` }}
@@ -497,7 +497,7 @@ export default function Savings() {
                         de {formatCurrency(targetAmount, goal.currency)}
                       </span>
                     </div>
-                    <div className="w-full h-2 bg-[#14161B] rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-[#121212] rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-[#C4FF3D] transition-all duration-300" 
                         style={{ width: `${Math.min(progress, 100)}%` }}

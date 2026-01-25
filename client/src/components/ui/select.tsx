@@ -2,7 +2,7 @@
  * SELECT COMPONENT - FASE 3 Refactor
  * 
  * REGLAS ESTRICTAS:
- * - Fondo trigger: #14161B (--color-bg-secondary)
+ * - Fondo trigger: #121212 (--color-bg-secondary)
  * - Border: 0.7px solid #C4FF3D
  * - Bordes redondeados tipo pill (9999px)
  * - Placeholder tenue (#6B7280)
@@ -50,14 +50,14 @@ function SelectTrigger({
         // Base styles
         "flex w-fit items-center justify-between gap-2 px-4 py-2 text-sm whitespace-nowrap",
         // Background and border (FASE 3 specs)
-        "bg-[#14161B] border-[0.7px] border-[#C4FF3D]",
+        "bg-[#121212] border-[0.7px] border-[#C4FF3D]",
         "rounded-[9999px]",
         // Text
         "text-white data-[placeholder]:text-[#6B7280]",
         // Focus state
         "focus-visible:outline-none focus-visible:border-[#D4FF6D] focus-visible:ring-2 focus-visible:ring-[#C4FF3D]/20 focus-visible:shadow-[0_0_12px_rgba(196,255,61,0.3)]",
         // Hover state
-        "hover:bg-[#14161B]/80 hover:border-[#D4FF6D]",
+        "hover:bg-[#121212]/80 hover:border-[#D4FF6D]",
         // Invalid state
         "aria-invalid:border-[#EF4444] aria-invalid:ring-[#EF4444]/20",
         // Disabled state

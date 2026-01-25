@@ -217,7 +217,7 @@ export default function Clients() {
               filteredClients.map((client) => (
                 <div
                   key={client.id}
-                  className="bg-[#14161B] rounded-[28px] border border-[#C4FF3D]/20 p-6 bg-[#C4FF3D]/5 transition-colors-smooth cursor-pointer group"
+                  className="bg-[#121212] rounded-[28px] border border-[#C4FF3D]/20 p-6 bg-[#C4FF3D]/5 transition-colors-smooth cursor-pointer group"
                 >
                   <div className="flex items-start md:items-center justify-between gap-6">
                     {/* Left: Client Info */}
@@ -417,7 +417,7 @@ export default function Clients() {
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Información adicional sobre el cliente..."
                 rows={4}
-                className="w-full bg-[#14161B] border border-[#C4FF3D] rounded-[20px] px-4 py-3 text-[#EDEDED] placeholder:text-[#8B92A8] focus:outline-none focus:ring-2 focus:ring-[#C4FF3D]/50 transition-colors-smooth resize-none"
+                className="w-full bg-[#121212] border border-[#C4FF3D] rounded-[20px] px-4 py-3 text-[#EDEDED] placeholder:text-[#8B92A8] focus:outline-none focus:ring-2 focus:ring-[#C4FF3D]/50 transition-colors-smooth resize-none"
               />
             </div>
 

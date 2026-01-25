@@ -404,7 +404,7 @@ export default function Invoices() {
               return (
                 <div
                   key={invoice.id}
-                  className="bg-[#14161B] rounded-[28px] border border-[#C4FF3D]/20 p-6 bg-[#C4FF3D]/5 transition-colors-smooth cursor-pointer group"
+                  className="bg-[#121212] rounded-[28px] border border-[#C4FF3D]/20 p-6 bg-[#C4FF3D]/5 transition-colors-smooth cursor-pointer group"
                 >
                   <div className="flex flex-col md:flex-row md:items-center gap-6">
                     {/* Columna Izquierda: Icono + Info */}
@@ -875,7 +875,7 @@ export default function Invoices() {
                   <p className="text-[#8B92A8] text-sm mb-2">Ítems</p>
                   <div className="space-y-2">
                     {viewInvoiceData.items.map((item: any, index: number) => (
-                       <div key={index} className="bg-[#14161B] p-4 rounded-[20px] border border-[rgba(255,255,255,0.06)]">
+                       <div key={index} className="bg-[#121212] p-4 rounded-[20px] border border-[rgba(255,255,255,0.06)]">
                         <p className="text-white font-medium">{item.description}</p>
                         <p className="text-[#8B92A8] text-sm">
                           {item.quantity} x ${item.unit_price} = ${item.total}
@@ -914,7 +914,7 @@ export default function Invoices() {
                 {paymentSummary && (
                   <div className="border-t border-[rgba(255,255,255,0.06)] pt-4">
                     <h3 className="text-white font-semibold mb-3">Resumen de Pagos</h3>
-                    <div className="bg-[#14161B] p-4 rounded-[20px] border border-[rgba(255,255,255,0.06)] space-y-2">
+                    <div className="bg-[#121212] p-4 rounded-[20px] border border-[rgba(255,255,255,0.06)] space-y-2">
                       <div className="flex justify-between">
                         <span className="text-[#8B92A8]">Total Factura:</span>
                         <span className="text-white">${paymentSummary.invoice_total.toFixed(2)} {viewInvoiceData.currency}</span>

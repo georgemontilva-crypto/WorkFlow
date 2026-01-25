@@ -22,7 +22,7 @@ export const tokens = {
   colors: {
     bg: {
       primary: '#0E0F12',
-      secondary: '#14161B',
+      secondary: '#121212',
       card: '#121212',
     },
     text: {

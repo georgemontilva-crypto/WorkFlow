@@ -2,7 +2,7 @@
  * INPUT COMPONENT - FASE 3 Refactor
  * 
  * REGLAS ESTRICTAS:
- * - Fondo: #14161B (--color-bg-secondary)
+ * - Fondo: #121212 (--color-bg-secondary)
  * - Border: 0.7px solid #C4FF3D
  * - Bordes redondeados tipo pill (9999px)
  * - Placeholder tenue (#6B7280)
@@ -68,7 +68,7 @@ function Input({
         // Base styles
         "min-h-[44px] h-10 w-full min-w-0 px-4 py-2 text-sm sm:text-base",
         // Background and border (FASE 3 specs)
-        "bg-[#14161B] border-[0.7px] border-[#C4FF3D]",
+        "bg-[#121212] border-[0.7px] border-[#C4FF3D]",
         "rounded-[9999px]",
         // Text and placeholder
         "text-white placeholder:text-[#6B7280]",
