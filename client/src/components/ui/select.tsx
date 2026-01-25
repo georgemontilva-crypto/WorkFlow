@@ -3,7 +3,7 @@
  * 
  * REGLAS ESTRICTAS:
  * - Fondo trigger: #121212 (--color-bg-secondary)
- * - Border: 0.5px solid #C4FF3D
+ * - Border: 0.3px solid #C4FF3D
  * - Bordes redondeados tipo pill (9999px)
  * - Placeholder tenue (#6B7280)
  * - Dropdown background: más oscuro que el contenedor (#0E0F12)
@@ -50,7 +50,7 @@ function SelectTrigger({
         // Base styles
         "flex w-fit items-center justify-between gap-2 px-4 py-2 text-sm whitespace-nowrap",
         // Background and border (FASE 3 specs)
-        "bg-[#121212] border-[0.5px] border-[#C4FF3D]",
+        "bg-[#121212] border-[0.3px] border-[#C4FF3D]",
         "rounded-[9999px]",
         // Text
         "text-white data-[placeholder]:text-[#6B7280]",
