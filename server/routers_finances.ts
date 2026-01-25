@@ -334,6 +334,7 @@ export const financesRouter = router({
             total: invoices.total,
             currency: invoices.currency,
             status: invoices.status,
+            created_at: invoices.created_at,
           })
           .from(invoices)
           .leftJoin(clients, eq(invoices.client_id, clients.id))
@@ -365,6 +366,7 @@ export const financesRouter = router({
             date: transactions.date,
             amount: transactions.amount,
             currency: transactions.currency,
+            created_at: transactions.created_at,
           })
           .from(transactions)
           .where(and(...transactionConditions));
@@ -383,6 +385,7 @@ export const financesRouter = router({
             status: row.status,
             description: null,
             category: null,
+            created_at: row.created_at,
           })),
           ...transactionResults.map(row => ({
             id: `transaction-${row.id}`,
@@ -396,8 +399,9 @@ export const financesRouter = router({
             status: null,
             description: row.description,
             category: row.category,
+            created_at: row.created_at,
           })),
-        ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
         console.log(`[Finances] History retrieved: ${history.length} transactions (${invoiceResults.length} invoices + ${transactionResults.length} manual)`);
 
