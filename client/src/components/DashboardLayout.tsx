@@ -4,23 +4,15 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { LayoutDashboard, Users, FileText, TrendingUp, Target, Bell, Settings, Menu, X, Sparkles, LogOut, Shield, Coins, Bug, Building2 } from 'lucide-react';
+import { Users, Settings, Menu, X, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { PaymentNotifications } from '@/components/PaymentNotifications';
-import { WelcomeDialog } from '@/components/WelcomeDialog';
 
-import { AlertCenter } from '@/components/AlertCenter';
-import { AlertToast } from '@/components/AlertToast';
-
-
-import { differenceInDays, parseISO } from 'date-fns';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
-import { useNotifications } from '@/hooks/useNotifications';
 
 
 
@@ -35,27 +27,11 @@ import { useNotifications } from '@/hooks/useNotifications';
  * 
  * El contador NO depende de los toasts visibles.
  */
-function UnreadAlertBadge() {
-  const { data: unreadCount } = trpc.alerts.unreadCount.useQuery(undefined, {
-    refetchInterval: 10000, // Refetch every 10 seconds for better sync
-    staleTime: 5000, // Consider data stale after 5 seconds
-  });
-
-  if (!unreadCount || unreadCount === 0) return null;
-
-  return (
-    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-in zoom-in duration-200">
-      {unreadCount > 99 ? '99+' : unreadCount}
-    </span>
-  );
-}
+// UnreadAlertBadge removed - alerts system disabled
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
-  // Activar sistema de notificaciones V2
-  useNotifications();
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isAlertCenterOpen, setIsAlertCenterOpen] = useState(false);
   const { t } = useLanguage();
   
   // Auth and access control
@@ -65,123 +41,23 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     refetchInterval: 60000, // Check every minute
   });
   
-  // Alert system state
-  const [showOverdueAlert, setShowOverdueAlert] = useState(false);
-  const [showUrgentAlert, setShowUrgentAlert] = useState(false);
+  // Simplified - no alerts for now
   
-  // Fetch clients and invoices for alerts using tRPC
-  const { data: allClients } = trpc.clients.list.useQuery(undefined, { enabled: isAuthenticated });
-  const { data: allInvoices } = trpc.invoices.list.useQuery(undefined, { enabled: isAuthenticated });
-  
-  const clients = allClients?.filter(c => c.status === 'active');
-  const invoices = allInvoices?.filter(i => i.status === 'draft' || i.status === 'sent');
-  
-  // Check for overdue and urgent reminders
-  useEffect(() => {
-    if (!clients || !invoices) return;
-    
-    // Check localStorage for dismissed alerts
-    const dismissedOverdue = localStorage.getItem('dismissedOverdueAlert');
-    const dismissedUrgent = localStorage.getItem('dismissedUrgentAlert');
-    
-    // Count overdue items
-    const overdueClients = clients.filter(c => {
-      const daysUntil = differenceInDays(new Date(c.next_payment_date), new Date());
-      return daysUntil < 0;
-    });
-    const overdueInvoices = invoices.filter(i => {
-      const daysUntil = differenceInDays(new Date(i.due_date), new Date());
-      return daysUntil < 0;
-    });
-    const overdueCount = overdueClients.length + overdueInvoices.length;
-    
-    // Count urgent items (5 days or less)
-    const urgentClients = clients.filter(c => {
-      const daysUntil = differenceInDays(new Date(c.next_payment_date), new Date());
-      return daysUntil >= 0 && daysUntil <= 5;
-    });
-    const urgentInvoices = invoices.filter(i => {
-      const daysUntil = differenceInDays(new Date(i.due_date), new Date());
-      return daysUntil >= 0 && daysUntil <= 5;
-    });
-    const urgentCount = urgentClients.length + urgentInvoices.length;
-    
-    // Show alerts if not dismissed and there are items
-    if (overdueCount > 0 && !dismissedOverdue) {
-      setTimeout(() => setShowOverdueAlert(true), 1000);
-    }
-    else if (urgentCount > 0 && !dismissedUrgent) {
-      setTimeout(() => setShowUrgentAlert(true), 1000);
-    }
-  }, [clients, invoices]);
-  
-  const handleDismissOverdue = () => {
-    localStorage.setItem('dismissedOverdueAlert', 'true');
-    setShowOverdueAlert(false);
-  };
-  
-  const handleDismissUrgent = () => {
-    localStorage.setItem('dismissedUrgentAlert', 'true');
-    setShowUrgentAlert(false);
-  };
-  
-  const handleViewReminders = () => {
-    setIsAlertCenterOpen(true);
-  };
-  
-  // Calculate counts for alerts
-  const overdueCount = clients && invoices ? 
-    clients.filter(c => differenceInDays(new Date(c.next_payment_date), new Date()) < 0).length +
-    invoices.filter(i => differenceInDays(new Date(i.due_date), new Date()) < 0).length : 0;
-  
-  const urgentCount = clients && invoices ?
-    clients.filter(c => {
-      const d = differenceInDays(new Date(c.next_payment_date), new Date());
-      return d >= 0 && d <= 5;
-    }).length +
-    invoices.filter(i => {
-      const d = differenceInDays(new Date(i.due_date), new Date());
-      return d >= 0 && d <= 5;
-    }).length : 0;
+  // Simplified - no alerts for now
+  // Simplified - no handlers needed
 
   // Navigation organized by sections
   const navigationSections = [
     {
-      title: 'OPERACIONES',
-      items: [
-        { name: t.nav.dashboard, href: '/dashboard', icon: LayoutDashboard },
-      ]
-    },
-    {
-      title: 'GESTIÓN DE CLIENTES',
+      title: 'GESTIÓN',
       items: [
         { name: t.nav.clients, href: '/clients', icon: Users },
       ]
     },
-    {
-      title: 'FINANZAS',
-      items: [
-        { name: t.nav.invoices, href: '/invoices', icon: FileText },
-        { name: t.nav.finances, href: '/finances', icon: Coins },
-        { name: t.nav.goals, href: '/savings', icon: Target },
-        { name: 'Mercados', href: '/markets', icon: TrendingUp },
-      ]
-    },
   ];
-
-  // Add admin section for super admins
-  if (user?.role === 'super_admin') {
-    navigationSections.push({
-      title: 'ADMINISTRACIÓN',
-      items: [
-        { name: 'Admin', href: '/admin', icon: Shield },
-      ]
-    });
-  }
 
   // Settings at the bottom (separate)
   const settingsItems = [
-    { name: 'Perfil Empresarial', href: '/company-profile', icon: Building2 },
     { name: t.nav.settings, href: '/settings', icon: Settings },
   ];
 

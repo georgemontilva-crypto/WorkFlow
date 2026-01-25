@@ -54,7 +54,6 @@ export default function Clients() {
   const { data: clients = [], refetch } = trpc.clients.list.useQuery();
   const createClientMutation = trpc.clients.create.useMutation();
   const updateClientMutation = trpc.clients.update.useMutation();
-  const archiveClientMutation = trpc.clients.archive.useMutation();
   const deleteClientMutation = trpc.clients.delete.useMutation();
 
   const handleOpenModal = (client?: Client) => {
@@ -119,7 +118,7 @@ export default function Clients() {
 
   const handleArchive = async (id: number) => {
     try {
-      await archiveClientMutation.mutateAsync({ id });
+      await updateClientMutation.mutateAsync({ id, archived: 1 });
       toast.success('Cliente archivado exitosamente');
       refetch();
     } catch (error: any) {
