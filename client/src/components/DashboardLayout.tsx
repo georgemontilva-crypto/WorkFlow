@@ -153,24 +153,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
         </nav>
 
-        {/* Subscription Plan Indicator */}
-        {accessStatus && accessStatus.subscription_plan && user?.role === 'user' && (
-          <div className="mx-3 mb-4">
-            <div className="bg-primary/10 border border-primary/30 rounded-lg p-3 space-y-2">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <p className="text-sm font-semibold text-foreground">
-                  Plan {accessStatus.subscription_plan === 'free' ? 'Free' : accessStatus.subscription_plan === 'pro' ? 'Pro' : 'Business'}
-                </p>
-              </div>
-              {accessStatus.subscription_plan === 'free' && (
-                <p className="text-xs text-muted-foreground">
-                  Actualiza a Pro para desbloquear funciones ilimitadas
-                </p>
-              )}
-            </div>
-          </div>
-        )}
+
 
         {/* Logout Button */}
         <div className="mx-3 mb-3">
@@ -209,15 +192,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           
           <div className="flex-1" />
           
-          {/* Alert Center Button */}
-          <button
-            onClick={() => setIsAlertCenterOpen(true)}
-            className="relative p-2 hover:bg-accent rounded-lg transition-colors"
-          >
-            <Bell className="w-5 h-5" />
-            {/* Unread count badge */}
-            <UnreadAlertBadge />
-          </button>
+
         </header>
 
         {/* Scrollable Content */}
