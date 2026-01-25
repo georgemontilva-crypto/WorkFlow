@@ -381,10 +381,6 @@ export default function Savings() {
               Reintentar
             </Button>
           </div>
-        ) : isLoading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="text-[#8B92A8]">Cargando metas...</div>
-          </div>
         ) : !savingsGoals || savingsGoals.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="w-32 h-32 rounded-full bg-white/5 flex items-center justify-center mb-6">

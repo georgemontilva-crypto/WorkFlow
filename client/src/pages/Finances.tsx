@@ -255,13 +255,7 @@ export default function Finances() {
               <p className="text-[#8B92A8] text-sm">Total Ingresos</p>
               <TrendingUp className="w-5 h-5 text-green-500" />
             </div>
-            {summaryLoading ? (
-              <div className="h-8 bg-gray-700 animate-pulse rounded"></div>
-            ) : (
-              <p className="text-3xl font-bold text-white">
-                {formatCurrency(totalIncome)}
-              </p>
-            )}
+            <p className="text-3xl font-bold text-white">{formatCurrency(summary?.total_income || 0)}</p>
           </div>
 
           {/* Total Expenses */}
@@ -292,9 +286,7 @@ export default function Finances() {
           {/* Tendencia Mensual (Line Chart) */}
           <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Tendencia Mensual</h2>
-            {monthLoading ? (
-              <div className="h-80 bg-gray-700 animate-pulse rounded"></div>
-            ) : trendData.length === 0 ? (
+            {trendData.length === 0 ? (
               <div className="h-80 flex items-center justify-center text-gray-500">
                 No hay datos de tendencia
               </div>
@@ -337,9 +329,7 @@ export default function Finances() {
           {/* Comparativa Mensual (Bar Chart) */}
           <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
             <h2 className="text-xl font-bold text-white mb-6">Comparativa Mensual</h2>
-            {monthLoading ? (
-              <div className="h-80 bg-gray-700 animate-pulse rounded"></div>
-            ) : comparativeData.length === 0 ? (
+            {comparativeData.length === 0 ? (
               <div className="h-80 flex items-center justify-center text-gray-500">
                 No hay datos comparativos
               </div>
@@ -412,9 +402,7 @@ export default function Finances() {
             </div>
           </div>
           
-          {historyLoading ? (
-            <div className="h-96 bg-gray-700 animate-pulse rounded"></div>
-          ) : filteredHistory.length === 0 ? (
+          {filteredHistory.length === 0 ? (
             <div className="h-96 flex items-center justify-center text-gray-500">
               No hay transacciones en {format(selectedMonth, 'MMMM yyyy', { locale: es })}
             </div>
@@ -598,10 +586,10 @@ export default function Finances() {
                   </button>
                   <button
                     type="submit"
-                    disabled={createTransactionMutation.isLoading}
-                    className="flex-1 px-4 py-2 bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 text-[#C4FF3D] rounded-[9999px] hover:bg-[#C4FF3D]/20 transition-colors disabled:opacity-50"
-                  >
-                    {createTransactionMutation.isLoading ? 'Guardando...' : 'Guardar'}
+                  disabled={createTransactionMutation.isPending}
+                  className="flex-1 px-4 py-2 bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 text-[#C4FF3D] rounded-[9999px] hover:bg-[#C4FF3D]/20 transition-colors disabled:opacity-50"
+                >
+                  {createTransactionMutation.isPending ? 'Guardando...' : 'Guardar'}
                   </button>
                 </div>
               </form>

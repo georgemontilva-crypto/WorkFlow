@@ -461,7 +461,7 @@ export default function Invoices() {
                         size="icon"
                         variant="ghost"
                         onClick={(e) => { e.stopPropagation(); handleDownloadPDF(invoice.id, invoice.invoice_number); }}
-                        disabled={downloadPDFMutation.isLoading}
+                        disabled={downloadPDFMutation.isPending}
                         className="text-[#8B92A8] hover:text-white disabled:opacity-50 min-h-[44px] min-w-[44px] hidden md:flex"
                       >
                         <Download className="w-5 h-5" />
@@ -549,7 +549,7 @@ export default function Invoices() {
                                     handleSendEmail(invoice.id);
                                     setOpenDropdownId(null);
                                   }}
-                                  disabled={sendEmailMutation.isLoading}
+                                  disabled={sendEmailMutation.isPending}
                                   className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors disabled:opacity-50"
                                 >
                                   <Send className="w-4 h-4 text-blue-400" />
@@ -1074,10 +1074,10 @@ export default function Invoices() {
                 </button>
                 <button
                   type="submit"
-                  disabled={registerPaymentMutation.isLoading}
+                  disabled={registerPaymentMutation.isPending}
                   className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50"
                 >
-                  {registerPaymentMutation.isLoading ? 'Registrando...' : 'Registrar Pago'}
+                  {registerPaymentMutation.isPending ? 'Registrando...' : 'Registrar Pago'}
                 </button>
               </div>
             </form>
