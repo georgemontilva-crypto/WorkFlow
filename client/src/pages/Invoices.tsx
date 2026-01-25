@@ -348,7 +348,7 @@ export default function Invoices() {
   const handleSubmit = async (e: React.FormEvent, action: 'create_only' | 'create_and_send' | 'download' | 'copy_link' = 'create_only') => {
     e.preventDefault();
 
-    if (!formData.client_id || !formData.items || formData.items.length === 0) {
+    if (!formData.client_id || formData.client_id === 0 || !formData.items || formData.items.length === 0) {
       toast.error('Selecciona un cliente y agrega al menos un item');
       return;
     }
