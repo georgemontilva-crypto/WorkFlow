@@ -175,9 +175,10 @@ export default function Clients() {
           </div>
         </Card>
 
-        {/* Filters Card */}
+        {/* Clients List Card with Filters */}
         <Card>
-          <div className="flex flex-col md:flex-row gap-4">
+          {/* Filters Section */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
               <Input
@@ -199,14 +200,11 @@ export default function Clients() {
               </SelectContent>
             </Select>
           </div>
-        </Card>
-
-        {/* Clients List Card */}
-        <Card>
-          <CardHeader
-            title="Clientes"
-            subtitle={`${filteredClients.length} cliente${filteredClients.length !== 1 ? 's' : ''}`}
-          />
+          
+          {/* Header - Solo contador */}
+          <div className="mb-6">
+            <p className="text-[#8B92A8] text-sm">{filteredClients.length} cliente{filteredClients.length !== 1 ? 's' : ''}</p>
+          </div>
           
           <div className="space-y-3">
             {filteredClients.length === 0 ? (
