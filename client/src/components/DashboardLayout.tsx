@@ -13,6 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useState } from 'react';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
+import { NotificationsPanel } from '@/components/NotificationsPanel';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -164,6 +165,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </Button>
           
           <div className="flex-1" />
+          
+          {/* Notifications Panel */}
+          <NotificationsPanel />
         </header>
 
         {/* Scrollable Content */}
