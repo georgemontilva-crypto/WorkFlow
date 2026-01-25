@@ -400,7 +400,7 @@ export default function Invoices() {
             subtitle={`${filteredInvoices.length} factura${filteredInvoices.length !== 1 ? 's' : ''}`}
           />
           
-          <div className="space-y-3">
+          <div className="h-[calc(100vh-400px)] overflow-y-auto space-y-3">
             {filteredInvoices.length === 0 ? (
               <div className="py-16 text-center">
                 <p className="text-[#8B92A8] text-base">No se encontraron facturas</p>
