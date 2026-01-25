@@ -6,6 +6,7 @@ import { z } from "zod";
 import * as db from "./db";
 import { getRedisClient } from "./config/redis";
 import { invoicesRouter } from "./routers_invoices";
+import { financesRouter } from "./routers_finances";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -658,6 +659,12 @@ export const appRouter = router({
    * Clean, stable, predictable invoice system
    */
   invoices: invoicesRouter,
+  
+  /**
+   * Finances router - BUILT FROM SCRATCH
+   * Read-only financial analytics based on paid invoices
+   */
+  finances: financesRouter,
 });
 
 export type AppRouter = typeof appRouter;
