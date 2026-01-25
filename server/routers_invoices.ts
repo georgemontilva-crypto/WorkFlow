@@ -12,7 +12,8 @@
 
 import { router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
-import * as db from "./db";
+import { getDb } from "./db";
+import * as dbHelpers from "./db";
 import { invoices, invoiceItems } from "../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
 
@@ -45,13 +46,14 @@ export const invoicesRouter = router({
       console.log(`[Invoices] List request from user: ${ctx.user.id}`, input);
       
       try {
+        const db = await getDb();
         const filters: any[] = [eq(invoices.user_id, ctx.user.id)];
         
         if (input?.status && input.status !== "all") {
           filters.push(eq(invoices.status, input.status));
         }
         
-        const result = await db.db
+        const result = await db
           .select()
           .from(invoices)
           .where(and(...filters))
@@ -73,8 +75,9 @@ export const invoicesRouter = router({
       console.log(`[Invoices] Get invoice ${input.id} for user: ${ctx.user.id}`);
       
       try {
+        const db = await getDb();
         // Get invoice
-        const invoice = await db.db
+        const invoice = await db
           .select()
           .from(invoices)
           .where(and(
@@ -89,7 +92,7 @@ export const invoicesRouter = router({
         }
         
         // Get items
-        const items = await db.db
+        const items = await db
           .select()
           .from(invoiceItems)
           .where(eq(invoiceItems.invoice_id, input.id));
@@ -116,8 +119,9 @@ export const invoicesRouter = router({
       });
       
       try {
+        const db = await getDb();
         // 1. Validate client exists and belongs to user
-        const client = await db.getClientById(input.client_id, ctx.user.id);
+        const client = await dbHelpers.getClientById(input.client_id, ctx.user.id);
         
         if (!client) {
           console.log(`[Invoices] Client ${input.client_id} not found for user ${ctx.user.id}`);
@@ -161,13 +165,13 @@ export const invoicesRouter = router({
         const invoice_number = `INV-${dateStr}-${random}`;
         
         // 6. Get user's primary currency
-        const user = await db.getUserById(ctx.user.id);
+        const user = await dbHelpers.getUserById(ctx.user.id);
         const currency = user?.primary_currency || "USD";
         
         console.log(`[Invoices] Invoice number: ${invoice_number}, currency: ${currency}`);
         
         // 7. Create invoice
-        const [newInvoice] = await db.db.insert(invoices).values({
+        const [newInvoice] = await db.insert(invoices).values({
           user_id: ctx.user.id,
           client_id: input.client_id,
           invoice_number,
@@ -187,7 +191,7 @@ export const invoicesRouter = router({
         
         // 8. Create invoice items
         for (const item of input.items) {
-          await db.db.insert(invoiceItems).values({
+          await db.insert(invoiceItems).values({
             invoice_id: invoiceId,
             description: item.description,
             quantity: item.quantity.toString(),
@@ -199,13 +203,13 @@ export const invoicesRouter = router({
         console.log(`[Invoices] ${input.items.length} items created for invoice ${invoiceId}`);
         
         // 9. Return created invoice with items
-        const createdInvoice = await db.db
+        const createdInvoice = await db
           .select()
           .from(invoices)
           .where(eq(invoices.id, invoiceId))
           .limit(1);
         
-        const createdItems = await db.db
+        const createdItems = await db
           .select()
           .from(invoiceItems)
           .where(eq(invoiceItems.invoice_id, invoiceId));
@@ -235,8 +239,9 @@ export const invoicesRouter = router({
       console.log(`[Invoices] Update status for invoice ${input.id} to ${input.status}`);
       
       try {
+        const db = await getDb();
         // Get current invoice
-        const [invoice] = await db.db
+        const [invoice] = await db
           .select()
           .from(invoices)
           .where(and(
@@ -266,7 +271,7 @@ export const invoicesRouter = router({
         }
         
         // Update status
-        await db.db
+        await db
           .update(invoices)
           .set({
             status: newStatus,
@@ -290,8 +295,9 @@ export const invoicesRouter = router({
       console.log(`[Invoices] Delete attempt for invoice ${input.id}`);
       
       try {
+        const db = await getDb();
         // Get invoice
-        const [invoice] = await db.db
+        const [invoice] = await db
           .select()
           .from(invoices)
           .where(and(
@@ -310,12 +316,12 @@ export const invoicesRouter = router({
         }
         
         // Delete items first (cascade should handle this, but being explicit)
-        await db.db
+        await db
           .delete(invoiceItems)
           .where(eq(invoiceItems.invoice_id, input.id));
         
         // Delete invoice
-        await db.db
+        await db
           .delete(invoices)
           .where(eq(invoices.id, input.id));
         
@@ -335,12 +341,13 @@ export const invoicesRouter = router({
       console.log(`[Invoices] Send email for invoice ${input.id}`);
       
       try {
+        const db = await getDb();
         // Import email service
         const { sendEmail } = await import("../_core/email");
         const { generateInvoicePDF } = await import("../services/invoicePDF");
         
         // Get invoice with items
-        const [invoice] = await db.db
+        const [invoice] = await db
           .select()
           .from(invoices)
           .where(and(
@@ -359,7 +366,7 @@ export const invoicesRouter = router({
         }
         
         // Get items
-        const items = await db.db
+        const items = await db
           .select()
           .from(invoiceItems)
           .where(eq(invoiceItems.invoice_id, input.id));
@@ -369,14 +376,14 @@ export const invoicesRouter = router({
         }
         
         // Get client
-        const client = await db.getClientById(invoice.client_id, ctx.user.id);
+        const client = await dbHelpers.getClientById(invoice.client_id, ctx.user.id);
         
         if (!client) {
           throw new Error("Cliente no encontrado");
         }
         
         // Get user
-        const user = await db.getUserById(ctx.user.id);
+        const user = await dbHelpers.getUserById(ctx.user.id);
         
         if (!user) {
           throw new Error("Usuario no encontrado");
@@ -446,7 +453,7 @@ export const invoicesRouter = router({
         }
         
         // Update status to sent
-        await db.db
+        await db
           .update(invoices)
           .set({
             status: "sent",
@@ -470,10 +477,11 @@ export const invoicesRouter = router({
       console.log(`[Invoices] Download PDF for invoice ${input.id}`);
       
       try {
+        const db = await getDb();
         const { generateInvoicePDF } = await import("../services/invoicePDF");
         
         // Get invoice with items
-        const [invoice] = await db.db
+        const [invoice] = await db
           .select()
           .from(invoices)
           .where(and(
@@ -487,20 +495,20 @@ export const invoicesRouter = router({
         }
         
         // Get items
-        const items = await db.db
+        const items = await db
           .select()
           .from(invoiceItems)
           .where(eq(invoiceItems.invoice_id, input.id));
         
         // Get client
-        const client = await db.getClientById(invoice.client_id, ctx.user.id);
+        const client = await dbHelpers.getClientById(invoice.client_id, ctx.user.id);
         
         if (!client) {
           throw new Error("Cliente no encontrado");
         }
         
         // Get user
-        const user = await db.getUserById(ctx.user.id);
+        const user = await dbHelpers.getUserById(ctx.user.id);
         
         if (!user) {
           throw new Error("Usuario no encontrado");
