@@ -10,13 +10,14 @@
 import { router, protectedProcedure } from './_core/trpc';
 import { getDb } from './db';
 import { z } from 'zod';
-import { invoices, clients } from '../drizzle/schema';
+import { invoices, clients, transactions } from '../drizzle/schema';
 import { eq, and, gte, lte, sql, desc } from 'drizzle-orm';
 
 export const financesRouter = router({
   /**
    * Get financial summary
-   * Returns: total income, current month, previous month, variation
+   * Returns: total income, total expenses, current month, previous month, variation
+   * Includes both invoices and manual transactions
    */
   getSummary: protectedProcedure
     .input(z.object({
@@ -41,8 +42,8 @@ export const financesRouter = router({
         const previousMonthStart = new Date(currentYear, currentMonth - 2, 1);
         const previousMonthEnd = new Date(currentYear, currentMonth - 1, 0, 23, 59, 59);
 
-        // Get total income (all paid invoices)
-        const totalIncomeResult = await db
+        // Get total income from invoices
+        const totalIncomeInvoicesResult = await db
           .select({
             total: sql<number>`COALESCE(SUM(CAST(${invoices.total} AS DECIMAL(10,2))), 0)`,
           })
@@ -55,10 +56,41 @@ export const financesRouter = router({
             )
           );
 
-        const totalIncome = Number(totalIncomeResult[0]?.total || 0);
+        // Get total income from manual transactions
+        const totalIncomeTransactionsResult = await db
+          .select({
+            total: sql<number>`COALESCE(SUM(CAST(${transactions.amount} AS DECIMAL(10,2))), 0)`,
+          })
+          .from(transactions)
+          .where(
+            and(
+              eq(transactions.user_id, userId),
+              eq(transactions.type, 'income'),
+              eq(transactions.status, 'active'),
+              input.currency ? eq(transactions.currency, input.currency) : undefined
+            )
+          );
 
-        // Get current month income
-        const currentMonthResult = await db
+        // Get total expenses from manual transactions
+        const totalExpensesResult = await db
+          .select({
+            total: sql<number>`COALESCE(SUM(CAST(${transactions.amount} AS DECIMAL(10,2))), 0)`,
+          })
+          .from(transactions)
+          .where(
+            and(
+              eq(transactions.user_id, userId),
+              eq(transactions.type, 'expense'),
+              eq(transactions.status, 'active'),
+              input.currency ? eq(transactions.currency, input.currency) : undefined
+            )
+          );
+
+        const totalIncome = Number(totalIncomeInvoicesResult[0]?.total || 0) + Number(totalIncomeTransactionsResult[0]?.total || 0);
+        const totalExpenses = Number(totalExpensesResult[0]?.total || 0);
+
+        // Get current month income (invoices + manual)
+        const currentMonthInvoicesResult = await db
           .select({
             total: sql<number>`COALESCE(SUM(CAST(${invoices.total} AS DECIMAL(10,2))), 0)`,
           })
@@ -73,10 +105,26 @@ export const financesRouter = router({
             )
           );
 
-        const currentMonthIncome = Number(currentMonthResult[0]?.total || 0);
+        const currentMonthTransactionsResult = await db
+          .select({
+            total: sql<number>`COALESCE(SUM(CAST(${transactions.amount} AS DECIMAL(10,2))), 0)`,
+          })
+          .from(transactions)
+          .where(
+            and(
+              eq(transactions.user_id, userId),
+              eq(transactions.type, 'income'),
+              eq(transactions.status, 'active'),
+              gte(transactions.date, currentMonthStart),
+              lte(transactions.date, currentMonthEnd),
+              input.currency ? eq(transactions.currency, input.currency) : undefined
+            )
+          );
 
-        // Get previous month income
-        const previousMonthResult = await db
+        const currentMonthIncome = Number(currentMonthInvoicesResult[0]?.total || 0) + Number(currentMonthTransactionsResult[0]?.total || 0);
+
+        // Get previous month income (invoices + manual)
+        const previousMonthInvoicesResult = await db
           .select({
             total: sql<number>`COALESCE(SUM(CAST(${invoices.total} AS DECIMAL(10,2))), 0)`,
           })
@@ -91,7 +139,23 @@ export const financesRouter = router({
             )
           );
 
-        const previousMonthIncome = Number(previousMonthResult[0]?.total || 0);
+        const previousMonthTransactionsResult = await db
+          .select({
+            total: sql<number>`COALESCE(SUM(CAST(${transactions.amount} AS DECIMAL(10,2))), 0)`,
+          })
+          .from(transactions)
+          .where(
+            and(
+              eq(transactions.user_id, userId),
+              eq(transactions.type, 'income'),
+              eq(transactions.status, 'active'),
+              gte(transactions.date, previousMonthStart),
+              lte(transactions.date, previousMonthEnd),
+              input.currency ? eq(transactions.currency, input.currency) : undefined
+            )
+          );
+
+        const previousMonthIncome = Number(previousMonthInvoicesResult[0]?.total || 0) + Number(previousMonthTransactionsResult[0]?.total || 0);
 
         // Calculate variation percentage
         let variation = 0;
@@ -101,10 +165,11 @@ export const financesRouter = router({
           variation = 100; // If previous was 0 and current > 0, it's 100% increase
         }
 
-        console.log(`[Finances] Summary calculated: Total=${totalIncome}, Current=${currentMonthIncome}, Previous=${previousMonthIncome}, Variation=${variation.toFixed(2)}%`);
+        console.log(`[Finances] Summary calculated: Total Income=${totalIncome}, Total Expenses=${totalExpenses}, Current=${currentMonthIncome}, Previous=${previousMonthIncome}, Variation=${variation.toFixed(2)}%`);
 
         return {
           totalIncome,
+          totalExpenses,
           currentMonthIncome,
           previousMonthIncome,
           variation: Number(variation.toFixed(2)),
@@ -223,7 +288,7 @@ export const financesRouter = router({
 
   /**
    * Get financial history (transaction list)
-   * Returns: Array of paid invoices with client info
+   * Returns: Array of paid invoices AND manual transactions
    */
   getHistory: protectedProcedure
     .input(z.object({
@@ -239,27 +304,27 @@ export const financesRouter = router({
       console.log(`[Finances] Getting history for user: ${userId}`);
 
       try {
-        // Build where conditions
-        const conditions = [
+        // Build where conditions for invoices
+        const invoiceConditions = [
           eq(invoices.user_id, userId),
           eq(invoices.status, 'paid'),
         ];
 
         if (input.startDate) {
-          conditions.push(gte(invoices.issue_date, input.startDate));
+          invoiceConditions.push(gte(invoices.issue_date, input.startDate));
         }
         if (input.endDate) {
-          conditions.push(lte(invoices.issue_date, input.endDate));
+          invoiceConditions.push(lte(invoices.issue_date, input.endDate));
         }
         if (input.clientId) {
-          conditions.push(eq(invoices.client_id, input.clientId));
+          invoiceConditions.push(eq(invoices.client_id, input.clientId));
         }
         if (input.currency) {
-          conditions.push(eq(invoices.currency, input.currency));
+          invoiceConditions.push(eq(invoices.currency, input.currency));
         }
 
         // Get paid invoices with client info
-        const result = await db
+        const invoiceResults = await db
           .select({
             id: invoices.id,
             invoice_number: invoices.invoice_number,
@@ -272,21 +337,69 @@ export const financesRouter = router({
           })
           .from(invoices)
           .leftJoin(clients, eq(invoices.client_id, clients.id))
-          .where(and(...conditions))
-          .orderBy(desc(invoices.issue_date));
+          .where(and(...invoiceConditions));
 
-        const history = result.map(row => ({
-          id: row.id,
-          invoice_number: row.invoice_number,
-          client_id: row.client_id,
-          client_name: row.client_name || 'Unknown',
-          date: row.issue_date,
-          amount: Number(row.total),
-          currency: row.currency,
-          status: row.status,
-        }));
+        // Build where conditions for manual transactions
+        const transactionConditions = [
+          eq(transactions.user_id, userId),
+          eq(transactions.status, 'active'),
+        ];
 
-        console.log(`[Finances] History retrieved: ${history.length} transactions`);
+        if (input.startDate) {
+          transactionConditions.push(gte(transactions.date, input.startDate));
+        }
+        if (input.endDate) {
+          transactionConditions.push(lte(transactions.date, input.endDate));
+        }
+        if (input.currency) {
+          transactionConditions.push(eq(transactions.currency, input.currency));
+        }
+
+        // Get manual transactions
+        const transactionResults = await db
+          .select({
+            id: transactions.id,
+            type: transactions.type,
+            category: transactions.category,
+            description: transactions.description,
+            date: transactions.date,
+            amount: transactions.amount,
+            currency: transactions.currency,
+          })
+          .from(transactions)
+          .where(and(...transactionConditions));
+
+        // Merge and format both types
+        const history = [
+          ...invoiceResults.map(row => ({
+            id: `invoice-${row.id}`,
+            type: 'invoice' as const,
+            invoice_number: row.invoice_number,
+            client_id: row.client_id,
+            client_name: row.client_name || 'Unknown',
+            date: row.issue_date,
+            amount: Number(row.total),
+            currency: row.currency,
+            status: row.status,
+            description: null,
+            category: null,
+          })),
+          ...transactionResults.map(row => ({
+            id: `transaction-${row.id}`,
+            type: row.type === 'income' ? ('manual-income' as const) : ('manual-expense' as const),
+            invoice_number: null,
+            client_id: null,
+            client_name: row.description,
+            date: row.date,
+            amount: Number(row.amount),
+            currency: row.currency,
+            status: null,
+            description: row.description,
+            category: row.category,
+          })),
+        ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+        console.log(`[Finances] History retrieved: ${history.length} transactions (${invoiceResults.length} invoices + ${transactionResults.length} manual)`);
 
         return history;
       } catch (error) {

@@ -159,7 +159,7 @@ export default function Finances() {
 
   // Calculate totals
   const totalIncome = summary?.totalIncome || 0;
-  const totalExpenses = 0; // TODO: Add expenses when available
+  const totalExpenses = summary?.totalExpenses || 0;
   const balance = totalIncome - totalExpenses;
 
   // Export history handler
@@ -357,29 +357,42 @@ export default function Finances() {
             </div>
           ) : (
             <div className="h-96 overflow-y-auto pr-2 space-y-2">
-              {history.map((transaction) => (
-                <div 
-                  key={transaction.id} 
-                  className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <TrendingUp className="w-5 h-5 text-green-500" />
+              {history.map((transaction: any) => {
+                const isExpense = transaction.type === 'manual-expense';
+                const isIncome = transaction.type === 'invoice' || transaction.type === 'manual-income';
+                
+                return (
+                  <div 
+                    key={transaction.id} 
+                    className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          isExpense ? 'bg-red-500/10' : 'bg-green-500/10'
+                        }`}>
+                          {isExpense ? (
+                            <TrendingDown className="w-5 h-5 text-red-500" />
+                          ) : (
+                            <TrendingUp className="w-5 h-5 text-green-500" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-white font-semibold">{transaction.client_name}</p>
+                          <p className="text-gray-400 text-sm">
+                            {transaction.invoice_number || transaction.category || 'Transacción manual'} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-white font-semibold">{transaction.client_name}</p>
-                        <p className="text-gray-400 text-sm">
-                          {transaction.invoice_number} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
-                        </p>
-                      </div>
+                      <p className={`font-bold text-lg ${
+                        isExpense ? 'text-red-500' : 'text-green-500'
+                      }`}>
+                        {isExpense ? '-' : '+'}{formatCurrency(transaction.amount)}
+                      </p>
                     </div>
-                    <p className="text-green-500 font-bold text-lg">
-                      +{formatCurrency(transaction.amount)}
-                    </p>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
