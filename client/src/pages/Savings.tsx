@@ -406,23 +406,23 @@ export default function Savings() {
               return (
                 <div 
                   key={goal.id} 
-                  className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#4ADE80]/5 hover:border-[rgba(74,222,128,0.15)] transition-colors-smooth group"
+                  className="bg-[#1B1E24] rounded-[9999px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#C4FF3D]/5 hover:border-[rgba(74,222,128,0.15)] transition-colors-smooth group"
                 >
                   <div className="flex items-center justify-between gap-6">
                     {/* Información Principal - Izquierda */}
                     <div className="flex items-center gap-4 flex-1 min-w-0">
                       {goal.status === 'completed' ? (
-                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#4ADE80]/20 flex items-center justify-center">
-                          <CheckCircle2 className="w-6 h-6 text-[#4ADE80]" />
+                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#C4FF3D]/20 flex items-center justify-center">
+                          <CheckCircle2 className="w-6 h-6 text-[#C4FF3D]" />
                         </div>
                       ) : (
-                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#4ADE80]/20 flex items-center justify-center">
-                          <Target className="w-6 h-6 text-[#4ADE80]" />
+                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#C4FF3D]/20 flex items-center justify-center">
+                          <Target className="w-6 h-6 text-[#C4FF3D]" />
                         </div>
                       )}
                       <div className="min-w-0 flex-1">
                         <h3 className="text-white text-lg font-medium mb-1">{goal.name}</h3>
-                        <p className="text-[#6B7280] text-sm">
+                        <p className="text-[#8B92A8] text-sm">
                           {goal.deadline ? `Vencimiento: ${format(new Date(goal.deadline), 'dd MMM yyyy', { locale: es })}` : 'Sin fecha límite'}
                         </p>
                       </div>
@@ -434,17 +434,17 @@ export default function Savings() {
                         <span className="text-2xl font-semibold text-white">
                           {formatCurrency(currentAmount, goal.currency)}
                         </span>
-                        <span className="text-[#9AA0AA] text-base">
+                        <span className="text-[#8B92A8] text-base">
                           / {formatCurrency(targetAmount, goal.currency)}
                         </span>
                       </div>
                       <div className="w-full max-w-xs h-2 bg-[#14161B] rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-[#4ADE80] transition-all duration-300" 
+                          className="h-full bg-[#C4FF3D] transition-all duration-300" 
                           style={{ width: `${Math.min(progress, 100)}%` }}
                         />
                       </div>
-                      <p className="text-sm text-[#9AA0AA]">
+                      <p className="text-sm text-[#8B92A8]">
                         {progress.toFixed(1)}% completado
                       </p>
                     </div>
@@ -465,12 +465,12 @@ export default function Savings() {
                       
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-[#9AA0AA] hover:text-white md:opacity-0 md:group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px]">
+                          <Button variant="ghost" size="icon" className="text-[#8B92A8] hover:text-white md:opacity-0 md:group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px]">
                             <MoreVertical className="w-5 h-5" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-[#0E0F12] border-[#4ADE80]/30">
-                          <DropdownMenuItem onClick={() => handleEdit(goal)} className="cursor-pointer text-white hover:bg-[#4ADE80]/10">
+                        <DropdownMenuContent align="end" className="bg-[#0E0F12] border-[#C4FF3D]/30">
+                          <DropdownMenuItem onClick={() => handleEdit(goal)} className="cursor-pointer text-white hover:bg-[#C4FF3D]/10">
                             <Pencil className="w-4 h-4 mr-2" />
                             Editar
                           </DropdownMenuItem>
@@ -493,23 +493,23 @@ export default function Savings() {
                       <span className="text-xl font-semibold text-white">
                         {formatCurrency(currentAmount, goal.currency)}
                       </span>
-                      <span className="text-[#9AA0AA] text-sm">
+                      <span className="text-[#8B92A8] text-sm">
                         de {formatCurrency(targetAmount, goal.currency)}
                       </span>
                     </div>
                     <div className="w-full h-2 bg-[#14161B] rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-[#4ADE80] transition-all duration-300" 
+                        className="h-full bg-[#C4FF3D] transition-all duration-300" 
                         style={{ width: `${Math.min(progress, 100)}%` }}
                       />
                     </div>
-                    <p className="text-sm text-[#9AA0AA]">
+                    <p className="text-sm text-[#8B92A8]">
                       {progress.toFixed(1)}% completado
                     </p>
                     {goal.status !== 'completed' && remaining > 0 && (
                       <div className="flex items-center justify-between pt-2">
                         <div>
-                          <p className="text-xs text-[#6B7280]">Falta</p>
+                          <p className="text-xs text-[#8B92A8]">Falta</p>
                           <p className="text-lg font-semibold text-white">
                             {formatCurrency(remaining, goal.currency)}
                           </p>
@@ -527,8 +527,8 @@ export default function Savings() {
                   </div>
 
                   {goal.status === 'completed' && (
-                    <div className="mt-4 p-3 bg-[#4ADE80]/10 rounded-[10px] border border-[#4ADE80]/20">
-                      <p className="text-sm text-[#4ADE80] font-medium text-center">
+                    <div className="mt-4 p-3 bg-[#C4FF3D]/10 rounded-[9999px] border border-[#C4FF3D]/20">
+                      <p className="text-sm text-[#C4FF3D] font-medium text-center">
                         ¡Meta completada!
                       </p>
                     </div>

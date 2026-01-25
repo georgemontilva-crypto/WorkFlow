@@ -403,7 +403,7 @@ export default function Invoices() {
               return (
                 <div
                   key={invoice.id}
-                  className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#4ADE80]/5 hover:border-[rgba(74,222,128,0.15)] transition-colors-smooth cursor-pointer group"
+                  className="bg-[#1B1E24] rounded-[9999px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#C4FF3D]/5 hover:border-[rgba(74,222,128,0.15)] transition-colors-smooth cursor-pointer group"
                 >
                   <div className="flex items-center justify-between gap-6">
                     {/* Información Principal - Izquierda */}
@@ -414,8 +414,8 @@ export default function Invoices() {
                           {badge.label}
                         </span>
                       </div>
-                      <p className="text-[#9AA0AA] text-base mb-1">{client?.name || 'Desconocido'}</p>
-                      <p className="text-[#6B7280] text-sm">
+                      <p className="text-[#8B92A8] text-base mb-1">{client?.name || 'Desconocido'}</p>
+                      <p className="text-[#8B92A8] text-sm">
                         Vencimiento: {format(new Date(invoice.due_date), 'dd/MM/yyyy')}
                       </p>
                     </div>
@@ -433,7 +433,7 @@ export default function Invoices() {
                         size="icon"
                         variant="ghost"
                         onClick={(e) => { e.stopPropagation(); setViewingInvoice(invoice.id); }}
-                        className="text-[#9AA0AA] hover:text-white min-h-[44px] min-w-[44px]"
+                        className="text-[#8B92A8] hover:text-white min-h-[44px] min-w-[44px]"
                       >
                         <Eye className="w-5 h-5" />
                       </Button>
@@ -443,7 +443,7 @@ export default function Invoices() {
                         variant="ghost"
                         onClick={(e) => { e.stopPropagation(); handleDownloadPDF(invoice.id, invoice.invoice_number); }}
                         disabled={downloadPDFMutation.isLoading}
-                        className="text-[#9AA0AA] hover:text-white disabled:opacity-50 min-h-[44px] min-w-[44px] hidden md:flex"
+                        className="text-[#8B92A8] hover:text-white disabled:opacity-50 min-h-[44px] min-w-[44px] hidden md:flex"
                       >
                         <Download className="w-5 h-5" />
                       </Button>
@@ -454,7 +454,7 @@ export default function Invoices() {
                           size="icon"
                           variant="ghost"
                           onClick={(e) => { e.stopPropagation(); setOpenDropdownId(openDropdownId === invoice.id ? null : invoice.id); }}
-                          className="text-[#9AA0AA] hover:text-white min-h-[44px] min-w-[44px]"
+                          className="text-[#8B92A8] hover:text-white min-h-[44px] min-w-[44px]"
                         >
                           <MoreVertical className="w-5 h-5" />
                         </Button>
@@ -468,7 +468,7 @@ export default function Invoices() {
                             />
                             
                             {/* Dropdown Menu */}
-                            <div className="absolute right-0 mt-2 w-56 bg-[#0E0F12] border border-[#4ADE80]/30 rounded-[10px] shadow-lg z-20 py-1">
+                            <div className="absolute right-0 mt-2 w-56 bg-[#0E0F12] border border-[#C4FF3D]/30 rounded-[9999px] shadow-lg z-20 py-1">
                               {/* Ver Factura */}
                               <button
                                 onClick={() => {
