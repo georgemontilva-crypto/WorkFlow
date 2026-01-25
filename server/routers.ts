@@ -2833,5 +2833,70 @@ export const appRouter = router({
         return { success: true };
       }),
   }),
+
+  /**
+   * Notifications router - Sistema de notificaciones V2
+   * Limpio, predecible y escalable con Redis
+   */
+  notifications: router({
+    // Obtener notificaciones pendientes (toasts desde Redis)
+    getPending: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getPendingNotifications } = await import("./services/notifications");
+        return await getPendingNotifications(ctx.user!.id);
+      }),
+
+    // Limpiar notificaciones pendientes (después de mostrar toasts)
+    clearPending: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { clearPendingNotifications } = await import("./services/notifications");
+        await clearPendingNotifications(ctx.user!.id);
+        return { success: true };
+      }),
+
+    // Obtener historial de notificaciones (desde base de datos)
+    getHistory: protectedProcedure
+      .input(z.object({
+        limit: z.number().optional().default(50),
+      }))
+      .query(async ({ ctx, input }) => {
+        const { getNotificationHistory } = await import("./services/notifications");
+        return await getNotificationHistory(ctx.user!.id, input.limit);
+      }),
+
+    // Marcar notificación como leída
+    markAsRead: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const { markNotificationAsRead } = await import("./services/notifications");
+        const success = await markNotificationAsRead(input.id, ctx.user!.id);
+        return { success };
+      }),
+
+    // Marcar todas las notificaciones como leídas
+    markAllAsRead: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { markAllNotificationsAsRead } = await import("./services/notifications");
+        const success = await markAllNotificationsAsRead(ctx.user!.id);
+        return { success };
+      }),
+
+    // Obtener contador de no leídas
+    getUnreadCount: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { notifications } = await import("../drizzle/schema");
+        const { eq, and } = await import("drizzle-orm");
+        const result = await db.db
+          .select()
+          .from(notifications)
+          .where(and(
+            eq(notifications.user_id, ctx.user!.id),
+            eq(notifications.is_read, 0)
+          ));
+        return { count: result.length };
+      }),
+  }),
 });
 export type AppRouter = typeof appRouter;
