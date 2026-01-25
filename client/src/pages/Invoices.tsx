@@ -393,11 +393,10 @@ export default function Invoices() {
             </Select>
           </div>
           
-          {/* Header */}
-          <CardHeader
-            title="Facturas"
-            subtitle={`${filteredInvoices.length} factura${filteredInvoices.length !== 1 ? 's' : ''}`}
-          />
+          {/* Header - Solo contador */}
+          <div className="mb-6">
+            <p className="text-[#8B92A8] text-sm">{filteredInvoices.length} factura{filteredInvoices.length !== 1 ? 's' : ''}</p>
+          </div>
           
           <div className="h-[calc(100vh-400px)] overflow-y-auto space-y-3">
             {filteredInvoices.length === 0 ? (
