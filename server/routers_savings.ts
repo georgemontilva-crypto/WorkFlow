@@ -13,7 +13,7 @@ import { router, protectedProcedure } from './_core/trpc';
 import { getDb } from './db';
 import { z } from 'zod';
 import { savingsGoals } from '../drizzle/schema';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, ne } from 'drizzle-orm';
 
 export const savingsRouter = router({
   /**
@@ -32,7 +32,11 @@ export const savingsRouter = router({
       try {
         const conditions = [eq(savingsGoals.user_id, userId)];
         
-        if (input.status !== 'all') {
+        if (input.status === 'all') {
+          // 'all' means active and completed, but NOT cancelled
+          // Exclude cancelled goals by default
+          conditions.push(ne(savingsGoals.status, 'cancelled'));
+        } else {
           conditions.push(eq(savingsGoals.status, input.status));
         }
 

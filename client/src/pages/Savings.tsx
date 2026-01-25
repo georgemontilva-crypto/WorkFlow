@@ -55,8 +55,9 @@ export default function Savings() {
   const { primaryCurrency } = useCurrency();
   
   // Fetch savings goals using tRPC
+  // Note: 'all' now excludes cancelled goals by default (backend logic)
   const { data: savingsGoals, isLoading, error } = trpc.savings.list.useQuery(
-    { status: 'all' },
+    { status: 'all' }, // Shows active and completed, excludes cancelled
     {
       retry: 1,
       retryDelay: 1000,
