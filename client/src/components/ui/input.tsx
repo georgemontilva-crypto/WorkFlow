@@ -1,3 +1,14 @@
+/**
+ * INPUT COMPONENT - FASE 3 Refactor
+ * 
+ * REGLAS ESTRICTAS:
+ * - Fondo: #14161B (--color-bg-secondary)
+ * - Border: 0.7px solid #4ADE80
+ * - Bordes redondeados (--radius-medium: 10px)
+ * - Placeholder tenue (#6B7280)
+ * - Focus: aumentar intensidad del verde
+ */
+
 import { useDialogComposition } from "@/components/ui/dialog";
 import { useComposition } from "@/hooks/useComposition";
 import { cn } from "@/lib/utils";
@@ -54,11 +65,31 @@ function Input({
       type={type}
       data-slot="input"
       className={cn(
-        "file:text-foreground placeholder:text-muted-foreground/60 selection:bg-primary selection:text-primary-foreground bg-white/5 backdrop-blur-sm border-white/8 min-h-[44px] h-10 w-full min-w-0 rounded-md border px-4 py-2 text-sm sm:text-base transition-all duration-300 outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 shadow-sm",
-        "focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:bg-white/10",
-        "aria-invalid:ring-destructive/20 aria-invalid:border-destructive",
+        // Base styles
+        "min-h-[44px] h-10 w-full min-w-0 px-4 py-2 text-sm sm:text-base",
+        // Background and border (FASE 3 specs)
+        "bg-[#14161B] border-[0.7px] border-[#4ADE80]",
+        "rounded-[var(--radius-medium)]",
+        // Text and placeholder
+        "text-white placeholder:text-[#6B7280]",
+        // Focus state
+        "focus-visible:outline-none focus-visible:border-[#5EF590] focus-visible:ring-2 focus-visible:ring-[#4ADE80]/20 focus-visible:shadow-[0_0_8px_rgba(74,222,128,0.2)]",
+        // Invalid state
+        "aria-invalid:border-[#EF4444] aria-invalid:ring-[#EF4444]/20",
+        // Disabled state
+        "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+        // File input
+        "file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-white",
+        // Selection
+        "selection:bg-[#4ADE80]/30 selection:text-white",
+        // Transition
+        "transition-all duration-200",
         className
       )}
+      style={{
+        fontFamily: 'var(--font-family-base)',
+        fontWeight: 'var(--font-weight-normal)',
+      }}
       onCompositionStart={handleCompositionStart}
       onCompositionEnd={handleCompositionEnd}
       onKeyDown={handleKeyDown}

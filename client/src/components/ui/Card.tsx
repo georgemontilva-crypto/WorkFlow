@@ -1,13 +1,13 @@
 /**
- * CARD COMPONENT - Base Card usando Design Tokens
+ * CARD COMPONENT - FASE 3 Refactor
  * 
- * FASE 2: Layout Base
- * Componente base para todo el contenido de la aplicación
- * 
- * REGLAS:
+ * REGLAS ESTRICTAS:
+ * - Fondo: #1B1E24 (--color-bg-card)
+ * - Border: 1px rgba(255,255,255,0.06)
+ * - Radius: 12px (--radius-large ajustado)
+ * - Padding generoso (24px default)
  * - Todo el contenido debe estar dentro de Cards
  * - No debe existir contenido directamente sobre el fondo
- * - Usa tokens del sistema
  */
 
 import { ReactNode } from 'react';
@@ -37,7 +37,7 @@ export function Card({
       className={`
         bg-[var(--color-bg-card)]
         ${noBorder ? '' : 'border border-[var(--color-border-subtle)]'}
-        rounded-[var(--radius-large)]
+        rounded-[12px]
         ${paddingClasses[padding]}
         ${className}
       `}
@@ -45,7 +45,7 @@ export function Card({
         backgroundColor: 'var(--color-bg-card)',
         borderColor: noBorder ? 'transparent' : 'var(--color-border-subtle)',
         borderWidth: noBorder ? '0' : '1px',
-        borderRadius: 'var(--radius-large)',
+        borderRadius: '12px',
       }}
     >
       {children}

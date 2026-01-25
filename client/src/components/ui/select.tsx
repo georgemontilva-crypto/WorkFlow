@@ -1,3 +1,15 @@
+/**
+ * SELECT COMPONENT - FASE 3 Refactor
+ * 
+ * REGLAS ESTRICTAS:
+ * - Fondo trigger: #14161B (--color-bg-secondary)
+ * - Border: 0.7px solid #4ADE80
+ * - Bordes redondeados (--radius-medium: 10px)
+ * - Placeholder tenue (#6B7280)
+ * - Dropdown background: más oscuro que el contenedor (#0E0F12)
+ * - Focus: aumentar intensidad del verde
+ */
+
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
@@ -35,14 +47,40 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "data-[placeholder]:text-muted-foreground/60 [&_svg:not([class*='text-'])]:text-muted-foreground bg-white/5 backdrop-blur-sm border-white/8 hover:bg-white/10 flex w-fit items-center justify-between gap-2 rounded-lg border px-4 py-2 text-sm whitespace-nowrap transition-all duration-300 outline-none focus-visible:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:bg-white/10 aria-invalid:ring-destructive/20 aria-invalid:border-destructive disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-10 data-[size=sm]:h-9 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 shadow-sm",
+        // Base styles
+        "flex w-fit items-center justify-between gap-2 px-4 py-2 text-sm whitespace-nowrap",
+        // Background and border (FASE 3 specs)
+        "bg-[#14161B] border-[0.7px] border-[#4ADE80]",
+        "rounded-[var(--radius-medium)]",
+        // Text
+        "text-white data-[placeholder]:text-[#6B7280]",
+        // Focus state
+        "focus-visible:outline-none focus-visible:border-[#5EF590] focus-visible:ring-2 focus-visible:ring-[#4ADE80]/20 focus-visible:shadow-[0_0_8px_rgba(74,222,128,0.2)]",
+        // Hover state
+        "hover:bg-[#14161B]/80 hover:border-[#5EF590]",
+        // Invalid state
+        "aria-invalid:border-[#EF4444] aria-invalid:ring-[#EF4444]/20",
+        // Disabled state
+        "disabled:cursor-not-allowed disabled:opacity-50",
+        // Size variants
+        "data-[size=default]:h-10 data-[size=sm]:h-9",
+        // Icon styles
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-[#9AA0AA]",
+        // Value styles
+        "*:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2",
+        // Transition
+        "transition-all duration-200",
         className
       )}
+      style={{
+        fontFamily: 'var(--font-family-base)',
+        fontWeight: 'var(--font-weight-normal)',
+      }}
       {...props}
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDownIcon className="size-4 opacity-50" />
+        <ChevronDownIcon className="size-4 opacity-70" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
@@ -60,7 +98,25 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          "bg-[#0D0D0D] border border-white/10 rounded-lg shadow-md text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto",
+          // Background (más oscuro que el módulo - FASE 3 spec)
+          "bg-[#0E0F12] border border-[#4ADE80]/30",
+          "rounded-[var(--radius-medium)]",
+          // Shadow sutil
+          "shadow-[0_4px_12px_rgba(0,0,0,0.3)]",
+          // Text
+          "text-white",
+          // Animations
+          "data-[state=open]:animate-in data-[state=closed]:animate-out",
+          "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+          "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+          "data-[side=bottom]:slide-in-from-top-2",
+          "data-[side=left]:slide-in-from-right-2",
+          "data-[side=right]:slide-in-from-left-2",
+          "data-[side=top]:slide-in-from-bottom-2",
+          // Position
+          "relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem]",
+          "origin-(--radix-select-content-transform-origin)",
+          "overflow-x-hidden overflow-y-auto",
           position === "popper" &&
             "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
           className
@@ -92,7 +148,7 @@ function SelectLabel({
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
-      className={cn("text-muted-foreground px-2 py-1.5 text-xs", className)}
+      className={cn("text-[#9AA0AA] px-2 py-1.5 text-xs font-medium", className)}
       {...props}
     />
   );
@@ -107,14 +163,23 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "focus:bg-white/10 focus:text-foreground hover:bg-white/5 [&_svg:not([class*='text-'])]:text-muted-foreground relative flex w-full cursor-pointer items-center gap-2 rounded-lg py-2 pr-8 pl-3 text-sm outline-hidden select-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        // Base styles
+        "relative flex w-full cursor-pointer items-center gap-2 rounded-lg py-2 pr-8 pl-3 text-sm outline-hidden select-none",
+        // Hover and focus
+        "focus:bg-[#4ADE80]/10 focus:text-white hover:bg-[#4ADE80]/5",
+        // Disabled
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        // Icon styles
+        "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-[#9AA0AA]",
+        // Transition
+        "transition-colors duration-150",
         className
       )}
       {...props}
     >
       <span className="absolute right-2 flex size-3.5 items-center justify-center">
         <SelectPrimitive.ItemIndicator>
-          <CheckIcon className="size-4" />
+          <CheckIcon className="size-4 text-[#4ADE80]" />
         </SelectPrimitive.ItemIndicator>
       </span>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
@@ -129,7 +194,7 @@ function SelectSeparator({
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
-      className={cn("bg-border pointer-events-none -mx-1 my-1 h-px", className)}
+      className={cn("bg-[#4ADE80]/10 pointer-events-none -mx-1 my-1 h-px", className)}
       {...props}
     />
   );
