@@ -88,6 +88,15 @@ export const invoices = mysqlTable("invoices", {
   due_date: timestamp("due_date").notNull(),
   notes: text("notes"),
   terms: text("terms"),
+  
+  /** Recurring invoice fields */
+  is_recurring: int("is_recurring").notNull().default(0),
+  recurrence_frequency: mysqlEnum("recurrence_frequency", ["weekly", "biweekly", "monthly", "quarterly", "semiannually", "annually"]),
+  recurrence_start_date: timestamp("recurrence_start_date"),
+  recurrence_end_date: timestamp("recurrence_end_date"),
+  last_generated_date: timestamp("last_generated_date"),
+  parent_invoice_id: int("parent_invoice_id"),
+  
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
 });

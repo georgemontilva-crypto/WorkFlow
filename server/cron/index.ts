@@ -4,11 +4,14 @@
  */
 
 import { processReminders } from './reminder-processor';
+import { processRecurringInvoices } from './recurring-invoices';
 
-// Interval in milliseconds (5 minutes = 300000 ms)
+// Interval in milliseconds
 const REMINDER_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const RECURRING_INVOICE_CHECK_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours (daily)
 
 let reminderInterval: NodeJS.Timeout | null = null;
+let recurringInvoiceInterval: NodeJS.Timeout | null = null;
 
 /**
  * Start all cron jobs
@@ -28,6 +31,19 @@ export function startCronJobs() {
     
     console.log('[Cron] Reminder processor started (runs every 5 minutes)');
   }
+  
+  // Start recurring invoices processor
+  if (!recurringInvoiceInterval) {
+    // Run immediately on start
+    processRecurringInvoices();
+    
+    // Then run every 24 hours
+    recurringInvoiceInterval = setInterval(() => {
+      processRecurringInvoices();
+    }, RECURRING_INVOICE_CHECK_INTERVAL);
+    
+    console.log('[Cron] Recurring invoices processor started (runs daily)');
+  }
 }
 
 /**
@@ -41,6 +57,12 @@ export function stopCronJobs() {
     reminderInterval = null;
     console.log('[Cron] Reminder processor stopped');
   }
+  
+  if (recurringInvoiceInterval) {
+    clearInterval(recurringInvoiceInterval);
+    recurringInvoiceInterval = null;
+    console.log('[Cron] Recurring invoices processor stopped');
+  }
 }
 
 /**
@@ -49,4 +71,12 @@ export function stopCronJobs() {
 export async function triggerReminderProcessing() {
   console.log('[Cron] Manually triggering reminder processing...');
   await processReminders();
+}
+
+/**
+ * Manually trigger recurring invoices processing (for testing)
+ */
+export async function triggerRecurringInvoicesProcessing() {
+  console.log('[Cron] Manually triggering recurring invoices processing...');
+  await processRecurringInvoices();
 }

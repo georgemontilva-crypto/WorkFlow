@@ -57,6 +57,9 @@ export default function Invoices() {
     due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     notes: '',
     terms: '',
+    is_recurring: false,
+    recurrence_frequency: 'monthly' as 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'semiannually' | 'annually',
+    recurrence_end_date: '',
   });
   
   const [items, setItems] = useState<InvoiceItem[]>([
@@ -146,6 +149,9 @@ export default function Invoices() {
         items: items.filter(item => item.description), // Only non-empty items
         notes: formData.notes || undefined,
         terms: formData.terms || undefined,
+        is_recurring: formData.is_recurring,
+        recurrence_frequency: formData.is_recurring ? formData.recurrence_frequency : undefined,
+        recurrence_end_date: formData.is_recurring && formData.recurrence_end_date ? formData.recurrence_end_date : undefined,
       });
       
       // toast.success('Factura creada exitosamente');
@@ -433,6 +439,62 @@ export default function Invoices() {
                       className="bg-[#222222] border-gray-700 text-white"
                     />
                   </div>
+                </div>
+                
+                {/* Recurring Invoice */}
+                <div className="space-y-4 p-4 bg-[#1a1a1a] border border-gray-800 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="is_recurring"
+                      checked={formData.is_recurring}
+                      onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
+                      className="w-4 h-4 bg-[#222222] border-gray-700 rounded"
+                    />
+                    <Label htmlFor="is_recurring" className="text-white cursor-pointer">
+                      Factura Recurrente
+                    </Label>
+                  </div>
+                  
+                  {formData.is_recurring && (
+                    <div className="grid grid-cols-2 gap-4 mt-3">
+                      <div>
+                        <Label className="text-white text-sm">Frecuencia</Label>
+                        <Select 
+                          value={formData.recurrence_frequency} 
+                          onValueChange={(value: any) => setFormData({ ...formData, recurrence_frequency: value })}
+                        >
+                          <SelectTrigger className="bg-[#222222] border-gray-700 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-[#1a1a1a] border-gray-700">
+                            <SelectItem value="weekly">Semanal</SelectItem>
+                            <SelectItem value="biweekly">Quincenal</SelectItem>
+                            <SelectItem value="monthly">Mensual</SelectItem>
+                            <SelectItem value="quarterly">Trimestral</SelectItem>
+                            <SelectItem value="semiannually">Semestral</SelectItem>
+                            <SelectItem value="annually">Anual</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-white text-sm">Fecha de Fin (Opcional)</Label>
+                        <Input
+                          type="date"
+                          value={formData.recurrence_end_date}
+                          onChange={(e) => setFormData({ ...formData, recurrence_end_date: e.target.value })}
+                          className="bg-[#222222] border-gray-700 text-white"
+                          placeholder="Sin fecha de fin"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {formData.is_recurring && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      Las facturas se generarán automáticamente según la frecuencia seleccionada
+                    </p>
+                  )}
                 </div>
                 
                 {/* Currency Info */}

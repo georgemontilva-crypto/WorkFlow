@@ -36,6 +36,9 @@ const createInvoiceSchema = z.object({
   items: z.array(invoiceItemSchema).min(1, "Debe agregar al menos un ítem"),
   notes: z.string().optional(),
   terms: z.string().optional(),
+  is_recurring: z.boolean().optional(),
+  recurrence_frequency: z.enum(["weekly", "biweekly", "monthly", "quarterly", "semiannually", "annually"]).optional(),
+  recurrence_end_date: z.string().optional(),
 });
 
 export const invoicesRouter = router({
@@ -185,6 +188,12 @@ export const invoicesRouter = router({
           due_date: dueDate,
           notes: input.notes || null,
           terms: input.terms || null,
+          is_recurring: input.is_recurring ? 1 : 0,
+          recurrence_frequency: input.is_recurring ? input.recurrence_frequency : null,
+          recurrence_start_date: input.is_recurring ? issueDate : null,
+          recurrence_end_date: input.is_recurring && input.recurrence_end_date ? new Date(input.recurrence_end_date) : null,
+          last_generated_date: null,
+          parent_invoice_id: null,
         });
         
         const invoiceId = Number(newInvoice.insertId);
