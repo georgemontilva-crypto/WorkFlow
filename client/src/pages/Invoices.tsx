@@ -334,26 +334,30 @@ export default function Invoices() {
   return (
     <DashboardLayout>
       <div className="max-w-[1440px] mx-auto p-6 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-[#EDEDED]">Facturas</h1>
-            <p className="text-[#8B92A8] mt-1">Gestiona tus facturas</p>
-          </div>
-          <Button
-            onClick={handleOpenModal}
-            variant="default"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nueva Factura
-          </Button>
-        </div>
         
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-4 h-4" />
+        {/* Header Card - Isla 1 */}
+        <Card>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold text-[#EDEDED]">Facturas</h1>
+              <p className="text-[#8B92A8] mt-1">Gestiona tus facturas y pagos</p>
+            </div>
+            <Button
+              onClick={handleOpenModal}
+              variant="default"
+              className="w-full md:w-auto"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Nueva Factura
+            </Button>
+          </div>
+        </Card>
+
+        {/* Filters Card - Isla 2 */}
+        <Card>
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
               <Input
                 type="text"
                 placeholder="Buscar por número de factura..."
@@ -362,40 +366,45 @@ export default function Invoices() {
                 className="pl-12 h-12 text-base"
               />
             </div>
+            <Select value={clientFilter.toString()} onValueChange={(value: any) => setClientFilter(value === 'all' ? 'all' : parseInt(value))}>
+              <SelectTrigger className="w-full md:w-[220px] h-12 text-base">
+                <SelectValue placeholder="Filtrar por cliente" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos los clientes</SelectItem>
+                {clients.map(client => (
+                  <SelectItem key={client.id} value={client.id.toString()}>{client.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
+              <SelectTrigger className="w-full md:w-[220px] h-12 text-base">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                <SelectItem value="draft">Borradores</SelectItem>
+                <SelectItem value="sent">Enviadas</SelectItem>
+                <SelectItem value="paid">Pagadas</SelectItem>
+                <SelectItem value="partial">Pago Parcial</SelectItem>
+                <SelectItem value="cancelled">Canceladas</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={clientFilter.toString()} onValueChange={(value: any) => setClientFilter(value === 'all' ? 'all' : parseInt(value))}>
-            <SelectTrigger className="w-full md:w-[220px] h-12 text-base">
-              <SelectValue placeholder="Filtrar por cliente" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos los clientes</SelectItem>
-              {clients.map(client => (
-                <SelectItem key={client.id} value={client.id.toString()}>{client.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
-            <SelectTrigger className="w-full md:w-[220px] h-12 text-base">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              <SelectItem value="draft">Borradores</SelectItem>
-              <SelectItem value="sent">Enviadas</SelectItem>
-              <SelectItem value="paid">Pagadas</SelectItem>
-              <SelectItem value="partial">Pago Parcial</SelectItem>
-              <SelectItem value="cancelled">Canceladas</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        </Card>
         
-        {/* Invoices List */}
-        <div className="bg-[#0A0A0A] rounded-2xl border border-[rgba(255,255,255,0.06)] overflow-hidden">
-          <div className="h-[calc(100vh-320px)] overflow-y-auto p-4 space-y-4">
+        {/* Invoices List Card - Isla 3 */}
+        <Card>
+          <CardHeader
+            title="Facturas"
+            subtitle={`${filteredInvoices.length} factura${filteredInvoices.length !== 1 ? 's' : ''}`}
+          />
+          
+          <div className="space-y-3">
             {filteredInvoices.length === 0 ? (
-            <div className="text-center py-12 bg-[#0A0A0A] rounded-lg border border-[rgba(255,255,255,0.06)]">
-              <p className="text-[#8B92A8]">No hay facturas</p>
-            </div>
+              <div className="py-16 text-center">
+                <p className="text-[#8B92A8] text-base">No se encontraron facturas</p>
+              </div>
           ) : (
             filteredInvoices.map((invoice) => {
               const badge = getStatusBadge(invoice.status);
@@ -591,7 +600,7 @@ export default function Invoices() {
             })
           )}
           </div>
-        </div>
+        </Card>
       </div>
       
       {/* Create Invoice Modal */}
