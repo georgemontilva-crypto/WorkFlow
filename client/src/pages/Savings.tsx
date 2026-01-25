@@ -211,7 +211,7 @@ export default function Savings() {
       <div className="max-w-[1440px] mx-auto p-6 space-y-6">
         {/* Header Card - Isla 1 */}
         <Card>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Metas de Ahorro</h1>
               <p className="text-sm sm:text-base text-[#8B92A8]">
