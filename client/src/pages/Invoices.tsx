@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { Card, CardHeader } from '../components/ui/Card';
-import { Plus, Search, Send, Download, Trash2, Eye, X, MoreVertical, Clock, CheckCircle, DollarSign, AlertCircle, XCircle } from 'lucide-react';
+import { Plus, Search, Send, Download, Trash2, Eye, X, MoreVertical, Clock, CheckCircle, DollarSign, AlertCircle, XCircle, FileText, Calendar } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -404,32 +404,41 @@ export default function Invoices() {
               return (
                 <div
                   key={invoice.id}
-                  className="bg-[#14161B] rounded-[28px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#C4FF3D]/5 hover:border-[#C4FF3D]/20 transition-colors-smooth cursor-pointer group"
+                  className="bg-[#14161B] rounded-[28px] border border-[rgba(255,255,255,0.06)] p-6 hover:bg-[#C4FF3D]/5 hover:border-[#C4FF3D]/20 transition-colors-smooth cursor-pointer group"
                 >
-                  <div className="flex items-center justify-between gap-6">
-                    {/* Información Principal - Izquierda */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-white font-medium text-lg">{invoice.invoice_number}</h3>
-                        <span className={`px-3 py-1.5 rounded-[6px] text-sm font-medium text-white ${badge.color}`}>
-                          {badge.label}
-                        </span>
+                  <div className="flex flex-col md:flex-row md:items-center gap-6">
+                    {/* Columna Izquierda: Icono + Info */}
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="w-12 h-12 rounded-[20px] bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 flex items-center justify-center flex-shrink-0">
+                        <FileText className="w-6 h-6 text-[#C4FF3D]" />
                       </div>
-                      <p className="text-[#8B92A8] text-base mb-1">{client?.name || 'Desconocido'}</p>
-                      <p className="text-[#8B92A8] text-sm">
-                        Vencimiento: {format(new Date(invoice.due_date), 'dd/MM/yyyy')}
-                      </p>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-medium text-[#EDEDED]">{invoice.invoice_number}</h3>
+                        <p className="text-sm text-[#8B92A8]">{client?.name || 'Desconocido'}</p>
+                      </div>
                     </div>
 
-                    {/* Monto - Centro */}
-                    <div className="hidden md:block">
-                      <p className="text-white font-semibold text-xl">
-                        {new Intl.NumberFormat('es-ES', { style: 'currency', currency: invoice.currency }).format(parseFloat(invoice.total))}
-                      </p>
+                    {/* Columna Centro: Monto y Vencimiento */}
+                    <div className="hidden md:flex flex-col gap-2 min-w-[200px]">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-[#8B92A8]" />
+                        <span className="text-sm text-[#EDEDED] font-medium">
+                          {new Intl.NumberFormat('es-ES', { style: 'currency', currency: invoice.currency }).format(parseFloat(invoice.total))}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-[#8B92A8]" />
+                        <span className="text-sm text-[#8B92A8]">
+                          {format(new Date(invoice.due_date), 'dd/MM/yyyy')}
+                        </span>
+                      </div>
                     </div>
-                    
-                    {/* Acciones - Derecha */}
-                    <div className="flex gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+
+                    {/* Columna Derecha: Badge + Acciones */}
+                    <div className="flex items-center gap-3">
+                      <span className={`px-4 py-1.5 rounded-[9999px] text-sm font-medium border ${badge.color === 'bg-green-500' ? 'text-[#C4FF3D] bg-[#C4FF3D]/10 border-[#C4FF3D]/30' : badge.color === 'bg-yellow-500' ? 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30' : badge.color === 'bg-red-500' ? 'text-red-400 bg-red-400/10 border-red-400/30' : 'text-[#8B92A8] bg-[#8B92A8]/10 border-[#8B92A8]/30'}`}>
+                        {badge.label}
+                      </span>
                       <Button
                         size="icon"
                         variant="ghost"
