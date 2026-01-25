@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { getCurrency, formatCurrency as formatCurrencyUtil } from '@shared/currencies';
 import { Badge } from '../components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Finances() {
@@ -523,16 +524,19 @@ export default function Finances() {
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Categoría
                   </label>
-                  <select
+                  <Select
                     value={formData.category}
-                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full bg-[#14161B] border border-[rgba(255,255,255,0.06)] rounded-[9999px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]"
-                    required
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
                   >
-                    {getCategories().map(cat => (
-                      <option key={cat.value} value={cat.value}>{cat.label}</option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="w-full h-12">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getCategories().map(cat => (
+                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 {/* Amount */}
