@@ -24,22 +24,26 @@ export interface ToastProps {
   onClose: (id: string) => void;
 }
 
-const variantStyles: Record<ToastVariant, { icon: React.ComponentType<any>; colors: string }> = {
+const variantStyles: Record<ToastVariant, { icon: React.ComponentType<any>; outline: string; iconColor: string }> = {
   success: {
     icon: CheckCircle2,
-    colors: "shadow-[inset_0_0_0_0.5px_#4ADE80] bg-[#4ADE80]/5 text-[#4ADE80]",
+    outline: "shadow-[inset_0_0_0_0.5px_#C4FF3D]",
+    iconColor: "text-[#C4FF3D]",
   },
   error: {
     icon: AlertCircle,
-    colors: "shadow-[inset_0_0_0_0.5px_#EF4444] bg-[#EF4444]/5 text-[#EF4444]",
+    outline: "shadow-[inset_0_0_0_0.5px_#EF4444]",
+    iconColor: "text-[#EF4444]",
   },
   warning: {
     icon: AlertTriangle,
-    colors: "shadow-[inset_0_0_0_0.5px_#F59E0B] bg-[#F59E0B]/5 text-[#F59E0B]",
+    outline: "shadow-[inset_0_0_0_0.5px_#F59E0B]",
+    iconColor: "text-[#F59E0B]",
   },
   info: {
     icon: Info,
-    colors: "shadow-[inset_0_0_0_0.5px_#8B92A8] bg-[#8B92A8]/5 text-[#8B92A8]",
+    outline: "shadow-[inset_0_0_0_0.5px_#C4FF3D]",
+    iconColor: "text-[#C4FF3D]",
   },
 };
 
@@ -52,7 +56,7 @@ export function Toast({
   onClose,
 }: ToastProps) {
   const [isExiting, setIsExiting] = React.useState(false);
-  const { icon: Icon, colors } = variantStyles[variant];
+  const { icon: Icon, outline, iconColor } = variantStyles[variant];
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -72,16 +76,16 @@ export function Toast({
   return (
     <div
       className={cn(
-        "flex items-start gap-3 p-4 rounded-[28px] bg-[#0A0A0A] min-w-[320px] max-w-[420px]",
+        "flex items-start gap-3 p-4 rounded-[28px] bg-[#121212] min-w-[320px] max-w-[420px]",
         "transition-all duration-300 ease-out",
-        colors,
+        outline,
         isExiting
           ? "opacity-0 translate-x-full"
           : "opacity-100 translate-x-0 animate-slide-in-right"
       )}
     >
       {/* Icon */}
-      <Icon className="w-5 h-5 flex-shrink-0 mt-0.5" />
+      <Icon className={cn("w-5 h-5 flex-shrink-0 mt-0.5", iconColor)} />
 
       {/* Content */}
       <div className="flex-1 min-w-0">
