@@ -403,7 +403,7 @@ export default function Invoices() {
               return (
                 <div
                   key={invoice.id}
-                  className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-6 hover:bg-[#4ADE80]/5 transition-colors cursor-pointer group"
+                  className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#4ADE80]/5 transition-colors cursor-pointer group"
                 >
                   <div className="flex items-center justify-between gap-6">
                     {/* Información Principal - Izquierda */}
@@ -428,12 +428,12 @@ export default function Invoices() {
                     </div>
                     
                     {/* Acciones - Derecha */}
-                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex gap-2 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                       <Button
                         size="icon"
                         variant="ghost"
                         onClick={(e) => { e.stopPropagation(); setViewingInvoice(invoice.id); }}
-                        className="text-[#9AA0AA] hover:text-white"
+                        className="text-[#9AA0AA] hover:text-white min-h-[44px] min-w-[44px]"
                       >
                         <Eye className="w-5 h-5" />
                       </Button>
@@ -443,7 +443,7 @@ export default function Invoices() {
                         variant="ghost"
                         onClick={(e) => { e.stopPropagation(); handleDownloadPDF(invoice.id, invoice.invoice_number); }}
                         disabled={downloadPDFMutation.isLoading}
-                        className="text-[#9AA0AA] hover:text-white disabled:opacity-50"
+                        className="text-[#9AA0AA] hover:text-white disabled:opacity-50 min-h-[44px] min-w-[44px] hidden md:flex"
                       >
                         <Download className="w-5 h-5" />
                       </Button>
@@ -454,7 +454,7 @@ export default function Invoices() {
                           size="icon"
                           variant="ghost"
                           onClick={(e) => { e.stopPropagation(); setOpenDropdownId(openDropdownId === invoice.id ? null : invoice.id); }}
-                          className="text-[#9AA0AA] hover:text-white"
+                          className="text-[#9AA0AA] hover:text-white min-h-[44px] min-w-[44px]"
                         >
                           <MoreVertical className="w-5 h-5" />
                         </Button>

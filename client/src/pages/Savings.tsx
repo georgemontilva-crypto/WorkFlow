@@ -406,7 +406,7 @@ export default function Savings() {
               return (
                 <div 
                   key={goal.id} 
-                  className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-6 hover:bg-[#4ADE80]/5 transition-colors group"
+                  className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#4ADE80]/5 transition-colors group"
                 >
                   <div className="flex items-center justify-between gap-6">
                     {/* Información Principal - Izquierda */}
@@ -456,7 +456,7 @@ export default function Savings() {
                           onClick={() => handleAddAmount(goal)}
                           variant="default"
                           size="sm"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="md:opacity-0 md:group-hover:opacity-100 transition-opacity min-h-[44px]"
                         >
                           <TrendingUp className="w-4 h-4 mr-2" />
                           Agregar
@@ -465,7 +465,7 @@ export default function Savings() {
                       
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-[#9AA0AA] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button variant="ghost" size="icon" className="text-[#9AA0AA] hover:text-white md:opacity-0 md:group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px]">
                             <MoreVertical className="w-5 h-5" />
                           </Button>
                         </DropdownMenuTrigger>

@@ -246,7 +246,7 @@ export default function Finances() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Total Income */}
-          <div className="bg-[#222222] border border-gray-800 rounded-2xl p-6">
+          <div className="bg-[#222222] border border-gray-800 rounded-2xl p-4 md:p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-gray-400 text-sm">Total Ingresos</p>
               <TrendingUp className="w-5 h-5 text-green-500" />
@@ -261,7 +261,7 @@ export default function Finances() {
           </div>
 
           {/* Total Expenses */}
-          <div className="bg-[#222222] border border-gray-800 rounded-2xl p-6">
+          <div className="bg-[#222222] border border-gray-800 rounded-2xl p-4 md:p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-gray-400 text-sm">Total Gastos</p>
               <TrendingDown className="w-5 h-5 text-red-500" />
@@ -272,7 +272,7 @@ export default function Finances() {
           </div>
 
           {/* Balance */}
-          <div className="bg-[#222222] border border-gray-800 rounded-2xl p-6">
+          <div className="bg-[#222222] border border-gray-800 rounded-2xl p-4 md:p-6">
             <div className="flex items-center justify-between mb-2">
               <p className="text-gray-400 text-sm">Balance</p>
               <DollarSign className="w-5 h-5 text-blue-500" />
@@ -379,24 +379,24 @@ export default function Finances() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={handlePreviousMonth}
-                  className="p-1 text-gray-400 hover:text-white transition-colors"
+                  className="p-2 md:p-1 text-gray-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                   title="Mes anterior"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-5 h-5 md:w-4 md:h-4" />
                 </button>
                 <button
                   onClick={handleResetMonth}
-                  className="text-sm text-gray-400 hover:text-white transition-colors min-w-[100px] text-center"
+                  className="text-sm md:text-sm text-gray-400 hover:text-white transition-colors min-w-[100px] text-center min-h-[44px] flex items-center justify-center"
                   title="Volver al mes actual"
                 >
                   {format(selectedMonth, 'MMMM yyyy', { locale: es })}
                 </button>
                 <button
                   onClick={handleNextMonth}
-                  className="p-1 text-gray-400 hover:text-white transition-colors"
+                  className="p-2 md:p-1 text-gray-400 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                   title="Mes siguiente"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-5 h-5 md:w-4 md:h-4" />
                 </button>
               </div>
               <button

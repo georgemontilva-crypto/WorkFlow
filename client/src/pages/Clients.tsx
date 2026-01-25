@@ -217,7 +217,7 @@ export default function Clients() {
             return (
               <div 
                 key={client.id} 
-                className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-6 hover:bg-[#4ADE80]/5 transition-colors cursor-pointer group"
+                className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#4ADE80]/5 transition-colors cursor-pointer group"
               >
                 <div className="flex items-center justify-between gap-6">
                   {/* Información Principal - Izquierda */}
@@ -244,14 +244,14 @@ export default function Clients() {
                   </div>
 
                   {/* Estado y Acciones - Derecha */}
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 md:gap-4">
                     <span className={`inline-flex items-center px-3 py-1.5 rounded-[6px] text-sm font-medium ${statusBadge.color} text-white`}>
                       {statusBadge.label}
                     </span>
                     
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-[#9AA0AA] hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button variant="ghost" size="icon" className="text-[#9AA0AA] hover:text-white md:opacity-0 md:group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px]">
                           <MoreVertical className="w-5 h-5" />
                         </Button>
                       </DropdownMenuTrigger>
