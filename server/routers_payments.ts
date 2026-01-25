@@ -9,7 +9,7 @@
  * - Transactional operations (all or nothing)
  */
 
-import { router, protectedProcedure } from "./trpc";
+import { router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
 import { payments, invoices } from "../drizzle/schema";
