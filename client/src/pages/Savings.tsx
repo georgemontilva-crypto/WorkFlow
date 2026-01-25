@@ -363,9 +363,9 @@ export default function Savings() {
         </Card>
 
         {/* Savings Goals Card - Isla 2 */}
-        <Card>
+        <Card className="py-4">
           {/* Contador */}
-          <div className="mb-6">
+          <div className="mb-4 px-6">
             <p className="text-[#8B92A8] text-sm">{savingsGoals?.length || 0} meta{(savingsGoals?.length || 0) !== 1 ? 's' : ''}</p>
           </div>
 
@@ -408,7 +408,7 @@ export default function Savings() {
               return (
                 <div 
                   key={goal.id} 
-                  className="bg-[#121212] rounded-[28px] border border-[#C4FF3D]/20 p-4 md:p-6 bg-[#C4FF3D]/5 transition-colors-smooth group"
+                  className="bg-[#121212] rounded-[28px] border border-[#C4FF3D]/20 p-4 md:p-6 bg-[#C4FF3D]/5 transition-colors-smooth"
                 >
                   <div className="flex items-center justify-between gap-6">
                     {/* Información Principal - Izquierda */}
@@ -458,7 +458,7 @@ export default function Savings() {
                           onClick={() => handleAddAmount(goal)}
                           variant="default"
                           size="sm"
-                          className="md:opacity-0 md:group-hover:opacity-100 transition-opacity min-h-[44px]"
+                          className="min-h-[44px]"
                         >
                           <TrendingUp className="w-4 h-4 mr-2" />
                           Agregar
@@ -467,7 +467,7 @@ export default function Savings() {
                       
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-[#8B92A8] hover:text-white md:opacity-0 md:group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px]">
+                          <Button variant="ghost" size="icon" className="text-[#8B92A8] hover:text-white min-h-[44px] min-w-[44px]">
                             <MoreVertical className="w-5 h-5" />
                           </Button>
                         </DropdownMenuTrigger>
