@@ -39,18 +39,34 @@ export default function Finances() {
   };
 
   // Prepare data for Tendencia Mensual (Line Chart)
-  const trendData = incomeByMonth.map(item => ({
-    month: formatMonth(item.month, item.year),
-    income: item.income,
-    expenses: 0 // TODO: Add expenses when available
-  }));
+  // Generate all 12 months with data, filling missing months with 0
+  const generateLast12Months = () => {
+    const months = [];
+    const now = new Date();
+    
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const month = date.getMonth() + 1;
+      const year = date.getFullYear();
+      
+      // Find income for this month
+      const monthData = incomeByMonth.find(item => item.month === month && item.year === year);
+      
+      months.push({
+        month: formatMonth(month, year),
+        fullDate: `${year}-${month.toString().padStart(2, '0')}`,
+        income: monthData?.income || 0,
+        expenses: 0 // TODO: Add expenses when available
+      });
+    }
+    
+    return months;
+  };
 
-  // Prepare data for Comparativa Mensual (Bar Chart)
-  const comparativeData = incomeByMonth.slice(-2).map(item => ({
-    month: formatMonth(item.month, item.year),
-    income: item.income,
-    expenses: 0 // TODO: Add expenses when available
-  }));
+  const trendData = generateLast12Months();
+
+  // Prepare data for Comparativa Mensual (Bar Chart) - Last 2 months
+  const comparativeData = trendData.slice(-2);
 
   // Calculate totals
   const totalIncome = summary?.totalIncome || 0;
