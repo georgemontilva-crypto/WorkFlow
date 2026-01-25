@@ -36,9 +36,7 @@ const createInvoiceSchema = z.object({
 });
 
 export const invoicesRouter = router({
-  /**
-   * List all invoices for the authenticated user
-   */
+  // List all invoices for the authenticated user
   list: protectedProcedure
     .input(z.object({
       status: z.enum(["all", "draft", "sent", "paid", "cancelled"]).optional().default("all"),
@@ -68,9 +66,7 @@ export const invoicesRouter = router({
       }
     }),
 
-  /**
-   * Get invoice by ID with items
-   */
+  // Get invoice by ID with items
   getById: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
@@ -110,9 +106,7 @@ export const invoicesRouter = router({
       }
     }),
 
-  /**
-   * Create invoice with validations
-   */
+  // Create invoice with validations
   create: protectedProcedure
     .input(createInvoiceSchema)
     .mutation(async ({ ctx, input }) => {
@@ -231,9 +225,7 @@ export const invoicesRouter = router({
       }
     }),
 
-  /**
-   * Update invoice status
-   */
+  // Update invoice status
   updateStatus: protectedProcedure
     .input(z.object({
       id: z.number(),
@@ -291,9 +283,7 @@ export const invoicesRouter = router({
       }
     }),
 
-  /**
-   * Delete invoice (only if draft)
-   */
+  // Delete invoice (only if draft)
   delete: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
@@ -337,11 +327,8 @@ export const invoicesRouter = router({
         throw new Error(error.message || "Error al eliminar factura");
       }
     }),
-});
 
-  /**
-   * Send invoice by email with PDF attachment
-   */
+  // Send invoice by email with PDF attachment
   sendByEmail: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
@@ -476,9 +463,7 @@ export const invoicesRouter = router({
       }
     }),
 
-  /**
-   * Download invoice PDF
-   */
+  // Download invoice PDF
   downloadPDF: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
@@ -562,3 +547,5 @@ export const invoicesRouter = router({
         throw new Error(error.message || "Error al generar PDF");
       }
     }),
+
+});
