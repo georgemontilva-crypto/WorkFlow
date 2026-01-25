@@ -2,7 +2,7 @@
  * CARD COMPONENT - FASE 3 Refactor
  * 
  * REGLAS ESTRICTAS:
- * - Fondo: #1B1E24 (--color-bg-card)
+ * - Fondo: #121212 (--color-bg-card)
  * - Border: 1px rgba(255,255,255,0.06)
  * - Radius: 28px (--radius-large ultra-redondeado)
  * - Padding generoso (24px default)

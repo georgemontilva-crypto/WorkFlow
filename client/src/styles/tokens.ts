@@ -23,7 +23,7 @@ export const tokens = {
     bg: {
       primary: '#0E0F12',
       secondary: '#14161B',
-      card: '#1B1E24',
+      card: '#121212',
     },
     text: {
       primary: '#EDEDED',
@@ -117,7 +117,7 @@ export const tokens = {
       borderColorFocus: '#4ADE80',
     },
     card: {
-      bg: '#1B1E24',
+      bg: '#121212',
       borderColor: 'rgba(255, 255, 255, 0.06)',
       borderWidth: '1px',
       padding: '1.5rem',     // spacing-6

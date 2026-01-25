@@ -403,7 +403,7 @@ export default function Invoices() {
               return (
                 <div
                   key={invoice.id}
-                  className="bg-[#1B1E24] rounded-[9999px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#C4FF3D]/5 hover:border-[rgba(74,222,128,0.15)] transition-colors-smooth cursor-pointer group"
+                  className="bg-[#121212] rounded-[9999px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#C4FF3D]/5 hover:border-[rgba(74,222,128,0.15)] transition-colors-smooth cursor-pointer group"
                 >
                   <div className="flex items-center justify-between gap-6">
                     {/* Información Principal - Izquierda */}
