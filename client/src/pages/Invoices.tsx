@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
-import { Plus, Search, Send, Download, Trash2, Eye, X } from 'lucide-react';
+import { Plus, Search, Send, Download, Trash2, Eye, X, MoreVertical, Clock, CheckCircle, DollarSign, AlertCircle, XCircle } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -50,6 +50,7 @@ export default function Invoices() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewingInvoice, setViewingInvoice] = useState<number | null>(null);
   const [registeringPaymentFor, setRegisteringPaymentFor] = useState<number | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [paymentFormData, setPaymentFormData] = useState({
     amount: '',
     payment_date: new Date().toISOString().split('T')[0],
@@ -220,6 +221,16 @@ export default function Invoices() {
     } catch (error: any) {
       console.error('Error al marcar como pagada:', error);
       // toast.error(error.message || 'Error al marcar como pagada');
+    }
+  };
+  
+  const handleUpdateStatus = async (id: number, status: 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled') => {
+    try {
+      await updateStatusMutation.mutateAsync({ id, status });
+      utils.invoices.list.invalidate();
+    } catch (error: any) {
+      console.error('Error al actualizar estado:', error);
+      alert('Error al actualizar estado: ' + (error.message || 'Error desconocido'));
     }
   };
   
@@ -416,36 +427,132 @@ export default function Invoices() {
                         <Download className="w-4 h-4" />
                       </Button>
                       
-                      {invoice.status === 'draft' && (
-                        <>
-                          <Button
-                            size="sm"
-                            onClick={() => handleSendEmail(invoice.id)}
-                            disabled={sendEmailMutation.isLoading}
-                            className="bg-[#EBFF57] hover:bg-[#EBFF57]/90 text-black disabled:opacity-50"
-                          >
-                            <Send className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDelete(invoice.id)}
-                            className="border-red-700 text-red-500 hover:bg-red-900/20"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </>
-                      )}
-                      
-                      {invoice.status === 'sent' && (
+                      {/* Actions Dropdown */}
+                      <div className="relative">
                         <Button
                           size="sm"
-                          onClick={() => handleMarkAsPaid(invoice.id)}
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          variant="outline"
+                          onClick={() => setOpenDropdownId(openDropdownId === invoice.id ? null : invoice.id)}
+                          className="border-gray-700 text-white hover:bg-gray-800"
                         >
-                          Marcar Pagada
+                          <MoreVertical className="w-4 h-4" />
                         </Button>
-                      )}
+                        
+                        {openDropdownId === invoice.id && (
+                          <>
+                            {/* Backdrop to close dropdown */}
+                            <div 
+                              className="fixed inset-0 z-10" 
+                              onClick={() => setOpenDropdownId(null)}
+                            />
+                            
+                            {/* Dropdown Menu */}
+                            <div className="absolute right-0 mt-2 w-56 bg-[#1a1a1a] border border-gray-700 rounded-lg shadow-lg z-20 py-1">
+                              {/* Ver Factura */}
+                              <button
+                                onClick={() => {
+                                  setViewingInvoice(invoice.id);
+                                  setOpenDropdownId(null);
+                                }}
+                                className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors"
+                              >
+                                <Eye className="w-4 h-4 text-blue-400" />
+                                Ver Factura
+                              </button>
+                              
+                              {/* Registrar Pago */}
+                              {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
+                                <button
+                                  onClick={() => {
+                                    handleOpenPaymentModal(invoice.id);
+                                    setOpenDropdownId(null);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors"
+                                >
+                                  <DollarSign className="w-4 h-4 text-green-400" />
+                                  Registrar Pago
+                                </button>
+                              )}
+                              
+                              {/* Marcar como Pendiente */}
+                              {invoice.status !== 'draft' && invoice.status !== 'cancelled' && (
+                                <button
+                                  onClick={() => {
+                                    handleUpdateStatus(invoice.id, 'sent');
+                                    setOpenDropdownId(null);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors"
+                                >
+                                  <Clock className="w-4 h-4 text-yellow-400" />
+                                  Marcar como Pendiente
+                                </button>
+                              )}
+                              
+                              {/* Marcar como Pagada */}
+                              {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
+                                <button
+                                  onClick={() => {
+                                    handleMarkAsPaid(invoice.id);
+                                    setOpenDropdownId(null);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors"
+                                >
+                                  <CheckCircle className="w-4 h-4 text-green-400" />
+                                  Marcar como Pagada
+                                </button>
+                              )}
+                              
+                              {/* Enviar por Email */}
+                              {invoice.status === 'draft' && (
+                                <button
+                                  onClick={() => {
+                                    handleSendEmail(invoice.id);
+                                    setOpenDropdownId(null);
+                                  }}
+                                  disabled={sendEmailMutation.isLoading}
+                                  className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors disabled:opacity-50"
+                                >
+                                  <Send className="w-4 h-4 text-blue-400" />
+                                  Enviar por Email
+                                </button>
+                              )}
+                              
+                              {/* Divider */}
+                              {invoice.status !== 'cancelled' && (
+                                <div className="border-t border-gray-700 my-1" />
+                              )}
+                              
+                              {/* Cancelar Factura */}
+                              {invoice.status !== 'cancelled' && (
+                                <button
+                                  onClick={() => {
+                                    handleUpdateStatus(invoice.id, 'cancelled');
+                                    setOpenDropdownId(null);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-900/20 flex items-center gap-3 transition-colors"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                  Cancelar Factura
+                                </button>
+                              )}
+                              
+                              {/* Eliminar (solo draft) */}
+                              {invoice.status === 'draft' && (
+                                <button
+                                  onClick={() => {
+                                    handleDelete(invoice.id);
+                                    setOpenDropdownId(null);
+                                  }}
+                                  className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-900/20 flex items-center gap-3 transition-colors"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                  Eliminar
+                                </button>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
