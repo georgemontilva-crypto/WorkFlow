@@ -437,41 +437,47 @@ export default function Invoices() {
                   
                   <div className="space-y-3">
                     {items.map((item, index) => (
-                      <div key={index} className="grid grid-cols-12 gap-2 items-end">
-                        <div className="col-span-5">
-                          <Input
-                            placeholder="Descripción"
-                            value={item.description}
-                            onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                            className="bg-[#222222] border-gray-700 text-white"
-                          />
-                        </div>
-                        <div className="col-span-2">
-                          <Input
-                            type="number"
-                            placeholder="Cant."
-                            value={item.quantity}
-                            onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
-                            className="bg-[#222222] border-gray-700 text-white"
-                          />
-                        </div>
-                        <div className="col-span-2">
-                          <Input
-                            type="number"
-                            placeholder="Precio"
-                            value={item.unit_price}
-                            onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                            className="bg-[#222222] border-gray-700 text-white"
-                          />
-                        </div>
-                        <div className="col-span-2">
-                          <Input
-                            type="number"
-                            placeholder="Total"
-                            value={item.total}
-                            readOnly
-                            className="bg-[#2a2a2a] border-gray-700 text-white"
-                          />
+                      <div key={index} className="space-y-2">
+                        <div className="grid grid-cols-12 gap-2 items-end">
+                          <div className="col-span-6">
+                            <Label className="text-white text-xs mb-1">Descripción</Label>
+                            <Input
+                              placeholder="Descripción del servicio o producto"
+                              value={item.description}
+                              onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                              className="bg-[#222222] border-gray-700 text-white"
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Label className="text-white text-xs mb-1">Cantidad</Label>
+                            <Input
+                              type="number"
+                              placeholder="1"
+                              value={item.quantity}
+                              onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
+                              className="bg-[#222222] border-gray-700 text-white"
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Label className="text-white text-xs mb-1">Precio Unitario</Label>
+                            <Input
+                              type="number"
+                              placeholder="0.00"
+                              value={item.unit_price}
+                              onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                              className="bg-[#222222] border-gray-700 text-white"
+                            />
+                          </div>
+                          <div className="col-span-2">
+                            <Label className="text-white text-xs mb-1">Total</Label>
+                            <Input
+                              type="number"
+                              placeholder="0.00"
+                              value={item.total}
+                              readOnly
+                              className="bg-[#2a2a2a] border-gray-700 text-white"
+                            />
+                          </div>
                         </div>
                         <div className="col-span-1">
                           {items.length > 1 && (
