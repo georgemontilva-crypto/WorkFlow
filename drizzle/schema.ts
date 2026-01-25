@@ -147,16 +147,26 @@ export type Transaction = typeof transactions.$inferSelect;
 export type InsertTransaction = typeof transactions.$inferInsert;
 
 /**
- * Savings Goals table - stores user savings goals
+ * Savings Goals table - REBUILT: Independent savings module
+ * Each goal has its OWN currency (not inherited from user)
+ * No automatic conversions, no financial impacts
  */
 export const savingsGoals = mysqlTable("savings_goals", {
   id: serial("id").primaryKey(),
   user_id: int("user_id").notNull(),
+  /** Name of the savings goal */
   name: varchar("name", { length: 255 }).notNull(),
+  /** Target amount to save */
   target_amount: decimal("target_amount", { precision: 10, scale: 2 }).notNull(),
+  /** Current saved amount */
   current_amount: decimal("current_amount", { precision: 10, scale: 2 }).notNull().default("0"),
-  currency: varchar("currency", { length: 3 }).notNull().default("USD"),
-  target_date: timestamp("target_date"),
+  /** Currency of THIS goal - MUST be explicitly selected, NO default */
+  currency: varchar("currency", { length: 3 }).notNull(),
+  /** Optional deadline for the goal */
+  deadline: timestamp("deadline"),
+  /** Optional description */
+  description: text("description"),
+  /** Status of the goal */
   status: mysqlEnum("status", ["active", "completed", "cancelled"]).notNull().default("active"),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),

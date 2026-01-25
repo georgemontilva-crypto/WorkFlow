@@ -7,6 +7,7 @@ import * as db from "./db";
 import { getRedisClient } from "./config/redis";
 import { invoicesRouter } from "./routers_invoices";
 import { financesRouter } from "./routers_finances";
+import { savingsRouter } from "./routers_savings";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -713,6 +714,12 @@ export const appRouter = router({
    * Read-only financial analytics based on paid invoices
    */
   finances: financesRouter,
+  
+  /**
+   * Savings router - BUILT FROM SCRATCH
+   * Independent savings goals module with own currency per goal
+   */
+  savings: savingsRouter,
 });
 
 export type AppRouter = typeof appRouter;

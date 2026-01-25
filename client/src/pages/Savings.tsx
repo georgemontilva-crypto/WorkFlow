@@ -42,7 +42,8 @@ type SavingsGoal = {
   target_amount: string;
   current_amount: string;
   currency: string;
-  target_date: Date | null;
+  deadline: Date | null; // Renamed from target_date
+  description: string | null; // New field
   status: 'active' | 'completed' | 'cancelled';
   created_at: Date;
   updated_at: Date;
@@ -54,12 +55,12 @@ export default function Savings() {
   const { primaryCurrency } = useCurrency();
   
   // Fetch savings goals using tRPC
-  const { data: savingsGoals, isLoading } = trpc.savingsGoals.list.useQuery();
+  const { data: savingsGoals, isLoading } = trpc.savings.list.useQuery({ status: 'all' });
   
   // Mutations
-  const createGoal = trpc.savingsGoals.create.useMutation({
+  const createGoal = trpc.savings.create.useMutation({
     onSuccess: () => {
-      utils.savingsGoals.list.invalidate();
+      utils.savings.list.invalidate();
       toast.success('Meta creada exitosamente');
     },
     onError: (error) => {
@@ -67,9 +68,9 @@ export default function Savings() {
     },
   });
   
-  const updateGoal = trpc.savingsGoals.update.useMutation({
+  const updateGoal = trpc.savings.update.useMutation({
     onSuccess: () => {
-      utils.savingsGoals.list.invalidate();
+      utils.savings.list.invalidate();
       toast.success('Meta actualizada exitosamente');
     },
     onError: (error) => {
@@ -77,9 +78,19 @@ export default function Savings() {
     },
   });
   
-  const deleteGoal = trpc.savingsGoals.delete.useMutation({
+  const updateProgress = trpc.savings.updateProgress.useMutation({
     onSuccess: () => {
-      utils.savingsGoals.list.invalidate();
+      utils.savings.list.invalidate();
+      toast.success('Progreso actualizado exitosamente');
+    },
+    onError: (error) => {
+      toast.error('Error al actualizar progreso: ' + error.message);
+    },
+  });
+  
+  const deleteGoal = trpc.savings.delete.useMutation({
+    onSuccess: () => {
+      utils.savings.list.invalidate();
       toast.success('Meta eliminada exitosamente');
     },
     onError: (error) => {
@@ -93,49 +104,46 @@ export default function Savings() {
     name: '',
     target_amount: '',
     current_amount: '',
-    currency: primaryCurrency || 'USD',
-    target_date: '',
+    currency: '', // NO default - must be explicitly selected
+    deadline: '', // Renamed from target_date
+    description: '', // New field
     status: 'active' as 'active' | 'completed' | 'cancelled',
   });
 
-  // Update currency when primaryCurrency loads
-  useEffect(() => {
-    if (primaryCurrency && !editingGoal) {
-      setFormData(prev => ({ ...prev, currency: primaryCurrency }));
-    }
-  }, [primaryCurrency, editingGoal]);
+  // NO auto-assign currency - user MUST explicitly select it
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.target_amount || !formData.target_date) {
+    // Validate required fields
+    if (!formData.name || !formData.target_amount) {
       toast.error('Por favor completa los campos requeridos');
       return;
     }
 
+    // Validate currency is selected
+    if (!formData.currency) {
+      toast.error('Debe seleccionar una moneda');
+      return;
+    }
+
     if (editingGoal) {
-      // Recalcular estado basado en el nuevo objetivo
-      const newCurrentAmount = parseFloat(formData.current_amount) || 0;
-      const newTargetAmount = parseFloat(formData.target_amount) || 0;
-      const newStatus = newCurrentAmount >= newTargetAmount ? 'completed' : 'active';
-      
+      // Update existing goal (cannot change currency)
       updateGoal.mutate({
         id: editingGoal.id,
         name: formData.name,
-        target_amount: formData.target_amount,
-        current_amount: formData.current_amount || '0',
-        currency: formData.currency,
-        target_date: formData.target_date,
-        status: newStatus,
+        target_amount: parseFloat(formData.target_amount),
+        deadline: formData.deadline || undefined,
+        description: formData.description || undefined,
       });
     } else {
+      // Create new goal
       createGoal.mutate({
         name: formData.name,
-        target_amount: formData.target_amount,
-        current_amount: formData.current_amount || '0',
+        target_amount: parseFloat(formData.target_amount),
         currency: formData.currency,
-        target_date: formData.target_date,
-        status: formData.status,
+        deadline: formData.deadline || undefined,
+        description: formData.description || undefined,
       });
     }
 
@@ -145,8 +153,9 @@ export default function Savings() {
       name: '',
       target_amount: '',
       current_amount: '',
-      currency: 'USD',
-      target_date: '',
+      currency: '',
+      deadline: '',
+      description: '',
       status: 'active',
     });
   };
