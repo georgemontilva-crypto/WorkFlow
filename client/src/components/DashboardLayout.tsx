@@ -184,23 +184,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           </Button>
         </div>
 
-        {/* Updates Button */}
-        <div className="mx-3 mb-4">
-          <Link href="/updates">
-            <Button
-              variant="ghost"
-              className={cn(
-                "w-full justify-start",
-                location === '/updates'
-                  ? "bg-accent text-accent-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-              )}
-            >
-              <Bug className="w-4 h-4 mr-2" />
-              Actualizaciones
-            </Button>
-          </Link>
-        </div>
+
 
         {/* Footer */}
         <div className="p-4 border-t border-border">
