@@ -10,6 +10,7 @@ import { financesRouter } from "./routers_finances";
 import { savingsRouter } from "./routers_savings";
 import { notificationsRouter } from "./routers_notifications";
 import { paymentsRouter } from "./routers_payments";
+import { transactionsRouter } from "./routers_transactions";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -735,6 +736,12 @@ export const appRouter = router({
    * Updates invoice status automatically
    */
   payments: paymentsRouter,
+  
+  /**
+   * Transactions Router - Manual income and expense transactions
+   * Independent from invoices, for tracking general finances
+   */
+  transactions: transactionsRouter,
 });
 
 export type AppRouter = typeof appRouter;

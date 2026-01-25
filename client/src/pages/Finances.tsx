@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
-import { Download, TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
+import { Download, TrendingUp, TrendingDown, DollarSign, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { trpc } from '../lib/trpc';
 import { format } from 'date-fns';
@@ -19,15 +19,104 @@ import { Badge } from '../components/ui/badge';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Finances() {
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    type: 'income' as 'income' | 'expense',
+    category: 'other_income' as string,
+    amount: '',
+    description: '',
+    date: new Date().toISOString().split('T')[0],
+  });
+  
   // Get user data
   const { data: user } = trpc.auth.me.useQuery();
   const currency = user?.primary_currency || 'USD';
   
   // Queries
+  const utils = trpc.useContext();
   const { data: summary, isLoading: summaryLoading } = trpc.finances.getSummary.useQuery({ currency });
   const { data: incomeByMonth = [], isLoading: monthLoading } = trpc.finances.getIncomeByMonth.useQuery({ months: 12, currency });
   const { data: expensesByMonth = [], isLoading: expensesLoading } = trpc.finances.getExpensesByMonth?.useQuery?.({ months: 12, currency }) || { data: [], isLoading: false };
   const { data: history = [], isLoading: historyLoading } = trpc.finances.getHistory.useQuery({});
+  
+  // Mutations
+  const createTransactionMutation = trpc.transactions.create.useMutation();
+  
+  // Handlers
+  const handleOpenModal = () => {
+    setFormData({
+      type: 'income',
+      category: 'other_income',
+      amount: '',
+      description: '',
+      date: new Date().toISOString().split('T')[0],
+    });
+    setIsModalOpen(true);
+  };
+  
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    try {
+      const amount = parseFloat(formData.amount);
+      
+      if (isNaN(amount) || amount <= 0) {
+        alert('El monto debe ser mayor a 0');
+        return;
+      }
+      
+      if (!formData.description.trim()) {
+        alert('La descripción es requerida');
+        return;
+      }
+      
+      await createTransactionMutation.mutateAsync({
+        type: formData.type,
+        category: formData.category as any,
+        amount,
+        currency,
+        description: formData.description,
+        date: formData.date,
+      });
+      
+      alert('Transacción creada exitosamente');
+      handleCloseModal();
+      
+      // Invalidate queries to refresh data
+      utils.finances.getSummary.invalidate();
+      utils.finances.getIncomeByMonth.invalidate();
+      utils.finances.getHistory.invalidate();
+    } catch (error: any) {
+      console.error('Error al crear transacción:', error);
+      alert(error.message || 'Error al crear transacción');
+    }
+  };
+  
+  const getCategories = () => {
+    if (formData.type === 'income') {
+      return [
+        { value: 'salary', label: 'Salario' },
+        { value: 'freelance', label: 'Freelance' },
+        { value: 'investment', label: 'Inversión' },
+        { value: 'other_income', label: 'Otro Ingreso' },
+      ];
+    } else {
+      return [
+        { value: 'rent', label: 'Alquiler' },
+        { value: 'utilities', label: 'Servicios' },
+        { value: 'food', label: 'Alimentación' },
+        { value: 'transportation', label: 'Transporte' },
+        { value: 'healthcare', label: 'Salud' },
+        { value: 'entertainment', label: 'Entretenimiento' },
+        { value: 'other_expense', label: 'Otro Gasto' },
+      ];
+    }
+  };
 
   const formatCurrency = (amount: number) => {
     return formatCurrencyUtil(amount, currency);
@@ -114,7 +203,7 @@ export default function Finances() {
             <p className="text-gray-400 mt-1">Control de ingresos y gastos</p>
           </div>
           <Button 
-            onClick={() => {/* TODO: Implement global export */}}
+            onClick={handleOpenModal}
             className="bg-[#EBFF57] hover:bg-[#EBFF57]/90 text-black"
           >
             + Nueva Transacción
@@ -295,6 +384,152 @@ export default function Finances() {
           )}
         </div>
       </div>
+      
+      {/* Nueva Transacción Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1a1a1a] rounded-2xl border border-gray-700 w-full max-w-md">
+            <div className="p-6">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-white">Nueva Transacción</h2>
+                <button
+                  onClick={handleCloseModal}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Tipo
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          type: 'income',
+                          category: 'other_income'
+                        }));
+                      }}
+                      className={`p-3 rounded-lg border transition-colors ${
+                        formData.type === 'income'
+                          ? 'bg-green-500/20 border-green-500 text-green-400'
+                          : 'bg-[#222222] border-gray-700 text-gray-400 hover:border-gray-600'
+                      }`}
+                    >
+                      Ingreso
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData(prev => ({
+                          ...prev,
+                          type: 'expense',
+                          category: 'other_expense'
+                        }));
+                      }}
+                      className={`p-3 rounded-lg border transition-colors ${
+                        formData.type === 'expense'
+                          ? 'bg-red-500/20 border-red-500 text-red-400'
+                          : 'bg-[#222222] border-gray-700 text-gray-400 hover:border-gray-600'
+                      }`}
+                    >
+                      Gasto
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Category */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Categoría
+                  </label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full bg-[#222222] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
+                    required
+                  >
+                    {getCategories().map(cat => (
+                      <option key={cat.value} value={cat.value}>{cat.label}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                {/* Amount */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Monto ({currency})
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.amount}
+                    onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+                    className="w-full bg-[#222222] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
+                    placeholder="0.00"
+                    required
+                  />
+                </div>
+                
+                {/* Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Fecha
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                    className="w-full bg-[#222222] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57]"
+                    required
+                  />
+                </div>
+                
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Descripción
+                  </label>
+                  <textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    className="w-full bg-[#222222] border border-gray-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#EBFF57] resize-none"
+                    rows={3}
+                    placeholder="Descripción de la transacción..."
+                    required
+                  />
+                </div>
+                
+                {/* Actions */}
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="flex-1 px-4 py-2 bg-[#222222] border border-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={createTransactionMutation.isLoading}
+                    className="flex-1 px-4 py-2 bg-[#EBFF57] text-black rounded-lg hover:bg-[#EBFF57]/90 transition-colors disabled:opacity-50"
+                  >
+                    {createTransactionMutation.isLoading ? 'Guardando...' : 'Guardar'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
