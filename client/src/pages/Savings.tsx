@@ -135,12 +135,15 @@ export default function Savings() {
       return;
     }
 
+    // Normalize decimal values (replace comma with dot for parseFloat)
+    const normalizeDecimal = (value: string) => value.replace(',', '.');
+    
     if (editingGoal) {
       // Update existing goal (cannot change currency)
       updateGoal.mutate({
         id: editingGoal.id,
         name: formData.name,
-        target_amount: parseFloat(formData.target_amount),
+        target_amount: parseFloat(normalizeDecimal(formData.target_amount)),
         deadline: formData.deadline || undefined,
         description: formData.description || undefined,
       });
@@ -148,8 +151,8 @@ export default function Savings() {
       // Create new goal
       createGoal.mutate({
         name: formData.name,
-        target_amount: parseFloat(formData.target_amount),
-        current_amount: parseFloat(formData.current_amount) || 0,
+        target_amount: parseFloat(normalizeDecimal(formData.target_amount)),
+        current_amount: parseFloat(normalizeDecimal(formData.current_amount)) || 0,
         currency: formData.currency,
         deadline: formData.deadline || undefined,
         description: formData.description || undefined,
