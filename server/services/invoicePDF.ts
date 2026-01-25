@@ -111,16 +111,6 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<string> {
     doc.setFont('helvetica', 'normal');
     doc.text(data.client.name, 20, yPosition);
     yPosition += 6;
-    if (data.client.company) {
-      doc.text(data.client.company, 20, yPosition);
-      yPosition += 6;
-    }
-    doc.text(data.client.email, 20, yPosition);
-    yPosition += 6;
-    if (data.client.phone) {
-      doc.text(data.client.phone, 20, yPosition);
-      yPosition += 6;
-    }
     
     yPosition += 15;
     
