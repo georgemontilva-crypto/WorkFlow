@@ -9,6 +9,7 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./index.css";
 import "./styles/tokens.css";
+import "./styles/microinteractions.css";
 
 const queryClient = new QueryClient();
 

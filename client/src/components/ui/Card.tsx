@@ -38,6 +38,7 @@ export function Card({
         bg-[var(--color-bg-card)]
         ${noBorder ? '' : 'border border-[var(--color-border-subtle)]'}
         rounded-[12px]
+        transition-colors-smooth
         ${paddingClasses[padding]}
         ${className}
       `}

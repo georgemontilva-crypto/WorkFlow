@@ -1,0 +1,245 @@
+/**
+ * Microinteracciones - Sistema de transiciones sutiles
+ * FASE 6: Fluidez y sensación premium
+ * 
+ * REGLAS:
+ * - Duración: 200-250ms
+ * - Easing: ease-out
+ * - NO rebotes
+ * - NO animaciones exageradas
+ */
+
+:root {
+  /* Timing */
+  --transition-fast: 200ms;
+  --transition-normal: 250ms;
+  
+  /* Easing */
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-out-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Transiciones estándar */
+.transition-smooth {
+  transition: all var(--transition-normal) var(--ease-out);
+}
+
+.transition-colors-smooth {
+  transition: background-color var(--transition-normal) var(--ease-out),
+              border-color var(--transition-normal) var(--ease-out),
+              color var(--transition-normal) var(--ease-out);
+}
+
+.transition-opacity-smooth {
+  transition: opacity var(--transition-fast) var(--ease-out);
+}
+
+.transition-transform-smooth {
+  transition: transform var(--transition-normal) var(--ease-out-smooth);
+}
+
+/* ===== HOVER STATES ===== */
+
+/* Card hover - Glow sutil */
+.card-hover {
+  transition: background-color var(--transition-normal) var(--ease-out),
+              border-color var(--transition-normal) var(--ease-out);
+}
+
+.card-hover:hover {
+  background-color: rgba(74, 222, 128, 0.05);
+  border-color: rgba(74, 222, 128, 0.15);
+}
+
+/* Button hover - Border glow */
+.button-hover {
+  transition: border-color var(--transition-fast) var(--ease-out),
+              box-shadow var(--transition-fast) var(--ease-out),
+              color var(--transition-fast) var(--ease-out);
+}
+
+.button-hover:hover {
+  border-color: #4ADE80;
+  box-shadow: 0 0 12px rgba(74, 222, 128, 0.3);
+  color: #4ADE80;
+}
+
+/* Icon hover - Scale sutil */
+.icon-hover {
+  transition: transform var(--transition-fast) var(--ease-out),
+              color var(--transition-fast) var(--ease-out);
+}
+
+.icon-hover:hover {
+  transform: scale(1.05);
+  color: #EDEDED;
+}
+
+/* ===== ESTADOS ===== */
+
+/* Fade in/out */
+.fade-in {
+  animation: fadeIn var(--transition-normal) var(--ease-out);
+}
+
+.fade-out {
+  animation: fadeOut var(--transition-fast) var(--ease-out);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Slide in from bottom - Modales */
+.slide-in-bottom {
+  animation: slideInBottom var(--transition-normal) var(--ease-out-smooth);
+}
+
+@keyframes slideInBottom {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale in - Dropdowns */
+.scale-in {
+  animation: scaleIn var(--transition-fast) var(--ease-out-smooth);
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== LOADING STATES ===== */
+
+/* Skeleton pulse - Muy sutil */
+.skeleton-pulse {
+  animation: skeletonPulse 2s var(--ease-out) infinite;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Spinner - Rotación suave */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== FOCUS STATES ===== */
+
+/* Focus ring - Accesibilidad */
+.focus-ring {
+  transition: box-shadow var(--transition-fast) var(--ease-out);
+}
+
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.5);
+}
+
+/* ===== DISABLED STATES ===== */
+
+/* Disabled - Transición a gris */
+.disabled-smooth {
+  transition: opacity var(--transition-normal) var(--ease-out),
+              filter var(--transition-normal) var(--ease-out);
+}
+
+.disabled-smooth:disabled {
+  opacity: 0.5;
+  filter: grayscale(0.3);
+  cursor: not-allowed;
+}
+
+/* ===== PROGRESS BARS ===== */
+
+/* Progress bar - Transición suave del width */
+.progress-smooth {
+  transition: width var(--transition-normal) var(--ease-out-smooth);
+}
+
+/* ===== TOOLTIPS ===== */
+
+/* Tooltip - Fade + slide */
+.tooltip {
+  animation: tooltipIn var(--transition-fast) var(--ease-out);
+}
+
+@keyframes tooltipIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== MOBILE OPTIMIZATIONS ===== */
+
+/* Reducir animaciones en mobile si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Desactivar hover en touch devices */
+@media (hover: none) {
+  .card-hover:hover {
+    background-color: inherit;
+    border-color: inherit;
+  }
+  
+  .icon-hover:hover {
+    transform: none;
+  }
+}

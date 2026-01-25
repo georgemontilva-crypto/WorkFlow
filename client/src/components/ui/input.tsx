@@ -83,7 +83,7 @@ function Input({
         // Selection
         "selection:bg-[#4ADE80]/30 selection:text-white",
         // Transition
-        "transition-all duration-200",
+        "transition-colors-smooth",
         className
       )}
       style={{

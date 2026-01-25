@@ -406,7 +406,7 @@ export default function Savings() {
               return (
                 <div 
                   key={goal.id} 
-                  className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#4ADE80]/5 transition-colors group"
+                  className="bg-[#1B1E24] rounded-[12px] border border-[rgba(255,255,255,0.06)] p-4 md:p-6 hover:bg-[#4ADE80]/5 hover:border-[rgba(74,222,128,0.15)] transition-colors-smooth group"
                 >
                   <div className="flex items-center justify-between gap-6">
                     {/* Información Principal - Izquierda */}
