@@ -718,7 +718,7 @@ export default function Invoices() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Client Selection with Search */}
                 <div className="relative">
-                  <Label className="text-white">Cliente *</Label>
+                  <Label className="text-white block mb-2">Cliente *</Label>
                   <div className="relative">
                     <input
                       type="text"
@@ -786,7 +786,7 @@ export default function Invoices() {
                 {/* Dates */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-white">Fecha de Emisión *</Label>
+                    <Label className="text-white block mb-2">Fecha de Emisión *</Label>
                     <Input
                       type="date"
                       value={formData.issue_date}
@@ -795,7 +795,7 @@ export default function Invoices() {
                     />
                   </div>
                   <div>
-                    <Label className="text-white">Fecha de Vencimiento *</Label>
+                    <Label className="text-white block mb-2">Fecha de Vencimiento *</Label>
                     <Input
                       type="date"
                       value={formData.due_date}
@@ -957,26 +957,27 @@ export default function Invoices() {
                   </div>
                 </div>
                 
-                {/* Notes */}
-                <div>
-                  <Label className="text-white">Notas</Label>
-                  <textarea
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="w-full min-h-[80px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2 text-white"
-                    placeholder="Notas adicionales..."
-                  />
-                </div>
-                
-                {/* Terms */}
-                <div>
-                  <Label className="text-white">Términos y Condiciones</Label>
-                  <textarea
-                    value={formData.terms}
-                    onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
-                    className="w-full min-h-[80px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2 text-white"
-                    placeholder="Términos y condiciones..."
-                  />
+                {/* Notes and Terms - Side by Side */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-white block mb-2">Notas</Label>
+                    <textarea
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      className="w-full min-h-[80px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2 text-white"
+                      placeholder="Notas adicionales..."
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label className="text-white block mb-2">Términos y Condiciones</Label>
+                    <textarea
+                      value={formData.terms}
+                      onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
+                      className="w-full min-h-[80px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2 text-white"
+                      placeholder="Términos y condiciones..."
+                    />
+                  </div>
                 </div>
                 
                 {/* Actions */}
