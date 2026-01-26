@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '../components/DashboardLayout';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Card, CardHeader } from '../components/ui/Card';
 import { Plus, Search, Send, Download, Trash2, Eye, X, MoreVertical, Clock, CheckCircle, DollarSign, AlertCircle, XCircle, FileText, Calendar, ChevronDown } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -62,6 +63,15 @@ export default function Invoices() {
   const [selectedClientName, setSelectedClientName] = useState('');
   const [showRecurringModal, setShowRecurringModal] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  
+  // Confirm dialog state
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant?: 'default' | 'danger' | 'success' | 'warning';
+  }>({ isOpen: false, title: '', message: '', onConfirm: () => {}, variant: 'default' });
   
   // Form state
   const [formData, setFormData] = useState({
@@ -318,49 +328,58 @@ export default function Invoices() {
   };
   
   const handleCancel = async (id: number) => {
-    if (!confirm('¿Estás seguro de que deseas cancelar esta factura?')) {
-      return;
-    }
-    
-    try {
-      await updateStatusMutation.mutateAsync({ id, status: 'cancelled' });
-      // toast.success('Factura cancelada');
-      utils.invoices.list.invalidate();
-    } catch (error: any) {
-      console.error('Error al cancelar factura:', error);
-      // toast.error(error.message || 'Error al cancelar factura');
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Cancelar Factura',
+      message: '¿Estás seguro de que deseas cancelar esta factura?',
+      variant: 'warning',
+      onConfirm: async () => {
+        try {
+          await updateStatusMutation.mutateAsync({ id, status: 'cancelled' });
+          utils.invoices.list.invalidate();
+        } catch (error: any) {
+          console.error('Error al cancelar factura:', error);
+        }
+      }
+    });
   };
   
   const handleDelete = async (id: number) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar esta factura?')) {
-      return;
-    }
-    
-    try {
-      await deleteInvoiceMutation.mutateAsync({ id });
-      // toast.success('Factura eliminada');
-      utils.invoices.list.invalidate();
-    } catch (error: any) {
-      console.error('Error al eliminar factura:', error);
-      // toast.error(error.message || 'Error al eliminar factura');
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Eliminar Factura',
+      message: '¿Estás seguro de que deseas eliminar esta factura? Esta acción no se puede deshacer.',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteInvoiceMutation.mutateAsync({ id });
+          utils.invoices.list.invalidate();
+        } catch (error: any) {
+          console.error('Error al eliminar factura:', error);
+        }
+      }
+    });
   };
   
   const handleMarkAsPaid = async (id: number) => {
-    if (!confirm('¿Confirmar que el pago ha sido recibido? Esto marcará la factura como pagada.')) {
-      return;
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Confirmar Pago Recibido',
+      message: '¿Confirmar que el pago ha sido recibido? Esto marcará la factura como pagada.',
+      variant: 'success',
+      onConfirm: async () => {
     
-    try {
-      await updateStatusMutation.mutateAsync({ id, status: 'paid' });
-      success(t('invoices.success.markedAsPaid'));
-      utils.invoices.list.invalidate();
-      setViewingInvoice(null);
-    } catch (error: any) {
-      console.error('Error al confirmar pago:', error);
-      showError(error.message || 'Error al confirmar pago');
-    }
+        try {
+          await updateStatusMutation.mutateAsync({ id, status: 'paid' });
+          success(t('invoices.success.markedAsPaid'));
+          utils.invoices.list.invalidate();
+          setViewingInvoice(null);
+        } catch (error: any) {
+          console.error('Error al confirmar pago:', error);
+          showError(error.message || 'Error al confirmar pago');
+        }
+      }
+    });
   };
   
   const getStatusBadge = (status: string) => {
@@ -1247,6 +1266,15 @@ export default function Invoices() {
         </div>
       )}
       
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+        onConfirm={confirmDialog.onConfirm}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        variant={confirmDialog.variant}
+      />
 
     </DashboardLayout>
   );

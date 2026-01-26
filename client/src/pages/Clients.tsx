@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '../components/DashboardLayout';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Plus, Search, Mail, Phone, Building2, MoreVertical, Archive, Trash2, Edit, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -46,6 +47,14 @@ export default function Clients() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    variant?: 'default' | 'danger' | 'success' | 'warning';
+  }>({ isOpen: false, title: '', message: '', onConfirm: () => {}, variant: 'default' });
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -127,16 +136,20 @@ export default function Clients() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm(t('clients.deleteConfirm'))) {
-      return;
-    }
-    
-    try {
-      await deleteClientMutation.mutateAsync({ id });
-      refetch();
-    } catch (error: any) {
-      console.error('Error al eliminar cliente:', error);
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: t('clients.deleteTitle') || 'Eliminar Cliente',
+      message: t('clients.deleteConfirm'),
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteClientMutation.mutateAsync({ id });
+          refetch();
+        } catch (error: any) {
+          console.error('Error al eliminar cliente:', error);
+        }
+      }
+    });
   };
 
   const filteredClients = clients.filter(client => {
@@ -440,6 +453,16 @@ export default function Clients() {
           </form>
         </DialogContent>
       </Dialog>
+      
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog({ ...confirmDialog, isOpen: false })}
+        onConfirm={confirmDialog.onConfirm}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        variant={confirmDialog.variant}
+      />
     </DashboardLayout>
   );
 }
