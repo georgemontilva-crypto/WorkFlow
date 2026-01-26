@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { ConfirmDialog } from '../components/ConfirmDialog';
-import { Plus, Search, Mail, Phone, Building2, MoreVertical, Archive, Trash2, Edit, X } from 'lucide-react';
+import { Plus, Search, Mail, Phone, Building2, MoreVertical, Archive, Trash2, Edit, X, ChevronDown } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -41,7 +41,8 @@ type Client = {
 };
 
 export default function Clients() {
-    const [searchTerm, setSearchTerm] = useState('');
+  const [expandedClientId, setExpandedClientId] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -223,105 +224,174 @@ export default function Clients() {
                 <p className="text-[#8B92A8] text-base">{'No hay clientes registrados'}</p>
               </div>
             ) : (
-              filteredClients.map((client) => (
-                <div
-                  key={client.id}
-                  className="bg-[#121212] rounded-[28px] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 p-6 transition-all duration-200 cursor-pointer group"
-                >
-                  <div className="flex items-start md:items-center justify-between gap-6">
-                    {/* Left: Client Info */}
-                    <div className="flex-1 min-w-0 space-y-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-[20px] bg-[#C4FF3D]/10 border border-[#C4FF3D]/20 flex items-center justify-center flex-shrink-0">
-                          <Building2 className="w-6 h-6 text-[#C4FF3D]" />
+              filteredClients.map((client) => {
+                const isExpanded = expandedClientId === client.id;
+                
+                return (
+                  <div
+                    key={client.id}
+                    className="bg-[#121212] rounded-[28px] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 transition-all duration-200 group"
+                  >
+                    {/* Header - Always Visible */}
+                    <div 
+                      className="p-6 cursor-pointer"
+                      onClick={() => setExpandedClientId(isExpanded ? null : client.id)}
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        {/* Left: Icon + Name + Company */}
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="w-12 h-12 rounded-[20px] bg-[#C4FF3D]/10 border border-[#C4FF3D]/20 flex items-center justify-center flex-shrink-0">
+                            <Building2 className="w-6 h-6 text-[#C4FF3D]" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-[#EDEDED] font-medium text-base md:text-lg leading-tight truncate">
+                              {client.name}
+                            </h3>
+                            {client.company && (
+                              <p className="text-[#8B92A8] text-sm mt-0.5 truncate">
+                                {client.company}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="text-[#EDEDED] font-medium text-lg leading-tight">
-                            {client.name}
-                          </h3>
-                          {client.company && (
-                            <p className="text-[#8B92A8] text-sm mt-0.5 truncate">
-                              {client.company}
-                            </p>
-                          )}
+
+                        {/* Center: Contact Info (Desktop Only) */}
+                        <div className="hidden md:flex flex-col gap-2 flex-1">
+                          <div className="flex items-center gap-2 text-[#8B92A8]">
+                            <Mail className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm truncate">{client.email}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[#8B92A8]">
+                            <Phone className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">{client.phone}</span>
+                          </div>
                         </div>
-                      </div>
-                    </div>
 
-                    {/* Center: Contact Info (Desktop) */}
-                    <div className="hidden md:flex flex-col gap-2 flex-1">
-                      <div className="flex items-center gap-2 text-[#8B92A8]">
-                        <Mail className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-sm truncate">{client.email}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[#8B92A8]">
-                        <Phone className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-sm">{client.phone}</span>
-                      </div>
-                    </div>
-
-                    {/* Right: Status & Actions */}
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`px-4 py-2 rounded-[9999px] text-sm font-medium ${
-                          client.status === 'active'
-                            ? 'bg-[#C4FF3D]/10 text-[#C4FF3D] border border-[#C4FF3D]/20'
-                            : 'bg-[#8B92A8]/10 text-[#8B92A8] border border-[#8B92A8]/20'
-                        }`}
-                      >
-                        {client.status === 'active' ? 'Activo' : 'Inactivo'}
-                      </span>
-
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-[#8B92A8] hover:text-[#EDEDED] md:opacity-0 md:group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px]"
+                        {/* Right: Status + Chevron (Mobile) / Actions (Desktop) */}
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`px-3 md:px-4 py-1.5 md:py-2 rounded-[9999px] text-xs md:text-sm font-medium whitespace-nowrap ${
+                              client.status === 'active'
+                                ? 'bg-[#C4FF3D]/10 text-[#C4FF3D] border border-[#C4FF3D]/20'
+                                : 'bg-[#8B92A8]/10 text-[#8B92A8] border border-[#8B92A8]/20'
+                            }`}
                           >
-                            <MoreVertical className="w-5 h-5" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-[#0E0F12] border-[#C4FF3D]/30">
-                          <DropdownMenuItem
-                            onClick={() => handleOpenModal(client)}
-                            className="text-[#EDEDED] hover:bg-[#C4FF3D]/10 cursor-pointer"
+                            {client.status === 'active' ? 'Activo' : 'Inactivo'}
+                          </span>
+
+                          {/* Chevron for Mobile */}
+                          <button
+                            className="md:hidden text-[#8B92A8] hover:text-[#EDEDED] p-2 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedClientId(isExpanded ? null : client.id);
+                            }}
+                          >
+                            <ChevronDown 
+                              className={`w-5 h-5 transition-transform duration-200 ${
+                                isExpanded ? 'rotate-180' : ''
+                              }`}
+                            />
+                          </button>
+
+                          {/* Actions Menu for Desktop */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => e.stopPropagation()}
+                                className="hidden md:flex text-[#8B92A8] hover:text-[#EDEDED] opacity-0 group-hover:opacity-100 transition-opacity min-h-[44px] min-w-[44px]"
+                              >
+                                <MoreVertical className="w-5 h-5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="bg-[#0E0F12] border-[#C4FF3D]/30">
+                              <DropdownMenuItem
+                                onClick={() => handleOpenModal(client)}
+                                className="text-[#EDEDED] hover:bg-[#C4FF3D]/10 cursor-pointer"
+                              >
+                                <Edit className="w-4 h-4 mr-2" />
+                                {'Editar'}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleArchive(client.id)}
+                                className="text-[#EDEDED] hover:bg-[#C4FF3D]/10 cursor-pointer"
+                              >
+                                <Archive className="w-4 h-4 mr-2" />
+                                {'Archivar'}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleDelete(client.id)}
+                                className="text-[#EF4444] hover:bg-[#EF4444]/10 cursor-pointer"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                {'Eliminar'}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Expanded Content - Mobile Only */}
+                    {isExpanded && (
+                      <div className="md:hidden px-6 pb-6 pt-0 space-y-4 border-t border-[rgba(255,255,255,0.06)] mt-4">
+                        {/* Contact Info */}
+                        <div className="space-y-3 pt-4">
+                          <div className="flex items-center gap-3 text-[#8B92A8]">
+                            <Mail className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm break-all">{client.email}</span>
+                          </div>
+                          <div className="flex items-center gap-3 text-[#8B92A8]">
+                            <Phone className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">{client.phone}</span>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-2 pt-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenModal(client);
+                            }}
+                            className="flex-1 bg-[#C4FF3D]/10 border-[#C4FF3D]/30 text-[#C4FF3D] hover:bg-[#C4FF3D]/20 h-10"
                           >
                             <Edit className="w-4 h-4 mr-2" />
-                            {'Editar'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleArchive(client.id)}
-                            className="text-[#EDEDED] hover:bg-[#C4FF3D]/10 cursor-pointer"
+                            Editar
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleArchive(client.id);
+                            }}
+                            className="flex-1 bg-[#8B92A8]/10 border-[#8B92A8]/30 text-[#8B92A8] hover:bg-[#8B92A8]/20 h-10"
                           >
                             <Archive className="w-4 h-4 mr-2" />
-                            {'Archivar'}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleDelete(client.id)}
-                            className="text-[#EF4444] hover:bg-[#EF4444]/10 cursor-pointer"
+                            Archivar
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(client.id);
+                            }}
+                            className="bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20 h-10 w-10 flex-shrink-0"
                           >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            {'Eliminar'}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-
-                  {/* Mobile: Contact Info */}
-                  <div className="md:hidden mt-4 pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-2">
-                    <div className="flex items-center gap-2 text-[#8B92A8]">
-                      <Mail className="w-4 h-4 flex-shrink-0" />
-                      <span className="text-sm truncate">{client.email}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[#8B92A8]">
-                      <Phone className="w-4 h-4 flex-shrink-0" />
-                      <span className="text-sm">{client.phone}</span>
-                    </div>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </Card>
