@@ -55,6 +55,9 @@ export default function Invoices() {
   const [viewingInvoice, setViewingInvoice] = useState<number | null>(null);
   const [isCreatingAndSending, setIsCreatingAndSending] = useState(false);
   const [showCreateDropdown, setShowCreateDropdown] = useState(false);
+  const [clientSearchTerm, setClientSearchTerm] = useState('');
+  const [showClientDropdown, setShowClientDropdown] = useState(false);
+  const [selectedClientName, setSelectedClientName] = useState('');
   const [registeringPaymentFor, setRegisteringPaymentFor] = useState<number | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [paymentFormData, setPaymentFormData] = useState({
@@ -122,6 +125,20 @@ export default function Invoices() {
   
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setClientSearchTerm('');
+    setShowClientDropdown(false);
+    setSelectedClientName('');
+    setFormData({
+      client_id: '',
+      issue_date: new Date().toISOString().split('T')[0],
+      due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      notes: '',
+      terms: '',
+      is_recurring: false,
+      recurrence_frequency: 'monthly',
+      recurrence_end_date: '',
+    });
+    setItems([{ description: '', quantity: 1, unit_price: 0, total: 0 }]);
   };
   
   const handleAddItem = () => {
@@ -699,21 +716,71 @@ export default function Invoices() {
               </div>
               
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Client Selection */}
-                <div>
+                {/* Client Selection with Search */}
+                <div className="relative">
                   <Label className="text-white">Cliente *</Label>
-                  <Select value={formData.client_id} onValueChange={(value) => setFormData({ ...formData, client_id: value })}>
-                    <SelectTrigger className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white">
-                      <SelectValue placeholder="Seleccionar cliente" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {clients.map((client) => (
-                        <SelectItem key={client.id} value={client.id.toString()}>
-                          {client.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={selectedClientName || clientSearchTerm}
+                      onChange={(e) => {
+                        setClientSearchTerm(e.target.value);
+                        setSelectedClientName('');
+                        setFormData({ ...formData, client_id: '' });
+                        setShowClientDropdown(true);
+                      }}
+                      onFocus={() => setShowClientDropdown(true)}
+                      placeholder="Buscar por nombre o empresa..."
+                      className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2.5 text-white placeholder:text-[#8B92A8] focus:outline-none focus:border-[rgba(196,255,61,0.3)]"
+                    />
+                    {showClientDropdown && (
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-[#0A0A0A] rounded-[20px] shadow-lg z-50 max-h-[300px] overflow-y-auto" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06), 0 10px 40px rgba(0,0,0,0.5)' }}>
+                        {clients
+                          .filter(client => {
+                            const searchLower = clientSearchTerm.toLowerCase();
+                            return (
+                              client.name.toLowerCase().includes(searchLower) ||
+                              (client.company && client.company.toLowerCase().includes(searchLower))
+                            );
+                          })
+                          .map((client, index, array) => (
+                            <button
+                              key={client.id}
+                              type="button"
+                              onClick={() => {
+                                setFormData({ ...formData, client_id: client.id.toString() });
+                                setSelectedClientName(client.name);
+                                setClientSearchTerm('');
+                                setShowClientDropdown(false);
+                              }}
+                              className={`w-full px-4 py-3 text-left text-white hover:bg-[#121212] transition-colors ${
+                                index === 0 ? 'rounded-t-[20px]' : ''
+                              } ${
+                                index === array.length - 1 ? 'rounded-b-[20px]' : ''
+                              }`}
+                            >
+                              <div>
+                                <p className="font-medium">{client.name}</p>
+                                {client.company && (
+                                  <p className="text-xs text-[#8B92A8]">{client.company}</p>
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        {clients.filter(client => {
+                          const searchLower = clientSearchTerm.toLowerCase();
+                          return (
+                            client.name.toLowerCase().includes(searchLower) ||
+                            (client.company && client.company.toLowerCase().includes(searchLower))
+                          );
+                        }).length === 0 && (
+                          <div className="px-4 py-6 text-center text-[#8B92A8]">
+                            No se encontraron clientes
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 {/* Dates */}
