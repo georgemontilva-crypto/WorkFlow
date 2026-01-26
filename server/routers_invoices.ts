@@ -712,7 +712,7 @@ export const invoicesRouter = router({
         console.log(`[Invoices] Found invoice ${invoice.invoice_number}, saving file...`);
         
         // Save file to filesystem (validates size and type)
-        const { savePaymentReceipt, getPublicUrl } = await import('../services/fileStorage');
+        const { savePaymentReceipt, getPublicUrl } = await import('./services/fileStorage.js');
         const fileData = await savePaymentReceipt(
           invoice.user_id,
           input.proof,
