@@ -697,6 +697,16 @@ export const invoicesRouter = router({
       try {
         const db = await getDb();
         
+        // Validate file size (base64 string length)
+        // TEXT field in MySQL can hold ~64KB, base64 is ~33% larger than original
+        // Limit to ~45KB base64 (~30KB original file)
+        const maxSize = 45000; // characters
+        if (input.proof.length > maxSize) {
+          throw new Error(`El archivo es demasiado grande. Máximo ${Math.floor(maxSize * 0.75 / 1024)}KB`);
+        }
+        
+        console.log(`[Invoices] File size: ${input.proof.length} characters`);
+        
         // Get invoice
         const [invoice] = await db
           .select()
@@ -707,6 +717,8 @@ export const invoicesRouter = router({
         if (!invoice) {
           throw new Error("Factura no encontrada");
         }
+        
+        console.log(`[Invoices] Found invoice ${invoice.invoice_number}, updating...`);
         
         // TODO: Upload file to storage and get URL
         // For now, we'll just store the base64 in the database
@@ -726,17 +738,23 @@ export const invoicesRouter = router({
         
         console.log(`[Invoices] Payment proof uploaded for invoice ${invoice.invoice_number}`);
         
-        // Create notification for user
-        const { notifyPaymentProofUploaded } = await import('./helpers/notificationHelpers');
-        await notifyPaymentProofUploaded(
-          invoice.user_id,
-          invoice.id,
-          invoice.invoice_number
-        );
+        // Create notification for user (non-blocking)
+        try {
+          const { notifyPaymentProofUploaded } = await import('./helpers/notificationHelpers');
+          await notifyPaymentProofUploaded(
+            invoice.user_id,
+            invoice.id,
+            invoice.invoice_number
+          );
+          console.log(`[Invoices] Notification sent`);
+        } catch (notifError: any) {
+          console.error(`[Invoices] Notification error (non-blocking):`, notifError.message);
+          // Don't throw, notification failure shouldn't block the upload
+        }
         
         return { success: true };
       } catch (error: any) {
-        console.error(`[Invoices] UploadPaymentProof error:`, error.message);
+        console.error(`[Invoices] UploadPaymentProof error:`, error.message, error.stack);
         throw new Error(error.message || "Error al subir comprobante");
       }
     }),
