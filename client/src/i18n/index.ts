@@ -4,7 +4,7 @@ import es from './locales/es.json';
 import en from './locales/en.json';
 
 // Get saved language from localStorage or default to Spanish
-const savedLanguage = localStorage.getItem('language') || 'es';
+const savedLanguage = typeof window !== 'undefined' ? (localStorage.getItem('language') || 'es') : 'es';
 
 i18n
   .use(initReactI18next)
