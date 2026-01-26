@@ -19,7 +19,7 @@ export default function PublicInvoice() {
   const [uploading, setUploading] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const { data: invoice, isLoading, error } = trpc.invoices.getByToken.useQuery(
+  const { data: invoice, isLoading, error, refetch } = trpc.invoices.getByToken.useQuery(
     { token: token! },
     { enabled: !!token }
   );
@@ -30,6 +30,8 @@ export default function PublicInvoice() {
       setSelectedFile(null);
       setPaymentReference('');
       setUploading(false);
+      // Refetch invoice data to show updated status
+      refetch();
     },
     onError: (error) => {
       console.error('Error al subir comprobante:', error);

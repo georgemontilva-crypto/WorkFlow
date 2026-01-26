@@ -6,6 +6,7 @@
 
 import { getDb } from '../db';
 import { notifications } from '../../drizzle/schema';
+import { eq, and } from 'drizzle-orm';
 
 type NotificationType = "info" | "success" | "warning" | "error";
 type NotificationSource = "invoice" | "savings" | "system";
@@ -53,11 +54,12 @@ export async function createNotification(params: CreateNotificationParams): Prom
         .select()
         .from(notifications)
         .where(
-          (notifications) => 
-            notifications.user_id.eq(params.user_id)
-            .and(notifications.source.eq(params.source))
-            .and(notifications.source_id.eq(params.source_id))
-            .and(notifications.type.eq(params.type))
+          and(
+            eq(notifications.user_id, params.user_id),
+            eq(notifications.source, params.source),
+            eq(notifications.source_id, params.source_id),
+            eq(notifications.type, params.type)
+          )
         )
         .limit(1);
 
