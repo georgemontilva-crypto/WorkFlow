@@ -11,6 +11,7 @@ import { savingsRouter } from "./routers_savings";
 import { notificationsRouter } from "./routers_notifications";
 import { paymentsRouter } from "./routers_payments";
 import { transactionsRouter } from "./routers_transactions";
+import { translationRouter } from "./modules/translation";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -742,6 +743,12 @@ export const appRouter = router({
    * Independent from invoices, for tracking general finances
    */
   transactions: transactionsRouter,
+  
+  /**
+   * Translation Router - Automatic translation with OpenAI
+   * Cached in Redis for performance and cost optimization
+   */
+  translation: translationRouter,
 });
 
 export type AppRouter = typeof appRouter;
