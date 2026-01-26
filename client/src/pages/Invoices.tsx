@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { Card, CardHeader } from '../components/ui/Card';
-import { Plus, Search, Send, Download, Trash2, Eye, X, MoreVertical, Clock, CheckCircle, DollarSign, AlertCircle, XCircle, FileText, Calendar } from 'lucide-react';
+import { Plus, Search, Send, Download, Trash2, Eye, X, MoreVertical, Clock, CheckCircle, DollarSign, AlertCircle, XCircle, FileText, Calendar, ChevronDown } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -54,6 +54,7 @@ export default function Invoices() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewingInvoice, setViewingInvoice] = useState<number | null>(null);
   const [isCreatingAndSending, setIsCreatingAndSending] = useState(false);
+  const [showCreateDropdown, setShowCreateDropdown] = useState(false);
   const [registeringPaymentFor, setRegisteringPaymentFor] = useState<number | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [paymentFormData, setPaymentFormData] = useState({
@@ -196,8 +197,69 @@ export default function Invoices() {
   
   const handleCreateAndSend = async (e: React.FormEvent) => {
     setIsCreatingAndSending(true);
+    setShowCreateDropdown(false);
     await handleSubmit(e, true);
     setIsCreatingAndSending(false);
+  };
+  
+  const handleCreateAndDownload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsCreatingAndSending(true);
+    setShowCreateDropdown(false);
+    
+    try {
+      // Validate
+      if (!formData.client_id) {
+        showError('Debe seleccionar un cliente');
+        setIsCreatingAndSending(false);
+        return;
+      }
+      
+      if (items.length === 0 || items.every(item => !item.description)) {
+        showError('Debe agregar al menos un ítem');
+        setIsCreatingAndSending(false);
+        return;
+      }
+      
+      // Create invoice as draft
+      const result = await createInvoiceMutation.mutateAsync({
+        client_id: parseInt(formData.client_id),
+        issue_date: formData.issue_date,
+        due_date: formData.due_date,
+        items: items.filter(item => item.description),
+        notes: formData.notes || undefined,
+        terms: formData.terms || undefined,
+        status: 'draft',
+        is_recurring: formData.is_recurring,
+        recurrence_frequency: formData.is_recurring ? formData.recurrence_frequency : undefined,
+        recurrence_end_date: formData.is_recurring && formData.recurrence_end_date ? formData.recurrence_end_date : undefined,
+      });
+      
+      // Download PDF
+      if (result.id) {
+        const pdfResult = await downloadPDFMutation.mutateAsync({ id: result.id });
+        if (pdfResult.pdf) {
+          const link = document.createElement('a');
+          link.href = `data:application/pdf;base64,${pdfResult.pdf}`;
+          link.download = pdfResult.filename;
+          link.click();
+        }
+        success('Factura creada y descargada exitosamente');
+      }
+      
+      handleCloseModal();
+      utils.invoices.list.invalidate();
+    } catch (error: any) {
+      console.error('Error al crear y descargar factura:', error);
+      showError(error.message || 'Error al crear y descargar factura');
+    } finally {
+      setIsCreatingAndSending(false);
+    }
+  };
+  
+  const handleJustCreate = async (e: React.FormEvent) => {
+    setShowCreateDropdown(false);
+    await handleSubmit(e, false);
   };
   
   const handleSendEmail = async (id: number) => {
@@ -851,16 +913,67 @@ export default function Invoices() {
                 </div>
                 
                 {/* Actions */}
-                <div className="flex gap-3 justify-end">
+                <div className="flex gap-3 justify-end items-center">
                   <Button type="button" variant="outline" onClick={handleCloseModal} className="border-[rgba(255,255,255,0.06)] text-white hover:bg-gray-800">
                     Cancelar
                   </Button>
-                  <Button type="submit" variant="secondary">
-                    Guardar Borrador
-                  </Button>
-                  <Button type="button" onClick={handleCreateAndSend} disabled={isCreatingAndSending} variant="default">
-                    {isCreatingAndSending ? 'Enviando...' : 'Crear y Enviar'}
-                  </Button>
+                  
+                  {/* Dropdown Button */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateDropdown(!showCreateDropdown)}
+                      disabled={isCreatingAndSending}
+                      className="px-6 py-2.5 bg-[#C4FF3D] text-black rounded-[9999px] font-medium hover:bg-[#C4FF3D]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      style={{ boxShadow: 'inset 0 0 0 0.5px rgba(0,0,0,0.1)' }}
+                    >
+                      {isCreatingAndSending ? 'Procesando...' : 'Crear Factura'}
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    
+                    {/* Dropdown Menu */}
+                    {showCreateDropdown && (
+                      <div className="absolute right-0 mt-2 w-56 bg-[#0A0A0A] rounded-[20px] shadow-lg z-50" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06), 0 10px 40px rgba(0,0,0,0.5)' }}>
+                        <div className="py-2">
+                          <button
+                            type="button"
+                            onClick={handleCreateAndSend}
+                            className="w-full px-4 py-3 text-left text-white hover:bg-[#121212] transition-colors flex items-center gap-3 rounded-t-[20px]"
+                          >
+                            <Send className="w-4 h-4 text-[#C4FF3D]" />
+                            <div>
+                              <p className="font-medium">Crear y Enviar</p>
+                              <p className="text-xs text-[#8B92A8]">Envía por email al cliente</p>
+                            </div>
+                          </button>
+                          
+                          <button
+                            type="button"
+                            onClick={handleCreateAndDownload}
+                            className="w-full px-4 py-3 text-left text-white hover:bg-[#121212] transition-colors flex items-center gap-3"
+                          >
+                            <Download className="w-4 h-4 text-[#C4FF3D]" />
+                            <div>
+                              <p className="font-medium">Crear y Descargar</p>
+                              <p className="text-xs text-[#8B92A8]">Descarga el PDF automáticamente</p>
+                            </div>
+                          </button>
+                          
+                          <button
+                            type="submit"
+                            onClick={handleJustCreate}
+                            className="w-full px-4 py-3 text-left text-white hover:bg-[#121212] transition-colors flex items-center gap-3 rounded-b-[20px]"
+                          >
+                            <FileText className="w-4 h-4 text-[#C4FF3D]" />
+                            <div>
+                              <p className="font-medium">Solo Crear</p>
+                              <p className="text-xs text-[#8B92A8]">Guarda como borrador</p>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </form>
             </div>
