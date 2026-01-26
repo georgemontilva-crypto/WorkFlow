@@ -209,9 +209,9 @@ export default function Settings() {
       <div className="max-w-[1440px] mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="mb-6 lg:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{t.settings.title}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{'Configuración'}</h1>
           <p className="text-sm sm:text-base text-muted-foreground">
-            {t.settings.subtitle}
+            {'Administra tus preferencias y configuración de cuenta'}
           </p>
         </div>
 
@@ -222,23 +222,23 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground text-base sm:text-lg">
                 <Languages className="w-5 h-5" strokeWidth={1.5} />
-                {t.settings.language}
+                {'Idioma'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                {t.settings.languageSubtitle}
+                {'Selecciona tu idioma preferido'}
               </p>
-              <Select value={language} onValueChange={(value: 'es' | 'en') => setLanguage(value)}>
+              <Select disabled>
                 <SelectTrigger className="w-full bg-background border-border text-foreground h-11">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-popover border-border">
                   <SelectItem value="es" className="text-foreground hover:bg-accent cursor-pointer">
-                    {t.settings.spanish}
+                    {'Español'}
                   </SelectItem>
                   <SelectItem value="en" className="text-foreground hover:bg-accent cursor-pointer">
-                    {t.settings.english}
+                    {'Inglés'}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -343,12 +343,12 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground text-base sm:text-lg">
                 <Database className="w-5 h-5" strokeWidth={1.5} />
-                {t.settings.dataManagement}
+                {'Gestión de Datos'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                {t.settings.dataManagementSubtitle}
+                {'Exporta, importa o elimina tus datos'}
               </p>
               <div className="flex flex-wrap gap-2">
                 <Button
@@ -358,7 +358,7 @@ export default function Settings() {
                   className="border-border text-foreground hover:bg-accent"
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  {t.settings.exportData}
+                  {'Exportar Datos'}
                 </Button>
                 <Button
                   onClick={() => fileInputRef.current?.click()}
@@ -367,7 +367,7 @@ export default function Settings() {
                   className="border-border text-foreground hover:bg-accent"
                 >
                   <Upload className="w-4 h-4 mr-2" />
-                  {t.settings.importData}
+                  {'Importar Datos'}
                 </Button>
                 <input
                   ref={fileInputRef}
