@@ -43,7 +43,7 @@ type Client = {
 export default function Clients() {
   const [expandedClientId, setExpandedClientId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('active');
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -205,10 +205,10 @@ export default function Clients() {
           {/* Filters Section - Pills y Búsqueda */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             {/* Pills de Filtro de Estado */}
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full md:w-auto">
               <button
                 onClick={() => setStatusFilter(statusFilter === 'active' ? 'all' : 'active')}
-                className={`px-6 h-12 rounded-full border transition-all ${
+                className={`flex-1 md:flex-none md:px-6 h-12 rounded-full border transition-all ${
                   statusFilter === 'active'
                     ? 'bg-[#C4FF3D] border-[#C4FF3D] text-[#121212] font-medium'
                     : 'border-[#C4FF3D]/30 text-[#8B92A8] hover:border-[#C4FF3D]/60'
@@ -218,7 +218,7 @@ export default function Clients() {
               </button>
               <button
                 onClick={() => setStatusFilter(statusFilter === 'inactive' ? 'all' : 'inactive')}
-                className={`px-6 h-12 rounded-full border transition-all ${
+                className={`flex-1 md:flex-none md:px-6 h-12 rounded-full border transition-all ${
                   statusFilter === 'inactive'
                     ? 'bg-[#C4FF3D] border-[#C4FF3D] text-[#121212] font-medium'
                     : 'border-[#C4FF3D]/30 text-[#8B92A8] hover:border-[#C4FF3D]/60'
