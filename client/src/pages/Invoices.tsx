@@ -59,15 +59,7 @@ export default function Invoices() {
   const [showClientDropdown, setShowClientDropdown] = useState(false);
   const [selectedClientName, setSelectedClientName] = useState('');
   const [showRecurringModal, setShowRecurringModal] = useState(false);
-  const [registeringPaymentFor, setRegisteringPaymentFor] = useState<number | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
-  const [paymentFormData, setPaymentFormData] = useState({
-    amount: '',
-    payment_date: new Date().toISOString().split('T')[0],
-    method: 'transfer' as 'cash' | 'transfer' | 'card' | 'other',
-    reference: '',
-    notes: '',
-  });
   
   // Form state
   const [formData, setFormData] = useState({
@@ -109,7 +101,6 @@ export default function Invoices() {
   const downloadPDFMutation = trpc.invoices.downloadPDF.useMutation();
   const updateStatusMutation = trpc.invoices.updateStatus.useMutation();
   const deleteInvoiceMutation = trpc.invoices.delete.useMutation();
-  const registerPaymentMutation = trpc.payments.register.useMutation();
   
   // Handlers
   const handleOpenModal = () => {
@@ -354,54 +345,6 @@ export default function Invoices() {
     }
   };
   
-  const handleOpenPaymentModal = (invoiceId: number) => {
-    setRegisteringPaymentFor(invoiceId);
-    setPaymentFormData({
-      amount: '',
-      payment_date: new Date().toISOString().split('T')[0],
-      method: 'transfer',
-      reference: '',
-      notes: '',
-    });
-  };
-  
-  const handleClosePaymentModal = () => {
-    setRegisteringPaymentFor(null);
-  };
-  
-  const handleRegisterPayment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!registeringPaymentFor) return;
-    
-    try {
-      const amount = parseFloat(paymentFormData.amount);
-      
-      if (isNaN(amount) || amount <= 0) {
-        showError('El monto debe ser mayor a 0');
-        return;
-      }
-      
-      await registerPaymentMutation.mutateAsync({
-        invoice_id: registeringPaymentFor,
-        amount,
-        payment_date: paymentFormData.payment_date,
-        method: paymentFormData.method,
-        reference: paymentFormData.reference || undefined,
-        notes: paymentFormData.notes || undefined,
-      });
-      
-      success('Pago registrado exitosamente');
-      handleClosePaymentModal();
-      utils.invoices.list.invalidate();
-      utils.payments.listByInvoice.invalidate();
-      utils.payments.getSummary.invalidate();
-    } catch (error: any) {
-      console.error('Error al registrar pago:', error);
-      showError(error.message || 'Error al registrar pago');
-    }
-  };
-  
   const handleMarkAsPaid = async (id: number) => {
     if (!confirm('¿Confirmar que el pago ha sido recibido? Esto marcará la factura como pagada.')) {
       return;
@@ -603,20 +546,7 @@ export default function Invoices() {
                                 Ver Factura
                               </button>
                               
-                              {/* Registrar Pago */}
-                              {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
-                                <button
-                                  onClick={() => {
-                                    handleOpenPaymentModal(invoice.id);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors"
-                                >
-                                  <DollarSign className="w-4 h-4 text-green-400" />
-                                  Registrar Pago
-                                </button>
-                              )}
-                              
+
                               {/* Marcar como Pendiente */}
                               {invoice.status !== 'draft' && invoice.status !== 'cancelled' && (
                                 <button
@@ -1218,15 +1148,7 @@ export default function Invoices() {
                       </div>
                     </div>
                     
-                    {/* Register Payment Button */}
-                    {viewInvoiceData.status !== 'paid' && viewInvoiceData.status !== 'cancelled' && (
-                      <button
-                        onClick={() => handleOpenPaymentModal(viewInvoiceData.id)}
-                        className="w-full mt-4 px-4 py-2 text-[#C4FF3D] bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 hover:bg-[#C4FF3D]/20 rounded-[9999px] transition-colors font-medium"
-                      >
-                        Registrar Pago
-                      </button>
-                    )}
+
                     
                     {/* Confirm Payment Button (for payment_submitted status) */}
                     {viewInvoiceData.status === 'payment_submitted' && (
@@ -1275,101 +1197,7 @@ export default function Invoices() {
         </div>
       )}
       
-      {/* Register Payment Modal */}
-      {registeringPaymentFor && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0A0A0A] rounded-lg border border-[rgba(255,255,255,0.06)] w-full max-w-md">
-            <form onSubmit={handleRegisterPayment} className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white">Registrar Pago</h2>
-                <button type="button" onClick={handleClosePaymentModal} className="text-[#8B92A8] hover:text-white">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Monto *</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={paymentFormData.amount}
-                    onChange={(e) => setPaymentFormData({ ...paymentFormData, amount: e.target.value })}
-                    className="w-full px-4 py-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
-                    placeholder="0.00"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Fecha de Pago *</label>
-                  <input
-                    type="date"
-                    value={paymentFormData.payment_date}
-                    onChange={(e) => setPaymentFormData({ ...paymentFormData, payment_date: e.target.value })}
-                    className="w-full px-4 py-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Método de Pago *</label>
-                  <select
-                    value={paymentFormData.method}
-                    onChange={(e) => setPaymentFormData({ ...paymentFormData, method: e.target.value as any })}
-                    className="w-full px-4 py-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
-                    required
-                  >
-                    <option value="transfer">Transferencia</option>
-                    <option value="cash">Efectivo</option>
-                    <option value="card">Tarjeta</option>
-                    <option value="other">Otro</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Referencia (opcional)</label>
-                  <input
-                    type="text"
-                    value={paymentFormData.reference}
-                    onChange={(e) => setPaymentFormData({ ...paymentFormData, reference: e.target.value })}
-                    className="w-full px-4 py-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
-                    placeholder="Número de referencia o transacción"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Notas (opcional)</label>
-                  <textarea
-                    value={paymentFormData.notes}
-                    onChange={(e) => setPaymentFormData({ ...paymentFormData, notes: e.target.value })}
-                    className="w-full px-4 py-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg text-white focus:outline-none focus:border-[#DFD0B8]"
-                    rows={3}
-                    placeholder="Notas adicionales sobre el pago"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex gap-3 mt-6">
-                <button
-                  type="button"
-                  onClick={handleClosePaymentModal}
-                  className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={registerPaymentMutation.isPending}
-                  className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50"
-                >
-                  {registerPaymentMutation.isPending ? 'Registrando...' : 'Registrar Pago'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+
     </DashboardLayout>
   );
 }

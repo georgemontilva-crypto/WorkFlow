@@ -299,14 +299,34 @@ export const invoicesRouter = router({
         
         console.log(`[Invoices] Status updated: ${currentStatus} → ${newStatus}`);
         
-        // Create notification if marked as paid
+        // Create transaction and notification if marked as paid
         if (newStatus === 'paid') {
+          // Get client info for description
+          const client = await dbHelpers.getClientById(invoice.client_id, ctx.user.id);
+          
+          // Create income transaction in Finanzas
+          const { transactions } = await import('../drizzle/schema');
+          await db.insert(transactions).values({
+            user_id: ctx.user.id,
+            type: 'income',
+            category: 'freelance',
+            amount: invoice.total,
+            currency: invoice.currency,
+            description: `Pago de factura ${invoice.invoice_number} - ${client?.name || 'Cliente'}`,
+            date: new Date(),
+            status: 'active',
+            invoice_id: input.id,
+          });
+          
+          console.log(`[Invoices] Transaction created for invoice ${invoice.invoice_number}`);
+          
+          // Create notification
           const { notifyInvoicePaid } = await import('../helpers/notificationHelpers');
           await notifyInvoicePaid(
             ctx.user.id,
             input.id,
             invoice.invoice_number,
-            parseFloat(invoice.total_amount),
+            parseFloat(invoice.total),
             invoice.currency
           );
         }
