@@ -44,7 +44,7 @@ export default function Clients() {
   const [expandedClientId, setExpandedClientId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -177,70 +177,75 @@ export default function Clients() {
               <h1 className="text-2xl font-semibold text-[#EDEDED]">{'Clientes'}</h1>
               <p className="text-[#8B92A8] mt-1 hidden md:block">{'Gestiona tu cartera de clientes'}</p>
             </div>
-            {/* Botón circular en móvil, normal en desktop */}
-            <Button
-              onClick={() => handleOpenModal()}
-              variant="default"
-              className="md:w-auto w-12 h-12 md:h-auto rounded-full md:rounded-[9999px] p-0 md:px-4 md:py-2 flex items-center justify-center"
-            >
-              <Plus className="w-5 h-5 md:mr-2" />
-              <span className="hidden md:inline">{'Agregar Cliente'}</span>
-            </Button>
+            {/* Botones circulares en móvil, normales en desktop */}
+            <div className="flex items-center gap-2">
+              {/* Botón de Búsqueda */}
+              <button
+                onClick={() => setIsSearchModalOpen(true)}
+                className="w-12 h-12 rounded-full border border-[#C4FF3D]/30 bg-transparent hover:border-[#C4FF3D]/60 transition-colors flex items-center justify-center md:hidden"
+              >
+                <Search className="w-5 h-5 text-[#C4FF3D]" />
+              </button>
+              
+              {/* Botón de Agregar Cliente */}
+              <Button
+                onClick={() => handleOpenModal()}
+                variant="default"
+                className="md:w-auto w-12 h-12 md:h-auto rounded-full md:rounded-[9999px] p-0 md:px-4 md:py-2 flex items-center justify-center"
+              >
+                <Plus className="w-5 h-5 md:mr-2" />
+                <span className="hidden md:inline">{'Agregar Cliente'}</span>
+              </Button>
+            </div>
           </div>
         </Card>
 
         {/* Clients List Card with Filters */}
         <Card>
-          {/* Filters Section - Optimized for Mobile */}
-          <div className="flex gap-2 mb-6">
-            {/* Filtro de Estados */}
-            <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
-              <SelectTrigger className="w-auto md:w-[220px] h-12 text-base px-4">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{'Todos los estados'}</SelectItem>
-                <SelectItem value="active">{'Activo'}</SelectItem>
-                <SelectItem value="inactive">{'Inactivo'}</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            {/* Búsqueda Colapsable */}
-            <div className="flex-1 flex items-center gap-2">
-              {/* Botón circular de búsqueda en móvil */}
+          {/* Filters Section - Pills y Búsqueda */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            {/* Pills de Filtro de Estado */}
+            <div className="flex gap-2">
               <button
-                onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-                className="md:hidden w-12 h-12 rounded-full border border-[#C4FF3D]/30 bg-[#121212] flex items-center justify-center hover:border-[#C4FF3D]/60 transition-colors"
+                onClick={() => setStatusFilter(statusFilter === 'active' ? 'all' : 'active')}
+                className={`px-6 h-12 rounded-full border transition-all ${
+                  statusFilter === 'active'
+                    ? 'bg-[#C4FF3D] border-[#C4FF3D] text-[#121212] font-medium'
+                    : 'border-[#C4FF3D]/30 text-[#8B92A8] hover:border-[#C4FF3D]/60'
+                }`}
               >
-                <Search className="w-5 h-5 text-[#C4FF3D]" />
+                {'Activo'}
               </button>
-              
-              {/* Input de búsqueda - Siempre visible en desktop, colapsable en móvil */}
-              <div className={`relative flex-1 ${
-                isSearchExpanded ? 'block' : 'hidden md:block'
-              }`}>
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
-                <Input
-                  type="text"
-                  placeholder={'Buscar clientes...'}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-12 text-base"
-                  autoFocus={isSearchExpanded}
-                />
-                {/* Botón para cerrar búsqueda en móvil */}
-                {isSearchExpanded && (
-                  <button
-                    onClick={() => {
-                      setIsSearchExpanded(false);
-                      setSearchTerm('');
-                    }}
-                    className="md:hidden absolute right-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] hover:text-[#EDEDED]"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                )}
-              </div>
+              <button
+                onClick={() => setStatusFilter(statusFilter === 'inactive' ? 'all' : 'inactive')}
+                className={`px-6 h-12 rounded-full border transition-all ${
+                  statusFilter === 'inactive'
+                    ? 'bg-[#C4FF3D] border-[#C4FF3D] text-[#121212] font-medium'
+                    : 'border-[#C4FF3D]/30 text-[#8B92A8] hover:border-[#C4FF3D]/60'
+                }`}
+              >
+                {'Inactivo'}
+              </button>
+            </div>
+            
+            {/* Búsqueda - Solo visible en desktop */}
+            <div className="hidden md:flex relative flex-1">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
+              <Input
+                type="text"
+                placeholder={'Buscar clientes...'}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 h-12 text-base w-full"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] hover:text-[#EDEDED]"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
             </div>
           </div>
           
@@ -550,6 +555,49 @@ export default function Clients() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Search Modal */}
+      <Dialog open={isSearchModalOpen} onOpenChange={setIsSearchModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="text-[#EDEDED]">{'Buscar Clientes'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
+              <Input
+                type="text"
+                placeholder={'Buscar por nombre, empresa o email...'}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 h-12 text-base"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => {
+                  setSearchTerm('');
+                  setIsSearchModalOpen(false);
+                }}
+                className="flex-1 h-12"
+              >
+                {'Limpiar'}
+              </Button>
+              <Button
+                type="button"
+                variant="default"
+                onClick={() => setIsSearchModalOpen(false)}
+                className="flex-1 h-12"
+              >
+                {'Buscar'}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
       
