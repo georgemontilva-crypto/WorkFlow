@@ -389,7 +389,7 @@ export const appRouter = router({
         return { success: true };
       }),
 
-    resendVerificationEmail: publicProcedure
+    resendVerification: publicProcedure
       .input(z.object({ email: z.string().email() }))
       .mutation(async ({ input }) => {
         const { sendVerificationEmail } = await import("./emails/service");
