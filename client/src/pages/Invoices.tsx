@@ -232,17 +232,6 @@ export default function Invoices() {
     }
   };
   
-  const handleMarkAsPaid = async (id: number) => {
-    try {
-      await updateStatusMutation.mutateAsync({ id, status: 'paid' });
-      // toast.success('Factura marcada como pagada');
-      utils.invoices.list.invalidate();
-    } catch (error: any) {
-      console.error('Error al marcar como pagada:', error);
-      // toast.error(error.message || 'Error al marcar como pagada');
-    }
-  };
-  
   const handleUpdateStatus = async (id: number, status: 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled') => {
     try {
       await updateStatusMutation.mutateAsync({ id, status });
