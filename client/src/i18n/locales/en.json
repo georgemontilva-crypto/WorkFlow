@@ -61,7 +61,10 @@
     "finance": "Finance",
     "markets": "Markets",
     "settings": "Settings",
-    "help": "Help"
+    "help": "Help",
+    "management": "MANAGEMENT",
+    "configuration": "CONFIGURATION",
+    "savings": "Savings"
   },
   "auth": {
     "login": "Login",

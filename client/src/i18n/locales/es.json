@@ -61,7 +61,10 @@
     "finance": "Finanzas",
     "markets": "Mercados",
     "settings": "Configuración",
-    "help": "Ayuda"
+    "help": "Ayuda",
+    "management": "GESTIÓN",
+    "configuration": "CONFIGURACIÓN",
+    "savings": "Ahorros"
   },
   "auth": {
     "login": "Iniciar sesión",
