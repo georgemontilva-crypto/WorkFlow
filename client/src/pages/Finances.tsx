@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Finances() {
+  const { t } = useTranslation();
   const { success, error: showError } = useToast();
   
   // Modal state
@@ -73,12 +74,12 @@ export default function Finances() {
       const amount = parseFloat(formData.amount);
       
       if (isNaN(amount) || amount <= 0) {
-        showError('El monto debe ser mayor a 0');
+        showError(t('finances.amountMustBePositive'));
         return;
       }
       
       if (!formData.description.trim()) {
-        showError('La descripción es requerida');
+        showError(t('finances.descriptionRequired'));
         return;
       }
       
@@ -91,7 +92,7 @@ export default function Finances() {
         date: formData.date,
       });
       
-      success('Transacción creada exitosamente');
+      success(t('finances.createdSuccessfully'));
       handleCloseModal();
       
       // Invalidate queries to refresh data
@@ -100,27 +101,27 @@ export default function Finances() {
       utils.finances.getHistory.invalidate();
     } catch (error: any) {
       console.error('Error al crear transacción:', error);
-      showError(error.message || 'Error al crear transacción');
+      showError(error.message || t('finances.errorSaving'));
     }
   };
   
   const getCategories = () => {
     if (formData.type === 'income') {
       return [
-        { value: 'salary', label: 'Salario' },
-        { value: 'freelance', label: 'Freelance' },
-        { value: 'investment', label: 'Inversión' },
-        { value: 'other_income', label: 'Otro Ingreso' },
+        { value: 'salary', label: t('finances.categories.salary') },
+        { value: 'freelance', label: t('finances.categories.freelance') },
+        { value: 'investment', label: t('finances.categories.investment') },
+        { value: 'other_income', label: t('finances.categories.other_income') },
       ];
     } else {
       return [
-        { value: 'rent', label: 'Alquiler' },
-        { value: 'utilities', label: 'Servicios' },
-        { value: 'food', label: 'Alimentación' },
-        { value: 'transportation', label: 'Transporte' },
-        { value: 'healthcare', label: 'Salud' },
-        { value: 'entertainment', label: 'Entretenimiento' },
-        { value: 'other_expense', label: 'Otro Gasto' },
+        { value: 'rent', label: t('finances.categories.rent') },
+        { value: 'utilities', label: t('finances.categories.utilities') },
+        { value: 'food', label: t('finances.categories.food') },
+        { value: 'transportation', label: t('finances.categories.transportation') },
+        { value: 'healthcare', label: t('finances.categories.healthcare') },
+        { value: 'entertainment', label: t('finances.categories.entertainment') },
+        { value: 'other_expense', label: t('finances.categories.other_expense') },
       ];
     }
   };
@@ -202,7 +203,7 @@ export default function Finances() {
   // Export history handler
   const handleExportHistory = () => {
     if (history.length === 0) {
-      showError('No hay transacciones para exportar');
+      showError(t('finances.noTransactionsToExport'));
       return;
     }
 
@@ -374,21 +375,21 @@ export default function Finances() {
                 <button
                   onClick={handlePreviousMonth}
                   className="p-2 md:p-1 text-[#8B92A8] hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                  title="Mes anterior"
+                  title={t('finances.previousMonth')}
                 >
                   <ChevronLeft className="w-5 h-5 md:w-4 md:h-4" />
                 </button>
                 <button
                   onClick={handleResetMonth}
                   className="text-sm md:text-sm text-[#8B92A8] hover:text-white transition-colors min-w-[100px] text-center min-h-[44px] flex items-center justify-center"
-                  title="Volver al mes actual"
+                  title={t('finances.backToCurrentMonth')}
                 >
                   {format(selectedMonth, 'MMMM yyyy', { locale: es })}
                 </button>
                 <button
                   onClick={handleNextMonth}
                   className="p-2 md:p-1 text-[#8B92A8] hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                  title="Mes siguiente"
+                  title={t('finances.nextMonth')}
                 >
                   <ChevronRight className="w-5 h-5 md:w-4 md:h-4" />
                 </button>
@@ -431,7 +432,7 @@ export default function Finances() {
                         <div>
                           <p className="text-white font-semibold">{transaction.client_name}</p>
                           <p className="text-[#8B92A8] text-sm">
-                            {transaction.invoice_number || transaction.category || 'Transacción manual'} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
+                            {transaction.invoice_number || transaction.category || t('finances.manualTransaction')} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
                           </p>
                         </div>
                       </div>
@@ -570,7 +571,7 @@ export default function Finances() {
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[20px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D] resize-none"
                     rows={3}
-                    placeholder="Descripción de la transacción..."
+                    placeholder={t('finances.transactionDescription')}
                     required
                   />
                 </div>
@@ -589,7 +590,7 @@ export default function Finances() {
                   disabled={createTransactionMutation.isPending}
                   className="flex-1 px-4 py-2 bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 text-[#C4FF3D] rounded-[9999px] hover:bg-[#C4FF3D]/20 transition-colors disabled:opacity-50"
                 >
-                  {createTransactionMutation.isPending ? 'Guardando...' : 'Guardar'}
+                  {createTransactionMutation.isPending ? t('finances.saving') : 'Guardar'}
                   </button>
                 </div>
               </form>
