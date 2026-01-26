@@ -470,7 +470,10 @@ export const invoicesRouter = router({
         console.log(`[Invoices] Sending email to ${client.email}`);
         
         // Generate public portal link
-        const publicLink = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/invoice/${invoice.public_token}`;
+        // Use production domain by default, fallback to localhost for development
+        const baseUrl = process.env.FRONTEND_URL || 
+                       (process.env.NODE_ENV === 'production' ? 'https://www.finwrk.app' : 'http://localhost:5000');
+        const publicLink = `${baseUrl}/invoice/${invoice.public_token}`;
         
         // Send email with PDF attachment and public link
         const emailSent = await sendEmail({
