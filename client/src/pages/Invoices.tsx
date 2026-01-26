@@ -1050,7 +1050,7 @@ export default function Invoices() {
                     <SelectTrigger className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)]">
+                    <SelectContent className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] z-[70]">
                       <SelectItem value="weekly">Semanal</SelectItem>
                       <SelectItem value="biweekly">Quincenal</SelectItem>
                       <SelectItem value="monthly">Mensual</SelectItem>
