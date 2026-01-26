@@ -407,9 +407,9 @@ export const invoicesRouter = router({
           throw new Error("Factura no encontrada");
         }
         
-        // Only send draft invoices
-        if (invoice.status !== "draft") {
-          throw new Error("Solo se pueden enviar facturas en borrador");
+        // Only send draft or sent invoices (allow resending)
+        if (invoice.status !== "draft" && invoice.status !== "sent") {
+          throw new Error("Solo se pueden enviar facturas en estado borrador o enviadas. No se pueden reenviar facturas pagadas o canceladas.");
         }
         
         // Get items
