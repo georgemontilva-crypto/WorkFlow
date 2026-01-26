@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../contexts/LanguageContext';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Card, CardHeader } from '../components/ui/Card';
@@ -48,7 +48,7 @@ type InvoiceItem = {
 };
 
 export default function Invoices() {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const { success, error: showError } = useToast();
   
   const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled'>('all');

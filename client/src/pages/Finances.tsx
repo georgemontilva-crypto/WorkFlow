@@ -8,7 +8,7 @@
  */
 
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { Download, TrendingUp, TrendingDown, DollarSign, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Finances() {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const { success, error: showError } = useToast();
   
   // Modal state

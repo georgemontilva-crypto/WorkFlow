@@ -1,40 +1,52 @@
 /**
- * Language Selector Component
- * Allows users to switch between English and Spanish using i18next
+ * Language Selector - Selector de idioma con traducción automática
  */
 
+import { Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useTranslation } from 'react-i18next';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export function LanguageSelector() {
-  const { i18n } = useTranslation();
+  const { language, setLanguage } = useLanguage();
+
+  const languages = [
+    { code: 'es' as const, name: 'Español', flag: '🇪🇸' },
+    { code: 'en' as const, name: 'English', flag: '🇺🇸' },
+  ];
+
+  const currentLanguage = languages.find(l => l.code === language);
 
   return (
-    <div className="flex items-center gap-2 border border-border rounded-lg p-1">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => i18n.changeLanguage('es')}
-        className={`h-8 px-3 text-xs ${
-          i18n.language === 'es' 
-            ? 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground' 
-            : 'text-muted-foreground hover:text-foreground'
-        }`}
-      >
-        ES
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => i18n.changeLanguage('en')}
-        className={`h-8 px-3 text-xs ${
-          i18n.language === 'en' 
-            ? 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground' 
-            : 'text-muted-foreground hover:text-foreground'
-        }`}
-      >
-        EN
-      </Button>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-2"
+        >
+          <Languages className="h-4 w-4" />
+          <span className="hidden sm:inline">{currentLanguage?.flag} {currentLanguage?.name}</span>
+          <span className="sm:hidden">{currentLanguage?.flag}</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {languages.map((lang) => (
+          <DropdownMenuItem
+            key={lang.code}
+            onClick={() => setLanguage(lang.code)}
+            className={language === lang.code ? 'bg-accent' : ''}
+          >
+            <span className="mr-2">{lang.flag}</span>
+            {lang.name}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

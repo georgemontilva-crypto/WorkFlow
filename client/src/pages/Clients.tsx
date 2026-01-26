@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Plus, Search, Mail, Phone, Building2, MoreVertical, Archive, Trash2, Edit, X } from 'lucide-react';
@@ -42,7 +42,7 @@ type Client = {
 };
 
 export default function Clients() {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);

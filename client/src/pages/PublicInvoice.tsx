@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRoute } from 'wouter';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Upload, Download, CheckCircle, AlertCircle, FileText, Building2, DollarSign, Calendar } from 'lucide-react';
@@ -13,7 +13,7 @@ import { format } from 'date-fns';
 import Toast from '@/components/Toast';
 
 export default function PublicInvoice() {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [, params] = useRoute('/invoice/:token');
   const token = params?.token;
   

@@ -8,7 +8,7 @@ import { Users, Settings, Menu, X, LogOut, FileText, TrendingUp, Target } from '
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
-import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 import { useState } from 'react';
 import { useAuth } from '@/_core/hooks/useAuth';
@@ -19,7 +19,7 @@ import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   
   // Auth and access control
   const { user, isAuthenticated, logout } = useAuth();
@@ -34,19 +34,19 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Navigation organized by sections
   const navigationSections = [
     {
-      title: t('navigation.management', 'GESTIÓN'),
+      title: 'GESTIÓN',
       items: [
-        { name: t('navigation.clients'), href: '/clients', icon: Users },
-        { name: t('navigation.invoices'), href: '/invoices', icon: FileText },
-        { name: t('navigation.finance'), href: '/finances', icon: TrendingUp },
-        { name: t('navigation.savings', 'Ahorros'), href: '/savings', icon: Target },
+        { name: t('Clientes'), href: '/clients', icon: Users },
+        { name: t('Facturas'), href: '/invoices', icon: FileText },
+        { name: t('Finanzas'), href: '/finances', icon: TrendingUp },
+        { name: t('Ahorros'), href: '/savings', icon: Target },
       ]
     },
   ];
 
   // Settings at the bottom (separate)
   const settingsItems = [
-    { name: t('navigation.settings'), href: '/settings', icon: Settings },
+    { name: t('Configuración'), href: '/settings', icon: Settings },
   ];
 
   return (
@@ -110,7 +110,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           <div className="mt-auto pt-4 border-t border-border">
             <div className="px-3 mb-2">
               <h3 className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider">
-                {t('navigation.configuration', 'CONFIGURACIÓN')}
+                CONFIGURACIÓN
               </h3>
             </div>
             <div className="space-y-0.5">
@@ -143,7 +143,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             className="w-full justify-start text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
           >
             <LogOut className="w-4 h-4 mr-2" />
-            {t('common.logout')}
+            {t('Cerrar sesión')}
           </Button>
         </div>
 
