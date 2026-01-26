@@ -108,7 +108,7 @@ export function getPasswordResetEmailTemplate(userName: string, resetLink: strin
     `,
     ctaText: 'Restablecer Contraseña',
     ctaUrl: resetLink,
-    expirationTime: '1 hour',
+    expirationTime: '1 hora',
     footerNote: 'Si no solicitaste restablecer tu contraseña, puedes ignorar este correo de forma segura.',
     showAlternativeLink: true,
   });

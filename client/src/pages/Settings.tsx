@@ -383,7 +383,7 @@ export default function Settings() {
                   className="border-destructive text-destructive hover:bg-destructive/10"
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Delete All
+                  Eliminar Todo
                 </Button>
               </div>
             </CardContent>
@@ -395,18 +395,18 @@ export default function Settings() {
               <CardTitle className="flex items-center justify-between text-foreground text-base sm:text-lg">
                 <div className="flex items-center gap-2">
                   <Shield className="w-5 h-5" strokeWidth={1.5} />
-                  Two-Factor Authentication
+                  Autenticación de Dos Factores
                 </div>
                 {user?.two_factor_enabled && (
                   <Badge className="bg-green-500/10 hover:bg-green-500/20 text-green-500 border border-green-500/30">
-                    Active
+                    Activo
                   </Badge>
                 )}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Add an extra layer of security to your account
+                Agrega una capa adicional de seguridad a tu cuenta
               </p>
               
               {user?.two_factor_enabled ? (
@@ -414,7 +414,7 @@ export default function Settings() {
                   {!show2FADisable ? (
                     <>
                       <div className="flex items-center justify-between p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
-                        <span className="text-sm font-medium text-foreground">2FA Enabled</span>
+                        <span className="text-sm font-medium text-foreground">2FA Activado</span>
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       </div>
                       <Button
@@ -423,7 +423,7 @@ export default function Settings() {
                         size="sm"
                         className="w-full border-destructive text-destructive hover:bg-destructive/10"
                       >
-                        Disable 2FA
+                        Desactivar 2FA
                       </Button>
                     </>
                   ) : (
@@ -433,10 +433,10 @@ export default function Settings() {
                           <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                           <div>
                             <p className="text-sm font-medium text-foreground mb-1">
-                              Disable Two-Factor Authentication
+                              Desactivar Autenticación de Dos Factores
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              Enter your password and current 2FA code to disable
+                              Ingresa tu contraseña y código 2FA actual para desactivar
                             </p>
                           </div>
                         </div>
@@ -482,7 +482,7 @@ export default function Settings() {
                           variant="outline"
                           className="border-border"
                         >
-                          Cancel
+                          Cancelar
                         </Button>
                       </div>
                     </div>
@@ -530,7 +530,7 @@ export default function Settings() {
                       variant="outline"
                       className="border-border"
                     >
-                      Cancel
+                      Cancelar
                     </Button>
                   </div>
                 </div>
@@ -542,7 +542,7 @@ export default function Settings() {
                   disabled={generate2FAMutation.isPending}
                 >
                   <Shield className="w-4 h-4 mr-2" />
-                  Enable 2FA
+                  Activar 2FA
                 </Button>
               )}
             </CardContent>
@@ -553,18 +553,18 @@ export default function Settings() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-foreground text-base sm:text-lg">
                 <Key className="w-5 h-5" strokeWidth={1.5} />
-                Change Password
+                Cambiar Contraseña
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Update your password regularly for better security
+                Actualiza tu contraseña regularmente para mayor seguridad
               </p>
               
               {showPasswordChange ? (
                 <div className="space-y-3">
                   <div className="space-y-2">
-                    <Label htmlFor="old-password" className="text-foreground">Current Password</Label>
+                    <Label htmlFor="old-password" className="text-foreground">Contraseña Actual</Label>
                     <Input
                       id="old-password"
                       type="password"
@@ -574,7 +574,7 @@ export default function Settings() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="new-password" className="text-foreground">New Password</Label>
+                    <Label htmlFor="new-password" className="text-foreground">Nueva Contraseña</Label>
                     <Input
                       id="new-password"
                       type="password"
@@ -584,7 +584,7 @@ export default function Settings() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-password" className="text-foreground">Confirm Password</Label>
+                    <Label htmlFor="confirm-password" className="text-foreground">Confirmar Contraseña</Label>
                     <Input
                       id="confirm-password"
                       type="password"
@@ -600,7 +600,7 @@ export default function Settings() {
                       className="flex-1 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                       disabled={changePasswordMutation.isPending}
                     >
-                      Update Password
+                      Actualizar Contraseña
                     </Button>
                     <Button
                       onClick={() => {
@@ -612,7 +612,7 @@ export default function Settings() {
                       variant="outline"
                       className="border-border"
                     >
-                      Cancel
+                      Cancelar
                     </Button>
                   </div>
                 </div>
@@ -623,7 +623,7 @@ export default function Settings() {
                   className="w-full border-border text-foreground hover:bg-accent"
                 >
                   <Key className="w-4 h-4 mr-2" />
-                  Change Password
+                  Cambiar Contraseña
                 </Button>
               )}
             </CardContent>

@@ -116,7 +116,7 @@ export function getBaseEmailTemplate(options: EmailTemplateOptions): string {
                   <tr>
                     <td style="padding:16px 20px;">
                       <p style="margin:0; font-size:13px; line-height:1.5; color:#666666; text-align:center;">
-                        ${expirationTime ? `This link will expire in <strong style="color:#888888;">${expirationTime}</strong>. ` : ''}
+                        ${expirationTime ? `Este enlace expirará en <strong style="color:#888888;">${expirationTime}</strong>. ` : ''}
                         ${footerNote || ''}
                       </p>
                     </td>
@@ -131,7 +131,7 @@ export function getBaseEmailTemplate(options: EmailTemplateOptions): string {
             <tr>
               <td align="center" style="padding:0 32px 30px 32px;">
                 <p style="margin:0 0 8px 0; font-size:12px; line-height:1.5; color:#555555;">
-                  Or copy and paste this link:
+                  O copia y pega este enlace:
                 </p>
                 <p style="margin:0; font-size:12px; line-height:1.5; color:#666666; word-break:break-all; 
                           background:rgba(255,255,255,0.03); padding:12px 16px; border-radius:8px;">
@@ -154,7 +154,7 @@ export function getBaseEmailTemplate(options: EmailTemplateOptions): string {
                   Finwrk
                 </p>
                 <p style="margin:0; font-size:11px; color:#444444;">
-                  Financial Management for Freelancers
+                  Gestión Financiera para Freelancers
                 </p>
               </td>
             </tr>
