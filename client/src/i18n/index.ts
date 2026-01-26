@@ -1,7 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import es from './locales/es.json';
-import en from './locales/en.json';
+import es from './locales/es.json' assert { type: 'json' };
+import en from './locales/en.json' assert { type: 'json' };
 
 // Get saved language from localStorage or default to Spanish
 const savedLanguage = typeof window !== 'undefined' ? (localStorage.getItem('language') || 'es') : 'es';
