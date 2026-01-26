@@ -754,8 +754,7 @@ export const invoicesRouter = router({
         // Send email notification to user (non-blocking)
         try {
           // Get user and client data for email
-          const { getUserById } = await import('./helpers/dbHelpers');
-          const { getClientById } = await import('./helpers/dbHelpers');
+          const { getUserById, getClientById } = await import('./db');
           const { sendEmail, getPaymentProofReceivedEmailTemplate } = await import('./_core/email');
           
           const user = await getUserById(invoice.user_id);
@@ -772,7 +771,7 @@ export const invoicesRouter = router({
             
             const emailSent = await sendEmail({
               to: user.email,
-              subject: `📩 Comprobante recibido - Factura ${invoice.invoice_number}`,
+              subject: `Comprobante recibido - Factura ${invoice.invoice_number}`,
               html: emailHtml,
             });
             

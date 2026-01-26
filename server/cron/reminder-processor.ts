@@ -161,7 +161,7 @@ async function sendReminderEmail(reminder: any) {
 
     const success = await sendEmail({
       to: user.email,
-      subject: `🔔 Recordatorio: ${reminder.title}`,
+      subject: `Recordatorio: ${reminder.title}`,
       html: emailHtml,
     });
 
