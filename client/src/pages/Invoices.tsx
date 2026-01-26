@@ -511,7 +511,7 @@ export default function Invoices() {
 
                     {/* Columna Derecha: Badge + Acciones */}
                     <div className="flex items-center gap-3">
-                      <span className={`px-4 py-1.5 rounded-[9999px] text-sm font-medium border ${badge.color === 'bg-green-500' ? 'text-[#C4FF3D] bg-[#C4FF3D]/10 border-[#C4FF3D]/30' : badge.color === 'bg-yellow-500' ? 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30' : badge.color === 'bg-red-500' ? 'text-red-400 bg-red-400/10 border-red-400/30' : 'text-[#8B92A8] bg-[#8B92A8]/10 border-[#8B92A8]/30'}`}>
+                      <span className={`px-4 py-1.5 rounded-[9999px] text-sm font-medium border min-w-[160px] text-center ${badge.color === 'bg-green-500' ? 'text-[#C4FF3D] bg-[#C4FF3D]/10 border-[#C4FF3D]/30' : badge.color === 'bg-yellow-500' ? 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30' : badge.color === 'bg-red-500' ? 'text-red-400 bg-red-400/10 border-red-400/30' : 'text-[#8B92A8] bg-[#8B92A8]/10 border-[#8B92A8]/30'}`}>
                         {badge.label}
                       </span>
                       <Button
