@@ -257,7 +257,7 @@ export default function Finances() {
               <p className="text-[#8B92A8] text-sm">Total Ingresos</p>
               <TrendingUp className="w-5 h-5 text-green-500" />
             </div>
-            <p className="text-3xl font-bold text-white">{formatCurrency(summary?.total_income || 0)}</p>
+            <p className="text-3xl font-bold text-white">{formatCurrency(summary?.totalIncome || 0)}</p>
           </div>
 
           {/* Total Expenses */}
