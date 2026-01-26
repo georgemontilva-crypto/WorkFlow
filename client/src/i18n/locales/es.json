@@ -126,7 +126,15 @@
     "deleteSuccess": "Cliente eliminado exitosamente",
     "deleteConfirm": "¿Estás seguro de que deseas eliminar este cliente?",
     "archive": "Archivar",
-    "unarchive": "Desarchivar"
+    "unarchive": "Desarchivar",
+    "subtitle": "Gestiona tu cartera de clientes",
+    "clients": "clientes",
+    "client": "cliente",
+    "namePlaceholder": "Ej: Juan Pérez",
+    "companyPlaceholder": "Ej: Acme Corp",
+    "emailPlaceholder": "correo@ejemplo.com",
+    "phonePlaceholder": "+1 234 567 8900",
+    "notesPlaceholder": "Información adicional sobre el cliente..."
   },
   "invoices": {
     "title": "Facturas",

@@ -126,7 +126,15 @@
     "deleteSuccess": "Client deleted successfully",
     "deleteConfirm": "Are you sure you want to delete this client?",
     "archive": "Archive",
-    "unarchive": "Unarchive"
+    "unarchive": "Unarchive",
+    "subtitle": "Manage your client portfolio",
+    "clients": "clients",
+    "client": "client",
+    "namePlaceholder": "E.g.: John Doe",
+    "companyPlaceholder": "E.g.: Acme Corp",
+    "emailPlaceholder": "email@example.com",
+    "phonePlaceholder": "+1 234 567 8900",
+    "notesPlaceholder": "Additional information about the client..."
   },
   "invoices": {
     "title": "Invoices",
