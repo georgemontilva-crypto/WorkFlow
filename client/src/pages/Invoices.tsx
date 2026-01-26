@@ -805,61 +805,7 @@ export default function Invoices() {
                   </div>
                 </div>
                 
-                {/* Recurring Invoice */}
-                <div className="space-y-4 p-4 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      id="is_recurring"
-                      checked={formData.is_recurring}
-                      onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
-                      className="w-4 h-4 bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] rounded"
-                    />
-                    <Label htmlFor="is_recurring" className="text-white cursor-pointer">
-                      Factura Recurrente
-                    </Label>
-                  </div>
-                  
-                  {formData.is_recurring && (
-                    <div className="grid grid-cols-2 gap-4 mt-3">
-                      <div>
-                        <Label className="text-white text-sm">Frecuencia</Label>
-                        <Select 
-                          value={formData.recurrence_frequency} 
-                          onValueChange={(value: any) => setFormData({ ...formData, recurrence_frequency: value })}
-                        >
-                          <SelectTrigger className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)]">
-                            <SelectItem value="weekly">Semanal</SelectItem>
-                            <SelectItem value="biweekly">Quincenal</SelectItem>
-                            <SelectItem value="monthly">Mensual</SelectItem>
-                            <SelectItem value="quarterly">Trimestral</SelectItem>
-                            <SelectItem value="semiannually">Semestral</SelectItem>
-                            <SelectItem value="annually">Anual</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label className="text-white text-sm">Fecha de Fin (Opcional)</Label>
-                        <Input
-                          type="date"
-                          value={formData.recurrence_end_date}
-                          onChange={(e) => setFormData({ ...formData, recurrence_end_date: e.target.value })}
-                          className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
-                          placeholder="Sin fecha de fin"
-                        />
-                      </div>
-                    </div>
-                  )}
-                  
-                  {formData.is_recurring && (
-                    <p className="text-xs text-gray-500 mt-2">
-                      Las facturas se generarán automáticamente según la frecuencia seleccionada
-                    </p>
-                  )}
-                </div>
+
                 
                 {/* Currency Info */}
                 <div className="p-3 bg-[#EBFF57]/10 border border-[#EBFF57]/30 rounded-lg">
@@ -981,7 +927,23 @@ export default function Invoices() {
                 </div>
                 
                 {/* Actions */}
-                <div className="flex gap-3 justify-end items-center">
+                <div className="flex gap-3 justify-between items-center">
+                  {/* Recurring Invoice - Bottom Left */}
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="is_recurring"
+                      checked={formData.is_recurring}
+                      onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
+                      className="w-4 h-4 bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] rounded accent-[#C4FF3D]"
+                    />
+                    <Label htmlFor="is_recurring" className="text-white cursor-pointer text-sm">
+                      Factura Recurrente
+                    </Label>
+                  </div>
+                  
+                  {/* Action Buttons - Bottom Right */}
+                  <div className="flex gap-3 items-center">
                   <Button type="button" variant="outline" onClick={handleCloseModal} className="border-[rgba(255,255,255,0.06)] text-white hover:bg-gray-800">
                     Cancelar
                   </Button>
@@ -1041,6 +1003,7 @@ export default function Invoices() {
                         </div>
                       </div>
                     )}
+                  </div>
                   </div>
                 </div>
               </form>
