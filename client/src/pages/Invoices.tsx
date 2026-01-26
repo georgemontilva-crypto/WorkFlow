@@ -53,6 +53,7 @@ export default function Invoices() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewingInvoice, setViewingInvoice] = useState<number | null>(null);
+  const [isCreatingAndSending, setIsCreatingAndSending] = useState(false);
   const [registeringPaymentFor, setRegisteringPaymentFor] = useState<number | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [paymentFormData, setPaymentFormData] = useState({
@@ -148,41 +149,55 @@ export default function Invoices() {
     return items.reduce((sum, item) => sum + item.total, 0);
   };
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, shouldSend: boolean = false) => {
     e.preventDefault();
     
     try {
       // Validate
       if (!formData.client_id) {
-        // toast.error('Debe seleccionar un cliente');
+        showError('Debe seleccionar un cliente');
         return;
       }
       
       if (items.length === 0 || items.every(item => !item.description)) {
-        // toast.error('Debe agregar al menos un ítem');
+        showError('Debe agregar al menos un ítem');
         return;
       }
       
       // Create invoice
-      await createInvoiceMutation.mutateAsync({
+      const result = await createInvoiceMutation.mutateAsync({
         client_id: parseInt(formData.client_id),
         issue_date: formData.issue_date,
         due_date: formData.due_date,
         items: items.filter(item => item.description), // Only non-empty items
         notes: formData.notes || undefined,
         terms: formData.terms || undefined,
+        status: shouldSend ? 'sent' : 'draft',
         is_recurring: formData.is_recurring,
         recurrence_frequency: formData.is_recurring ? formData.recurrence_frequency : undefined,
         recurrence_end_date: formData.is_recurring && formData.recurrence_end_date ? formData.recurrence_end_date : undefined,
       });
       
-      // toast.success('Factura creada exitosamente');
+      // If shouldSend, send email
+      if (shouldSend && result.id) {
+        await sendEmailMutation.mutateAsync({ id: result.id });
+        success('Factura creada y enviada exitosamente');
+      } else {
+        success('Factura creada exitosamente');
+      }
+      
       handleCloseModal();
       utils.invoices.list.invalidate();
     } catch (error: any) {
       console.error('Error al crear factura:', error);
-      // toast.error(error.message || 'Error al crear factura');
+      showError(error.message || 'Error al crear factura');
     }
+  };
+  
+  const handleCreateAndSend = async (e: React.FormEvent) => {
+    setIsCreatingAndSending(true);
+    await handleSubmit(e, true);
+    setIsCreatingAndSending(false);
   };
   
   const handleSendEmail = async (id: number) => {
@@ -316,10 +331,27 @@ export default function Invoices() {
     }
   };
   
+  const handleMarkAsPaid = async (id: number) => {
+    if (!confirm('¿Confirmar que el pago ha sido recibido? Esto marcará la factura como pagada.')) {
+      return;
+    }
+    
+    try {
+      await updateStatusMutation.mutateAsync({ id, status: 'paid' });
+      success('Factura marcada como pagada');
+      utils.invoices.list.invalidate();
+      setViewingInvoice(null);
+    } catch (error: any) {
+      console.error('Error al confirmar pago:', error);
+      showError(error.message || 'Error al confirmar pago');
+    }
+  };
+  
   const getStatusBadge = (status: string) => {
     const badges = {
       draft: { label: 'Borrador', color: 'bg-gray-500' },
       sent: { label: 'Enviada', color: 'bg-blue-500' },
+      payment_submitted: { label: 'Pago en Revisión', color: 'bg-yellow-500' },
       paid: { label: 'Pagada', color: 'bg-green-500' },
       partial: { label: 'Pago Parcial', color: 'bg-yellow-500' },
       cancelled: { label: 'Cancelada', color: 'bg-red-500' },
@@ -834,8 +866,11 @@ export default function Invoices() {
                   <Button type="button" variant="outline" onClick={handleCloseModal} className="border-[rgba(255,255,255,0.06)] text-white hover:bg-gray-800">
                     Cancelar
                   </Button>
-                  <Button type="submit" variant="default">
-                    Crear Factura
+                  <Button type="submit" variant="secondary">
+                    Guardar Borrador
+                  </Button>
+                  <Button type="button" onClick={handleCreateAndSend} disabled={isCreatingAndSending} variant="default">
+                    {isCreatingAndSending ? 'Enviando...' : 'Crear y Enviar'}
                   </Button>
                 </div>
               </form>
@@ -949,6 +984,16 @@ export default function Invoices() {
                         className="w-full mt-4 px-4 py-2 text-[#C4FF3D] bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 hover:bg-[#C4FF3D]/20 rounded-[9999px] transition-colors font-medium"
                       >
                         Registrar Pago
+                      </button>
+                    )}
+                    
+                    {/* Confirm Payment Button (for payment_submitted status) */}
+                    {viewInvoiceData.status === 'payment_submitted' && (
+                      <button
+                        onClick={() => handleMarkAsPaid(viewInvoiceData.id)}
+                        className="w-full mt-4 px-4 py-2 text-white bg-[#C4FF3D] hover:bg-[#C4FF3D]/90 rounded-[9999px] transition-colors font-medium"
+                      >
+                        Confirmar Pago Recibido
                       </button>
                     )}
                   </div>

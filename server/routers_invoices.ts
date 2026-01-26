@@ -36,6 +36,7 @@ const createInvoiceSchema = z.object({
   items: z.array(invoiceItemSchema).min(1, "Debe agregar al menos un ítem"),
   notes: z.string().optional(),
   terms: z.string().optional(),
+  status: z.enum(["draft", "sent"]).optional().default("draft"),
   is_recurring: z.boolean().optional(),
   recurrence_frequency: z.enum(["weekly", "biweekly", "monthly", "quarterly", "semiannually", "annually"]).optional(),
   recurrence_end_date: z.string().optional(),
@@ -175,12 +176,16 @@ export const invoicesRouter = router({
         
         console.log(`[Invoices] Invoice number: ${invoice_number}, currency: ${currency}`);
         
-        // 7. Create invoice
+        // 7. Generate public token for client portal
+        const crypto = await import('crypto');
+        const public_token = crypto.randomBytes(32).toString('hex');
+        
+        // 8. Create invoice
         const [newInvoice] = await db.insert(invoices).values({
           user_id: ctx.user.id,
           client_id: input.client_id,
           invoice_number,
-          status: "draft",
+          status: input.status || "draft",
           currency,
           subtotal: subtotal.toString(),
           total: total.toString(),
@@ -188,6 +193,7 @@ export const invoicesRouter = router({
           due_date: dueDate,
           notes: input.notes || null,
           terms: input.terms || null,
+          public_token,
           is_recurring: input.is_recurring ? 1 : 0,
           recurrence_frequency: input.is_recurring ? input.recurrence_frequency : null,
           recurrence_start_date: input.is_recurring ? issueDate : null,
@@ -244,7 +250,7 @@ export const invoicesRouter = router({
   updateStatus: protectedProcedure
     .input(z.object({
       id: z.number(),
-      status: z.enum(["draft", "sent", "paid", "cancelled"]),
+      status: z.enum(["draft", "sent", "payment_submitted", "paid", "partial", "cancelled"]),
     }))
     .mutation(async ({ ctx, input }) => {
       console.log(`[Invoices] Update status for invoice ${input.id} to ${input.status}`);
@@ -271,7 +277,8 @@ export const invoicesRouter = router({
         
         const validTransitions: Record<string, string[]> = {
           draft: ["sent", "cancelled"],
-          sent: ["paid", "cancelled"],
+          sent: ["payment_submitted", "paid", "cancelled"],
+          payment_submitted: ["paid", "cancelled"],
           paid: [], // Cannot change from paid
           cancelled: [], // Cannot change from cancelled
         };
@@ -442,23 +449,53 @@ export const invoicesRouter = router({
         
         console.log(`[Invoices] Sending email to ${client.email}`);
         
-        // Send email with PDF attachment
+        // Generate public portal link
+        const publicLink = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/invoice/${invoice.public_token}`;
+        
+        // Send email with PDF attachment and public link
         const emailSent = await sendEmail({
           to: client.email,
           subject: `Factura ${invoice.invoice_number} - ${user.name}`,
           html: `
-            <h2>Nueva Factura</h2>
-            <p>Hola ${client.name},</p>
-            <p>Adjunto encontrarás la factura <strong>${invoice.invoice_number}</strong>.</p>
-            <p><strong>Detalles:</strong></p>
-            <ul>
-              <li>Número: ${invoice.invoice_number}</li>
-              <li>Fecha de emisión: ${new Date(invoice.issue_date).toLocaleDateString('es-ES')}</li>
-              <li>Fecha de vencimiento: ${new Date(invoice.due_date).toLocaleDateString('es-ES')}</li>
-              <li>Total: ${new Intl.NumberFormat('es-ES', { style: 'currency', currency: invoice.currency }).format(parseFloat(invoice.total))}</li>
-            </ul>
-            <p>Gracias por tu negocio.</p>
-            <p>Saludos,<br>${user.name}</p>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2 style="color: #333;">Nueva Factura</h2>
+              <p>Hola <strong>${client.name}</strong>,</p>
+              <p>Te enviamos la factura <strong>${invoice.invoice_number}</strong> de <strong>${user.name}</strong>.</p>
+              
+              <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="margin-top: 0; color: #333;">Resumen de Factura</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr>
+                    <td style="padding: 8px 0; color: #666;">Número:</td>
+                    <td style="padding: 8px 0; text-align: right; font-weight: bold;">${invoice.invoice_number}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #666;">Monto Total:</td>
+                    <td style="padding: 8px 0; text-align: right; font-weight: bold; font-size: 18px; color: #C4FF3D;">${new Intl.NumberFormat('es-ES', { style: 'currency', currency: invoice.currency }).format(parseFloat(invoice.total))}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px 0; color: #666;">Fecha de Vencimiento:</td>
+                    <td style="padding: 8px 0; text-align: right; font-weight: bold;">${new Date(invoice.due_date).toLocaleDateString('es-ES')}</td>
+                  </tr>
+                </table>
+              </div>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${publicLink}" style="display: inline-block; background: #C4FF3D; color: #000; padding: 14px 32px; text-decoration: none; border-radius: 9999px; font-weight: bold; font-size: 16px;">Ver Factura</a>
+              </div>
+              
+              <p style="color: #666; font-size: 14px;">En el portal podrás:</p>
+              <ul style="color: #666; font-size: 14px;">
+                <li>Ver los detalles completos de la factura</li>
+                <li>Descargar el PDF</li>
+                <li>Subir tu comprobante de pago</li>
+              </ul>
+              
+              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+              
+              <p style="color: #999; font-size: 12px;">Gracias por tu preferencia.</p>
+              <p style="color: #999; font-size: 12px;">Saludos,<br><strong>${user.name}</strong></p>
+            </div>
           `,
           attachments: [{
             filename: `Factura-${invoice.invoice_number}.pdf`,
@@ -571,6 +608,193 @@ export const invoicesRouter = router({
         };
       } catch (error: any) {
         console.error(`[Invoices] DownloadPDF error:`, error.message);
+        throw new Error(error.message || "Error al generar PDF");
+      }
+    }),
+
+  // Get invoice by public token (for client portal)
+  getByToken: protectedProcedure
+    .input(z.object({ token: z.string() }))
+    .query(async ({ input }) => {
+      console.log(`[Invoices] Get invoice by public token`);
+      
+      try {
+        const db = await getDb();
+        
+        // Get invoice
+        const [invoice] = await db
+          .select()
+          .from(invoices)
+          .where(eq(invoices.public_token, input.token))
+          .limit(1);
+        
+        if (!invoice) {
+          throw new Error("Factura no encontrada");
+        }
+        
+        // Get items
+        const items = await db
+          .select()
+          .from(invoiceItems)
+          .where(eq(invoiceItems.invoice_id, invoice.id));
+        
+        // Get client
+        const client = await dbHelpers.getClientById(invoice.client_id, invoice.user_id);
+        
+        // Get user/company profile
+        const user = await dbHelpers.getUserById(invoice.user_id);
+        
+        console.log(`[Invoices] Public invoice found: ${invoice.invoice_number}`);
+        
+        return {
+          ...invoice,
+          items,
+          client,
+          companyProfile: {
+            company_name: user?.name,
+            email: user?.email,
+          },
+        };
+      } catch (error: any) {
+        console.error(`[Invoices] GetByToken error:`, error.message);
+        throw new Error(error.message || "Error al obtener factura");
+      }
+    }),
+
+  // Upload payment proof (public endpoint for clients)
+  uploadPaymentProof: protectedProcedure
+    .input(z.object({
+      token: z.string(),
+      proof: z.string(), // base64 encoded file
+      comment: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      console.log(`[Invoices] Upload payment proof for token`);
+      
+      try {
+        const db = await getDb();
+        
+        // Get invoice
+        const [invoice] = await db
+          .select()
+          .from(invoices)
+          .where(eq(invoices.public_token, input.token))
+          .limit(1);
+        
+        if (!invoice) {
+          throw new Error("Factura no encontrada");
+        }
+        
+        // TODO: Upload file to storage and get URL
+        // For now, we'll just store the base64 in the database
+        const payment_proof_url = input.proof;
+        
+        // Update invoice with payment proof
+        await db
+          .update(invoices)
+          .set({
+            status: "payment_submitted",
+            payment_proof_url,
+            payment_proof_uploaded_at: new Date(),
+            payment_reference: input.comment || null,
+            updated_at: new Date(),
+          })
+          .where(eq(invoices.id, invoice.id));
+        
+        console.log(`[Invoices] Payment proof uploaded for invoice ${invoice.invoice_number}`);
+        
+        // Create notification for user
+        const { notifyPaymentProofUploaded } = await import('./helpers/notificationHelpers');
+        await notifyPaymentProofUploaded(
+          invoice.user_id,
+          invoice.id,
+          invoice.invoice_number
+        );
+        
+        return { success: true };
+      } catch (error: any) {
+        console.error(`[Invoices] UploadPaymentProof error:`, error.message);
+        throw new Error(error.message || "Error al subir comprobante");
+      }
+    }),
+
+  // Generate PDF by public token (for client portal)
+  generatePDFByToken: protectedProcedure
+    .input(z.object({ token: z.string() }))
+    .mutation(async ({ input }) => {
+      console.log(`[Invoices] Generate PDF by public token`);
+      
+      try {
+        const db = await getDb();
+        
+        // Get invoice
+        const [invoice] = await db
+          .select()
+          .from(invoices)
+          .where(eq(invoices.public_token, input.token))
+          .limit(1);
+        
+        if (!invoice) {
+          throw new Error("Factura no encontrada");
+        }
+        
+        // Get items
+        const items = await db
+          .select()
+          .from(invoiceItems)
+          .where(eq(invoiceItems.invoice_id, invoice.id));
+        
+        // Get client
+        const client = await dbHelpers.getClientById(invoice.client_id, invoice.user_id);
+        
+        if (!client) {
+          throw new Error("Cliente no encontrado");
+        }
+        
+        // Get user
+        const user = await dbHelpers.getUserById(invoice.user_id);
+        
+        if (!user) {
+          throw new Error("Usuario no encontrado");
+        }
+        
+        // Generate PDF
+        const pdfBase64 = await generateInvoicePDF({
+          invoice_number: invoice.invoice_number,
+          issue_date: invoice.issue_date,
+          due_date: invoice.due_date,
+          status: invoice.status,
+          currency: invoice.currency,
+          subtotal: invoice.subtotal,
+          total: invoice.total,
+          notes: invoice.notes,
+          terms: invoice.terms,
+          client: {
+            name: client.name,
+            email: client.email,
+            phone: client.phone,
+            company: client.company,
+          },
+          items: items.map(item => ({
+            description: item.description,
+            quantity: item.quantity,
+            unit_price: item.unit_price,
+            total: item.total,
+          })),
+          user: {
+            name: user.name,
+            email: user.email,
+          },
+        });
+        
+        console.log(`[Invoices] PDF generated for public invoice ${invoice.invoice_number}`);
+        
+        return {
+          success: true,
+          pdf: pdfBase64,
+        };
+      } catch (error: any) {
+        console.error(`[Invoices] GeneratePDFByToken error:`, error.message);
         throw new Error(error.message || "Error al generar PDF");
       }
     }),

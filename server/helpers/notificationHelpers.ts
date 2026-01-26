@@ -164,3 +164,18 @@ export async function notifyPaymentRegistered(
     source_id: invoiceId,
   });
 }
+
+export async function notifyPaymentProofUploaded(
+  userId: number,
+  invoiceId: number,
+  invoiceNumber: string
+) {
+  return createNotification({
+    user_id: userId,
+    type: "info",
+    title: `Comprobante recibido para ${invoiceNumber}`,
+    message: `El cliente ha subido un comprobante de pago para la factura ${invoiceNumber}. Revisa y confirma el pago.`,
+    source: "invoice",
+    source_id: invoiceId,
+  });
+}

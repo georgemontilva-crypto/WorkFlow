@@ -80,7 +80,7 @@ export const invoices = mysqlTable("invoices", {
   user_id: int("user_id").notNull(),
   client_id: int("client_id").notNull(),
   invoice_number: varchar("invoice_number", { length: 50 }).notNull().unique(),
-  status: mysqlEnum("status", ["draft", "sent", "paid", "partial", "cancelled"]).notNull().default("draft"),
+  status: mysqlEnum("status", ["draft", "sent", "payment_submitted", "paid", "partial", "cancelled"]).notNull().default("draft"),
   currency: varchar("currency", { length: 3 }).notNull().default("USD"),
   subtotal: decimal("subtotal", { precision: 10, scale: 2 }).notNull(),
   total: decimal("total", { precision: 10, scale: 2 }).notNull(),
@@ -96,6 +96,14 @@ export const invoices = mysqlTable("invoices", {
   recurrence_end_date: timestamp("recurrence_end_date"),
   last_generated_date: timestamp("last_generated_date"),
   parent_invoice_id: int("parent_invoice_id"),
+  
+  /** Public access token for client portal */
+  public_token: varchar("public_token", { length: 255 }).unique(),
+  
+  /** Payment proof fields */
+  payment_proof_url: text("payment_proof_url"),
+  payment_proof_uploaded_at: timestamp("payment_proof_uploaded_at"),
+  payment_reference: varchar("payment_reference", { length: 255 }),
   
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updated_at").defaultNow().notNull(),
