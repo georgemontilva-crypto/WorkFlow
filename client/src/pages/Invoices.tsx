@@ -975,7 +975,7 @@ export default function Invoices() {
                     
                     {/* Dropdown Menu */}
                     {showCreateDropdown && (
-                      <div className="absolute right-0 mt-2 w-56 bg-[#0A0A0A] rounded-[20px] shadow-lg z-50" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06), 0 10px 40px rgba(0,0,0,0.5)' }}>
+                      <div className="absolute right-0 bottom-full mb-2 w-56 bg-[#0A0A0A] rounded-[20px] shadow-lg z-50" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06), 0 10px 40px rgba(0,0,0,0.5)' }}>
                         <div className="py-2">
                           <button
                             type="button"
