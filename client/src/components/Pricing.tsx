@@ -9,55 +9,55 @@ import { Check } from 'lucide-react';
 const plans = [
   {
     id: 'free',
-    name: 'Finwrk Free',
+    name: 'Finwrk Gratis',
     price: 0,
     period: '',
-    description: 'Perfect for getting started',
+    description: 'Perfecto para comenzar',
     features: [
-      'Basic financial dashboard',
-      'Up to 3 clients',
-      'Maximum 5 invoices',
-      'Crypto tracking (no payments)',
-      'No automations',
+      'Panel financiero básico',
+      'Hasta 3 clientes',
+      'Máximo 5 facturas',
+      'Seguimiento cripto (sin pagos)',
+      'Sin automatizaciones',
     ],
-    cta: 'Start Free',
+    cta: 'Comenzar Gratis',
     highlighted: false,
   },
   {
     id: 'pro',
     name: 'Finwrk Pro',
     price: 15,
-    period: '/month',
-    description: 'For growing freelancers and businesses',
+    period: '/mes',
+    description: 'Para freelancers y negocios en crecimiento',
     features: [
-      'Unlimited clients',
-      'Unlimited invoices',
-      'Multi-currency (USD, COP, EUR, USDT)',
-      'Payment links per invoice',
-      'Crypto payments via external custody',
-      'Invoice states (paid/overdue/partial)',
-      'Financial reports',
-      'Automatic payment reminders',
-      'Crypto to local currency conversion',
-      'CSV / PDF export',
+      'Clientes ilimitados',
+      'Facturas ilimitadas',
+      'Multimoneda (USD, COP, EUR, USDT)',
+      'Enlaces de pago por factura',
+      'Pagos cripto vía custodia externa',
+      'Estados de factura (pagada/vencida/parcial)',
+      'Reportes financieros',
+      'Recordatorios automáticos de pago',
+      'Conversión cripto a moneda local',
+      'Exportación CSV / PDF',
     ],
-    cta: 'Upgrade to Pro',
+    cta: 'Mejorar a Pro',
     highlighted: true,
   },
   {
     id: 'business',
-    name: 'Finwrk Business',
+    name: 'Finwrk Empresarial',
     price: 29,
-    period: '/month',
-    description: 'For teams and enterprises',
+    period: '/mes',
+    description: 'Para equipos y empresas',
     features: [
-      'Everything in Pro',
-      'Public API for integrations',
-      'White label (logo, colors, domain)',
-      'User activity logs',
-      'Priority support',
+      'Todo en Pro',
+      'API pública para integraciones',
+      'Marca blanca (logo, colores, dominio)',
+      'Registros de actividad de usuarios',
+      'Soporte prioritario',
     ],
-    cta: 'Upgrade to Business',
+    cta: 'Mejorar a Empresarial',
     highlighted: false,
   },
 ];
@@ -69,10 +69,10 @@ export function Pricing() {
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            Simple, transparent pricing
+            Precios simples y transparentes
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose the plan that fits your needs. Start free, upgrade anytime.
+            Elige el plan que se ajuste a tus necesidades. Comienza gratis, mejora en cualquier momento.
           </p>
         </div>
 
@@ -91,7 +91,7 @@ export function Pricing() {
               {plan.highlighted && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                   <span className="bg-primary text-primary-foreground text-sm font-medium px-4 py-1 rounded-md">
-                    Most Popular
+                    Más Popular
                   </span>
                 </div>
               )}
@@ -156,9 +156,9 @@ export function Pricing() {
         {/* Footer note */}
         <div className="text-center mt-12">
           <p className="text-sm text-muted-foreground">
-            All plans include bank-level security and data encryption.{' '}
+            Todos los planes incluyen seguridad de nivel bancario y encriptación de datos.{' '}
             <a href="/faq" className="text-primary hover:underline">
-              View FAQ
+              Ver Preguntas Frecuentes
             </a>
           </p>
         </div>

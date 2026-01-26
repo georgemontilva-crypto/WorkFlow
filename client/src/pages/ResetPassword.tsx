@@ -40,7 +40,7 @@ export default function ResetPassword() {
     }
 
     if (password.length < 8) {
-      // toast.error('Password must be at least 8 characters');
+      // toast.error('La contraseña debe tener al menos 8 caracteres');
       return;
     }
 
@@ -162,7 +162,7 @@ export default function ResetPassword() {
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="At least 8 characters"
+                    placeholder="Mínimo 8 caracteres"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={resetPassword.isPending}
@@ -201,7 +201,7 @@ export default function ResetPassword() {
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
-                    placeholder="Confirm your password"
+                    placeholder="Confirma tu contraseña"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     disabled={resetPassword.isPending}
@@ -228,7 +228,7 @@ export default function ResetPassword() {
                     Resetting...
                   </>
                 ) : (
-                  'Reset Password'
+                  'Restablecer Contraseña'
                 )}
               </Button>
 

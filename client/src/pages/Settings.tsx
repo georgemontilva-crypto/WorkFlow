@@ -448,7 +448,7 @@ export default function Settings() {
                           type="password"
                           value={disable2FAPassword}
                           onChange={(e) => setDisable2FAPassword(e.target.value)}
-                          placeholder="Enter your password"
+                          placeholder="Ingresa tu contraseña"
                           className="bg-background border-border text-foreground"
                         />
                       </div>
