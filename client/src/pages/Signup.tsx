@@ -33,9 +33,9 @@ export default function Signup() {
     if (/\d/.test(pwd)) strength++;
     if (/[^a-zA-Z0-9]/.test(pwd)) strength++;
     
-    if (strength <= 2) return { strength: 33, label: 'Weak', color: 'bg-red-500' };
-    if (strength <= 3) return { strength: 66, label: 'Medium', color: 'bg-yellow-500' };
-    return { strength: 100, label: 'Strong', color: 'bg-green-500' };
+    if (strength <= 2) return { strength: 33, label: 'Débil', color: 'bg-red-500' };
+    if (strength <= 3) return { strength: 66, label: 'Media', color: 'bg-yellow-500' };
+    return { strength: 100, label: 'Fuerte', color: 'bg-green-500' };
   };
 
   const passwordStrength = getPasswordStrength(password);
@@ -60,7 +60,7 @@ export default function Signup() {
     setError('');
     
     if (!businessType) {
-      setError('Please select your business type');
+      setError('Por favor selecciona tu tipo de negocio');
       return;
     }
     
@@ -77,19 +77,19 @@ export default function Signup() {
     {
       value: 'freelancer' as const,
       label: 'Freelancer',
-      description: 'Independent professional',
+      description: 'Profesional independiente',
       icon: User,
     },
     {
       value: 'agencia' as const,
-      label: 'Agency',
-      description: 'Creative or service agency',
+      label: 'Agencia',
+      description: 'Agencia creativa o de servicios',
       icon: Users,
     },
     {
       value: 'empresa' as const,
-      label: 'Company',
-      description: 'Established business',
+      label: 'Empresa',
+      description: 'Negocio establecido',
       icon: Building2,
     },
   ];
@@ -103,14 +103,14 @@ export default function Signup() {
             <img src="/finwrk-logo.png" alt="Finwrk" className="h-10 w-auto" />
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-xs sm:text-sm text-muted-foreground hidden sm:inline">Already have an account?</span>
+            <span className="text-xs sm:text-sm text-muted-foreground hidden sm:inline">¿Ya tienes cuenta?</span>
             <Button
               variant="outline"
               onClick={() => setLocation('/login')}
               className="border-border text-foreground hover:bg-accent text-sm"
               size="sm"
             >
-              Sign In
+              Iniciar Sesión
             </Button>
           </div>
         </div>
@@ -121,10 +121,10 @@ export default function Signup() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Create your account
+              Crea tu cuenta
             </h1>
             <p className="text-muted-foreground">
-              Start for free. No credit card required.
+              Comienza gratis. No se requiere tarjeta de crédito.
             </p>
           </div>
 
@@ -138,14 +138,14 @@ export default function Signup() {
 
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-foreground">
-                  Full Name
+                  Nombre Completo
                 </Label>
                 <Input
                   id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="John Doe"
+                  placeholder="Juan Pérez"
                   required
                   className="bg-background border-border text-foreground"
                   disabled={signupMutation.isPending}
@@ -154,14 +154,14 @@ export default function Signup() {
 
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-foreground">
-                  Email Address
+                  Correo Electrónico
                 </Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="john@example.com"
+                  placeholder="juan@ejemplo.com"
                   required
                   className="bg-background border-border text-foreground"
                   disabled={signupMutation.isPending}
@@ -170,14 +170,14 @@ export default function Signup() {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-foreground">
-                  Password
+                  Contraseña
                 </Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 8 characters"
+                  placeholder="Mínimo 8 caracteres"
                   required
                   minLength={8}
                   className="bg-background border-border text-foreground"
@@ -199,7 +199,7 @@ export default function Signup() {
                   </div>
                 )}
                 <p className="text-xs text-muted-foreground">
-                  Must be at least 8 characters long
+                  Debe tener al menos 8 caracteres
                 </p>
               </div>
 
@@ -220,7 +220,7 @@ export default function Signup() {
               {/* Business Type Selection */}
               <div className="space-y-3">
                 <Label className="text-foreground">
-                  Business Type
+                  Tipo de Negocio
                 </Label>
                 <div className="grid grid-cols-3 gap-3">
                   {businessTypes.map((type) => {
@@ -260,22 +260,22 @@ export default function Signup() {
                 {signupMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating account...
+                    Creando cuenta...
                   </>
                 ) : (
-                  'Create Account'
+                  'Crear Cuenta'
                 )}
               </Button>
             </form>
 
             <div className="mt-6 text-center text-xs text-muted-foreground">
-              By creating an account, you agree to our{' '}
+              Al crear una cuenta, aceptas nuestros{' '}
               <a href="/terms" className="text-foreground hover:underline">
-                Terms of Service
+                Términos de Servicio
               </a>{' '}
-              and{' '}
+              y{' '}
               <a href="/privacy" className="text-foreground hover:underline">
-                Privacy Policy
+                Política de Privacidad
               </a>
             </div>
           </div>

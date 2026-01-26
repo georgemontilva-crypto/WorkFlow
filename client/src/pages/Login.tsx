@@ -73,14 +73,14 @@ export default function Login() {
             <img src="/finwrk-logo.png" alt="Finwrk" className="h-10 w-auto" />
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-xs sm:text-sm text-muted-foreground hidden sm:inline">Don't have an account?</span>
+            <span className="text-xs sm:text-sm text-muted-foreground hidden sm:inline">¿No tienes cuenta?</span>
             <Button
               variant="outline"
               onClick={() => setLocation('/signup')}
               className="border-border text-foreground hover:bg-accent text-sm"
               size="sm"
             >
-              Sign Up
+              Registrarse
             </Button>
           </div>
         </div>
@@ -91,10 +91,10 @@ export default function Login() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Welcome back
+              Bienvenido de nuevo
             </h1>
             <p className="text-muted-foreground">
-              Sign in to your Finwrk account
+              Inicia sesión en tu cuenta de Finwrk
             </p>
           </div>
 
@@ -115,10 +115,10 @@ export default function Login() {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-sm font-medium text-foreground mb-1">
-                        Email not verified
+                        Correo no verificado
                       </h3>
                       <p className="text-sm text-muted-foreground mb-3">
-                        Please verify your email address before signing in. Check your inbox for the verification link.
+                        Por favor verifica tu dirección de correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada para el enlace de verificación.
                       </p>
                       <Button
                         type="button"
@@ -131,10 +131,10 @@ export default function Login() {
                         {resendMutation.isPending ? (
                           <>
                             <Loader2 className="w-3 h-3 mr-2 animate-spin" />
-                            Sending...
+                            Enviando...
                           </>
                         ) : (
-                          'Resend verification email'
+                          'Reenviar correo de verificación'
                         )}
                       </Button>
                     </div>
@@ -144,14 +144,14 @@ export default function Login() {
 
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-foreground">
-                  Email Address
+                  Correo Electrónico
                 </Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="john@example.com"
+                  placeholder="juan@ejemplo.com"
                   required
                   className="bg-background border-border text-foreground"
                   disabled={loginMutation.isPending}
@@ -160,14 +160,14 @@ export default function Login() {
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-foreground">
-                  Password
+                  Contraseña
                 </Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder="Ingresa tu contraseña"
                   required
                   className="bg-background border-border text-foreground"
                   disabled={loginMutation.isPending}
@@ -183,10 +183,10 @@ export default function Login() {
                 {loginMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Signing in...
+                    Iniciando sesión...
                   </>
                 ) : (
-                  'Sign In'
+                  'Iniciar Sesión'
                 )}
               </Button>
             </form>
@@ -196,7 +196,7 @@ export default function Login() {
                 href="/forgot-password"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
-                Forgot your password?
+                ¿Olvidaste tu contraseña?
               </a>
             </div>
           </div>

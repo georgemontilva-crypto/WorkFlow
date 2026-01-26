@@ -1,6 +1,6 @@
 /**
  * Finwrk Landing Page
- * Slogan: "Get paid. Stay in control."
+ * Slogan: "Recibe pagos. Mantén el control."
  */
 
 import { useState, useEffect } from 'react';
@@ -31,107 +31,107 @@ export default function Landing() {
   const features = [
     {
       icon: FileText,
-      title: "Professional Invoicing",
-      description: "Create and send beautiful invoices in seconds"
+      title: "Facturación Profesional",
+      description: "Crea y envía facturas hermosas en segundos"
     },
     {
       icon: Users,
-      title: "Client Management",
-      description: "Organize all your clients and projects in one place"
+      title: "Gestión de Clientes",
+      description: "Organiza todos tus clientes y proyectos en un solo lugar"
     },
     {
       icon: Globe,
-      title: "Multi-Currency & Crypto",
-      description: "Accept payments in fiat and cryptocurrency"
+      title: "Multimoneda y Cripto",
+      description: "Acepta pagos en moneda fiat y criptomonedas"
     },
     {
       icon: Zap,
-      title: "Payment Links",
-      description: "Share custom payment links with your clients"
+      title: "Enlaces de Pago",
+      description: "Comparte enlaces de pago personalizados con tus clientes"
     },
     {
       icon: TrendingUp,
-      title: "Financial Reports",
-      description: "Automated reports and insights"
+      title: "Reportes Financieros",
+      description: "Reportes automáticos y análisis detallados"
     },
     {
       icon: Bell,
-      title: "Smart Reminders",
-      description: "Never miss a payment with automatic reminders"
+      title: "Recordatorios Inteligentes",
+      description: "Nunca pierdas un pago con recordatorios automáticos"
     }
   ];
 
   const securityFeatures = [
     {
       icon: Lock,
-      title: "Two-Factor Authentication",
-      description: "Extra layer of security for your account"
+      title: "Autenticación de Dos Factores",
+      description: "Capa adicional de seguridad para tu cuenta"
     },
     {
       icon: Database,
-      title: "End-to-End Encryption",
-      description: "Your data is encrypted at rest and in transit"
+      title: "Encriptación de Extremo a Extremo",
+      description: "Tus datos están encriptados en reposo y en tránsito"
     },
     {
       icon: Key,
-      title: "External Wallet Custody",
-      description: "Crypto assets secured with industry standards"
+      title: "Custodia Externa de Wallets",
+      description: "Activos cripto asegurados con estándares de la industria"
     },
     {
       icon: Shield,
-      title: "Compliance Ready",
-      description: "Built to meet financial regulations"
+      title: "Cumplimiento Normativo",
+      description: "Construido para cumplir con regulaciones financieras"
     }
   ];
 
   const plans = [
     {
-      name: "Free",
+      name: "Gratis",
       price: "$0",
-      period: "/forever",
-      description: "Perfect for getting started",
+      period: "/para siempre",
+      description: "Perfecto para comenzar",
       features: [
-        { text: "Basic dashboard", included: true },
-        { text: "Up to 3 clients", included: true },
-        { text: "Maximum 5 invoices", included: true },
-        { text: "Crypto visualization", included: true },
-        { text: "Payment links", included: false },
-        { text: "Automations", included: false }
+        { text: "Panel básico", included: true },
+        { text: "Hasta 3 clientes", included: true },
+        { text: "Máximo 5 facturas", included: true },
+        { text: "Visualización de cripto", included: true },
+        { text: "Enlaces de pago", included: false },
+        { text: "Automatizaciones", included: false }
       ],
-      cta: "Start Free",
+      cta: "Comenzar Gratis",
       highlighted: false
     },
     {
       name: "Pro",
       price: "$15",
-      period: "/month",
-      description: "For growing businesses",
+      period: "/mes",
+      description: "Para negocios en crecimiento",
       features: [
-        { text: "Unlimited clients", included: true },
-        { text: "Unlimited invoices", included: true },
-        { text: "Multi-currency", included: true },
-        { text: "Payment links", included: true },
-        { text: "Crypto payments", included: true },
-        { text: "Automations", included: true },
-        { text: "Financial reports", included: true }
+        { text: "Clientes ilimitados", included: true },
+        { text: "Facturas ilimitadas", included: true },
+        { text: "Multimoneda", included: true },
+        { text: "Enlaces de pago", included: true },
+        { text: "Pagos cripto", included: true },
+        { text: "Automatizaciones", included: true },
+        { text: "Reportes financieros", included: true }
       ],
-      cta: "Start Pro Trial",
+      cta: "Probar Pro Gratis",
       highlighted: true
     },
     {
-      name: "Business",
+      name: "Empresarial",
       price: "$29",
-      period: "/month",
-      description: "For teams and agencies",
+      period: "/mes",
+      description: "Para equipos y agencias",
       features: [
-        { text: "Everything in Pro", included: true },
-        { text: "Multi-user accounts", included: true },
-        { text: "Roles & permissions", included: true },
-        { text: "Public API", included: true },
-        { text: "White label", included: true },
-        { text: "Priority support", included: true }
+        { text: "Todo en Pro", included: true },
+        { text: "Cuentas multiusuario", included: true },
+        { text: "Roles y permisos", included: true },
+        { text: "API pública", included: true },
+        { text: "Marca blanca", included: true },
+        { text: "Soporte prioritario", included: true }
       ],
-      cta: "Contact Sales",
+      cta: "Contactar Ventas",
       highlighted: false
     }
   ];
@@ -139,37 +139,37 @@ export default function Landing() {
   const howItWorks = [
     {
       step: "1",
-      title: "Sign Up Free",
-      description: "Create your account in less than 60 seconds"
+      title: "Regístrate Gratis",
+      description: "Crea tu cuenta en menos de 60 segundos"
     },
     {
       step: "2",
-      title: "Add Clients & Create Invoices",
-      description: "Set up your clients and start invoicing"
+      title: "Agrega Clientes y Crea Facturas",
+      description: "Configura tus clientes y comienza a facturar"
     },
     {
       step: "3",
-      title: "Get Paid",
-      description: "Share payment links and receive payments instantly"
+      title: "Recibe Pagos",
+      description: "Comparte enlaces de pago y recibe pagos al instante"
     }
   ];
 
   const faqs = [
     {
-      question: "Is Finwrk really free?",
-      answer: "Yes! Our Free plan is completely free forever with no credit card required."
+      question: "¿Finwrk es realmente gratis?",
+      answer: "¡Sí! Nuestro plan Gratis es completamente gratuito para siempre sin necesidad de tarjeta de crédito."
     },
     {
-      question: "Can I accept cryptocurrency payments?",
-      answer: "Yes, Pro and Business plans support crypto payments with external custody for maximum security."
+      question: "¿Puedo aceptar pagos en criptomonedas?",
+      answer: "Sí, los planes Pro y Empresarial soportan pagos cripto con custodia externa para máxima seguridad."
     },
     {
-      question: "Is my financial data secure?",
-      answer: "Absolutely. We use end-to-end encryption, 2FA, and follow industry best practices for data security."
+      question: "¿Mis datos financieros están seguros?",
+      answer: "Absolutamente. Usamos encriptación de extremo a extremo, 2FA y seguimos las mejores prácticas de la industria para la seguridad de datos."
     },
     {
-      question: "Can I upgrade or downgrade my plan?",
-      answer: "Yes, you can upgrade or downgrade at any time. Changes take effect immediately."
+      question: "¿Puedo mejorar o reducir mi plan?",
+      answer: "Sí, puedes mejorar o reducir tu plan en cualquier momento. Los cambios toman efecto inmediatamente."
     }
   ];
 
@@ -190,25 +190,25 @@ export default function Landing() {
               onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
             >
-              Features
+              Características
             </button>
             <button 
               onClick={() => document.getElementById('security')?.scrollIntoView({ behavior: 'smooth' })}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
             >
-              Security
+              Seguridad
             </button>
             <button 
               onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
             >
-              Pricing
+              Precios
             </button>
             <button 
               onClick={() => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' })}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
             >
-              FAQ
+              Preguntas Frecuentes
             </button>
 
             <Button 
@@ -216,10 +216,10 @@ export default function Landing() {
               variant="outline"
               className="border-white text-white bg-black hover:bg-white hover:text-black transition-colors"
             >
-              Login
+              Iniciar Sesión
             </Button>
             <Button onClick={() => setLocation('/signup')} className="">
-              Start Free
+              Comenzar Gratis
             </Button>
           </nav>
           
@@ -244,7 +244,7 @@ export default function Landing() {
                 }}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-left bg-transparent border-none cursor-pointer"
               >
-                Features
+                Características
               </button>
               <button 
                 onClick={() => {
@@ -253,7 +253,7 @@ export default function Landing() {
                 }}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-left bg-transparent border-none cursor-pointer"
               >
-                Security
+                Seguridad
               </button>
               <button 
                 onClick={() => {
@@ -262,7 +262,7 @@ export default function Landing() {
                 }}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-left bg-transparent border-none cursor-pointer"
               >
-                Pricing
+                Precios
               </button>
               <button 
                 onClick={() => {
@@ -271,7 +271,7 @@ export default function Landing() {
                 }}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-left bg-transparent border-none cursor-pointer"
               >
-                FAQ
+                Preguntas Frecuentes
               </button>
               <div className="pt-2 border-t border-border space-y-3">
     
@@ -284,7 +284,7 @@ export default function Landing() {
                     variant="outline"
                     className="border-white text-white bg-black hover:bg-white hover:text-black transition-colors flex-1"
                   >
-                    Login
+                    Iniciar Sesión
                   </Button>
                   <Button 
                     onClick={() => {
@@ -293,7 +293,7 @@ export default function Landing() {
                     }} 
                     className="bg-primary text-primary-foreground hover:opacity-90 flex-1"
                   >
-                    Start Free
+                    Comenzar Gratis
                   </Button>
                 </div>
               </div>
@@ -307,16 +307,16 @@ export default function Landing() {
         <div className="container mx-auto max-w-5xl text-center">
           <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-primary/10 text-primary rounded-md text-sm font-medium">
             <Sparkles className="w-4 h-4" />
-            <span>Now accepting crypto payments</span>
+            <span>Ahora aceptamos pagos cripto</span>
           </div>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
-            Get paid.
+            Recibe pagos.
             <br />
-            <span className="text-primary">Stay in control.</span>
+            <span className="text-primary">Mantén el control.</span>
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Professional invoicing and financial management for freelancers and businesses. 
-            Accept payments in fiat and crypto with bank-level security.
+            Facturación profesional y gestión financiera para freelancers y negocios. 
+            Acepta pagos en fiat y cripto con seguridad de nivel bancario.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button 
@@ -324,7 +324,7 @@ export default function Landing() {
               onClick={() => setLocation('/signup')}
               className="bg-primary text-primary-foreground hover:opacity-90 text-lg px-8 py-6"
             >
-              Start Free <ArrowRight className="ml-2 w-5 h-5" />
+              Comenzar Gratis <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button 
               size="lg" 
@@ -332,11 +332,11 @@ export default function Landing() {
               onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
               className="text-lg px-8 py-6"
             >
-              See How It Works
+              Ver Cómo Funciona
             </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-6">
-            No credit card required • Free forever plan available
+            No se requiere tarjeta de crédito • Plan gratis disponible para siempre
           </p>
         </div>
       </section>
@@ -346,10 +346,10 @@ export default function Landing() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Everything you need to get paid
+              Todo lo que necesitas para recibir pagos
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Powerful features designed for modern businesses
+              Funcionalidades poderosas diseñadas para negocios modernos
             </p>
           </div>
           
@@ -377,13 +377,13 @@ export default function Landing() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 text-primary rounded-md text-sm font-medium">
               <Shield className="w-4 h-4" />
-              <span>Security First</span>
+              <span>Seguridad Primero</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Bank-level security for your financial data
+              Seguridad de nivel bancario para tus datos financieros
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Your security is our top priority. We implement industry-leading practices to keep your data safe.
+              Tu seguridad es nuestra máxima prioridad. Implementamos prácticas líderes de la industria para mantener tus datos seguros.
             </p>
           </div>
           
@@ -414,10 +414,10 @@ export default function Landing() {
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Get started in minutes
+              Comienza en minutos
             </h2>
             <p className="text-xl text-muted-foreground">
-              Three simple steps to start getting paid
+              Tres simples pasos para comenzar a recibir pagos
             </p>
           </div>
           
@@ -440,7 +440,7 @@ export default function Landing() {
         <div className="container mx-auto max-w-3xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Frequently Asked Questions
+              Preguntas Frecuentes
             </h2>
           </div>
           
@@ -473,17 +473,17 @@ export default function Landing() {
       <section className="py-20 px-4">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Ready to take control of your finances?
+            ¿Listo para tomar el control de tus finanzas?
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of businesses using Finwrk to get paid faster
+            Únete a miles de negocios usando Finwrk para recibir pagos más rápido
           </p>
           <Button 
             size="lg" 
             onClick={() => setLocation('/signup')}
             className="bg-primary text-primary-foreground hover:opacity-90 text-lg px-8 py-6"
           >
-            Start Free Today <ArrowRight className="ml-2 w-5 h-5" />
+            Comenzar Gratis Hoy <ArrowRight className="ml-2 w-5 h-5" />
           </Button>
         </div>
       </section>
@@ -500,40 +500,40 @@ export default function Landing() {
                 <img src="/finwrk-logo.png" alt="Finwrk" className="h-8 w-auto" />
               </div>
               <p className="text-sm text-muted-foreground">
-                Get paid. Stay in control.
+                Recibe pagos. Mantén el control.
               </p>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">Product</h3>
+              <h3 className="font-semibold mb-4">Producto</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground transition-colors bg-transparent border-none cursor-pointer p-0">Features</button></li>
-                <li><button onClick={() => document.getElementById('security')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground transition-colors bg-transparent border-none cursor-pointer p-0">Security</button></li>
-                <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground transition-colors bg-transparent border-none cursor-pointer p-0">Pricing</button></li>
+                <li><button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground transition-colors bg-transparent border-none cursor-pointer p-0">Características</button></li>
+                <li><button onClick={() => document.getElementById('security')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground transition-colors bg-transparent border-none cursor-pointer p-0">Seguridad</button></li>
+                <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground transition-colors bg-transparent border-none cursor-pointer p-0">Precios</button></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4">Company</h3>
+              <h3 className="font-semibold mb-4">Empresa</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Acerca de</a></li>
                 <li><a href="#" className="hover:text-foreground transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Contact</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Contacto</a></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold mb-4">Legal</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Terms</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Security</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Privacidad</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Términos</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Seguridad</a></li>
               </ul>
             </div>
           </div>
           
           <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            <p>© 2026 Finwrk. All rights reserved.</p>
+            <p>© 2026 Finwrk. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>
