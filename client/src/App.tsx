@@ -10,7 +10,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { LanguageProvider } from "./contexts/LanguageContext";
+
 import { ToastProvider } from "./contexts/ToastContext";
 import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
@@ -119,15 +119,13 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <LanguageProvider>
-        <ThemeProvider defaultTheme="dark">
-          <ToastProvider>
-            <TooltipProvider>
-              <Router />
-            </TooltipProvider>
-          </ToastProvider>
-        </ThemeProvider>
-      </LanguageProvider>
+      <ThemeProvider defaultTheme="dark">
+        <ToastProvider>
+          <TooltipProvider>
+            <Router />
+          </TooltipProvider>
+        </ToastProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

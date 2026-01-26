@@ -18,7 +18,7 @@ import CurrencySelector from '@/components/CurrencySelector';
 import { getCurrency } from '@shared/currencies';
 
 export default function Settings() {
-  const { language, setLanguage, t } = useLanguage();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { data: user } = trpc.auth.me.useQuery();
 

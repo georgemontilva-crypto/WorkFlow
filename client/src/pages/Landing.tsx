@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/_core/hooks/useAuth';
-import { LanguageSelector } from '@/components/LanguageSelector';
+
 import { Pricing } from '@/components/Pricing';
 
 export default function Landing() {
@@ -210,7 +210,7 @@ export default function Landing() {
             >
               FAQ
             </button>
-            <LanguageSelector />
+
             <Button 
               onClick={() => setLocation('/login')} 
               variant="outline"
@@ -274,7 +274,7 @@ export default function Landing() {
                 FAQ
               </button>
               <div className="pt-2 border-t border-border space-y-3">
-                <LanguageSelector />
+    
                 <div className="flex items-center gap-3">
                   <Button 
                     onClick={() => {
