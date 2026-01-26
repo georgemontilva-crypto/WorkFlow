@@ -36,13 +36,12 @@ export function NotificationsPanel() {
     limit: 50,
   }, {
     enabled: isOpen,
-    refetchInterval: 30000, // Refetch every 30 seconds when open
+    // No polling needed - using SSE for real-time updates
   });
 
   // Get unread count
-  const { data: unreadData } = trpc.notifications.unreadCount.useQuery(undefined, {
-    refetchInterval: 60000, // Refetch every minute
-  });
+  const { data: unreadData } = trpc.notifications.unreadCount.useQuery();
+  // No polling needed - SSE invalidates queries automatically
   const unreadCount = unreadData?.count || 0;
 
   // Mark as read mutation

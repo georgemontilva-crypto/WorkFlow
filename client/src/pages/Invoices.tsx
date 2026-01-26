@@ -92,16 +92,8 @@ export default function Invoices() {
   // Queries
   const utils = trpc.useContext();
   const { data: user } = trpc.auth.me.useQuery();
-  const { data: invoices = [], refetch: refetchInvoices } = trpc.invoices.list.useQuery({ status: statusFilter });
-  
-  // Auto-refresh invoices every 15 seconds for real-time updates
-  useEffect(() => {
-    const interval = setInterval(() => {
-      refetchInvoices();
-    }, 15000); // 15 seconds
-    
-    return () => clearInterval(interval);
-  }, [refetchInvoices]);
+  const { data: invoices = [] } = trpc.invoices.list.useQuery({ status: statusFilter });
+  // Note: Real-time updates handled by SSE in DashboardLayout
   const { data: clients = [] } = trpc.clients.list.useQuery();
   const { data: viewInvoiceData } = trpc.invoices.getById.useQuery(
     { id: viewingInvoice! },

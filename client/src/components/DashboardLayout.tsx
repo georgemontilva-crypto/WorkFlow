@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
 import { NotificationsPanel } from '@/components/NotificationsPanel';
+import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -26,6 +27,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     enabled: isAuthenticated,
     refetchInterval: 60000, // Check every minute
   });
+  
+  // Real-time notifications via SSE
+  useRealtimeNotifications();
 
   // Navigation organized by sections
   const navigationSections = [

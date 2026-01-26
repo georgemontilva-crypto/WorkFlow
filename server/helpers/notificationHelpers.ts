@@ -70,7 +70,7 @@ export async function createNotification(params: CreateNotificationParams): Prom
     }
 
     // Create notification
-    await db.insert(notifications).values({
+    const [result] = await db.insert(notifications).values({
       user_id: params.user_id,
       type: params.type,
       title: params.title.trim(),
@@ -78,9 +78,25 @@ export async function createNotification(params: CreateNotificationParams): Prom
       source: params.source,
       source_id: params.source_id || null,
       is_read: 0,
-    });
+    }).returning({ id: notifications.id });
 
     console.log(`[NotificationHelper] Created successfully: ${params.title}`);
+    
+    // Publish real-time event via Redis (non-blocking)
+    try {
+      const { notificationsRealtimeService } = await import('../services/notificationsRealtimeService');
+      await notificationsRealtimeService.publishNotification({
+        userId: params.user_id,
+        notificationId: result.id,
+        type: 'new',
+        source: params.source,
+        timestamp: Date.now(),
+      });
+      console.log(`[NotificationHelper] Real-time event published`);
+    } catch (realtimeError: any) {
+      console.error(`[NotificationHelper] Real-time publish error (non-blocking):`, realtimeError.message);
+    }
+    
     return true;
   } catch (error: any) {
     console.error(`[NotificationHelper] Create error:`, error.message);

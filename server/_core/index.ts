@@ -47,6 +47,55 @@ async function startServer() {
     })
   );
   
+  // SSE endpoint for real-time notifications
+  app.get("/api/notifications/stream", async (req, res) => {
+    // Verify authentication
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    
+    try {
+      // Verify JWT token
+      const { verifyToken } = await import('./auth');
+      const payload = await verifyToken(token);
+      const userId = payload.userId;
+      
+      // Set SSE headers
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+      
+      // Send initial connection message
+      res.write(`data: ${JSON.stringify({ type: 'connected', timestamp: Date.now() })}\n\n`);
+      
+      // Subscribe to user's notifications via Redis
+      const { notificationsRealtimeService } = await import('../services/notificationsRealtimeService');
+      const unsubscribe = await notificationsRealtimeService.subscribeToUser(userId, (event) => {
+        // Send notification event to client
+        res.write(`data: ${JSON.stringify(event)}\n\n`);
+      });
+      
+      console.log(`[SSE] Client connected: user ${userId}`);
+      
+      // Send heartbeat every 30 seconds to keep connection alive
+      const heartbeat = setInterval(() => {
+        res.write(`:heartbeat\n\n`);
+      }, 30000);
+      
+      // Clean up on disconnect
+      req.on('close', () => {
+        clearInterval(heartbeat);
+        unsubscribe();
+        console.log(`[SSE] Client disconnected: user ${userId}`);
+      });
+    } catch (error: any) {
+      console.error('[SSE] Authentication error:', error.message);
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+  });
+  
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
