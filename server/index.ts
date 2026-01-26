@@ -14,6 +14,11 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
 
+  // Serve uploaded files (payment receipts, etc.)
+  const uploadsPath = path.resolve(process.cwd(), "uploads");
+  app.use("/uploads", express.static(uploadsPath));
+  console.log(`[Server] Serving uploads from: ${uploadsPath}`);
+
   // Serve static files from dist/public in production
   const staticPath =
     process.env.NODE_ENV === "production"

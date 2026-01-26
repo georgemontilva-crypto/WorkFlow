@@ -688,7 +688,8 @@ export const invoicesRouter = router({
   uploadPaymentProof: publicProcedure
     .input(z.object({
       token: z.string(),
-      proof: z.string(), // base64 encoded file
+      proof: z.string(), // base64 encoded file (without data:image/... prefix)
+      mime: z.string(), // MIME type (e.g., 'image/jpeg')
       comment: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
@@ -697,17 +698,7 @@ export const invoicesRouter = router({
       try {
         const db = await getDb();
         
-        // Validate file size (base64 string length)
-        // MEDIUMTEXT field in MySQL can hold ~16MB, base64 is ~33% larger than original
-        // Limit to ~1MB base64 (~800KB original file)
-        const maxSize = 1100000; // characters (~1MB base64 = ~800KB original)
-        if (input.proof.length > maxSize) {
-          throw new Error(`El archivo es demasiado grande. Máximo 800KB`);
-        }
-        
-        console.log(`[Invoices] File size: ${input.proof.length} characters`);
-        
-        // Get invoice
+        // Get invoice first to get user_id
         const [invoice] = await db
           .select()
           .from(invoices)
@@ -718,18 +709,26 @@ export const invoicesRouter = router({
           throw new Error("Factura no encontrada");
         }
         
-        console.log(`[Invoices] Found invoice ${invoice.invoice_number}, updating...`);
+        console.log(`[Invoices] Found invoice ${invoice.invoice_number}, saving file...`);
         
-        // TODO: Upload file to storage and get URL
-        // For now, we'll just store the base64 in the database
-        const payment_proof_url = input.proof;
+        // Save file to filesystem (validates size and type)
+        const { savePaymentReceipt, getPublicUrl } = await import('../services/fileStorage');
+        const fileData = await savePaymentReceipt(
+          invoice.user_id,
+          input.proof,
+          input.mime
+        );
         
-        // Update invoice with payment proof
+        console.log(`[Invoices] File saved: ${fileData.relativePath} (${fileData.size} bytes)`);
+        
+        // Update invoice with file metadata
         await db
           .update(invoices)
           .set({
             status: "payment_submitted",
-            payment_proof_url,
+            receipt_path: fileData.relativePath,
+            receipt_size: fileData.size,
+            receipt_mime: fileData.mime,
             payment_proof_uploaded_at: new Date(),
             payment_reference: input.comment || null,
             updated_at: new Date(),
@@ -752,7 +751,10 @@ export const invoicesRouter = router({
           // Don't throw, notification failure shouldn't block the upload
         }
         
-        return { success: true };
+        return { 
+          success: true,
+          fileUrl: getPublicUrl(fileData.relativePath)
+        };
       } catch (error: any) {
         console.error(`[Invoices] UploadPaymentProof error:`, error.message, error.stack);
         throw new Error(error.message || "Error al subir comprobante");

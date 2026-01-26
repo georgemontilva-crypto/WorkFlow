@@ -1128,7 +1128,7 @@ export default function Invoices() {
                 )}
                 
                 {/* Payment Proof Section - NUEVO */}
-                {viewInvoiceData.status === 'payment_submitted' && viewInvoiceData.payment_proof_url && (
+                {viewInvoiceData.status === 'payment_submitted' && viewInvoiceData.receipt_path && (
                   <div className="border-t border-[rgba(255,255,255,0.06)] pt-4">
                     <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-[20px] p-4 mb-4">
                       <div className="flex items-start gap-3">
@@ -1164,23 +1164,16 @@ export default function Invoices() {
                       
                       <div className="mt-3">
                         <img 
-                          src={`data:image/png;base64,${viewInvoiceData.payment_proof_url}`}
+                          src={`/uploads/${viewInvoiceData.receipt_path}`}
                           alt="Comprobante de pago"
                           className="w-full rounded-[12px] border border-[rgba(255,255,255,0.06)]"
                           onError={(e) => {
-                            // Si falla como imagen, mostrar como link de descarga
-                            e.currentTarget.style.display = 'none';
-                            const parent = e.currentTarget.parentElement;
-                            if (parent) {
-                              const link = document.createElement('a');
-                              link.href = `data:application/pdf;base64,${viewInvoiceData.payment_proof_url}`;
-                              link.download = `comprobante-${viewInvoiceData.invoice_number}.pdf`;
-                              link.className = 'text-[#C4FF3D] hover:underline flex items-center gap-2';
-                              link.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Descargar Comprobante (PDF)';
-                              parent.appendChild(link);
-                            }
+                            console.error('Error loading receipt image');
                           }}
                         />
+                        <p className="text-[#8B92A8] text-xs mt-2">
+                          Tamaño: {viewInvoiceData.receipt_size ? `${(viewInvoiceData.receipt_size / 1024).toFixed(1)} KB` : 'N/A'}
+                        </p>
                       </div>
                       
                       <button

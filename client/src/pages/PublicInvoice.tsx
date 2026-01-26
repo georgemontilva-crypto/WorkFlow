@@ -67,7 +67,8 @@ export default function PublicInvoice() {
         const base64 = reader.result as string;
         await uploadProof.mutateAsync({
           token: token!,
-          proof: base64.split(',')[1],
+          proof: base64.split(',')[1], // Remove data:image/... prefix
+          mime: selectedFile.type, // Send MIME type
           comment: paymentReference || selectedFile.name,
         });
       };

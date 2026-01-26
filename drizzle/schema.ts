@@ -100,8 +100,10 @@ export const invoices = mysqlTable("invoices", {
   /** Public access token for client portal */
   public_token: varchar("public_token", { length: 255 }).unique(),
   
-  /** Payment proof fields */
-  payment_proof_url: mediumtext("payment_proof_url"),
+  /** Payment proof fields - Filesystem storage (prepared for S3 migration) */
+  receipt_path: varchar("receipt_path", { length: 255 }), // Relative path to file
+  receipt_size: int("receipt_size"), // File size in bytes
+  receipt_mime: varchar("receipt_mime", { length: 50 }), // MIME type
   payment_proof_uploaded_at: timestamp("payment_proof_uploaded_at"),
   payment_reference: varchar("payment_reference", { length: 255 }),
   
