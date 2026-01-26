@@ -307,7 +307,7 @@ export default function Invoices() {
     }
   };
   
-  const handleUpdateStatus = async (id: number, status: 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled') => {
+  const handleUpdateStatus = async (id: number, status: 'draft' | 'sent' | 'payment_submitted' | 'paid' | 'partial' | 'cancelled') => {
     try {
       await updateStatusMutation.mutateAsync({ id, status });
       utils.invoices.list.invalidate();
@@ -1127,6 +1127,73 @@ export default function Invoices() {
                   </div>
                 )}
                 
+                {/* Payment Proof Section - NUEVO */}
+                {viewInvoiceData.status === 'payment_submitted' && viewInvoiceData.payment_proof_url && (
+                  <div className="border-t border-[rgba(255,255,255,0.06)] pt-4">
+                    <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-[20px] p-4 mb-4">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h3 className="text-yellow-400 font-semibold mb-1">⚠️ Pago Pendiente de Confirmación</h3>
+                          <p className="text-[#8B92A8] text-sm">
+                            El cliente ha subido un comprobante de pago. Revisa el comprobante y confirma el pago.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-[#121212] rounded-[20px] border border-[rgba(255,255,255,0.06)] p-4">
+                      <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-[#C4FF3D]" />
+                        Comprobante de Pago
+                      </h3>
+                      
+                      {viewInvoiceData.payment_reference && (
+                        <div className="mb-3">
+                          <p className="text-[#8B92A8] text-sm">Referencia del cliente:</p>
+                          <p className="text-white">{viewInvoiceData.payment_reference}</p>
+                        </div>
+                      )}
+                      
+                      {viewInvoiceData.payment_proof_uploaded_at && (
+                        <div className="mb-3">
+                          <p className="text-[#8B92A8] text-sm">Fecha de envío:</p>
+                          <p className="text-white">{format(new Date(viewInvoiceData.payment_proof_uploaded_at), 'dd/MM/yyyy HH:mm')}</p>
+                        </div>
+                      )}
+                      
+                      <div className="mt-3">
+                        <img 
+                          src={`data:image/png;base64,${viewInvoiceData.payment_proof_url}`}
+                          alt="Comprobante de pago"
+                          className="w-full rounded-[12px] border border-[rgba(255,255,255,0.06)]"
+                          onError={(e) => {
+                            // Si falla como imagen, mostrar como link de descarga
+                            e.currentTarget.style.display = 'none';
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              const link = document.createElement('a');
+                              link.href = `data:application/pdf;base64,${viewInvoiceData.payment_proof_url}`;
+                              link.download = `comprobante-${viewInvoiceData.invoice_number}.pdf`;
+                              link.className = 'text-[#C4FF3D] hover:underline flex items-center gap-2';
+                              link.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Descargar Comprobante (PDF)';
+                              parent.appendChild(link);
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <button
+                        onClick={() => handleMarkAsPaid(viewInvoiceData.id)}
+                        className="w-full mt-4 px-6 py-3 text-black bg-[#C4FF3D] hover:bg-[#C4FF3D]/90 rounded-[9999px] transition-colors font-semibold flex items-center justify-center gap-2"
+                      >
+                        <CheckCircle className="w-5 h-5" />
+                        Confirmar Pago y Marcar como Pagada
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
                 {/* Payment Summary */}
                 {paymentSummary && (
                   <div className="border-t border-[rgba(255,255,255,0.06)] pt-4">
@@ -1149,18 +1216,6 @@ export default function Invoices() {
                         <span className="text-[#8B92A8] text-sm">{paymentSummary.payment_count}</span>
                       </div>
                     </div>
-                    
-
-                    
-                    {/* Confirm Payment Button (for payment_submitted status) */}
-                    {viewInvoiceData.status === 'payment_submitted' && (
-                      <button
-                        onClick={() => handleMarkAsPaid(viewInvoiceData.id)}
-                        className="w-full mt-4 px-4 py-2 text-white bg-[#C4FF3D] hover:bg-[#C4FF3D]/90 rounded-[9999px] transition-colors font-medium"
-                      >
-                        {t('common.confirm')} Pago Recibido
-                      </button>
-                    )}
                   </div>
                 )}
                 

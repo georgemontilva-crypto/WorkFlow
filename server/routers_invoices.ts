@@ -321,7 +321,7 @@ export const invoicesRouter = router({
           console.log(`[Invoices] Transaction created for invoice ${invoice.invoice_number}`);
           
           // Create notification
-          const { notifyInvoicePaid } = await import('../helpers/notificationHelpers');
+          const { notifyInvoicePaid } = await import('./helpers/notificationHelpers');
           await notifyInvoicePaid(
             ctx.user.id,
             input.id,
@@ -501,14 +501,14 @@ export const invoicesRouter = router({
               </div>
               
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${publicLink}" style="display: inline-block; background: #C4FF3D; color: #000; padding: 14px 32px; text-decoration: none; border-radius: 9999px; font-weight: bold; font-size: 16px;">Ver Factura</a>
+                <a href="${publicLink}" style="display: inline-block; background: #C4FF3D; color: #000; padding: 16px 48px; text-decoration: none; border-radius: 9999px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 12px rgba(196, 255, 61, 0.3);">💳 Pagar Ahora</a>
               </div>
               
-              <p style="color: #666; font-size: 14px;">En el portal podrás:</p>
-              <ul style="color: #666; font-size: 14px;">
-                <li>Ver los detalles completos de la factura</li>
-                <li>Descargar el PDF</li>
-                <li>Subir tu comprobante de pago</li>
+              <p style="color: #666; font-size: 14px; text-align: center; margin-top: 20px;">En el portal de pago podrás:</p>
+              <ul style="color: #666; font-size: 14px; max-width: 400px; margin: 10px auto;">
+                <li>✓ Ver los detalles completos de la factura</li>
+                <li>✓ Descargar el PDF</li>
+                <li>✓ Realizar el pago y subir tu comprobante</li>
               </ul>
               
               <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
