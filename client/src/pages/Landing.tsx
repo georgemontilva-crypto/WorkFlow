@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/_core/hooks/useAuth';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { LanguageSelector } from '@/components/LanguageSelector';
 import { Pricing } from '@/components/Pricing';
 
@@ -22,9 +21,7 @@ export default function Landing() {
   const [, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated, loading } = useAuth();
-  const { t } = useLanguage();
-
-  // Redirect to dashboard if already authenticated
+    // Redirect to dashboard if already authenticated
   useEffect(() => {
     if (!loading && isAuthenticated) {
       setLocation('/dashboard');

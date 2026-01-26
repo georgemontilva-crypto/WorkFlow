@@ -14,7 +14,6 @@ import { Badge } from '@/components/ui/badge';
 import { trpc } from '@/lib/trpc';
 // import { toast } from 'sonner';
 import { Languages, Database, Download, Upload, Trash2, Shield, Key, AlertCircle, CheckCircle2, DollarSign } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
 import CurrencySelector from '@/components/CurrencySelector';
 import { getCurrency } from '@shared/currencies';
 

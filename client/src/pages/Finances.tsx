@@ -8,7 +8,6 @@
  */
 
 import { useState } from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { Download, TrendingUp, TrendingDown, DollarSign, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -22,8 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Finances() {
-  const { t } = useLanguage();
-  const { success, error: showError } = useToast();
+    const { success, error: showError } = useToast();
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -75,12 +73,12 @@ export default function Finances() {
       const amount = parseFloat(formData.amount);
       
       if (isNaN(amount) || amount <= 0) {
-        showError(t('finances.amountMustBePositive'));
+        showError('AmountMustBePositive');
         return;
       }
       
       if (!formData.description.trim()) {
-        showError(t('finances.descriptionRequired'));
+        showError('DescriptionRequired');
         return;
       }
       
@@ -93,7 +91,7 @@ export default function Finances() {
         date: formData.date,
       });
       
-      success(t('finances.createdSuccessfully'));
+      success('CreatedSuccessfully');
       handleCloseModal();
       
       // Invalidate queries to refresh data
@@ -102,27 +100,27 @@ export default function Finances() {
       utils.finances.getHistory.invalidate();
     } catch (error: any) {
       console.error('Error al crear transacción:', error);
-      showError(error.message || t('finances.errorSaving'));
+      showError(error.message || 'ErrorSaving');
     }
   };
   
   const getCategories = () => {
     if (formData.type === 'income') {
       return [
-        { value: 'salary', label: t('finances.categories.salary') },
-        { value: 'freelance', label: t('finances.categories.freelance') },
-        { value: 'investment', label: t('finances.categories.investment') },
-        { value: 'other_income', label: t('finances.categories.other_income') },
+        { value: 'salary', label: 'Salary' },
+        { value: 'freelance', label: 'Freelance' },
+        { value: 'investment', label: 'Investment' },
+        { value: 'other_income', label: 'Other_income' },
       ];
     } else {
       return [
-        { value: 'rent', label: t('finances.categories.rent') },
-        { value: 'utilities', label: t('finances.categories.utilities') },
-        { value: 'food', label: t('finances.categories.food') },
-        { value: 'transportation', label: t('finances.categories.transportation') },
-        { value: 'healthcare', label: t('finances.categories.healthcare') },
-        { value: 'entertainment', label: t('finances.categories.entertainment') },
-        { value: 'other_expense', label: t('finances.categories.other_expense') },
+        { value: 'rent', label: 'Rent' },
+        { value: 'utilities', label: 'Utilities' },
+        { value: 'food', label: 'Food' },
+        { value: 'transportation', label: 'Transportation' },
+        { value: 'healthcare', label: 'Healthcare' },
+        { value: 'entertainment', label: 'Entertainment' },
+        { value: 'other_expense', label: 'Other_expense' },
       ];
     }
   };
@@ -204,7 +202,7 @@ export default function Finances() {
   // Export history handler
   const handleExportHistory = () => {
     if (history.length === 0) {
-      showError(t('finances.noTransactionsToExport'));
+      showError('NoTransactionsToExport');
       return;
     }
 
@@ -376,21 +374,21 @@ export default function Finances() {
                 <button
                   onClick={handlePreviousMonth}
                   className="p-2 md:p-1 text-[#8B92A8] hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                  title={t('finances.previousMonth')}
+                  title={'PreviousMonth'}
                 >
                   <ChevronLeft className="w-5 h-5 md:w-4 md:h-4" />
                 </button>
                 <button
                   onClick={handleResetMonth}
                   className="text-sm md:text-sm text-[#8B92A8] hover:text-white transition-colors min-w-[100px] text-center min-h-[44px] flex items-center justify-center"
-                  title={t('finances.backToCurrentMonth')}
+                  title={'BackToCurrentMonth'}
                 >
                   {format(selectedMonth, 'MMMM yyyy', { locale: es })}
                 </button>
                 <button
                   onClick={handleNextMonth}
                   className="p-2 md:p-1 text-[#8B92A8] hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
-                  title={t('finances.nextMonth')}
+                  title={'NextMonth'}
                 >
                   <ChevronRight className="w-5 h-5 md:w-4 md:h-4" />
                 </button>
@@ -433,7 +431,7 @@ export default function Finances() {
                         <div>
                           <p className="text-white font-semibold">{transaction.client_name}</p>
                           <p className="text-[#8B92A8] text-sm">
-                            {transaction.invoice_number || transaction.category || t('finances.manualTransaction')} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
+                            {transaction.invoice_number || transaction.category || 'ManualTransaction'} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
                           </p>
                         </div>
                       </div>
@@ -572,7 +570,7 @@ export default function Finances() {
                     onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[20px] px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D] resize-none"
                     rows={3}
-                    placeholder={t('finances.transactionDescription')}
+                    placeholder={'TransactionDescription'}
                     required
                   />
                 </div>
@@ -591,7 +589,7 @@ export default function Finances() {
                   disabled={createTransactionMutation.isPending}
                   className="flex-1 px-4 py-2 bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 text-[#C4FF3D] rounded-[9999px] hover:bg-[#C4FF3D]/20 transition-colors disabled:opacity-50"
                 >
-                  {createTransactionMutation.isPending ? t('finances.saving') : 'Guardar'}
+                  {createTransactionMutation.isPending ? 'Saving' : 'Guardar'}
                   </button>
                 </div>
               </form>

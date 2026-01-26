@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Plus, Search, Mail, Phone, Building2, MoreVertical, Archive, Trash2, Edit, X } from 'lucide-react';
@@ -42,8 +41,7 @@ type Client = {
 };
 
 export default function Clients() {
-  const { t } = useLanguage();
-  const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -138,8 +136,8 @@ export default function Clients() {
   const handleDelete = async (id: number) => {
     setConfirmDialog({
       isOpen: true,
-      title: t('clients.deleteTitle') || 'Eliminar Cliente',
-      message: t('clients.deleteConfirm'),
+      title: 'Eliminar Cliente' || 'Eliminar Cliente',
+      message: '¿Estás seguro de que deseas eliminar este cliente?',
       variant: 'danger',
       onConfirm: async () => {
         try {
@@ -174,8 +172,8 @@ export default function Clients() {
         <Card>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-[#EDEDED]">{t('clients.title')}</h1>
-              <p className="text-[#8B92A8] mt-1">{t('clients.subtitle', 'Gestiona tu cartera de clientes')}</p>
+              <h1 className="text-2xl font-semibold text-[#EDEDED]">{'Clientes'}</h1>
+              <p className="text-[#8B92A8] mt-1">{'Gestiona tu cartera de clientes'}</p>
             </div>
             <Button
               onClick={() => handleOpenModal()}
@@ -183,7 +181,7 @@ export default function Clients() {
               className="w-full md:w-auto"
             >
               <Plus className="w-5 h-5 mr-2" />
-              {t('clients.addClient')}
+              {'Agregar Cliente'}
             </Button>
           </div>
         </Card>
@@ -196,7 +194,7 @@ export default function Clients() {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
               <Input
                 type="text"
-                placeholder={t('clients.searchPlaceholder')}
+                placeholder={'Buscar clientes...'}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-12 h-12 text-base"
@@ -207,22 +205,22 @@ export default function Clients() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t('common.all')} {t('common.status', 'estados').toLowerCase()}</SelectItem>
-                <SelectItem value="active">{t('common.active')}</SelectItem>
-                <SelectItem value="inactive">{t('common.inactive')}</SelectItem>
+                <SelectItem value="all">{'Todos'} {'estados'.toLowerCase()}</SelectItem>
+                <SelectItem value="active">{'Activo'}</SelectItem>
+                <SelectItem value="inactive">{'Inactivo'}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           
           {/* Header - Solo contador */}
           <div className="mb-6">
-            <p className="text-[#8B92A8] text-sm">{filteredClients.length} {filteredClients.length !== 1 ? t('clients.clients', 'clientes') : t('clients.client', 'cliente')}</p>
+            <p className="text-[#8B92A8] text-sm">{filteredClients.length} {filteredClients.length !== 1 ? 'clientes' : 'cliente'}</p>
           </div>
           
           <div className="space-y-3">
             {filteredClients.length === 0 ? (
               <div className="py-16 text-center">
-                <p className="text-[#8B92A8] text-base">{t('clients.noClients')}</p>
+                <p className="text-[#8B92A8] text-base">{'No hay clientes registrados'}</p>
               </div>
             ) : (
               filteredClients.map((client) => (
@@ -271,7 +269,7 @@ export default function Clients() {
                             : 'bg-[#8B92A8]/10 text-[#8B92A8] border border-[#8B92A8]/20'
                         }`}
                       >
-                        {client.status === 'active' ? t('common.active') : t('common.inactive')}
+                        {client.status === 'active' ? 'Activo' : 'Inactivo'}
                       </span>
 
                       <DropdownMenu>
@@ -290,21 +288,21 @@ export default function Clients() {
                             className="text-[#EDEDED] hover:bg-[#C4FF3D]/10 cursor-pointer"
                           >
                             <Edit className="w-4 h-4 mr-2" />
-                            {t('common.edit')}
+                            {'Editar'}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleArchive(client.id)}
                             className="text-[#EDEDED] hover:bg-[#C4FF3D]/10 cursor-pointer"
                           >
                             <Archive className="w-4 h-4 mr-2" />
-                            {t('clients.archive')}
+                            {'Archivar'}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleDelete(client.id)}
                             className="text-[#EF4444] hover:bg-[#EF4444]/10 cursor-pointer"
                           >
                             <Trash2 className="w-4 h-4 mr-2" />
-                            {t('common.delete')}
+                            {'Eliminar'}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -334,7 +332,7 @@ export default function Clients() {
         <DialogContent className="bg-[#121212] border-[rgba(255,255,255,0.06)] max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-[#EDEDED] text-2xl font-semibold">
-              {editingClient ? t('clients.editClient') : t('clients.addClient')}
+              {editingClient ? 'Editar Cliente' : 'Agregar Cliente'}
             </DialogTitle>
           </DialogHeader>
 
@@ -342,13 +340,13 @@ export default function Clients() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-[#EDEDED]">
-                  {t('clients.clientName')}
+                  {'Nombre del Cliente'}
                 </Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder={t('clients.namePlaceholder', 'Ej: Juan Pérez')}
+                  placeholder={'Ej: Juan Pérez'}
                   required
                   className="h-12"
                 />
@@ -356,27 +354,27 @@ export default function Clients() {
 
               <div className="space-y-2">
                 <Label htmlFor="company" className="text-[#EDEDED]">
-                  {t('clients.clientCompany')}
+                  {'Empresa'}
                 </Label>
                 <Input
                   id="company"
                   value={formData.company}
                   onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  placeholder={t('clients.companyPlaceholder', 'Ej: Acme Corp')}
+                  placeholder={'Ej: Acme Corp'}
                   className="h-12"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-[#EDEDED]">
-                  {t('common.email')}
+                  {'Email'}
                 </Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder={t('clients.emailPlaceholder', 'correo@ejemplo.com')}
+                  placeholder={'correo@ejemplo.com'}
                   required
                   className="h-12"
                 />
@@ -384,14 +382,14 @@ export default function Clients() {
 
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-[#EDEDED]">
-                  {t('common.phone')}
+                  {'Teléfono'}
                 </Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder={t('clients.phonePlaceholder', '+1 234 567 8900')}
+                  placeholder={'+1 234 567 8900'}
                   required
                   className="h-12"
                 />
@@ -399,7 +397,7 @@ export default function Clients() {
 
               <div className="space-y-2">
                 <Label htmlFor="status" className="text-[#EDEDED]">
-                  {t('common.status')}
+                  {'estados'}
                 </Label>
                 <Select
                   value={formData.status}
@@ -411,8 +409,8 @@ export default function Clients() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">{t('common.active')}</SelectItem>
-                    <SelectItem value="inactive">{t('common.inactive')}</SelectItem>
+                    <SelectItem value="active">{'Activo'}</SelectItem>
+                    <SelectItem value="inactive">{'Inactivo'}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -420,13 +418,13 @@ export default function Clients() {
 
             <div className="space-y-2">
               <Label htmlFor="notes" className="text-[#EDEDED]">
-                {t('clients.clientNotes')} ({t('common.optional')})
+                {'Notas'} ({'opcional'})
               </Label>
               <textarea
                 id="notes"
                 value={formData.notes}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder={t('clients.notesPlaceholder', 'Información adicional sobre el cliente...')}
+                placeholder={'Información adicional sobre el cliente...'}
                 rows={4}
                 className="w-full bg-[#121212] border border-[#C4FF3D] rounded-[20px] px-4 py-3 text-[#EDEDED] placeholder:text-[#8B92A8] focus:outline-none focus:ring-2 focus:ring-[#C4FF3D]/50 transition-colors-smooth resize-none"
               />
@@ -439,7 +437,7 @@ export default function Clients() {
                 onClick={handleCloseModal}
                 className="flex-1 h-12"
               >
-                {t('common.cancel')}
+                {'Cancelar'}
               </Button>
               <Button
                 type="submit"
@@ -447,7 +445,7 @@ export default function Clients() {
                 disabled={createClientMutation.isPending || updateClientMutation.isPending}
                 className="flex-1 h-12"
               >
-                {editingClient ? t('common.update') : t('common.create')} {t('clients.client', 'Cliente')}
+                {editingClient ? 'Actualizar' : 'Crear'} {'cliente'}
               </Button>
             </div>
           </form>

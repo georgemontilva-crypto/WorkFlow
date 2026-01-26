@@ -28,7 +28,6 @@ import { Target, Plus, TrendingUp, MoreVertical, Pencil, Trash2, CheckCircle2 } 
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 // import { toast } from 'sonner';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useState, useEffect } from 'react';
 import { CurrencySelect } from '@/components/CurrencySelect';
 import { formatCurrency, getCurrencySymbol } from '@shared/currencies';
@@ -50,8 +49,7 @@ type SavingsGoal = {
 };
 
 export default function Savings() {
-  const { t } = useLanguage();
-  const utils = trpc.useUtils();
+    const utils = trpc.useUtils();
   const { primaryCurrency } = useCurrency();
   
   // Fetch savings goals using tRPC

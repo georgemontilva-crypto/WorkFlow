@@ -8,7 +8,6 @@ import { Users, Settings, Menu, X, LogOut, FileText, TrendingUp, Target } from '
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/contexts/LanguageContext';
 
 import { useState } from 'react';
 import { useAuth } from '@/_core/hooks/useAuth';
@@ -19,9 +18,7 @@ import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { t } = useLanguage();
-  
-  // Auth and access control
+    // Auth and access control
   const { user, isAuthenticated, logout } = useAuth();
   const { data: accessStatus } = trpc.auth.accessStatus.useQuery(undefined, {
     enabled: isAuthenticated,
@@ -36,17 +33,17 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     {
       title: 'GESTIÓN',
       items: [
-        { name: t('Clientes'), href: '/clients', icon: Users },
-        { name: t('Facturas'), href: '/invoices', icon: FileText },
-        { name: t('Finanzas'), href: '/finances', icon: TrendingUp },
-        { name: t('Ahorros'), href: '/savings', icon: Target },
+        { name: 'Clientes', href: '/clients', icon: Users },
+        { name: 'Facturas', href: '/invoices', icon: FileText },
+        { name: 'Finanzas', href: '/finances', icon: TrendingUp },
+        { name: 'Ahorros', href: '/savings', icon: Target },
       ]
     },
   ];
 
   // Settings at the bottom (separate)
   const settingsItems = [
-    { name: t('Configuración'), href: '/settings', icon: Settings },
+    { name: 'Configuración', href: '/settings', icon: Settings },
   ];
 
   return (
@@ -143,7 +140,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             className="w-full justify-start text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
           >
             <LogOut className="w-4 h-4 mr-2" />
-            {t('Cerrar sesión')}
+            {'Cerrar sesión'}
           </Button>
         </div>
 

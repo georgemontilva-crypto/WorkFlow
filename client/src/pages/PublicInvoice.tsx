@@ -5,7 +5,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRoute } from 'wouter';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Upload, Download, CheckCircle, AlertCircle, FileText, Building2, DollarSign, Calendar } from 'lucide-react';
@@ -13,8 +12,7 @@ import { format } from 'date-fns';
 import Toast from '@/components/Toast';
 
 export default function PublicInvoice() {
-  const { t } = useLanguage();
-  const [, params] = useRoute('/invoice/:token');
+    const [, params] = useRoute('/invoice/:token');
   const token = params?.token;
   
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -96,7 +94,7 @@ export default function PublicInvoice() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center">
-        <div className="text-white">{t('publicInvoice.loading')}</div>
+        <div className="text-white">{'Loading'}</div>
       </div>
     );
   }
@@ -106,7 +104,7 @@ export default function PublicInvoice() {
       <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center p-6">
         <div className="bg-[#121212] rounded-[28px] p-8 max-w-md w-full text-center" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}>
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-2">{t('publicInvoice.notFound')}</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">{'NotFound'}</h1>
           <p className="text-[#8B92A8]">
             El enlace de esta factura no es válido o ha expirado.
           </p>
@@ -118,17 +116,17 @@ export default function PublicInvoice() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'paid':
-        return { label: t('invoices.status.paid'), color: 'text-[#C4FF3D] bg-[#C4FF3D]/10', outline: '#C4FF3D' };
+        return { label: 'Pagada', color: 'text-[#C4FF3D] bg-[#C4FF3D]/10', outline: '#C4FF3D' };
       case 'sent':
-        return { label: t('invoices.status.sent'), color: 'text-blue-400 bg-blue-400/10', outline: '#60A5FA' };
+        return { label: 'Enviada', color: 'text-blue-400 bg-blue-400/10', outline: '#60A5FA' };
       case 'payment_submitted':
-        return { label: t('invoices.status.paymentSubmitted'), color: 'text-yellow-400 bg-yellow-400/10', outline: '#FBBF24' };
+        return { label: 'Pago en Revisión', color: 'text-yellow-400 bg-yellow-400/10', outline: '#FBBF24' };
       case 'partial':
-        return { label: t('invoices.status.partial'), color: 'text-orange-400 bg-orange-400/10', outline: '#FB923C' };
+        return { label: 'Pago Parcial', color: 'text-orange-400 bg-orange-400/10', outline: '#FB923C' };
       case 'cancelled':
-        return { label: t('invoices.status.cancelled'), color: 'text-red-400 bg-red-400/10', outline: '#EF4444' };
+        return { label: 'Cancelada', color: 'text-red-400 bg-red-400/10', outline: '#EF4444' };
       default:
-        return { label: t('invoices.status.draft'), color: 'text-[#8B92A8] bg-[#8B92A8]/10', outline: '#8B92A8' };
+        return { label: 'Borrador', color: 'text-[#8B92A8] bg-[#8B92A8]/10', outline: '#8B92A8' };
     }
   };
 
@@ -181,7 +179,7 @@ export default function PublicInvoice() {
         {/* Invoice Summary Card */}
         <div className="bg-[#121212] rounded-[28px] p-8" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}>
           <div className="flex justify-between items-start mb-6">
-            <h2 className="text-xl font-bold text-white">{t('publicInvoice.invoiceSummary')}</h2>
+            <h2 className="text-xl font-bold text-white">{'InvoiceSummary'}</h2>
             <span 
               className={`inline-block px-4 py-1.5 rounded-[9999px] text-sm font-medium ${statusBadge.color}`}
               style={{ boxShadow: `inset 0 0 0 0.5px ${statusBadge.outline}` }}
@@ -192,27 +190,27 @@ export default function PublicInvoice() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <p className="text-[#8B92A8] text-sm mb-1">{t('publicInvoice.from')}</p>
+              <p className="text-[#8B92A8] text-sm mb-1">{'From'}</p>
               <p className="text-white font-semibold">{profile?.company_name || 'N/A'}</p>
             </div>
             
             <div>
-              <p className="text-[#8B92A8] text-sm mb-1">{t('publicInvoice.billTo')}</p>
+              <p className="text-[#8B92A8] text-sm mb-1">{'BillTo'}</p>
               <p className="text-white font-semibold">{invoice.client?.name || 'N/A'}</p>
             </div>
             
             <div>
-              <p className="text-[#8B92A8] text-sm mb-1">{t('publicInvoice.issueDate')}</p>
+              <p className="text-[#8B92A8] text-sm mb-1">{'IssueDate'}</p>
               <p className="text-white font-semibold">{format(new Date(invoice.issue_date), 'dd/MM/yyyy')}</p>
             </div>
             
             <div>
-              <p className="text-[#8B92A8] text-sm mb-1">{t('publicInvoice.dueDate')}</p>
+              <p className="text-[#8B92A8] text-sm mb-1">{'DueDate'}</p>
               <p className="text-white font-semibold">{format(new Date(invoice.due_date), 'dd/MM/yyyy')}</p>
             </div>
             
             <div className="md:col-span-2">
-              <p className="text-[#8B92A8] text-sm mb-1">{t('publicInvoice.total')}</p>
+              <p className="text-[#8B92A8] text-sm mb-1">{'Total'}</p>
               <p className="text-white font-bold text-3xl">${total.toFixed(2)}</p>
               {balance > 0 && balance < total && (
                 <p className="text-yellow-400 text-sm mt-1">Saldo pendiente: ${balance.toFixed(2)}</p>
@@ -222,7 +220,7 @@ export default function PublicInvoice() {
 
           {/* Items */}
           <div className="mt-8">
-            <h3 className="text-white font-semibold mb-4">{t('publicInvoice.invoiceDetails')}</h3>
+            <h3 className="text-white font-semibold mb-4">{'InvoiceDetails'}</h3>
             <div className="space-y-3">
               {items.map((item: any, index: number) => (
                 <div 
@@ -336,9 +334,9 @@ export default function PublicInvoice() {
                 <Upload className="w-6 h-6 text-[#C4FF3D]" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white mb-2">{t('publicInvoice.uploadProof')}</h2>
+                <h2 className="text-xl font-bold text-white mb-2">{'UploadProof'}</h2>
                 <p className="text-[#8B92A8] text-sm">
-                  {t('publicInvoice.uploadProofDescription')}
+                  {'UploadProofDescription'}
                 </p>
               </div>
             </div>
@@ -365,13 +363,13 @@ export default function PublicInvoice() {
               
               <div>
                 <label className="block text-white text-sm font-medium mb-2">
-                  {t('publicInvoice.paymentReference')}
+                  {'PaymentReference'}
                 </label>
                 <input
                   type="text"
                   value={paymentReference}
                   onChange={(e) => setPaymentReference(e.target.value)}
-                  placeholder={t('publicInvoice.paymentReferencePlaceholder')}
+                  placeholder={'PaymentReferencePlaceholder'}
                   className="w-full bg-[#0A0A0A] text-white rounded-[9999px] px-6 py-3 text-sm placeholder:text-[#8B92A8]"
                   style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}
                 />
@@ -386,9 +384,9 @@ export default function PublicInvoice() {
                 {submitSuccess ? (
                   <span className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" />
-                    {t('publicInvoice.proofSubmittedSuccess')}
+                    {'ProofSubmittedSuccess'}
                   </span>
-                ) : uploading ? t('publicInvoice.submitting') : t('publicInvoice.submitProof')}
+                ) : uploading ? 'Submitting' : 'SubmitProof'}
               </Button>
             </div>
           </div>
@@ -402,7 +400,7 @@ export default function PublicInvoice() {
             disabled={downloadPDF.isLoading}
           >
             <Download className="w-4 h-4 mr-2" />
-            {downloadPDF.isLoading ? t('publicInvoice.submitting') : t('publicInvoice.downloadInvoice')}
+            {downloadPDF.isLoading ? 'Submitting' : 'DownloadInvoice'}
           </Button>
         </div>
 

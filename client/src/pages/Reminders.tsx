@@ -32,7 +32,6 @@ import {
 } from 'lucide-react';
 import { format, differenceInDays } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useLocation } from 'wouter';
 // import { toast } from 'sonner';
 import {
@@ -59,8 +58,7 @@ type ReminderItem = {
 };
 
 export default function Reminders() {
-  const { t } = useLanguage();
-  const [, setLocation] = useLocation();
+    const [, setLocation] = useLocation();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingReminder, setEditingReminder] = useState<any>(null);
   

@@ -4,7 +4,6 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Card, CardHeader } from '../components/ui/Card';
@@ -48,8 +47,7 @@ type InvoiceItem = {
 };
 
 export default function Invoices() {
-  const { t } = useLanguage();
-  const { success, error: showError } = useToast();
+    const { success, error: showError } = useToast();
   
   const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled'>('all');
   const [clientFilter, setClientFilter] = useState<'all' | number>('all');
@@ -178,12 +176,12 @@ export default function Invoices() {
     try {
       // Validate
       if (!formData.client_id) {
-        showError(t('invoices.errors.selectClient'));
+        showError('SelectClient');
         return;
       }
       
       if (items.length === 0 || items.every(item => !item.description)) {
-        showError(t('invoices.errors.addItem'));
+        showError('AddItem');
         return;
       }
       
@@ -205,9 +203,9 @@ export default function Invoices() {
       if (shouldSend && result.invoice?.id) {
         console.log('[Invoices] Sending email for invoice:', result.invoice.id);
         await sendEmailMutation.mutateAsync({ id: result.invoice.id });
-        success(t('invoices.success.createdAndSent'));
+        success('CreatedAndSent');
       } else {
-        success(t('invoices.success.created'));
+        success('Created');
       }
       
       handleCloseModal();
@@ -233,13 +231,13 @@ export default function Invoices() {
     try {
       // Validate
       if (!formData.client_id) {
-        showError(t('invoices.errors.selectClient'));
+        showError('SelectClient');
         setIsCreatingAndSending(false);
         return;
       }
       
       if (items.length === 0 || items.every(item => !item.description)) {
-        showError(t('invoices.errors.addItem'));
+        showError('AddItem');
         setIsCreatingAndSending(false);
         return;
       }
@@ -268,7 +266,7 @@ export default function Invoices() {
           link.download = pdfResult.filename;
           link.click();
         }
-        success(t('invoices.success.createdAndDownloaded'));
+        success('CreatedAndDownloaded');
       }
       
       handleCloseModal();
@@ -290,7 +288,7 @@ export default function Invoices() {
     try {
       console.log('[Invoices] Sending email for invoice:', id);
       await sendEmailMutation.mutateAsync({ id });
-      success(t('invoices.success.sent'));
+      success('Sent');
       utils.invoices.list.invalidate();
     } catch (error: any) {
       console.error('Error al enviar email:', error);
@@ -372,7 +370,7 @@ export default function Invoices() {
     
         try {
           await updateStatusMutation.mutateAsync({ id, status: 'paid' });
-          success(t('invoices.success.markedAsPaid'));
+          success('MarkedAsPaid');
           utils.invoices.list.invalidate();
           setViewingInvoice(null);
         } catch (error: any) {
@@ -385,12 +383,12 @@ export default function Invoices() {
   
   const getStatusBadge = (status: string) => {
     const badges = {
-      draft: { label: t('invoices.status.draft'), color: 'bg-gray-500' },
-      sent: { label: t('invoices.status.sent'), color: 'bg-blue-500' },
-      payment_submitted: { label: t('invoices.status.paymentSubmitted'), color: 'bg-yellow-500' },
-      paid: { label: t('invoices.status.paid'), color: 'bg-green-500' },
-      partial: { label: t('invoices.status.partial'), color: 'bg-yellow-500' },
-      cancelled: { label: t('invoices.status.cancelled'), color: 'bg-red-500' },
+      draft: { label: 'Borrador', color: 'bg-gray-500' },
+      sent: { label: 'Enviada', color: 'bg-blue-500' },
+      payment_submitted: { label: 'Pago en Revisión', color: 'bg-yellow-500' },
+      paid: { label: 'Pagada', color: 'bg-green-500' },
+      partial: { label: 'Pago Parcial', color: 'bg-yellow-500' },
+      cancelled: { label: 'Cancelada', color: 'bg-red-500' },
     };
     return badges[status as keyof typeof badges] || badges.draft;
   };
@@ -409,8 +407,8 @@ export default function Invoices() {
         <Card>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold text-[#EDEDED]">{t('invoices.title')}</h1>
-              <p className="text-[#8B92A8] mt-1">{t('invoices.subtitle')}</p>
+              <h1 className="text-2xl font-semibold text-[#EDEDED]">{'Facturas'}</h1>
+              <p className="text-[#8B92A8] mt-1">{'Gestiona tus facturas'}</p>
             </div>
             <Button
               onClick={handleOpenModal}
@@ -418,7 +416,7 @@ export default function Invoices() {
               className="w-full md:w-auto"
             >
               <Plus className="w-5 h-5 mr-2" />
-              {t('invoices.addInvoice')}
+              {'Crear Factura'}
             </Button>
           </div>
         </Card>
@@ -431,7 +429,7 @@ export default function Invoices() {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
               <Input
                 type="text"
-                placeholder={t('invoices.searchPlaceholder')}
+                placeholder={'Buscar facturas...'}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-12 h-12 text-base"
@@ -439,10 +437,10 @@ export default function Invoices() {
             </div>
             <Select value={clientFilter.toString()} onValueChange={(value: any) => setClientFilter(value === 'all' ? 'all' : parseInt(value))}>
               <SelectTrigger className="w-full md:w-[220px] h-12 text-base">
-                <SelectValue placeholder={t('invoices.filterByClient')} />
+                <SelectValue placeholder={'FilterByClient'} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t('common.all')} {t('clients.clients')}</SelectItem>
+                <SelectItem value="all">{'Todos'} {'clientes'}</SelectItem>
                 {clients.map(client => (
                   <SelectItem key={client.id} value={client.id.toString()}>{client.name}</SelectItem>
                 ))}
@@ -453,12 +451,12 @@ export default function Invoices() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">{t('common.all')}</SelectItem>
-                <SelectItem value="draft">{t('invoices.status.drafts')}</SelectItem>
-                <SelectItem value="sent">{t('invoices.status.sents')}</SelectItem>
-                <SelectItem value="paid">{t('invoices.status.paids')}</SelectItem>
-                <SelectItem value="partial">{t('invoices.status.partials')}</SelectItem>
-                <SelectItem value="cancelled">{t('invoices.status.cancelleds')}</SelectItem>
+                <SelectItem value="all">{'Todos'}</SelectItem>
+                <SelectItem value="draft">{'Drafts'}</SelectItem>
+                <SelectItem value="sent">{'Sents'}</SelectItem>
+                <SelectItem value="paid">{'Paids'}</SelectItem>
+                <SelectItem value="partial">{'Partials'}</SelectItem>
+                <SelectItem value="cancelled">{'Cancelleds'}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -565,7 +563,7 @@ export default function Invoices() {
                                 className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors"
                               >
                                 <Eye className="w-4 h-4 text-blue-400" />
-                                {t('invoices.viewInvoice')}
+                                {'ViewInvoice'}
                               </button>
                               
 
@@ -593,7 +591,7 @@ export default function Invoices() {
                                   className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors"
                                 >
                                   <CheckCircle className="w-4 h-4 text-green-400" />
-                                  {t('invoices.markAsPaid')}
+                                  {'MarkAsPaid'}
                                 </button>
                               )}
                               
@@ -627,7 +625,7 @@ export default function Invoices() {
                                   className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-900/20 flex items-center gap-3 transition-colors"
                                 >
                                   <XCircle className="w-4 h-4" />
-                                  {t('invoices.cancelInvoice')}
+                                  {'CancelInvoice'}
                                 </button>
                               )}
                               
@@ -641,7 +639,7 @@ export default function Invoices() {
                                   className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-900/20 flex items-center gap-3 transition-colors"
                                 >
                                   <Trash2 className="w-4 h-4" />
-                                  {t('common.delete')}
+                                  {'Eliminar'}
                                 </button>
                               )}
                             </div>
@@ -664,7 +662,7 @@ export default function Invoices() {
           <div className="bg-[#0A0A0A] rounded-lg border border-[rgba(255,255,255,0.06)] w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white">{t('invoices.addInvoice')}</h2>
+                <h2 className="text-xl font-bold text-white">{'Crear Factura'}</h2>
                 <button onClick={handleCloseModal} className="text-[#8B92A8] hover:text-white">
                   <X className="w-5 h-5" />
                 </button>
@@ -673,7 +671,7 @@ export default function Invoices() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Client Selection with Search */}
                 <div className="relative">
-                  <Label className="text-white block mb-2">{t('common.client')} *</Label>
+                  <Label className="text-white block mb-2">{'Client'} *</Label>
                   <div className="relative">
                     <input
                       type="text"
@@ -685,7 +683,7 @@ export default function Invoices() {
                         setShowClientDropdown(true);
                       }}
                       onFocus={() => setShowClientDropdown(true)}
-                      placeholder={t('invoices.searchClientPlaceholder')}
+                      placeholder={'SearchClientPlaceholder'}
                       className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2.5 text-white placeholder:text-[#8B92A8] focus:outline-none focus:border-[rgba(196,255,61,0.3)]"
                     />
                     {showClientDropdown && (
@@ -741,7 +739,7 @@ export default function Invoices() {
                 {/* Dates */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-white block mb-2">{t('invoices.issueDate')} *</Label>
+                    <Label className="text-white block mb-2">{'IssueDate'} *</Label>
                     <Input
                       type="date"
                       value={formData.issue_date}
@@ -750,7 +748,7 @@ export default function Invoices() {
                     />
                   </div>
                   <div>
-                    <Label className="text-white block mb-2">{t('invoices.dueDate')} *</Label>
+                    <Label className="text-white block mb-2">{'DueDate'} *</Label>
                     <Input
                       type="date"
                       value={formData.due_date}
@@ -766,7 +764,7 @@ export default function Invoices() {
                 <div className="p-3 bg-[#EBFF57]/10 border border-[#EBFF57]/30 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-[#8B92A8] mb-1">{t('invoices.invoiceCurrency')}</p>
+                      <p className="text-xs text-[#8B92A8] mb-1">{'InvoiceCurrency'}</p>
                       <p className="text-sm font-medium text-white">
                         {getCurrency(user?.primary_currency || 'USD')?.name}
                       </p>
@@ -776,17 +774,17 @@ export default function Invoices() {
                     </Badge>
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
-                    {t('invoices.currencyAutoAssigned')}
+                    {'CurrencyAutoAssigned'}
                   </p>
                 </div>
                 
                 {/* Items */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <Label className="text-white">{t('invoices.items')} *</Label>
+                    <Label className="text-white">{'Items'} *</Label>
                     <Button type="button" size="sm" onClick={handleAddItem} variant="default">
                       <Plus className="w-4 h-4 mr-1" />
-                      {t('invoices.addItem')}
+                      {'AddItem'}
                     </Button>
                   </div>
                   
@@ -795,16 +793,16 @@ export default function Invoices() {
                       <div key={index} className="space-y-2">
                         <div className="grid grid-cols-12 gap-2 items-end">
                           <div className="col-span-6">
-                            <Label className="text-white text-xs mb-1">{t('common.description')}</Label>
+                            <Label className="text-white text-xs mb-1">{'Description'}</Label>
                             <Input
-                              placeholder={t('invoices.itemDescriptionPlaceholder')}
+                              placeholder={'ItemDescriptionPlaceholder'}
                               value={item.description}
                               onChange={(e) => handleItemChange(index, 'description', e.target.value)}
                               className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
                             />
                           </div>
                           <div className="col-span-2">
-                            <Label className="text-white text-xs mb-1">{t('invoices.quantity')}</Label>
+                            <Label className="text-white text-xs mb-1">{'Quantity'}</Label>
                             <Input
                               type="number"
                               placeholder="1"
@@ -814,7 +812,7 @@ export default function Invoices() {
                             />
                           </div>
                           <div className="col-span-2">
-                            <Label className="text-white text-xs mb-1">{t('invoices.unitPrice')}</Label>
+                            <Label className="text-white text-xs mb-1">{'UnitPrice'}</Label>
                             <Input
                               type="number"
                               placeholder="0.00"
@@ -824,7 +822,7 @@ export default function Invoices() {
                             />
                           </div>
                           <div className="col-span-2">
-                            <Label className="text-white text-xs mb-1">{t('common.total')}</Label>
+                            <Label className="text-white text-xs mb-1">{'Total'}</Label>
                             <Input
                               type="number"
                               placeholder="0.00"
@@ -853,7 +851,7 @@ export default function Invoices() {
                   
                   <div className="mt-4 text-right">
                     <p className="text-white font-semibold">
-                      {t('invoices.subtotal')}: ${calculateSubtotal().toFixed(2)}
+                      {'Subtotal'}: ${calculateSubtotal().toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -861,22 +859,22 @@ export default function Invoices() {
                 {/* Notes and Terms - Side by Side */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-white block mb-2">{t('invoices.notes')}</Label>
+                    <Label className="text-white block mb-2">{'Notes'}</Label>
                     <textarea
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       className="w-full min-h-[80px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2 text-white"
-                      placeholder={t('invoices.notesPlaceholder')}
+                      placeholder={'NotesPlaceholder'}
                     />
                   </div>
                   
                   <div>
-                    <Label className="text-white block mb-2">{t('invoices.terms')}</Label>
+                    <Label className="text-white block mb-2">{'Terms'}</Label>
                     <textarea
                       value={formData.terms}
                       onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
                       className="w-full min-h-[80px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2 text-white"
-                      placeholder={t('invoices.termsPlaceholder')}
+                      placeholder={'TermsPlaceholder'}
                     />
                   </div>
                 </div>
@@ -904,14 +902,14 @@ export default function Invoices() {
                       className="w-4 h-4 bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] rounded accent-[#C4FF3D]"
                     />
                     <Label htmlFor="is_recurring" className="text-white cursor-pointer text-sm">
-                      {t('invoices.recurringInvoice')}
+                      {'RecurringInvoice'}
                     </Label>
                   </div>
                   
                   {/* Action Buttons - Bottom Right */}
                   <div className="flex gap-3 items-center">
                   <Button type="button" variant="outline" onClick={handleCloseModal} className="border-[rgba(255,255,255,0.06)] text-white hover:bg-gray-800">
-                    {t('common.cancel')}
+                    {'Cancelar'}
                   </Button>
                   
                   {/* Dropdown Button */}
@@ -923,7 +921,7 @@ export default function Invoices() {
                       className="px-6 py-2.5 bg-[#C4FF3D] text-black rounded-[9999px] font-medium hover:bg-[#C4FF3D]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                       style={{ boxShadow: 'inset 0 0 0 0.5px rgba(0,0,0,0.1)' }}
                     >
-                      {isCreatingAndSending ? t('common.processing') : t('invoices.createInvoice')}
+                      {isCreatingAndSending ? 'Processing' : 'CreateInvoice'}
                       <ChevronDown className="w-4 h-4" />
                     </button>
                     
@@ -938,8 +936,8 @@ export default function Invoices() {
                           >
                             <Send className="w-4 h-4 text-[#C4FF3D]" />
                             <div>
-                              <p className="font-medium">{t('invoices.createAndSend')}</p>
-                              <p className="text-xs text-[#8B92A8]">{t('invoices.createAndSendDesc')}</p>
+                              <p className="font-medium">{'CreateAndSend'}</p>
+                              <p className="text-xs text-[#8B92A8]">{'CreateAndSendDesc'}</p>
                             </div>
                           </button>
                           
@@ -950,8 +948,8 @@ export default function Invoices() {
                           >
                             <Download className="w-4 h-4 text-[#C4FF3D]" />
                             <div>
-                              <p className="font-medium">{t('invoices.createAndDownload')}</p>
-                              <p className="text-xs text-[#8B92A8]">{t('invoices.createAndDownloadDesc')}</p>
+                              <p className="font-medium">{'CreateAndDownload'}</p>
+                              <p className="text-xs text-[#8B92A8]">{'CreateAndDownloadDesc'}</p>
                             </div>
                           </button>
                           
@@ -962,8 +960,8 @@ export default function Invoices() {
                           >
                             <FileText className="w-4 h-4 text-[#C4FF3D]" />
                             <div>
-                              <p className="font-medium">{t('invoices.justCreate')}</p>
-                              <p className="text-xs text-[#8B92A8]">{t('invoices.justCreateDesc')}</p>
+                              <p className="font-medium">{'JustCreate'}</p>
+                              <p className="text-xs text-[#8B92A8]">{'JustCreateDesc'}</p>
                             </div>
                           </button>
                         </div>
@@ -984,7 +982,7 @@ export default function Invoices() {
           <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-md">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white">{t('invoices.configureRecurring')}</h2>
+                <h2 className="text-xl font-bold text-white">{'ConfigureRecurring'}</h2>
                 <button 
                   onClick={() => setShowRecurringModal(false)} 
                   className="text-[#8B92A8] hover:text-white"
@@ -996,7 +994,7 @@ export default function Invoices() {
               <div className="space-y-6">
                 {/* Frequency */}
                 <div>
-                  <Label className="text-white block mb-2">{t('invoices.frequency')} *</Label>
+                  <Label className="text-white block mb-2">{'Frequency'} *</Label>
                   <Select 
                     value={formData.recurrence_frequency} 
                     onValueChange={(value: any) => setFormData({ ...formData, recurrence_frequency: value })}
@@ -1005,19 +1003,19 @@ export default function Invoices() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] z-[70]">
-                      <SelectItem value="weekly">{t('invoices.frequencies.weekly')}</SelectItem>
-                      <SelectItem value="biweekly">{t('invoices.frequencies.biweekly')}</SelectItem>
-                      <SelectItem value="monthly">{t('invoices.frequencies.monthly')}</SelectItem>
-                      <SelectItem value="quarterly">{t('invoices.frequencies.quarterly')}</SelectItem>
-                      <SelectItem value="semiannually">{t('invoices.frequencies.semiannually')}</SelectItem>
-                      <SelectItem value="annually">{t('invoices.frequencies.annually')}</SelectItem>
+                      <SelectItem value="weekly">{'Weekly'}</SelectItem>
+                      <SelectItem value="biweekly">{'Biweekly'}</SelectItem>
+                      <SelectItem value="monthly">{'Monthly'}</SelectItem>
+                      <SelectItem value="quarterly">{'Quarterly'}</SelectItem>
+                      <SelectItem value="semiannually">{'Semiannually'}</SelectItem>
+                      <SelectItem value="annually">{'Annually'}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 
                 {/* End Date */}
                 <div>
-                  <Label className="text-white block mb-2">{t('invoices.endDate')} ({t('common.optional')})</Label>
+                  <Label className="text-white block mb-2">{'EndDate'} ({'opcional'})</Label>
                   <Input
                     type="date"
                     value={formData.recurrence_end_date}
@@ -1026,14 +1024,14 @@ export default function Invoices() {
                     placeholder="Sin fecha de fin"
                   />
                   <p className="text-xs text-[#8B92A8] mt-2">
-                    {t('invoices.recurringEndDateInfo')}
+                    {'RecurringEndDateInfo'}
                   </p>
                 </div>
                 
                 {/* Info */}
                 <div className="p-3 bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 rounded-lg">
                   <p className="text-xs text-[#C4FF3D]">
-                    {t('invoices.recurringInfo')}
+                    {'RecurringInfo'}
                   </p>
                 </div>
                 
@@ -1053,7 +1051,7 @@ export default function Invoices() {
                     }}
                     className="border-[rgba(255,255,255,0.06)] text-white hover:bg-gray-800"
                   >
-                    {t('common.cancel')}
+                    {'Cancelar'}
                   </Button>
                   <Button 
                     type="button" 
@@ -1063,7 +1061,7 @@ export default function Invoices() {
                     }}
                     className="bg-[#C4FF3D] text-black hover:bg-[#C4FF3D]/90 rounded-[9999px]"
                   >
-                    {t('common.confirm')}
+                    {'Confirmar'}
                   </Button>
                 </div>
               </div>
