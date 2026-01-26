@@ -47,7 +47,8 @@ type InvoiceItem = {
 };
 
 export default function Invoices() {
-    const { success, error: showError } = useToast();
+  const [expandedInvoiceId, setExpandedInvoiceId] = useState<number | null>(null);
+  const { success, error: showError } = useToast();
   
   const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'sent' | 'paid' | 'partial' | 'cancelled'>('all');
   const [clientFilter, setClientFilter] = useState<'all' | number>('all');
@@ -475,176 +476,339 @@ export default function Invoices() {
             filteredInvoices.map((invoice) => {
               const badge = getStatusBadge(invoice.status);
               const client = clients.find(c => c.id === invoice.client_id);
+              const isExpanded = expandedInvoiceId === invoice.id;
               
               return (
                 <div
                   key={invoice.id}
-                  className="bg-[#121212] rounded-[28px] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 p-6 transition-all duration-200 cursor-pointer group"
+                  className="bg-[#121212] rounded-[28px] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 transition-all duration-200 group"
                 >
-                  <div className="flex flex-col md:flex-row md:items-center gap-6">
-                    {/* Columna Izquierda: Icono + Info */}
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="w-12 h-12 rounded-[20px] bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 flex items-center justify-center flex-shrink-0">
-                        <FileText className="w-6 h-6 text-[#C4FF3D]" />
+                  {/* Header - Always Visible */}
+                  <div className="p-4 lg:p-6">
+                    {/* MOBILE & TABLET (< 1024px) - Card Layout */}
+                    <div className="lg:hidden">
+                      <div 
+                        className="cursor-pointer"
+                        onClick={() => setExpandedInvoiceId(isExpanded ? null : invoice.id)}
+                      >
+                        {/* Línea 1: Cliente + Badge */}
+                        <div className="flex items-start justify-between gap-3 mb-3">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="w-10 h-10 rounded-[16px] bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 flex items-center justify-center flex-shrink-0">
+                              <FileText className="w-5 h-5 text-[#C4FF3D]" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-sm font-medium text-[#EDEDED] truncate">{client?.name || 'Desconocido'}</h3>
+                            </div>
+                          </div>
+                          <span className={`px-3 py-1 rounded-[9999px] text-xs font-medium border whitespace-nowrap flex-shrink-0 ${
+                            badge.color === 'bg-green-500' ? 'text-[#C4FF3D] bg-[#C4FF3D]/10 border-[#C4FF3D]/30' : 
+                            badge.color === 'bg-yellow-500' ? 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30' : 
+                            badge.color === 'bg-red-500' ? 'text-red-400 bg-red-400/10 border-red-400/30' : 
+                            'text-[#8B92A8] bg-[#8B92A8]/10 border-[#8B92A8]/30'
+                          }`}>
+                            {badge.label}
+                          </span>
+                        </div>
+
+                        {/* Línea 2: Total */}
+                        <div className="mb-2">
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-xl font-semibold text-[#EDEDED]">
+                              {new Intl.NumberFormat('es-ES', { style: 'currency', currency: invoice.currency }).format(parseFloat(invoice.total))}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Línea 3: Fecha + Número */}
+                        <div className="flex items-center gap-4 text-xs text-[#8B92A8]">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span>{format(new Date(invoice.due_date), 'dd/MM/yyyy')}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>{invoice.invoice_number}</span>
+                          </div>
+                          <button
+                            className="ml-auto text-[#8B92A8] hover:text-[#EDEDED] p-1 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExpandedInvoiceId(isExpanded ? null : invoice.id);
+                            }}
+                          >
+                            <ChevronDown 
+                              className={`w-4 h-4 transition-transform duration-200 ${
+                                isExpanded ? 'rotate-180' : ''
+                              }`}
+                            />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-medium text-[#EDEDED]">{invoice.invoice_number}</h3>
-                        <p className="text-sm text-[#8B92A8]">{client?.name || 'Desconocido'}</p>
-                      </div>
+
+                      {/* Expanded Content - Mobile/Tablet Only */}
+                      {isExpanded && (
+                        <div className="mt-4 pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-3">
+                          {/* Botón Ver Factura */}
+                          <Button
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setViewingInvoice(invoice.id);
+                            }}
+                            className="w-full bg-[#C4FF3D]/10 border-[#C4FF3D]/30 text-[#C4FF3D] hover:bg-[#C4FF3D]/20 h-11 justify-center"
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            Ver Factura
+                          </Button>
+
+                          {/* Grid de Acciones */}
+                          <div className="grid grid-cols-2 gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDownloadPDF(invoice.id, invoice.invoice_number);
+                              }}
+                              disabled={downloadPDFMutation.isPending}
+                              className="bg-[#8B92A8]/10 border-[#8B92A8]/30 text-[#8B92A8] hover:bg-[#8B92A8]/20 h-10"
+                            >
+                              <Download className="w-4 h-4 mr-2" />
+                              Descargar
+                            </Button>
+
+                            {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleMarkAsPaid(invoice.id);
+                                }}
+                                className="bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20 h-10"
+                              >
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Pagada
+                              </Button>
+                            )}
+
+                            {invoice.status === 'draft' && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleSendEmail(invoice.id);
+                                }}
+                                disabled={sendEmailMutation.isPending}
+                                className="bg-blue-500/10 border-blue-500/30 text-blue-400 hover:bg-blue-500/20 h-10"
+                              >
+                                <Send className="w-4 h-4 mr-2" />
+                                Enviar
+                              </Button>
+                            )}
+
+                            {invoice.status !== 'cancelled' && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleUpdateStatus(invoice.id, 'cancelled');
+                                }}
+                                className="bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20 h-10"
+                              >
+                                <XCircle className="w-4 h-4 mr-2" />
+                                Cancelar
+                              </Button>
+                            )}
+
+                            {invoice.status === 'draft' && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(invoice.id);
+                                }}
+                                className="bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20 h-10"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Eliminar
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Columna Centro: Monto y Vencimiento */}
-                    <div className="hidden md:flex flex-col gap-2 min-w-[200px]">
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-[#8B92A8]" />
-                        <span className="text-sm text-[#EDEDED] font-medium">
-                          {new Intl.NumberFormat('es-ES', { style: 'currency', currency: invoice.currency }).format(parseFloat(invoice.total))}
-                        </span>
+                    {/* DESKTOP (≥ 1024px) - Table Layout */}
+                    <div className="hidden lg:flex items-center gap-6">
+                      {/* Columna 1: Cliente */}
+                      <div className="flex items-center gap-4 w-[280px]">
+                        <div className="w-12 h-12 rounded-[20px] bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 flex items-center justify-center flex-shrink-0">
+                          <FileText className="w-6 h-6 text-[#C4FF3D]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base font-medium text-[#EDEDED] truncate">{client?.name || 'Desconocido'}</h3>
+                          <p className="text-sm text-[#8B92A8] truncate">{invoice.invoice_number}</p>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-[#8B92A8]" />
-                        <span className="text-sm text-[#8B92A8]">
-                          {format(new Date(invoice.due_date), 'dd/MM/yyyy')}
-                        </span>
-                      </div>
-                    </div>
 
-                    {/* Columna Derecha: Badge + Acciones */}
-                    <div className="flex items-center gap-3">
-                      <span className={`px-4 py-1.5 rounded-[9999px] text-sm font-medium border min-w-[160px] text-center ${badge.color === 'bg-green-500' ? 'text-[#C4FF3D] bg-[#C4FF3D]/10 border-[#C4FF3D]/30' : badge.color === 'bg-yellow-500' ? 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30' : badge.color === 'bg-red-500' ? 'text-red-400 bg-red-400/10 border-red-400/30' : 'text-[#8B92A8] bg-[#8B92A8]/10 border-[#8B92A8]/30'}`}>
-                        {badge.label}
-                      </span>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={(e) => { e.stopPropagation(); setViewingInvoice(invoice.id); }}
-                        className="text-[#8B92A8] hover:text-white min-h-[44px] min-w-[44px]"
-                      >
-                        <Eye className="w-5 h-5" />
-                      </Button>
-                      
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={(e) => { e.stopPropagation(); handleDownloadPDF(invoice.id, invoice.invoice_number); }}
-                        disabled={downloadPDFMutation.isPending}
-                        className="text-[#8B92A8] hover:text-white disabled:opacity-50 min-h-[44px] min-w-[44px] hidden md:flex"
-                      >
-                        <Download className="w-5 h-5" />
-                      </Button>
-                      
-                      {/* Actions Dropdown */}
-                      <div className="relative">
+                      {/* Columna 2: Estado */}
+                      <div className="w-[160px] flex-shrink-0">
+                        <span className={`inline-flex px-4 py-1.5 rounded-[9999px] text-sm font-medium border ${
+                          badge.color === 'bg-green-500' ? 'text-[#C4FF3D] bg-[#C4FF3D]/10 border-[#C4FF3D]/30' : 
+                          badge.color === 'bg-yellow-500' ? 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30' : 
+                          badge.color === 'bg-red-500' ? 'text-red-400 bg-red-400/10 border-red-400/30' : 
+                          'text-[#8B92A8] bg-[#8B92A8]/10 border-[#8B92A8]/30'
+                        }`}>
+                          {badge.label}
+                        </span>
+                      </div>
+
+                      {/* Columna 3: Total */}
+                      <div className="w-[140px] flex-shrink-0">
+                        <div className="flex items-center gap-2">
+                          <DollarSign className="w-4 h-4 text-[#8B92A8]" />
+                          <span className="text-sm text-[#EDEDED] font-medium">
+                            {new Intl.NumberFormat('es-ES', { style: 'currency', currency: invoice.currency }).format(parseFloat(invoice.total))}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Columna 4: Fecha */}
+                      <div className="w-[120px] flex-shrink-0">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-[#8B92A8]" />
+                          <span className="text-sm text-[#8B92A8]">
+                            {format(new Date(invoice.due_date), 'dd/MM/yyyy')}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Columna 5: Acciones */}
+                      <div className="flex items-center gap-2 ml-auto">
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={(e) => { e.stopPropagation(); setOpenDropdownId(openDropdownId === invoice.id ? null : invoice.id); }}
+                          onClick={(e) => { e.stopPropagation(); setViewingInvoice(invoice.id); }}
                           className="text-[#8B92A8] hover:text-white min-h-[44px] min-w-[44px]"
                         >
-                          <MoreVertical className="w-5 h-5" />
+                          <Eye className="w-5 h-5" />
                         </Button>
                         
-                        {openDropdownId === invoice.id && (
-                          <>
-                            {/* Backdrop to close dropdown */}
-                            <div 
-                              className="fixed inset-0 z-10" 
-                              onClick={() => setOpenDropdownId(null)}
-                            />
-                            
-                            {/* Dropdown Menu */}
-                            <div className="absolute right-0 mt-2 w-56 bg-[#0E0F12] border border-[#C4FF3D]/30 rounded-[28px] shadow-lg z-20 py-1">
-                              {/* Ver Factura */}
-                              <button
-                                onClick={() => {
-                                  setViewingInvoice(invoice.id);
-                                  setOpenDropdownId(null);
-                                }}
-                                className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors"
-                              >
-                                <Eye className="w-4 h-4 text-blue-400" />
-                                {'ViewInvoice'}
-                              </button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={(e) => { e.stopPropagation(); handleDownloadPDF(invoice.id, invoice.invoice_number); }}
+                          disabled={downloadPDFMutation.isPending}
+                          className="text-[#8B92A8] hover:text-white disabled:opacity-50 min-h-[44px] min-w-[44px]"
+                        >
+                          <Download className="w-5 h-5" />
+                        </Button>
+                        
+                        {/* Actions Dropdown */}
+                        <div className="relative">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={(e) => { e.stopPropagation(); setOpenDropdownId(openDropdownId === invoice.id ? null : invoice.id); }}
+                            className="text-[#8B92A8] hover:text-white min-h-[44px] min-w-[44px]"
+                          >
+                            <MoreVertical className="w-5 h-5" />
+                          </Button>
+                          
+                          {openDropdownId === invoice.id && (
+                            <>
+                              {/* Backdrop to close dropdown */}
+                              <div 
+                                className="fixed inset-0 z-10" 
+                                onClick={() => setOpenDropdownId(null)}
+                              />
                               
-
-                              {/* Marcar como Pendiente */}
-                              {invoice.status !== 'draft' && invoice.status !== 'cancelled' && (
-                                <button
-                                  onClick={() => {
-                                    handleUpdateStatus(invoice.id, 'sent');
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors"
-                                >
-                                  <Clock className="w-4 h-4 text-yellow-400" />
-                                  Marcar como Pendiente
-                                </button>
-                              )}
-                              
-                              {/* Marcar como Pagada */}
-                              {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
-                                <button
-                                  onClick={() => {
-                                    handleMarkAsPaid(invoice.id);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors"
-                                >
-                                  <CheckCircle className="w-4 h-4 text-green-400" />
-                                  {'MarkAsPaid'}
-                                </button>
-                              )}
-                              
-                              {/* Enviar por Email */}
-                              {invoice.status === 'draft' && (
-                                <button
-                                  onClick={() => {
-                                    handleSendEmail(invoice.id);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  disabled={sendEmailMutation.isPending}
-                                  className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors disabled:opacity-50"
-                                >
-                                  <Send className="w-4 h-4 text-blue-400" />
-                                  Enviar por Email
-                                </button>
-                              )}
-                              
-                              {/* Divider */}
-                              {invoice.status !== 'cancelled' && (
-                                <div className="border-t border-[rgba(255,255,255,0.06)] my-1" />
-                              )}
-                              
-                              {/* Cancelar Factura */}
-                              {invoice.status !== 'cancelled' && (
-                                <button
-                                  onClick={() => {
-                                    handleUpdateStatus(invoice.id, 'cancelled');
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-900/20 flex items-center gap-3 transition-colors"
-                                >
-                                  <XCircle className="w-4 h-4" />
-                                  {'CancelInvoice'}
-                                </button>
-                              )}
-                              
-                              {/* Eliminar (solo draft) */}
-                              {invoice.status === 'draft' && (
-                                <button
-                                  onClick={() => {
-                                    handleDelete(invoice.id);
-                                    setOpenDropdownId(null);
-                                  }}
-                                  className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-900/20 flex items-center gap-3 transition-colors"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                  {'Eliminar'}
-                                </button>
-                              )}
-                            </div>
-                          </>
-                        )}
+                              {/* Dropdown Menu */}
+                              <div className="absolute right-0 mt-2 w-56 bg-[#0E0F12] border border-[#C4FF3D]/30 rounded-[28px] shadow-lg z-20 py-1">
+                                {/* Marcar como Pendiente */}
+                                {invoice.status !== 'draft' && invoice.status !== 'cancelled' && (
+                                  <button
+                                    onClick={() => {
+                                      handleUpdateStatus(invoice.id, 'sent');
+                                      setOpenDropdownId(null);
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors"
+                                  >
+                                    <Clock className="w-4 h-4 text-yellow-400" />
+                                    Marcar como Pendiente
+                                  </button>
+                                )}
+                                
+                                {/* Marcar como Pagada */}
+                                {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
+                                  <button
+                                    onClick={() => {
+                                      handleMarkAsPaid(invoice.id);
+                                      setOpenDropdownId(null);
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors"
+                                  >
+                                    <CheckCircle className="w-4 h-4 text-green-400" />
+                                    Marcar como Pagada
+                                  </button>
+                                )}
+                                
+                                {/* Enviar por Email */}
+                                {invoice.status === 'draft' && (
+                                  <button
+                                    onClick={() => {
+                                      handleSendEmail(invoice.id);
+                                      setOpenDropdownId(null);
+                                    }}
+                                    disabled={sendEmailMutation.isPending}
+                                    className="w-full px-4 py-2 text-left text-white hover:bg-gray-800 flex items-center gap-3 transition-colors disabled:opacity-50"
+                                  >
+                                    <Send className="w-4 h-4 text-blue-400" />
+                                    Enviar por Email
+                                  </button>
+                                )}
+                                
+                                {/* Divider */}
+                                {invoice.status !== 'cancelled' && (
+                                  <div className="border-t border-[rgba(255,255,255,0.06)] my-1" />
+                                )}
+                                
+                                {/* Cancelar Factura */}
+                                {invoice.status !== 'cancelled' && (
+                                  <button
+                                    onClick={() => {
+                                      handleUpdateStatus(invoice.id, 'cancelled');
+                                      setOpenDropdownId(null);
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-900/20 flex items-center gap-3 transition-colors"
+                                  >
+                                    <XCircle className="w-4 h-4" />
+                                    Cancelar Factura
+                                  </button>
+                                )}
+                                
+                                {/* Eliminar (solo draft) */}
+                                {invoice.status === 'draft' && (
+                                  <button
+                                    onClick={() => {
+                                      handleDelete(invoice.id);
+                                      setOpenDropdownId(null);
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-red-400 hover:bg-red-900/20 flex items-center gap-3 transition-colors"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                    Eliminar
+                                  </button>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
