@@ -10,7 +10,7 @@
  *         sent → cancelled
  */
 
-import { router, protectedProcedure } from "./_core/trpc";
+import { router, protectedProcedure, publicProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { getDb } from "./db";
 import * as dbHelpers from "./db";
@@ -636,7 +636,7 @@ export const invoicesRouter = router({
     }),
 
   // Get invoice by public token (for client portal)
-  getByToken: protectedProcedure
+  getByToken: publicProcedure
     .input(z.object({ token: z.string() }))
     .query(async ({ input }) => {
       console.log(`[Invoices] Get invoice by public token`);
@@ -685,7 +685,7 @@ export const invoicesRouter = router({
     }),
 
   // Upload payment proof (public endpoint for clients)
-  uploadPaymentProof: protectedProcedure
+  uploadPaymentProof: publicProcedure
     .input(z.object({
       token: z.string(),
       proof: z.string(), // base64 encoded file
@@ -742,7 +742,7 @@ export const invoicesRouter = router({
     }),
 
   // Generate PDF by public token (for client portal)
-  generatePDFByToken: protectedProcedure
+  generatePDFByToken: publicProcedure
     .input(z.object({ token: z.string() }))
     .mutation(async ({ input }) => {
       console.log(`[Invoices] Generate PDF by public token`);
