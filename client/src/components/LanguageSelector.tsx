@@ -29,7 +29,7 @@ export function LanguageSelector() {
         onClick={() => i18n.changeLanguage('en')}
         className={`h-8 px-3 text-xs ${
           i18n.language === 'en' 
-            : 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground' 
+            ? 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground' 
             : 'text-muted-foreground hover:text-foreground'
         }`}
       >
