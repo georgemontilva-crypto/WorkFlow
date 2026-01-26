@@ -198,8 +198,9 @@ export default function Invoices() {
       });
       
       // If shouldSend, send email
-      if (shouldSend && result.id) {
-        await sendEmailMutation.mutateAsync({ id: result.id });
+      if (shouldSend && result.invoice?.id) {
+        console.log('[Invoices] Sending email for invoice:', result.invoice.id);
+        await sendEmailMutation.mutateAsync({ id: result.invoice.id });
         success('Factura creada y enviada exitosamente');
       } else {
         success('Factura creada exitosamente');
@@ -254,8 +255,9 @@ export default function Invoices() {
       });
       
       // Download PDF
-      if (result.id) {
-        const pdfResult = await downloadPDFMutation.mutateAsync({ id: result.id });
+      if (result.invoice?.id) {
+        console.log('[Invoices] Downloading PDF for invoice:', result.invoice.id);
+        const pdfResult = await downloadPDFMutation.mutateAsync({ id: result.invoice.id });
         if (pdfResult.pdf) {
           const link = document.createElement('a');
           link.href = `data:application/pdf;base64,${pdfResult.pdf}`;
