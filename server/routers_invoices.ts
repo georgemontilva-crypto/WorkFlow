@@ -698,11 +698,11 @@ export const invoicesRouter = router({
         const db = await getDb();
         
         // Validate file size (base64 string length)
-        // TEXT field in MySQL can hold ~64KB, base64 is ~33% larger than original
-        // Limit to ~45KB base64 (~30KB original file)
-        const maxSize = 45000; // characters
+        // MEDIUMTEXT field in MySQL can hold ~16MB, base64 is ~33% larger than original
+        // Limit to ~1MB base64 (~800KB original file)
+        const maxSize = 1100000; // characters (~1MB base64 = ~800KB original)
         if (input.proof.length > maxSize) {
-          throw new Error(`El archivo es demasiado grande. Máximo ${Math.floor(maxSize * 0.75 / 1024)}KB`);
+          throw new Error(`El archivo es demasiado grande. Máximo 800KB`);
         }
         
         console.log(`[Invoices] File size: ${input.proof.length} characters`);

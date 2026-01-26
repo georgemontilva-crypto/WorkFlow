@@ -1,4 +1,4 @@
-import { mysqlTable, serial, varchar, text, int, bigint, timestamp, decimal, mysqlEnum, boolean } from "drizzle-orm/mysql-core";
+import { mysqlTable, serial, varchar, text, mediumtext, int, bigint, timestamp, decimal, mysqlEnum, boolean } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -101,7 +101,7 @@ export const invoices = mysqlTable("invoices", {
   public_token: varchar("public_token", { length: 255 }).unique(),
   
   /** Payment proof fields */
-  payment_proof_url: text("payment_proof_url"),
+  payment_proof_url: mediumtext("payment_proof_url"),
   payment_proof_uploaded_at: timestamp("payment_proof_uploaded_at"),
   payment_reference: varchar("payment_reference", { length: 255 }),
   
