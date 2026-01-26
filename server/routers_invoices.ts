@@ -745,10 +745,46 @@ export const invoicesRouter = router({
             invoice.id,
             invoice.invoice_number
           );
-          console.log(`[Invoices] Notification sent`);
+          console.log(`[Invoices] In-app notification created`);
         } catch (notifError: any) {
           console.error(`[Invoices] Notification error (non-blocking):`, notifError.message);
           // Don't throw, notification failure shouldn't block the upload
+        }
+        
+        // Send email notification to user (non-blocking)
+        try {
+          // Get user and client data for email
+          const { getUserById } = await import('./helpers/dbHelpers');
+          const { getClientById } = await import('./helpers/dbHelpers');
+          const { sendEmail, getPaymentProofReceivedEmailTemplate } = await import('./_core/email');
+          
+          const user = await getUserById(invoice.user_id);
+          const client = await getClientById(invoice.client_id, invoice.user_id);
+          
+          if (user && client) {
+            const emailHtml = getPaymentProofReceivedEmailTemplate(
+              user.name,
+              invoice.invoice_number,
+              client.name,
+              invoice.total.toString(),
+              invoice.currency
+            );
+            
+            const emailSent = await sendEmail({
+              to: user.email,
+              subject: `📩 Comprobante recibido - Factura ${invoice.invoice_number}`,
+              html: emailHtml,
+            });
+            
+            if (emailSent) {
+              console.log(`[Invoices] Email notification sent to ${user.email}`);
+            } else {
+              console.warn(`[Invoices] Email notification failed to send`);
+            }
+          }
+        } catch (emailError: any) {
+          console.error(`[Invoices] Email notification error (non-blocking):`, emailError.message);
+          // Don't throw, email failure shouldn't block the upload
         }
         
         return { 

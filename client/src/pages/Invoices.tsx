@@ -3,7 +3,7 @@
  * Clean, minimal, functional UI for invoice management
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { ConfirmDialog } from '../components/ConfirmDialog';
@@ -92,7 +92,16 @@ export default function Invoices() {
   // Queries
   const utils = trpc.useContext();
   const { data: user } = trpc.auth.me.useQuery();
-  const { data: invoices = [] } = trpc.invoices.list.useQuery({ status: statusFilter });
+  const { data: invoices = [], refetch: refetchInvoices } = trpc.invoices.list.useQuery({ status: statusFilter });
+  
+  // Auto-refresh invoices every 15 seconds for real-time updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetchInvoices();
+    }, 15000); // 15 seconds
+    
+    return () => clearInterval(interval);
+  }, [refetchInvoices]);
   const { data: clients = [] } = trpc.clients.list.useQuery();
   const { data: viewInvoiceData } = trpc.invoices.getById.useQuery(
     { id: viewingInvoice! },

@@ -203,6 +203,36 @@ export function getLoginAlertEmailTemplate(
   });
 }
 
+export function getPaymentProofReceivedEmailTemplate(
+  userName: string,
+  invoiceNumber: string,
+  clientName: string,
+  amount: string,
+  currency: string
+): string {
+  const body = `
+    <p style="margin:0 0 16px;">Hola <strong>${userName}</strong>,</p>
+    <p style="margin:0 0 24px;">Tu cliente <strong>${clientName}</strong> ha subido un comprobante de pago para la factura <strong>${invoiceNumber}</strong>.</p>
+    
+    <div style="background-color:#1a1a1f; border:2px solid #C4FF3D; border-radius:12px; padding:24px; text-align:center; margin:0 0 24px;">
+      <p style="margin:0 0 8px; font-size:13px; color:#8e8e93; text-transform:uppercase; letter-spacing:0.5px;">Factura</p>
+      <p style="margin:0 0 16px; font-size:36px; font-weight:700; color:#C4FF3D;">${invoiceNumber}</p>
+      <p style="margin:0 0 4px; font-size:15px; color:#ffffff;">Monto: <strong>${amount} ${currency}</strong></p>
+      <p style="margin:0; font-size:14px; color:#8e8e93;">Cliente: ${clientName}</p>
+    </div>
+    
+    <p style="margin:0 0 16px;">Por favor revisa el comprobante y confirma el pago en tu dashboard.</p>
+    <p style="margin:0; font-size:14px; color:#8e8e93;">Una vez confirmado, la factura se marcará como pagada automáticamente.</p>
+  `;
+
+  return getBaseEmailTemplate({
+    title: 'Comprobante de Pago Recibido',
+    body,
+    ctaText: 'Revisar Comprobante',
+    ctaUrl: `${process.env.APP_URL || 'http://localhost:3000'}/invoices`
+  });
+}
+
 export function getPriceAlertEmailTemplate(
   userName: string,
   symbol: string,

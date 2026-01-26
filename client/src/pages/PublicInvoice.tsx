@@ -3,12 +3,13 @@
  * Diseño consistente con el sistema visual de Finwrk
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRoute } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
 import { Upload, Download, CheckCircle, AlertCircle, FileText, Building2, DollarSign, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
+import Toast from '@/components/Toast';
 
 export default function PublicInvoice() {
   const [, params] = useRoute('/invoice/:token');
@@ -18,6 +19,14 @@ export default function PublicInvoice() {
   const [paymentReference, setPaymentReference] = useState('');
   const [uploading, setUploading] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  
+  // Check if payment proof already uploaded on load
+  useEffect(() => {
+    if (invoice?.status === 'payment_submitted') {
+      setSubmitSuccess(true);
+    }
+  }, [invoice?.status]);
 
   const { data: invoice, isLoading, error, refetch } = trpc.invoices.getByToken.useQuery(
     { token: token! },
@@ -27,6 +36,7 @@ export default function PublicInvoice() {
   const uploadProof = trpc.invoices.uploadPaymentProof.useMutation({
     onSuccess: () => {
       setSubmitSuccess(true);
+      setShowToast(true);
       setSelectedFile(null);
       setPaymentReference('');
       setUploading(false);
@@ -367,10 +377,16 @@ export default function PublicInvoice() {
               
               <Button
                 onClick={handleUpload}
-                disabled={!selectedFile || uploading}
+                disabled={!selectedFile || uploading || submitSuccess}
                 className="w-full"
+                variant={submitSuccess ? "secondary" : "default"}
               >
-                {uploading ? 'Enviando...' : 'Enviar Comprobante'}
+                {submitSuccess ? (
+                  <span className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4" />
+                    Comprobante Enviado
+                  </span>
+                ) : uploading ? 'Enviando...' : 'Enviar Comprobante'}
               </Button>
             </div>
           </div>
@@ -394,6 +410,16 @@ export default function PublicInvoice() {
           <p className="mt-2">Portal seguro de Finwrk</p>
         </div>
       </div>
+      
+      {/* Toast Notification */}
+      {showToast && (
+        <Toast
+          message="¡Comprobante enviado exitosamente! El emisor revisará tu pago."
+          type="success"
+          duration={4000}
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
 }
