@@ -20,6 +20,11 @@ export default function PublicInvoice() {
   const [uploading, setUploading] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [showToast, setShowToast] = useState(false);
+
+  const { data: invoice, isLoading, error, refetch } = trpc.invoices.getByToken.useQuery(
+    { token: token! },
+    { enabled: !!token }
+  );
   
   // Check if payment proof already uploaded on load
   useEffect(() => {
@@ -27,11 +32,6 @@ export default function PublicInvoice() {
       setSubmitSuccess(true);
     }
   }, [invoice?.status]);
-
-  const { data: invoice, isLoading, error, refetch } = trpc.invoices.getByToken.useQuery(
-    { token: token! },
-    { enabled: !!token }
-  );
 
   const uploadProof = trpc.invoices.uploadPaymentProof.useMutation({
     onSuccess: () => {
