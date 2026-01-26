@@ -58,6 +58,7 @@ export default function Invoices() {
   const [clientSearchTerm, setClientSearchTerm] = useState('');
   const [showClientDropdown, setShowClientDropdown] = useState(false);
   const [selectedClientName, setSelectedClientName] = useState('');
+  const [showRecurringModal, setShowRecurringModal] = useState(false);
   const [registeringPaymentFor, setRegisteringPaymentFor] = useState<number | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   const [paymentFormData, setPaymentFormData] = useState({
@@ -934,7 +935,18 @@ export default function Invoices() {
                       type="checkbox"
                       id="is_recurring"
                       checked={formData.is_recurring}
-                      onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setShowRecurringModal(true);
+                        } else {
+                          setFormData({ 
+                            ...formData, 
+                            is_recurring: false,
+                            recurrence_frequency: 'monthly',
+                            recurrence_end_date: ''
+                          });
+                        }
+                      }}
                       className="w-4 h-4 bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] rounded accent-[#C4FF3D]"
                     />
                     <Label htmlFor="is_recurring" className="text-white cursor-pointer text-sm">
@@ -1007,6 +1019,100 @@ export default function Invoices() {
                   </div>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Recurring Invoice Configuration Modal */}
+      {showRecurringModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-md">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-white">Configurar Factura Recurrente</h2>
+                <button 
+                  onClick={() => setShowRecurringModal(false)} 
+                  className="text-[#8B92A8] hover:text-white"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="space-y-6">
+                {/* Frequency */}
+                <div>
+                  <Label className="text-white block mb-2">Frecuencia *</Label>
+                  <Select 
+                    value={formData.recurrence_frequency} 
+                    onValueChange={(value: any) => setFormData({ ...formData, recurrence_frequency: value })}
+                  >
+                    <SelectTrigger className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)]">
+                      <SelectItem value="weekly">Semanal</SelectItem>
+                      <SelectItem value="biweekly">Quincenal</SelectItem>
+                      <SelectItem value="monthly">Mensual</SelectItem>
+                      <SelectItem value="quarterly">Trimestral</SelectItem>
+                      <SelectItem value="semiannually">Semestral</SelectItem>
+                      <SelectItem value="annually">Anual</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* End Date */}
+                <div>
+                  <Label className="text-white block mb-2">Fecha de Fin (Opcional)</Label>
+                  <Input
+                    type="date"
+                    value={formData.recurrence_end_date}
+                    onChange={(e) => setFormData({ ...formData, recurrence_end_date: e.target.value })}
+                    className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
+                    placeholder="Sin fecha de fin"
+                  />
+                  <p className="text-xs text-[#8B92A8] mt-2">
+                    Si no especificas una fecha, las facturas se generarán indefinidamente
+                  </p>
+                </div>
+                
+                {/* Info */}
+                <div className="p-3 bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 rounded-lg">
+                  <p className="text-xs text-[#C4FF3D]">
+                    Las facturas se generarán automáticamente según la frecuencia seleccionada a partir de la fecha de emisión.
+                  </p>
+                </div>
+                
+                {/* Actions */}
+                <div className="flex gap-3 justify-end">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowRecurringModal(false);
+                      setFormData({ 
+                        ...formData, 
+                        is_recurring: false,
+                        recurrence_frequency: 'monthly',
+                        recurrence_end_date: ''
+                      });
+                    }}
+                    className="border-[rgba(255,255,255,0.06)] text-white hover:bg-gray-800"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    type="button" 
+                    onClick={() => {
+                      setFormData({ ...formData, is_recurring: true });
+                      setShowRecurringModal(false);
+                    }}
+                    className="bg-[#C4FF3D] text-black hover:bg-[#C4FF3D]/90 rounded-[9999px]"
+                  >
+                    Confirmar
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
