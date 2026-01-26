@@ -58,7 +58,7 @@ export function getBaseEmailTemplate(options: EmailTemplateOptions): string {
                     <td align="center"
                       style="width:80px; height:80px; background:#0a0a0a; border:1px solid rgba(255,255,255,0.15);
                              border-radius:20px;">
-                      <img src="${appUrl}/icon-512.png" width="40" height="40" alt="Finwrk"
+                      <img src="${appUrl}/finwrk-logo.png" width="60" height="auto" alt="Finwrk"
                         style="display:block; margin:0 auto; border:0; outline:none; text-decoration:none;" />
                     </td>
                   </tr>
@@ -93,9 +93,10 @@ export function getBaseEmailTemplate(options: EmailTemplateOptions): string {
                       <a href="${ctaUrl}"
                         style="display:inline-block; padding:16px 48px; text-decoration:none;
                                font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-                               font-size:15px; font-weight:600; color:#ffffff;
-                               background:transparent; border:2px solid #ffffff;
+                               font-size:16px; font-weight:700; color:#000000;
+                               background:#C4FF3D; border:none;
                                border-radius:12px; letter-spacing:0.3px;
+                               box-shadow:0 4px 12px rgba(196, 255, 61, 0.25);
                                transition:all 0.2s ease;">
                         ${ctaText}
                       </a>

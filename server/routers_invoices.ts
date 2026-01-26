@@ -18,6 +18,7 @@ import { invoices, invoiceItems } from "../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { generateInvoicePDF } from "./services/invoicePDF";
 import { sendEmail } from "./_core/email";
+import { getInvoiceEmailTemplate } from "./_core/email-invoice";
 
 /**
  * Validation schemas
@@ -479,47 +480,15 @@ export const invoicesRouter = router({
         const emailSent = await sendEmail({
           to: client.email,
           subject: `Factura ${invoice.invoice_number} - ${user.name}`,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-              <h2 style="color: #333;">Nueva Factura</h2>
-              <p>Hola <strong>${client.name}</strong>,</p>
-              <p>Te enviamos la factura <strong>${invoice.invoice_number}</strong> de <strong>${user.name}</strong>.</p>
-              
-              <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <h3 style="margin-top: 0; color: #333;">Resumen de Factura</h3>
-                <table style="width: 100%; border-collapse: collapse;">
-                  <tr>
-                    <td style="padding: 8px 0; color: #666;">Número:</td>
-                    <td style="padding: 8px 0; text-align: right; font-weight: bold;">${invoice.invoice_number}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 8px 0; color: #666;">Monto Total:</td>
-                    <td style="padding: 8px 0; text-align: right; font-weight: bold; font-size: 18px; color: #C4FF3D;">${new Intl.NumberFormat('es-ES', { style: 'currency', currency: invoice.currency }).format(parseFloat(invoice.total))}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 8px 0; color: #666;">Fecha de Vencimiento:</td>
-                    <td style="padding: 8px 0; text-align: right; font-weight: bold;">${new Date(invoice.due_date).toLocaleDateString('es-ES')}</td>
-                  </tr>
-                </table>
-              </div>
-              
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${publicLink}" style="display: inline-block; background: #C4FF3D; color: #000; padding: 16px 48px; text-decoration: none; border-radius: 9999px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 12px rgba(196, 255, 61, 0.3);">💳 Pagar Ahora</a>
-              </div>
-              
-              <p style="color: #666; font-size: 14px; text-align: center; margin-top: 20px;">En el portal de pago podrás:</p>
-              <ul style="color: #666; font-size: 14px; max-width: 400px; margin: 10px auto;">
-                <li>✓ Ver los detalles completos de la factura</li>
-                <li>✓ Descargar el PDF</li>
-                <li>✓ Realizar el pago y subir tu comprobante</li>
-              </ul>
-              
-              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
-              
-              <p style="color: #999; font-size: 12px;">Gracias por tu preferencia.</p>
-              <p style="color: #999; font-size: 12px;">Saludos,<br><strong>${user.name}</strong></p>
-            </div>
-          `,
+          html: getInvoiceEmailTemplate({
+            clientName: client.name,
+            userName: user.name,
+            invoiceNumber: invoice.invoice_number,
+            total: invoice.total,
+            currency: invoice.currency,
+            dueDate: new Date(invoice.due_date),
+            publicLink,
+          }),
           attachments: [{
             filename: `Factura-${invoice.invoice_number}.pdf`,
             content: pdfBase64,
