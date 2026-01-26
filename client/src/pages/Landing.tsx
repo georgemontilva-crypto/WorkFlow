@@ -1,369 +1,201 @@
 /**
  * Finwrk Landing Page
- * Slogan: "Recibe pagos. Mantén el control."
+ * Enfoque: Claridad, problemas reales y valor emocional
  */
 
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { 
-  Users, FileText, TrendingUp, Target, Bell, Shield,
-  Check, X, Menu, Zap, Globe, Lock, Key, Database,
-  ArrowRight, Star, ChevronDown, Sparkles
+  FileText, Users, TrendingUp, Menu, X,
+  AlertCircle, CheckCircle, ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/_core/hooks/useAuth';
-
-import { Pricing } from '@/components/Pricing';
 
 export default function Landing() {
   const [, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isAuthenticated, loading } = useAuth();
-    // Redirect to dashboard if already authenticated
+
   useEffect(() => {
     if (!loading && isAuthenticated) {
       setLocation('/dashboard');
     }
   }, [isAuthenticated, loading, setLocation]);
 
-  const features = [
+  const problems = [
     {
       icon: FileText,
-      title: "Facturación Profesional",
-      description: "Crea y envía facturas hermosas en segundos"
+      text: "Facturas en un lado, pagos en otro, y un Excel para intentar entender todo."
     },
     {
-      icon: Users,
-      title: "Gestión de Clientes",
-      description: "Organiza todos tus clientes y proyectos en un solo lugar"
-    },
-    {
-      icon: Globe,
-      title: "Multimoneda y Cripto",
-      description: "Acepta pagos en moneda fiat y criptomonedas"
-    },
-    {
-      icon: Zap,
-      title: "Enlaces de Pago",
-      description: "Comparte enlaces de pago personalizados con tus clientes"
+      icon: AlertCircle,
+      text: "No saber con certeza cuándo te pagarán o cuánto dinero tienes realmente disponible."
     },
     {
       icon: TrendingUp,
-      title: "Reportes Financieros",
-      description: "Reportes automáticos y análisis detallados"
-    },
-    {
-      icon: Bell,
-      title: "Recordatorios Inteligentes",
-      description: "Nunca pierdas un pago con recordatorios automáticos"
+      text: "La sensación de no tener el control de tus finanzas y tomar decisiones a ciegas."
     }
   ];
 
-  const securityFeatures = [
+  const steps = [
     {
-      icon: Lock,
-      title: "Autenticación de Dos Factores",
-      description: "Capa adicional de seguridad para tu cuenta"
+      number: "1",
+      title: "Registra tus clientes y facturas",
+      description: "Centraliza toda la información de tus proyectos y lo que tienes que cobrar."
     },
     {
-      icon: Database,
-      title: "Encriptación de Extremo a Extremo",
-      description: "Tus datos están encriptados en reposo y en tránsito"
+      number: "2",
+      title: "Registra pagos y seguimientos",
+      description: "Marca las facturas como pagadas y lleva un control de lo que está pendiente."
     },
     {
-      icon: Key,
-      title: "Custodia Externa de Wallets",
-      description: "Activos cripto asegurados con estándares de la industria"
-    },
-    {
-      icon: Shield,
-      title: "Cumplimiento Normativo",
-      description: "Construido para cumplir con regulaciones financieras"
+      number: "3",
+      title: "Visualiza tus ingresos reales",
+      description: "Ten una vista clara y en tiempo real de cómo va tu negocio cada mes."
     }
   ];
 
-  const plans = [
+  const benefits = [
     {
-      name: "Gratis",
-      price: "$0",
-      period: "/para siempre",
-      description: "Perfecto para comenzar",
-      features: [
-        { text: "Panel básico", included: true },
-        { text: "Hasta 3 clientes", included: true },
-        { text: "Máximo 5 facturas", included: true },
-        { text: "Visualización de cripto", included: true },
-        { text: "Enlaces de pago", included: false },
-        { text: "Automatizaciones", included: false }
-      ],
-      cta: "Comenzar Gratis",
-      highlighted: false
+      icon: CheckCircle,
+      title: "Menos caos",
+      description: "Olvídate de los Excels y las carpetas desordenadas."
     },
     {
-      name: "Pro",
-      price: "$15",
-      period: "/mes",
-      description: "Para negocios en crecimiento",
-      features: [
-        { text: "Clientes ilimitados", included: true },
-        { text: "Facturas ilimitadas", included: true },
-        { text: "Multimoneda", included: true },
-        { text: "Enlaces de pago", included: true },
-        { text: "Pagos cripto", included: true },
-        { text: "Automatizaciones", included: true },
-        { text: "Reportes financieros", included: true }
-      ],
-      cta: "Probar Pro Gratis",
-      highlighted: true
+      icon: CheckCircle,
+      title: "Más claridad",
+      description: "Entiende tus números de un vistazo."
     },
     {
-      name: "Empresarial",
-      price: "$29",
-      period: "/mes",
-      description: "Para equipos y agencias",
-      features: [
-        { text: "Todo en Pro", included: true },
-        { text: "Cuentas multiusuario", included: true },
-        { text: "Roles y permisos", included: true },
-        { text: "API pública", included: true },
-        { text: "Marca blanca", included: true },
-        { text: "Soporte prioritario", included: true }
-      ],
-      cta: "Contactar Ventas",
-      highlighted: false
+      icon: CheckCircle,
+      title: "Decisiones más tranquilas",
+      description: "Toma decisiones informadas sobre tu negocio y tu dinero."
     }
   ];
-
-  const howItWorks = [
-    {
-      step: "1",
-      title: "Regístrate Gratis",
-      description: "Crea tu cuenta en menos de 60 segundos"
-    },
-    {
-      step: "2",
-      title: "Agrega Clientes y Crea Facturas",
-      description: "Configura tus clientes y comienza a facturar"
-    },
-    {
-      step: "3",
-      title: "Recibe Pagos",
-      description: "Comparte enlaces de pago y recibe pagos al instante"
-    }
-  ];
-
-  const faqs = [
-    {
-      question: "¿Finwrk es realmente gratis?",
-      answer: "¡Sí! Nuestro plan Gratis es completamente gratuito para siempre sin necesidad de tarjeta de crédito."
-    },
-    {
-      question: "¿Puedo aceptar pagos en criptomonedas?",
-      answer: "Sí, los planes Pro y Empresarial soportan pagos cripto con custodia externa para máxima seguridad."
-    },
-    {
-      question: "¿Mis datos financieros están seguros?",
-      answer: "Absolutamente. Usamos encriptación de extremo a extremo, 2FA y seguimos las mejores prácticas de la industria para la seguridad de datos."
-    },
-    {
-      question: "¿Puedo mejorar o reducir mi plan?",
-      answer: "Sí, puedes mejorar o reducir tu plan en cualquier momento. Los cambios toman efecto inmediatamente."
-    }
-  ];
-
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center">
-            <img src="/finwrk-logo.png" alt="Finwrk" className="h-10 w-auto" />
-          </div>
-          
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            <button 
-              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
-            >
-              Características
-            </button>
-            <button 
-              onClick={() => document.getElementById('security')?.scrollIntoView({ behavior: 'smooth' })}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
-            >
-              Seguridad
-            </button>
-            <button 
-              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
-            >
-              Precios
-            </button>
-            <button 
-              onClick={() => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' })}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors bg-transparent border-none cursor-pointer"
-            >
-              Preguntas Frecuentes
-            </button>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <img src="/finwrk-logo.png" alt="Finwrk" className="h-8" />
+            </div>
+            
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-6">
+              <Button 
+                variant="ghost" 
+                onClick={() => setLocation('/login')}
+                className="text-foreground hover:text-primary"
+              >
+                Iniciar Sesión
+              </Button>
+              <Button 
+                onClick={() => setLocation('/signup')}
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                Empezar ahora
+              </Button>
+            </div>
 
-            <Button 
-              onClick={() => setLocation('/login')} 
-              variant="outline"
-              className="border-white text-white bg-black hover:bg-white hover:text-black transition-colors"
-            >
-              Iniciar Sesión
-            </Button>
-            <Button onClick={() => setLocation('/signup')} className="">
-              Comenzar Gratis
-            </Button>
-          </nav>
-          
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-foreground hover:bg-accent rounded-md transition-colors"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-        
-        {/* Mobile Navigation Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-background border-t border-border">
-            <nav className="container mx-auto px-4 py-4 flex flex-col gap-4">
-              <button 
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setTimeout(() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }), 100);
-                }}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-left bg-transparent border-none cursor-pointer"
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
-                Características
-              </button>
-              <button 
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setTimeout(() => document.getElementById('security')?.scrollIntoView({ behavior: 'smooth' }), 100);
-                }}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-left bg-transparent border-none cursor-pointer"
-              >
-                Seguridad
-              </button>
-              <button 
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 100);
-                }}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-left bg-transparent border-none cursor-pointer"
-              >
-                Precios
-              </button>
-              <button 
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setTimeout(() => document.getElementById('faq')?.scrollIntoView({ behavior: 'smooth' }), 100);
-                }}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors py-2 text-left bg-transparent border-none cursor-pointer"
-              >
-                Preguntas Frecuentes
-              </button>
-              <div className="pt-2 border-t border-border space-y-3">
-    
-                <div className="flex items-center gap-3">
-                  <Button 
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setLocation('/login');
-                    }} 
-                    variant="outline"
-                    className="border-white text-white bg-black hover:bg-white hover:text-black transition-colors flex-1"
-                  >
-                    Iniciar Sesión
-                  </Button>
-                  <Button 
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      setLocation('/signup');
-                    }} 
-                    className="bg-primary text-primary-foreground hover:opacity-90 flex-1"
-                  >
-                    Comenzar Gratis
-                  </Button>
-                </div>
-              </div>
-            </nav>
+                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
           </div>
-        )}
-      </header>
+
+          {/* Mobile Navigation */}
+          {mobileMenuOpen && (
+            <div className="md:hidden py-4 space-y-2 border-t border-border">
+              <Button 
+                variant="ghost" 
+                onClick={() => setLocation('/login')}
+                className="w-full justify-start"
+              >
+                Iniciar Sesión
+              </Button>
+              <Button 
+                onClick={() => setLocation('/signup')}
+                className="w-full bg-primary text-primary-foreground"
+              >
+                Empezar ahora
+              </Button>
+            </div>
+          )}
+        </div>
+      </nav>
 
       {/* Hero Section */}
-      <section className="pt-40 pb-20 px-4" style={{ paddingTop: 'calc(8rem + env(safe-area-inset-top))' }}>
-        <div className="container mx-auto max-w-5xl text-center">
-          <div className="inline-flex items-center gap-2 mb-6 px-4 py-2 bg-primary/10 text-primary rounded-md text-sm font-medium">
-            <Sparkles className="w-4 h-4" />
-            <span>Ahora aceptamos pagos cripto</span>
+      <section className="pt-24 sm:pt-32 pb-16 sm:pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto max-w-7xl">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                Ten claridad real sobre tu dinero,{' '}
+                <span className="text-primary">sin complicarte.</span>
+              </h1>
+              <p className="text-xl text-muted-foreground leading-relaxed">
+                Finwrk organiza tus clientes, facturas y pagos para que sepas qué cobraste, 
+                qué falta por cobrar y cómo va tu mes.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  size="lg"
+                  onClick={() => setLocation('/signup')}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6"
+                >
+                  Empezar ahora
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  onClick={() => document.getElementById('como-funciona')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="text-lg px-8 py-6"
+                >
+                  Ver cómo funciona
+                </Button>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="relative rounded-3xl overflow-hidden border border-border shadow-2xl">
+                <img 
+                  src="/landing-images/hero-freelancer.jpg" 
+                  alt="Freelancer trabajando tranquilo" 
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
           </div>
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight">
-            Recibe pagos.
-            <br />
-            <span className="text-primary">Mantén el control.</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Facturación profesional y gestión financiera para freelancers y negocios. 
-            Acepta pagos en fiat y cripto con seguridad de nivel bancario.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button 
-              size="lg" 
-              onClick={() => setLocation('/signup')}
-              className="bg-primary text-primary-foreground hover:opacity-90 text-lg px-8 py-6"
-            >
-              Comenzar Gratis <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-              className="text-lg px-8 py-6"
-            >
-              Ver Cómo Funciona
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground mt-6">
-            No se requiere tarjeta de crédito • Plan gratis disponible para siempre
-          </p>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-accent/5">
-        <div className="container mx-auto max-w-6xl">
+      {/* Problem Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
+        <div className="container mx-auto max-w-7xl">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Todo lo que necesitas para recibir pagos
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Funcionalidades poderosas diseñadas para negocios modernos
-            </p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">¿Te suena familiar?</h2>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="border hover:border-primary/50 transition-all hover:shadow-lg">
-                <CardHeader>
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                    <feature.icon className="w-6 h-6 text-primary" />
+          <div className="grid md:grid-cols-3 gap-8">
+            {problems.map((problem, index) => (
+              <Card key={index} className="bg-card border-border hover:border-primary/50 transition-colors">
+                <CardContent className="p-8 space-y-4">
+                  <div className="w-14 h-14 rounded-2xl bg-destructive/10 flex items-center justify-center">
+                    <problem.icon className="w-7 h-7 text-destructive" strokeWidth={1.5} />
                   </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{feature.description}</p>
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    {problem.text}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -371,169 +203,120 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Security Section */}
-      <section id="security" className="py-20 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 bg-primary/10 text-primary rounded-md text-sm font-medium">
-              <Shield className="w-4 h-4" />
-              <span>Seguridad Primero</span>
+      {/* Solution Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto max-w-7xl">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="order-2 lg:order-1">
+              <div className="relative rounded-3xl overflow-hidden border border-border shadow-2xl">
+                <img 
+                  src="/landing-images/dashboard-mockup.png" 
+                  alt="Dashboard de Finwrk" 
+                  className="w-full h-auto"
+                />
+              </div>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Seguridad de nivel bancario para tus datos financieros
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Tu seguridad es nuestra máxima prioridad. Implementamos prácticas líderes de la industria para mantener tus datos seguros.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {securityFeatures.map((feature, index) => (
-              <Card key={index} className="border">
-                <CardHeader>
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center shrink-0">
-                      <feature.icon className="w-6 h-6 text-green-600" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl mb-2">{feature.title}</CardTitle>
-                      <p className="text-muted-foreground">{feature.description}</p>
-                    </div>
-                  </div>
-                </CardHeader>
-              </Card>
-            ))}
+            <div className="order-1 lg:order-2 space-y-6">
+              <h2 className="text-3xl sm:text-4xl font-bold leading-tight">
+                Todo tu flujo financiero, en un solo lugar y con claridad.
+              </h2>
+              <p className="text-xl text-muted-foreground leading-relaxed">
+                Finwrk no es un ERP complicado ni un banco. Es tu workspace financiero, 
+                diseñado para personas que trabajan.
+              </p>
+            </div>
           </div>
         </div>
       </section>
-
-
 
       {/* How It Works Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto max-w-4xl">
+      <section id="como-funciona" className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
+        <div className="container mx-auto max-w-7xl">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Comienza en minutos
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Tres simples pasos para comenzar a recibir pagos
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {howItWorks.map((step, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-3xl font-bold text-primary mx-auto mb-4">
-                  {step.step}
-                </div>
-                <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-                <p className="text-muted-foreground">{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section id="faq" className="py-20 px-4 bg-accent/5">
-        <div className="container mx-auto max-w-3xl">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Preguntas Frecuentes
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Menos caos, más claridad en 3 simples pasos.
             </h2>
           </div>
-          
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <Card key={index} className="border">
-                <CardHeader 
-                  className="cursor-pointer hover:bg-accent/50 transition-colors"
-                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                >
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{faq.question}</CardTitle>
-                    <ChevronDown 
-                      className={`w-5 h-5 transition-transform ${openFaq === index ? 'rotate-180' : ''}`}
-                    />
+          <div className="grid md:grid-cols-3 gap-8">
+            {steps.map((step, index) => (
+              <Card key={index} className="bg-card border-border relative overflow-hidden">
+                <CardContent className="p-8 space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+                    <span className="text-3xl font-bold text-primary">{step.number}</span>
                   </div>
-                </CardHeader>
-                {openFaq === index && (
-                  <CardContent>
-                    <p className="text-muted-foreground">{faq.answer}</p>
-                  </CardContent>
-                )}
+                  <h3 className="text-xl font-semibold">{step.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {step.description}
+                  </p>
+                </CardContent>
               </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 px-4">
+      {/* Benefits Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Diseñado para la tranquilidad, no para la contabilidad.
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {benefits.map((benefit, index) => (
+              <Card key={index} className="bg-card border-border hover:border-primary/50 transition-colors">
+                <CardContent className="p-8 space-y-4 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+                    <benefit.icon className="w-7 h-7 text-primary" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-xl font-semibold">{benefit.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {benefit.description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
         <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            ¿Listo para tomar el control de tus finanzas?
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
+            Recupera el control de tus finanzas hoy.
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Únete a miles de negocios usando Finwrk para recibir pagos más rápido
+            Únete a cientos de freelancers y agencias que ya tienen claridad sobre su dinero.
           </p>
           <Button 
-            size="lg" 
+            size="lg"
             onClick={() => setLocation('/signup')}
-            className="bg-primary text-primary-foreground hover:opacity-90 text-lg px-8 py-6"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-12 py-6"
           >
-            Comenzar Gratis Hoy <ArrowRight className="ml-2 w-5 h-5" />
+            Empezar ahora
+            <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <Pricing />
-
       {/* Footer */}
-      <footer className="border-t border-border py-12 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center mb-4">
-                <img src="/finwrk-logo.png" alt="Finwrk" className="h-8 w-auto" />
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Recibe pagos. Mantén el control.
-              </p>
+      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-border">
+        <div className="container mx-auto max-w-7xl">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-2">
+              <img src="/finwrk-logo.png" alt="Finwrk" className="h-6" />
+              <span className="text-sm text-muted-foreground">© 2025 Finwrk. Todos los derechos reservados.</span>
             </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Producto</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground transition-colors bg-transparent border-none cursor-pointer p-0">Características</button></li>
-                <li><button onClick={() => document.getElementById('security')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground transition-colors bg-transparent border-none cursor-pointer p-0">Seguridad</button></li>
-                <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-foreground transition-colors bg-transparent border-none cursor-pointer p-0">Precios</button></li>
-              </ul>
+            <div className="flex gap-6">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                Privacidad
+              </Button>
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                Términos
+              </Button>
             </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Empresa</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Acerca de</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Contacto</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4">Legal</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacidad</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Términos</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Seguridad</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            <p>© 2026 Finwrk. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>
