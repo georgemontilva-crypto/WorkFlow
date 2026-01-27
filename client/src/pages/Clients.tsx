@@ -26,6 +26,7 @@ import {
   DialogTitle,
 } from '../components/ui/dialog';
 import { trpc } from '../lib/trpc';
+import { useToast } from '../contexts/ToastContext';
 
 type Client = {
   id: number;
@@ -41,6 +42,7 @@ type Client = {
 };
 
 export default function Clients() {
+  const { success, error: showError } = useToast();
   const [expandedClientId, setExpandedClientId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('active');
@@ -116,22 +118,27 @@ export default function Clients() {
           id: editingClient.id,
           ...formData,
         });
+        success('Cliente actualizado exitosamente');
       } else {
         await createClientMutation.mutateAsync(formData);
+        success('Cliente creado exitosamente');
       }
       handleCloseModal();
       refetch();
     } catch (error: any) {
       console.error('Error al guardar cliente:', error);
+      showError(error.message || 'Error al guardar cliente');
     }
   };
 
   const handleArchive = async (id: number) => {
     try {
       await updateClientMutation.mutateAsync({ id, archived: 1 });
+      success('Cliente archivado exitosamente');
       refetch();
     } catch (error: any) {
       console.error('Error al archivar cliente:', error);
+      showError(error.message || 'Error al archivar cliente');
     }
   };
 
@@ -144,9 +151,11 @@ export default function Clients() {
       onConfirm: async () => {
         try {
           await deleteClientMutation.mutateAsync({ id });
+          success('Cliente eliminado exitosamente');
           refetch();
         } catch (error: any) {
           console.error('Error al eliminar cliente:', error);
+          showError(error.message || 'Error al eliminar cliente');
         }
       }
     });

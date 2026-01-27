@@ -27,6 +27,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       id,
       onClose: removeToast,
     };
+    console.log(`[Toast] Showing ${options.variant || 'default'} toast:`, options.title || options.description);
     setToasts((prev) => [...prev, newToast]);
   }, []);
 

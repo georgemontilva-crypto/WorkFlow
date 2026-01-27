@@ -1,78 +1,135 @@
 /**
  * useRealtimeNotifications Hook
- * Uses polling to check for new notifications every 5 seconds
- * Shows toast notifications when new notifications arrive
+ * Uses SSE (Server-Sent Events) to receive notifications in real-time via Redis Pub/Sub
+ * Shows toast notifications instantly when events arrive
  */
 
 import { useEffect, useRef } from 'react';
 import { trpc } from '@/lib/trpc';
 import { useToast } from '@/contexts/ToastContext';
 
+interface NotificationEvent {
+  userId: number;
+  notificationId: number;
+  type: 'new' | 'read' | 'delete';
+  source?: 'invoice' | 'savings' | 'system';
+  timestamp: number;
+}
+
 export function useRealtimeNotifications() {
   const utils = trpc.useContext();
   const toast = useToast();
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const lastUnreadCountRef = useRef<number | null>(null);
-
-  // Query to get unread count
-  const { data: unreadCount } = trpc.notifications.unreadCount.useQuery(undefined, {
-    refetchInterval: 5000, // Refetch every 5 seconds
-  });
-
-  // Query to get latest notifications
-  const { data: notifications } = trpc.notifications.list.useQuery(
-    { limit: 5, offset: 0 },
-    { refetchInterval: 5000 }
-  );
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Check if there are new notifications
-    if (unreadCount !== undefined && lastUnreadCountRef.current !== null) {
-      const hasNewNotifications = unreadCount > lastUnreadCountRef.current;
-      
-      if (hasNewNotifications && notifications && notifications.length > 0) {
-        // Get the most recent unread notification
-        const latestNotification = notifications.find(n => n.is_read === 0);
-        
-        if (latestNotification) {
-          console.log('[Realtime Notifications] New notification detected:', latestNotification.title);
-          
-          // Determine toast variant based on notification type
-          let variant: 'info' | 'success' | 'warning' | 'error' = 'info';
-          if (latestNotification.type === 'success') variant = 'success';
-          else if (latestNotification.type === 'warning') variant = 'warning';
-          else if (latestNotification.type === 'error') variant = 'error';
-          
-          // Show toast
-          toast.showToast({
-            title: latestNotification.title,
-            description: latestNotification.message,
-            variant,
-          });
-        }
-      }
+    // Get auth token from localStorage
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log('[Realtime Notifications] No auth token found, skipping SSE connection');
+      return;
     }
-    
-    // Update last unread count
-    lastUnreadCountRef.current = unreadCount ?? 0;
-  }, [unreadCount, notifications, toast]);
 
-  // Also invalidate invoices list to refresh dashboard
-  useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      utils.invoices.list.invalidate();
-    }, 5000);
+    // Connect to SSE endpoint
+    const connectSSE = () => {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || '';
+        const sseUrl = `${apiUrl}/api/notifications/stream?token=${encodeURIComponent(token)}`;
+        
+        console.log('[Realtime Notifications] Connecting to SSE...');
+        
+        // Create EventSource with auth token in URL (EventSource doesn't support custom headers)
+        const eventSource = new EventSource(sseUrl);
+        eventSourceRef.current = eventSource;
 
-    console.log('[Realtime Notifications] Polling started (5s interval)');
+        // Connection opened
+        eventSource.onopen = () => {
+          console.log('[Realtime Notifications] ✅ SSE connection established');
+        };
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+        // Receive messages
+        eventSource.onmessage = async (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            
+            // Handle connection confirmation
+            if (data.type === 'connected') {
+              console.log('[Realtime Notifications] Connected to server');
+              return;
+            }
+
+            // Handle notification events
+            const notificationEvent = data as NotificationEvent;
+            console.log('[Realtime Notifications] Event received:', notificationEvent.type);
+
+            if (notificationEvent.type === 'new') {
+              // Fetch the new notification details
+              const notifications = await utils.notifications.list.fetch({ limit: 1, offset: 0 });
+              
+              if (notifications && notifications.length > 0) {
+                const latestNotification = notifications[0];
+                
+                console.log('[Realtime Notifications] New notification:', latestNotification.title);
+                
+                // Determine toast variant based on notification type
+                let variant: 'info' | 'success' | 'warning' | 'error' = 'info';
+                if (latestNotification.type === 'success') variant = 'success';
+                else if (latestNotification.type === 'warning') variant = 'warning';
+                else if (latestNotification.type === 'error') variant = 'error';
+                
+                // Show toast immediately
+                toast.showToast({
+                  title: latestNotification.title,
+                  description: latestNotification.message,
+                  variant,
+                });
+              }
+
+              // Invalidate queries to refresh UI
+              utils.notifications.list.invalidate();
+              utils.notifications.unreadCount.invalidate();
+              utils.invoices.list.invalidate();
+            }
+          } catch (error: any) {
+            console.error('[Realtime Notifications] Parse error:', error.message);
+          }
+        };
+
+        // Handle errors
+        eventSource.onerror = (error) => {
+          console.error('[Realtime Notifications] SSE error:', error);
+          eventSource.close();
+          eventSourceRef.current = null;
+
+          // Attempt to reconnect after 5 seconds
+          console.log('[Realtime Notifications] Reconnecting in 5 seconds...');
+          reconnectTimeoutRef.current = setTimeout(() => {
+            connectSSE();
+          }, 5000);
+        };
+
+      } catch (error: any) {
+        console.error('[Realtime Notifications] Connection error:', error.message);
       }
-      console.log('[Realtime Notifications] Polling stopped');
     };
-  }, [utils]);
 
-  return null; // This hook doesn't return anything, it just manages the polling
+    // Initial connection
+    connectSSE();
+
+    // Cleanup on unmount
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+        console.log('[Realtime Notifications] SSE connection closed');
+      }
+      
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
+      }
+    };
+  }, [utils, toast]);
+
+  return null; // This hook doesn't return anything, it just manages the SSE connection
 }

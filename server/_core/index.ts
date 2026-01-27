@@ -49,8 +49,8 @@ async function startServer() {
   
   // SSE endpoint for real-time notifications
   app.get("/api/notifications/stream", async (req, res) => {
-    // Verify authentication
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    // Verify authentication (token from query parameter since EventSource doesn't support headers)
+    const token = req.query.token as string;
     if (!token) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
