@@ -644,14 +644,12 @@ export const appRouter = router({
           
           // Create notification (non-blocking)
           try {
-            const { createNotification } = await import('./helpers/notificationHelpers');
-            await createNotification({
-              user_id: ctx.user.id,
-              type: 'success',
-              title: 'Cliente creado',
-              message: `El cliente ${client.name} ha sido agregado exitosamente`,
-              source: 'system',
-            });
+            const { notifyClientCreated } = await import('./helpers/notificationHelpers');
+            await notifyClientCreated(
+              ctx.user.id,
+              client.id,
+              client.name
+            );
           } catch (notifError: any) {
             console.error(`[Clients] Notification error (non-blocking):`, notifError.message);
           }

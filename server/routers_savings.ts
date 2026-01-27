@@ -146,6 +146,20 @@ export const savingsRouter = router({
 
         console.log(`[Savings] Goal created successfully: ${goalId} - ${input.name} (${input.currency})`);
 
+        // Create notification (non-blocking)
+        try {
+          const { notifySavingsGoalCreated } = await import('./helpers/notificationHelpers');
+          await notifySavingsGoalCreated(
+            userId,
+            goalId,
+            input.name,
+            input.target_amount,
+            input.currency
+          );
+        } catch (notifError: any) {
+          console.error(`[Savings] Notification error (non-blocking):`, notifError.message);
+        }
+
         // Return created goal
         const [createdGoal] = await db
           .select()
@@ -212,16 +226,35 @@ export const savingsRouter = router({
 
         console.log(`[Savings] Progress updated for goal ${input.id}: ${input.current_amount}/${targetAmount} (${newStatus})`);
 
-        // Create notification if goal just completed
-        if (newStatus === 'completed' && previousStatus !== 'completed') {
-          const { notifySavingsGoalCompleted } = await import('../helpers/notificationHelpers');
-          await notifySavingsGoalCompleted(
+        // Create notifications (non-blocking)
+        try {
+          const percentageComplete = Math.round((input.current_amount / targetAmount) * 100);
+          
+          // Notify progress update
+          const { notifySavingsProgressUpdated } = await import('./helpers/notificationHelpers');
+          await notifySavingsProgressUpdated(
             userId,
             input.id,
             goal.name,
+            input.current_amount,
             targetAmount,
-            goal.currency
+            goal.currency,
+            percentageComplete
           );
+          
+          // Notify goal reached if just completed
+          if (newStatus === 'completed' && previousStatus !== 'completed') {
+            const { notifySavingsGoalReached } = await import('./helpers/notificationHelpers');
+            await notifySavingsGoalReached(
+              userId,
+              input.id,
+              goal.name,
+              targetAmount,
+              goal.currency
+            );
+          }
+        } catch (notifError: any) {
+          console.error(`[Savings] Notification error (non-blocking):`, notifError.message);
         }
 
         return { success: true };

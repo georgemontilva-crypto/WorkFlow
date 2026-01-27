@@ -457,12 +457,16 @@ export const notifications = mysqlTable("notifications", {
   /** Whether the notification was read by the user */
   is_read: int("is_read").notNull().default(0),
   
+  /** Whether the notification is urgent (invoices, payments) */
+  is_urgent: int("is_urgent").notNull().default(0),
+  
   /** Creation timestamp */
   created_at: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({
   userReadIdx: index("idx_user_read").on(table.user_id, table.is_read),
   userCreatedIdx: index("idx_user_created").on(table.user_id, table.created_at),
   sourceIdx: index("idx_source").on(table.source, table.source_id),
+  userUrgentIdx: index("idx_user_urgent").on(table.user_id, table.is_urgent, table.created_at),
 }));
 
 export type Notification = typeof notifications.$inferSelect;

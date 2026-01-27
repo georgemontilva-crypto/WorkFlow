@@ -18,6 +18,7 @@ interface CreateNotificationParams {
   message: string;
   source: NotificationSource;
   source_id?: number;
+  is_urgent?: boolean;
 }
 
 /**
@@ -78,6 +79,7 @@ export async function createNotification(params: CreateNotificationParams): Prom
       source: params.source,
       source_id: params.source_id || null,
       is_read: 0,
+      is_urgent: params.is_urgent ? 1 : 0,
     });
 
     console.log(`[NotificationHelper] Created successfully: ${params.title}`);
@@ -119,6 +121,7 @@ export async function notifyInvoiceOverdue(userId: number, invoiceId: number, in
     message: `La factura ${invoiceNumber} venció el ${dueDate.toLocaleDateString('es-ES')}. Considera enviar un recordatorio al cliente.`,
     source: "invoice",
     source_id: invoiceId,
+    is_urgent: true,  // ← URGENTE: factura vencida
   });
 }
 
@@ -198,6 +201,7 @@ export async function notifyPaymentProofUploaded(
     message: `El cliente ha subido un comprobante de pago para la factura ${invoiceNumber}. Revisa y confirma el pago.`,
     source: "invoice",
     source_id: invoiceId,
+    is_urgent: true,  // ← URGENTE: requiere revisión del admin
   });
 }
 
@@ -266,5 +270,154 @@ export async function notifyInvoiceDueSoon(
     message: `La factura ${invoiceNumber} vence en ${daysUntilDue} ${daysUntilDue === 1 ? 'día' : 'días'}. Considera enviar un recordatorio al cliente.`,
     source: "invoice",
     source_id: invoiceId,
+    is_urgent: true,  // ← URGENTE: factura próxima a vencer
+  });
+}
+
+
+/**
+ * CLIENT NOTIFICATIONS
+ */
+
+export async function notifyClientCreated(
+  userId: number,
+  clientId: number,
+  clientName: string
+) {
+  return createNotification({
+    user_id: userId,
+    type: "success",
+    title: `Cliente creado: ${clientName}`,
+    message: `El cliente "${clientName}" ha sido agregado exitosamente a tu cartera.`,
+    source: "system",
+    source_id: clientId,
+  });
+}
+
+/**
+ * INVOICE NOTIFICATIONS (Extended)
+ */
+
+export async function notifyInvoiceCreated(
+  userId: number,
+  invoiceId: number,
+  invoiceNumber: string,
+  clientName: string,
+  amount: number,
+  currency: string
+) {
+  return createNotification({
+    user_id: userId,
+    type: "success",
+    title: `Factura ${invoiceNumber} creada`,
+    message: `Factura para ${clientName} por ${amount} ${currency} creada exitosamente.`,
+    source: "invoice",
+    source_id: invoiceId,
+  });
+}
+
+export async function notifyInvoiceSent(
+  userId: number,
+  invoiceId: number,
+  invoiceNumber: string,
+  clientName: string,
+  clientEmail: string
+) {
+  return createNotification({
+    user_id: userId,
+    type: "info",
+    title: `Factura ${invoiceNumber} enviada`,
+    message: `La factura para ${clientName} ha sido enviada a ${clientEmail}.`,
+    source: "invoice",
+    source_id: invoiceId,
+  });
+}
+
+export async function notifyInvoiceCancelled(
+  userId: number,
+  invoiceId: number,
+  invoiceNumber: string
+) {
+  return createNotification({
+    user_id: userId,
+    type: "warning",
+    title: `Factura ${invoiceNumber} cancelada`,
+    message: `La factura ${invoiceNumber} ha sido marcada como cancelada.`,
+    source: "invoice",
+    source_id: invoiceId,
+  });
+}
+
+/**
+ * SAVINGS NOTIFICATIONS (Extended)
+ */
+
+export async function notifySavingsGoalCreated(
+  userId: number,
+  goalId: number,
+  goalName: string,
+  targetAmount: number,
+  currency: string
+) {
+  return createNotification({
+    user_id: userId,
+    type: "success",
+    title: `Meta de ahorro creada: ${goalName}`,
+    message: `Tu nueva meta de ahorro "${goalName}" por ${targetAmount} ${currency} ha sido creada.`,
+    source: "savings",
+    source_id: goalId,
+  });
+}
+
+export async function notifySavingsProgressUpdated(
+  userId: number,
+  goalId: number,
+  goalName: string,
+  currentAmount: number,
+  targetAmount: number,
+  currency: string,
+  percentageComplete: number
+) {
+  return createNotification({
+    user_id: userId,
+    type: "info",
+    title: `Progreso actualizado: ${goalName}`,
+    message: `Has ahorrado ${currentAmount} ${currency} de ${targetAmount} ${currency} (${percentageComplete}% completado).`,
+    source: "savings",
+    source_id: goalId,
+  });
+}
+
+export async function notifySavingsGoalReached(
+  userId: number,
+  goalId: number,
+  goalName: string,
+  targetAmount: number,
+  currency: string
+) {
+  return createNotification({
+    user_id: userId,
+    type: "success",
+    title: `¡Meta alcanzada! ${goalName}`,
+    message: `¡Felicitaciones! Has alcanzado tu meta de ahorro "${goalName}" de ${targetAmount} ${currency}.`,
+    source: "savings",
+    source_id: goalId,
+  });
+}
+
+export async function notifySavingsTransferredToBalance(
+  userId: number,
+  goalId: number,
+  goalName: string,
+  amount: number,
+  currency: string
+) {
+  return createNotification({
+    user_id: userId,
+    type: "success",
+    title: `Fondos transferidos al balance`,
+    message: `${amount} ${currency} de tu meta "${goalName}" han sido transferidos a tu balance disponible.`,
+    source: "savings",
+    source_id: goalId,
   });
 }

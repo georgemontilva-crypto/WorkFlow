@@ -234,6 +234,21 @@ export const invoicesRouter = router({
         
         console.log(`[Invoices] Invoice ${invoiceId} created successfully`);
         
+        // Create notification (non-blocking)
+        try {
+          const { notifyInvoiceCreated } = await import('./helpers/notificationHelpers');
+          await notifyInvoiceCreated(
+            ctx.user.id,
+            invoiceId,
+            invoice_number,
+            client.name,
+            total,
+            currency
+          );
+        } catch (notifError: any) {
+          console.error(`[Invoices] Notification error (non-blocking):`, notifError.message);
+        }
+        
         return {
           success: true,
           invoice: {
@@ -329,6 +344,16 @@ export const invoicesRouter = router({
             invoice.invoice_number,
             parseFloat(invoice.total),
             invoice.currency
+          );
+        }
+        
+        // Create notification if cancelled
+        if (newStatus === 'cancelled') {
+          const { notifyInvoiceCancelled } = await import('./helpers/notificationHelpers');
+          await notifyInvoiceCancelled(
+            ctx.user.id,
+            input.id,
+            invoice.invoice_number
           );
         }
         
@@ -511,6 +536,20 @@ export const invoicesRouter = router({
           .where(eq(invoices.id, input.id));
         
         console.log(`[Invoices] Email sent successfully for invoice ${invoice.invoice_number}`);
+        
+        // Create notification (non-blocking)
+        try {
+          const { notifyInvoiceSent } = await import('./helpers/notificationHelpers');
+          await notifyInvoiceSent(
+            ctx.user.id,
+            input.id,
+            invoice.invoice_number,
+            client.name,
+            client.email
+          );
+        } catch (notifError: any) {
+          console.error(`[Invoices] Notification error (non-blocking):`, notifError.message);
+        }
         
         return { success: true };
       } catch (error: any) {

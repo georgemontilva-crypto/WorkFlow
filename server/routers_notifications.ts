@@ -45,7 +45,10 @@ export const notificationsRouter = router({
           .select()
           .from(notifications)
           .where(and(...conditions))
-          .orderBy(desc(notifications.created_at))
+          .orderBy(
+            desc(notifications.is_urgent),  // Urgentes primero
+            desc(notifications.created_at)   // Luego por fecha
+          )
           .limit(input.limit);
 
         console.log(`[Notifications] Found ${result.length} notifications for user ${userId}`);
