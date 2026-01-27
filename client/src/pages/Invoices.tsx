@@ -210,7 +210,7 @@ export default function Invoices() {
       }
       
       handleCloseModal();
-      utils.invoices.list.invalidate();
+      await utils.invoices.invalidate();
     } catch (error: any) {
       console.error('Error al crear factura:', error);
       showError(error.message || 'Error al crear factura');
@@ -271,7 +271,7 @@ export default function Invoices() {
       }
       
       handleCloseModal();
-      utils.invoices.list.invalidate();
+      await utils.invoices.invalidate();
     } catch (error: any) {
       console.error('Error al crear y descargar factura:', error);
       showError(error.message || 'Error al crear y descargar factura');
@@ -289,10 +289,12 @@ export default function Invoices() {
     try {
       console.log('[Invoices] Sending email for invoice:', id);
       await sendEmailMutation.mutateAsync({ id });
-      success('Sent');
-      utils.invoices.list.invalidate();
+      console.log('[Invoices] Email sent successfully, invalidating queries');
+      // Invalidate all invoice queries to refresh the list
+      await utils.invoices.invalidate();
+      success('Factura enviada exitosamente');
     } catch (error: any) {
-      console.error('Error al enviar email:', error);
+      console.error('[Invoices] Error sending email:', error);
       showError('Error al enviar email: ' + (error.message || 'Error desconocido'));
     }
   };
@@ -320,7 +322,8 @@ export default function Invoices() {
   const handleUpdateStatus = async (id: number, status: 'draft' | 'sent' | 'payment_submitted' | 'paid' | 'partial' | 'cancelled') => {
     try {
       await updateStatusMutation.mutateAsync({ id, status });
-      utils.invoices.list.invalidate();
+      await utils.invoices.invalidate();
+      success('Estado actualizado exitosamente');
     } catch (error: any) {
       console.error('Error al actualizar estado:', error);
       showError('Error al actualizar estado: ' + (error.message || 'Error desconocido'));
@@ -336,9 +339,11 @@ export default function Invoices() {
       onConfirm: async () => {
         try {
           await updateStatusMutation.mutateAsync({ id, status: 'cancelled' });
-          utils.invoices.list.invalidate();
+          await utils.invoices.invalidate();
+          success('Factura cancelada exitosamente');
         } catch (error: any) {
           console.error('Error al cancelar factura:', error);
+          showError(error.message || 'Error al cancelar factura');
         }
       }
     });
@@ -353,9 +358,11 @@ export default function Invoices() {
       onConfirm: async () => {
         try {
           await deleteInvoiceMutation.mutateAsync({ id });
-          utils.invoices.list.invalidate();
+          await utils.invoices.invalidate();
+          success('Factura eliminada exitosamente');
         } catch (error: any) {
           console.error('Error al eliminar factura:', error);
+          showError(error.message || 'Error al eliminar factura');
         }
       }
     });
@@ -371,8 +378,8 @@ export default function Invoices() {
     
         try {
           await updateStatusMutation.mutateAsync({ id, status: 'paid' });
-          success('MarkedAsPaid');
-          utils.invoices.list.invalidate();
+          await utils.invoices.invalidate();
+          success('Factura marcada como pagada');
           setViewingInvoice(null);
         } catch (error: any) {
           console.error('Error al confirmar pago:', error);

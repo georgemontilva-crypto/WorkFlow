@@ -65,8 +65,8 @@ export default function Savings() {
   
   // Mutations
   const createGoal = trpc.savings.create.useMutation({
-    onSuccess: () => {
-      utils.savings.list.invalidate();
+    onSuccess: async () => {
+      await utils.savings.invalidate();
       // toast.success('Meta creada exitosamente');
     },
     onError: (error) => {
@@ -75,8 +75,8 @@ export default function Savings() {
   });
   
   const updateGoal = trpc.savings.update.useMutation({
-    onSuccess: () => {
-      utils.savings.list.invalidate();
+    onSuccess: async () => {
+      await utils.savings.invalidate();
       // toast.success('Meta actualizada exitosamente');
     },
     onError: (error) => {
@@ -85,8 +85,8 @@ export default function Savings() {
   });
   
   const updateProgress = trpc.savings.updateProgress.useMutation({
-    onSuccess: () => {
-      utils.savings.list.invalidate();
+    onSuccess: async () => {
+      await utils.savings.invalidate();
       // toast.success('Progreso actualizado exitosamente');
     },
     onError: (error) => {
@@ -95,8 +95,8 @@ export default function Savings() {
   });
   
   const deleteGoal = trpc.savings.delete.useMutation({
-    onSuccess: () => {
-      utils.savings.list.invalidate();
+    onSuccess: async () => {
+      await utils.savings.invalidate();
       // toast.success('Meta eliminada exitosamente');
     },
     onError: (error) => {
@@ -372,7 +372,7 @@ export default function Savings() {
             <div className="text-red-500">Error al cargar metas</div>
             <div className="text-[#8B92A8] text-sm">{error.message}</div>
             <Button
-              onClick={() => utils.savings.list.invalidate()}
+              onClick={() => utils.savings.invalidate()}
               variant="outline"
               size="sm"
             >
