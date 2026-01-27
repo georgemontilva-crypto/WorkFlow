@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import path from "path";
+import cookieParser from "cookie-parser";
 import { createServer } from "http";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
@@ -24,6 +25,10 @@ async function startServer() {
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
+  
+  // Cookie parser middleware (required for SSE authentication)
+  app.use(cookieParser());
+  console.log('[Server] Cookie parser middleware enabled');
   
   // Force HTTPS in production (Railway)
   if (process.env.NODE_ENV === "production") {
@@ -55,12 +60,19 @@ async function startServer() {
   
   // SSE endpoint for real-time notifications
   app.get("/api/notifications/stream", async (req, res) => {
+    console.log('[SSE] Connection attempt');
+    console.log('[SSE] Cookies:', req.cookies);
+    console.log('[SSE] Headers:', req.headers.cookie);
+    
     // Verify authentication (read token from cookie since it's HTTP-only)
     const token = req.cookies?.auth_token;
     if (!token) {
-      console.log('[SSE] No auth token found in cookies');
+      console.log('[SSE] ❌ No auth token found in cookies');
+      console.log('[SSE] Available cookies:', Object.keys(req.cookies || {}));
       return res.status(401).json({ error: 'Unauthorized - No auth token' });
     }
+    
+    console.log('[SSE] ✅ Token found in cookies');
     
     try {
       // Verify JWT token
