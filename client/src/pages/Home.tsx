@@ -58,12 +58,12 @@ export default function Home() {
              date.getMonth() === currentMonth && 
              date.getFullYear() === currentYear;
     })
-    .reduce((sum, inv) => sum + parseFloat(inv.total_amount.toString()), 0) || 0;
+    .reduce((sum, inv) => sum + parseFloat((inv.total_amount || 0).toString()), 0) || 0;
   
   // Total pendiente por cobrar (facturas enviadas)
   const totalPending = invoices
     ?.filter(inv => inv.status === 'sent' || inv.status === 'payment_submitted')
-    .reduce((sum, inv) => sum + parseFloat(inv.total_amount.toString()), 0) || 0;
+    .reduce((sum, inv) => sum + parseFloat((inv.total_amount || 0).toString()), 0) || 0;
   
   // Facturas vencidas
   const overdueInvoices = invoices
@@ -73,7 +73,7 @@ export default function Home() {
       return isBefore(dueDate, today);
     }) || [];
   
-  const totalOverdue = overdueInvoices.reduce((sum, inv) => sum + parseFloat(inv.total_amount.toString()), 0);
+  const totalOverdue = overdueInvoices.reduce((sum, inv) => sum + parseFloat((inv.total_amount || 0).toString()), 0);
   
   // Total facturado este mes (todas las facturas excepto borradores y canceladas)
   const monthlyInvoiced = invoices
@@ -83,7 +83,7 @@ export default function Home() {
              date.getMonth() === currentMonth && 
              date.getFullYear() === currentYear;
     })
-    .reduce((sum, inv) => sum + parseFloat(inv.total_amount.toString()), 0) || 0;
+    .reduce((sum, inv) => sum + parseFloat((inv.total_amount || 0).toString()), 0) || 0;
 
   // Calculate weekly data (last 7 days)
   const weeklyData = (() => {
@@ -100,7 +100,7 @@ export default function Home() {
           return (inv.status === 'sent' || inv.status === 'paid' || inv.status === 'payment_submitted') && 
                  invDate.getTime() === targetDate.getTime();
         })
-        .reduce((sum, inv) => sum + parseFloat(inv.total_amount.toString()), 0) || 0;
+        .reduce((sum, inv) => sum + parseFloat((inv.total_amount || 0).toString()), 0) || 0;
       
       data.push({
         day: format(targetDate, 'EEE', { locale: es }),
@@ -126,7 +126,7 @@ export default function Home() {
                  date.getMonth() === month && 
                  date.getFullYear() === year;
         })
-        .reduce((sum, inv) => sum + parseFloat(inv.total_amount.toString()), 0) || 0;
+        .reduce((sum, inv) => sum + parseFloat((inv.total_amount || 0).toString()), 0) || 0;
       
       const monthPaid = invoices
         ?.filter(inv => {
@@ -135,7 +135,7 @@ export default function Home() {
                  date.getMonth() === month && 
                  date.getFullYear() === year;
         })
-        .reduce((sum, inv) => sum + parseFloat(inv.total_amount.toString()), 0) || 0;
+        .reduce((sum, inv) => sum + parseFloat((inv.total_amount || 0).toString()), 0) || 0;
       
       data.push({
         month: format(targetDate, 'MMM', { locale: es }),
@@ -344,7 +344,7 @@ export default function Home() {
                             Vencida el {format(new Date(invoice.due_date), 'dd MMM yyyy', { locale: es })}
                           </p>
                           <p className="text-sm font-semibold text-red-500 mt-1">
-                            ${parseFloat(invoice.total_amount.toString()).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                            ${parseFloat((invoice.total_amount || 0).toString()).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                           </p>
                         </div>
                       </div>
@@ -516,7 +516,7 @@ export default function Home() {
                     </div>
                     <div className="flex items-center gap-3">
                       <p className="font-semibold text-sm">
-                        ${parseFloat(invoice.total_amount.toString()).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                        ${parseFloat((invoice.total_amount || 0).toString()).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                       </p>
                       {getStatusBadge(invoice.status)}
                     </div>
