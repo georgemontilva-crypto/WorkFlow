@@ -212,13 +212,13 @@ export default function PublicInvoice() {
           {/* Desktop: Grid */}
           <div className="hidden md:grid md:grid-cols-4 gap-4">
             {/* Paso 1 */}
-            <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative">
-              <div className="absolute -top-3 left-6">
-                <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+            <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center flex-shrink-0">
                   <span className="text-black font-bold text-sm">1</span>
                 </div>
               </div>
-              <div className="mt-4">
+              <div>
                 <CreditCard className="w-8 h-8 text-[#C4FF3D] mb-3" />
                 <h3 className="text-white font-semibold mb-2">Realiza el pago</h3>
                 <p className="text-sm text-[#8B92A8]">
@@ -228,13 +228,13 @@ export default function PublicInvoice() {
             </div>
 
             {/* Paso 2 */}
-            <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative">
-              <div className="absolute -top-3 left-6">
-                <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+            <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center flex-shrink-0">
                   <span className="text-black font-bold text-sm">2</span>
                 </div>
               </div>
-              <div className="mt-4">
+              <div>
                 <Download className="w-8 h-8 text-[#C4FF3D] mb-3" />
                 <h3 className="text-white font-semibold mb-2">Descarga tu comprobante</h3>
                 <p className="text-sm text-[#8B92A8]">
@@ -244,13 +244,13 @@ export default function PublicInvoice() {
             </div>
 
             {/* Paso 3 */}
-            <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative">
-              <div className="absolute -top-3 left-6">
-                <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+            <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center flex-shrink-0">
                   <span className="text-black font-bold text-sm">3</span>
                 </div>
               </div>
-              <div className="mt-4">
+              <div>
                 <Upload className="w-8 h-8 text-[#C4FF3D] mb-3" />
                 <h3 className="text-white font-semibold mb-2">Súbelo aquí</h3>
                 <p className="text-sm text-[#8B92A8]">
@@ -260,13 +260,13 @@ export default function PublicInvoice() {
             </div>
 
             {/* Paso 4 */}
-            <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative">
-              <div className="absolute -top-3 left-6">
-                <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+            <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center flex-shrink-0">
                   <span className="text-black font-bold text-sm">4</span>
                 </div>
               </div>
-              <div className="mt-4">
+              <div>
                 <CheckCheck className="w-8 h-8 text-[#C4FF3D] mb-3" />
                 <h3 className="text-white font-semibold mb-2">El emisor confirmará</h3>
                 <p className="text-sm text-[#8B92A8]">
@@ -280,13 +280,13 @@ export default function PublicInvoice() {
           <div className="md:hidden overflow-x-auto pb-4 -mx-4 px-4">
             <div className="flex gap-4 min-w-max">
               {/* Paso 1 */}
-              <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative w-[280px] flex-shrink-0">
-                <div className="absolute -top-3 left-6">
-                  <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+              <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 w-[280px] flex-shrink-0">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center flex-shrink-0">
                     <span className="text-black font-bold text-sm">1</span>
                   </div>
                 </div>
-                <div className="mt-4">
+                <div>
                   <CreditCard className="w-8 h-8 text-[#C4FF3D] mb-3" />
                   <h3 className="text-white font-semibold mb-2">Realiza el pago</h3>
                   <p className="text-sm text-[#8B92A8]">
@@ -296,13 +296,13 @@ export default function PublicInvoice() {
               </div>
 
               {/* Paso 2 */}
-              <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative w-[280px] flex-shrink-0">
-                <div className="absolute -top-3 left-6">
-                  <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+              <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 w-[280px] flex-shrink-0">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center flex-shrink-0">
                     <span className="text-black font-bold text-sm">2</span>
                   </div>
                 </div>
-                <div className="mt-4">
+                <div>
                   <Download className="w-8 h-8 text-[#C4FF3D] mb-3" />
                   <h3 className="text-white font-semibold mb-2">Descarga tu comprobante</h3>
                   <p className="text-sm text-[#8B92A8]">
@@ -312,13 +312,13 @@ export default function PublicInvoice() {
               </div>
 
               {/* Paso 3 */}
-              <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative w-[280px] flex-shrink-0">
-                <div className="absolute -top-3 left-6">
-                  <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+              <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 w-[280px] flex-shrink-0">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center flex-shrink-0">
                     <span className="text-black font-bold text-sm">3</span>
                   </div>
                 </div>
-                <div className="mt-4">
+                <div>
                   <Upload className="w-8 h-8 text-[#C4FF3D] mb-3" />
                   <h3 className="text-white font-semibold mb-2">Súbelo aquí</h3>
                   <p className="text-sm text-[#8B92A8]">
@@ -328,13 +328,13 @@ export default function PublicInvoice() {
               </div>
 
               {/* Paso 4 */}
-              <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative w-[280px] flex-shrink-0">
-                <div className="absolute -top-3 left-6">
-                  <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+              <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 w-[280px] flex-shrink-0">
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center flex-shrink-0">
                     <span className="text-black font-bold text-sm">4</span>
                   </div>
                 </div>
-                <div className="mt-4">
+                <div>
                   <CheckCheck className="w-8 h-8 text-[#C4FF3D] mb-3" />
                   <h3 className="text-white font-semibold mb-2">El emisor confirmará</h3>
                   <p className="text-sm text-[#8B92A8]">
