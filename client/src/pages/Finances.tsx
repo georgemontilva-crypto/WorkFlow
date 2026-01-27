@@ -242,9 +242,9 @@ export default function Finances() {
           <Button 
             onClick={handleOpenModal}
             variant="default"
-            className="md:w-auto fixed md:relative bottom-6 right-6 md:bottom-auto md:right-auto w-14 h-14 md:w-auto md:h-auto rounded-full md:rounded-md p-0 md:p-2 shadow-lg md:shadow-none z-50"
+            className="w-12 h-12 md:w-auto md:h-auto rounded-full md:rounded-md p-0 md:px-4 md:py-2 flex items-center justify-center"
           >
-            <Plus className="w-6 h-6 md:w-5 md:h-5 md:mr-2" />
+            <Plus className="w-5 h-5 md:mr-2" />
             <span className="hidden md:inline">Nueva Transacción</span>
           </Button>
         </div>
