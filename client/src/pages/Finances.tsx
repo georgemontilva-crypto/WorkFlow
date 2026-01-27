@@ -236,14 +236,16 @@ export default function Finances() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Finanzas</h1>
-            <p className="text-[#8B92A8] mt-1">Control de ingresos y gastos</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-white">Finanzas</h1>
+            <p className="text-sm md:text-base text-[#8B92A8] mt-1">Control de ingresos y gastos</p>
           </div>
           <Button 
             onClick={handleOpenModal}
             variant="default"
+            className="md:w-auto fixed md:relative bottom-6 right-6 md:bottom-auto md:right-auto w-14 h-14 md:w-auto md:h-auto rounded-full md:rounded-md p-0 md:p-2 shadow-lg md:shadow-none z-50"
           >
-            + Nueva Transacción
+            <Plus className="w-6 h-6 md:w-5 md:h-5 md:mr-2" />
+            <span className="hidden md:inline">Nueva Transacción</span>
           </Button>
         </div>
 
@@ -366,9 +368,9 @@ export default function Finances() {
 
         {/* Transacciones Recientes */}
         <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
             <h2 className="text-xl font-bold text-white">Transacciones Recientes</h2>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-between md:gap-4 gap-2">
               {/* Month Navigation */}
               <div className="flex items-center gap-2">
                 <button
@@ -395,7 +397,7 @@ export default function Finances() {
               </div>
               <button
                 onClick={handleExportHistory}
-                className="text-sm text-[#8B92A8] hover:text-white transition-colors"
+                className="text-sm text-[#8B92A8] hover:text-white transition-colors hidden md:block"
               >
                 Exportar historial
               </button>
@@ -407,7 +409,7 @@ export default function Finances() {
               No hay transacciones en {format(selectedMonth, 'MMMM yyyy', { locale: es })}
             </div>
           ) : (
-            <div className="h-96 overflow-y-auto pr-2 space-y-2">
+            <div className="h-96 overflow-y-auto overflow-x-hidden pr-2 space-y-2">
               {filteredHistory.map((transaction: any) => {
                 const isExpense = transaction.type === 'manual-expense';
                 const isIncome = transaction.type === 'invoice' || transaction.type === 'manual-income';
@@ -417,9 +419,9 @@ export default function Finances() {
                     key={transaction.id} 
                     className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4 hover:border-[rgba(255,255,255,0.06)] transition-colors"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                           isExpense ? 'bg-red-500/10' : 'bg-green-500/10'
                         }`}>
                           {isExpense ? (
@@ -428,14 +430,14 @@ export default function Finances() {
                             <TrendingUp className="w-5 h-5 text-green-500" />
                           )}
                         </div>
-                        <div>
-                          <p className="text-white font-semibold">{transaction.client_name}</p>
-                          <p className="text-[#8B92A8] text-sm">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-semibold truncate">{transaction.client_name}</p>
+                          <p className="text-[#8B92A8] text-sm truncate">
                             {transaction.invoice_number || transaction.category || 'ManualTransaction'} • {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
                           </p>
                         </div>
                       </div>
-                      <p className={`font-bold text-lg ${
+                      <p className={`font-bold text-lg flex-shrink-0 ${
                         isExpense ? 'text-red-500' : 'text-green-500'
                       }`}>
                         {isExpense ? '-' : '+'}{formatCurrency(transaction.amount)}
