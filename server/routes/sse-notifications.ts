@@ -12,17 +12,17 @@ import { verifyToken } from '../_core/auth';
  * GET /api/notifications/stream
  */
 export async function handleSSENotifications(req: Request, res: Response) {
-  // Extract token from Authorization header
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    res.status(401).json({ error: 'Unauthorized' });
+  // Extract token from cookies (since EventSource can't send custom headers)
+  const token = req.cookies?.auth_token;
+  
+  if (!token) {
+    console.error('[SSE] No auth token in cookies');
+    res.status(401).json({ error: 'Unauthorized - No token' });
     return;
   }
-
-  const token = authHeader.substring(7);
   
   try {
-    // Verify JWT token
+    // Verify JWT token from cookie
     const decoded = await verifyToken(token);
     const userId = decoded.userId;
 
