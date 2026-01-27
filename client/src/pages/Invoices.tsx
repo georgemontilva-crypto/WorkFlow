@@ -425,8 +425,8 @@ export default function Invoices() {
             </div>
             <Button
               onClick={handleOpenModal}
-              variant="default"
-              className="md:w-auto fixed md:relative bottom-6 right-6 md:bottom-auto md:right-auto w-14 h-14 md:w-auto md:h-auto rounded-full md:rounded-md p-0 md:p-2 shadow-lg md:shadow-none z-50"
+              variant="outline"
+              className="md:w-auto fixed md:relative bottom-6 right-6 md:bottom-auto md:right-auto w-14 h-14 md:w-auto md:h-auto rounded-full md:rounded-md p-0 md:p-2 shadow-lg md:shadow-none z-50 border-[#C4FF3D]/40 hover:border-[#C4FF3D] text-[#C4FF3D]"
             >
               <Plus className="w-6 h-6 md:w-5 md:h-5 md:mr-2" />
               <span className="hidden md:inline">{'Crear Factura'}</span>

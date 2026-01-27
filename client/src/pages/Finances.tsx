@@ -241,8 +241,8 @@ export default function Finances() {
           </div>
           <Button 
             onClick={handleOpenModal}
-            variant="default"
-            className="w-12 h-12 md:w-auto md:h-auto rounded-full md:rounded-md p-0 md:px-4 md:py-2 flex items-center justify-center"
+            variant="outline"
+            className="w-12 h-12 md:w-auto md:h-auto rounded-full md:rounded-md p-0 md:px-4 md:py-2 flex items-center justify-center border-[#C4FF3D]/40 hover:border-[#C4FF3D] text-[#C4FF3D]"
           >
             <Plus className="w-5 h-5 md:mr-2" />
             <span className="hidden md:inline">Nueva Transacción</span>
@@ -368,33 +368,43 @@ export default function Finances() {
 
         {/* Transacciones Recientes */}
         <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-            <h2 className="text-xl font-bold text-white">Transacciones Recientes</h2>
-            <div className="flex items-center justify-between md:gap-4 gap-2">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+            <div className="flex flex-col gap-2">
+              <h2 className="text-xl font-bold text-white">Transacciones Recientes</h2>
+              {/* Botón Exportar en móvil, debajo del título */}
+              <button
+                onClick={handleExportHistory}
+                className="text-sm text-[#8B92A8] hover:text-white transition-colors text-left md:hidden"
+              >
+                Exportar historial
+              </button>
+            </div>
+            <div className="flex items-center justify-between md:gap-4">
               {/* Month Navigation */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <button
                   onClick={handlePreviousMonth}
-                  className="p-2 md:p-1 text-[#8B92A8] hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  className="p-1 text-[#8B92A8] hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                   title={'PreviousMonth'}
                 >
                   <ChevronLeft className="w-5 h-5 md:w-4 md:h-4" />
                 </button>
                 <button
                   onClick={handleResetMonth}
-                  className="text-sm md:text-sm text-[#8B92A8] hover:text-white transition-colors min-w-[100px] text-center min-h-[44px] flex items-center justify-center"
+                  className="text-sm text-[#8B92A8] hover:text-white transition-colors min-w-[100px] text-center min-h-[44px] flex items-center justify-center px-2"
                   title={'BackToCurrentMonth'}
                 >
                   {format(selectedMonth, 'MMMM yyyy', { locale: es })}
                 </button>
                 <button
                   onClick={handleNextMonth}
-                  className="p-2 md:p-1 text-[#8B92A8] hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  className="p-1 text-[#8B92A8] hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
                   title={'NextMonth'}
                 >
                   <ChevronRight className="w-5 h-5 md:w-4 md:h-4" />
                 </button>
               </div>
+              {/* Botón Exportar en desktop */}
               <button
                 onClick={handleExportHistory}
                 className="text-sm text-[#8B92A8] hover:text-white transition-colors hidden md:block"
