@@ -855,7 +855,7 @@ export default function Invoices() {
                         setShowClientDropdown(true);
                       }}
                       onFocus={() => setShowClientDropdown(true)}
-                      placeholder={'SearchClientPlaceholder'}
+                      placeholder="Buscar cliente..."
                       className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2.5 text-white placeholder:text-[#8B92A8] focus:outline-none focus:border-[rgba(196,255,61,0.3)]"
                     />
                     {showClientDropdown && (
@@ -887,8 +887,7 @@ export default function Invoices() {
                               <div>
                                 <p className="font-medium">{client.name}</p>
                                 {client.company && (
-                                  <p className="text-xs text-[#8B92A8]">{client.company}</p>
-                                )}
+                                  <p className="text-xs text-[#8B92A8]">{client.company}</p>                               )}
                               </div>
                             </button>
                           ))}
@@ -911,7 +910,7 @@ export default function Invoices() {
                 {/* Dates */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-white block mb-2">{'IssueDate'} *</Label>
+                    <Label className="text-white block mb-2">Fecha de Emisión *</Label>
                     <Input
                       type="date"
                       value={formData.issue_date}
@@ -920,7 +919,7 @@ export default function Invoices() {
                     />
                   </div>
                   <div>
-                    <Label className="text-white block mb-2">{'DueDate'} *</Label>
+                    <Label className="text-white block mb-2">Fecha de Vencimiento *</Label>
                     <Input
                       type="date"
                       value={formData.due_date}
@@ -936,7 +935,7 @@ export default function Invoices() {
                 <div className="p-3 bg-[#EBFF57]/10 border border-[#EBFF57]/30 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-[#8B92A8] mb-1">{'InvoiceCurrency'}</p>
+                      <p className="text-xs text-[#8B92A8] mb-1">Moneda de la Factura</p>
                       <p className="text-sm font-medium text-white">
                         {getCurrency(user?.primary_currency || 'USD')?.name}
                       </p>
@@ -953,10 +952,10 @@ export default function Invoices() {
                 {/* Items */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <Label className="text-white">{'Items'} *</Label>
+                    <Label className="text-white">Artículos *</Label>
                     <Button type="button" size="sm" onClick={handleAddItem} variant="default">
                       <Plus className="w-4 h-4 mr-1" />
-                      {'AddItem'}
+                      Agregar Artículo
                     </Button>
                   </div>
                   
@@ -965,16 +964,16 @@ export default function Invoices() {
                       <div key={index} className="space-y-2">
                         <div className="grid grid-cols-12 gap-2 items-end">
                           <div className="col-span-6">
-                            <Label className="text-white text-xs mb-1">{'Description'}</Label>
+                            <Label className="text-white text-xs mb-1">Descripción</Label>
                             <Input
-                              placeholder={'ItemDescriptionPlaceholder'}
+                              placeholder="Descripción del artículo..."
                               value={item.description}
                               onChange={(e) => handleItemChange(index, 'description', e.target.value)}
                               className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
                             />
                           </div>
                           <div className="col-span-2">
-                            <Label className="text-white text-xs mb-1">{'Quantity'}</Label>
+                            <Label className="text-white text-xs mb-1">Cantidad</Label>
                             <Input
                               type="number"
                               placeholder="1"
@@ -984,7 +983,7 @@ export default function Invoices() {
                             />
                           </div>
                           <div className="col-span-2">
-                            <Label className="text-white text-xs mb-1">{'UnitPrice'}</Label>
+                            <Label className="text-white text-xs mb-1">Precio Unitario</Label>
                             <Input
                               type="number"
                               placeholder="0.00"
@@ -994,7 +993,7 @@ export default function Invoices() {
                             />
                           </div>
                           <div className="col-span-2">
-                            <Label className="text-white text-xs mb-1">{'Total'}</Label>
+                            <Label className="text-white text-xs mb-1">Total</Label>
                             <Input
                               type="number"
                               placeholder="0.00"
@@ -1036,7 +1035,7 @@ export default function Invoices() {
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       className="w-full min-h-[80px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2 text-white"
-                      placeholder={'NotesPlaceholder'}
+                      placeholder="Notas adicionales..."
                     />
                   </div>
                   
@@ -1046,7 +1045,7 @@ export default function Invoices() {
                       value={formData.terms}
                       onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
                       className="w-full min-h-[80px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2 text-white"
-                      placeholder={'TermsPlaceholder'}
+                      placeholder="Términos y condiciones..."
                     />
                   </div>
                 </div>
@@ -1074,7 +1073,7 @@ export default function Invoices() {
                       className="w-4 h-4 bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] rounded accent-[#C4FF3D]"
                     />
                     <Label htmlFor="is_recurring" className="text-white cursor-pointer text-sm">
-                      {'RecurringInvoice'}
+                      Factura Recurrente
                     </Label>
                   </div>
                   
@@ -1108,9 +1107,8 @@ export default function Invoices() {
                           >
                             <Send className="w-4 h-4 text-[#C4FF3D]" />
                             <div>
-                              <p className="font-medium">{'CreateAndSend'}</p>
-                              <p className="text-xs text-[#8B92A8]">{'CreateAndSendDesc'}</p>
-                            </div>
+                              <p className="font-medium">Crear y Enviar</p>
+                              <p className="text-xs text-[#8B92A8]">Moneda asignada automáticamente</p>                          </div>
                           </button>
                           
                           <button
@@ -1120,8 +1118,8 @@ export default function Invoices() {
                           >
                             <Download className="w-4 h-4 text-[#C4FF3D]" />
                             <div>
-                              <p className="font-medium">{'CreateAndDownload'}</p>
-                              <p className="text-xs text-[#8B92A8]">{'CreateAndDownloadDesc'}</p>
+                              <p className="font-medium">Crear y Descargar</p>
+                              <p className="text-xs text-[#8B92A8]">Crear factura y enviar por email</p></p>
                             </div>
                           </button>
                           
@@ -1132,9 +1130,8 @@ export default function Invoices() {
                           >
                             <FileText className="w-4 h-4 text-[#C4FF3D]" />
                             <div>
-                              <p className="font-medium">{'JustCreate'}</p>
-                              <p className="text-xs text-[#8B92A8]">{'JustCreateDesc'}</p>
-                            </div>
+                              <p className="font-medium">Solo Crear</p>
+                         <p className="text-xs text-[#8B92A8]">Crear factura y descargar PDF</p>                           </div>
                           </button>
                         </div>
                       </div>
@@ -1154,7 +1151,7 @@ export default function Invoices() {
           <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-md">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white">{'ConfigureRecurring'}</h2>
+                <h2 className="text-xl font-bold text-white">Configurar Recurrencia</h2>
                 <button 
                   onClick={() => setShowRecurringModal(false)} 
                   className="text-[#8B92A8] hover:text-white"
@@ -1166,7 +1163,7 @@ export default function Invoices() {
               <div className="space-y-6">
                 {/* Frequency */}
                 <div>
-                  <Label className="text-white block mb-2">{'Frequency'} *</Label>
+                  <Label className="text-white block mb-2">Frecuencia *</Label>
                   <Select 
                     value={formData.recurrence_frequency} 
                     onValueChange={(value: any) => setFormData({ ...formData, recurrence_frequency: value })}
@@ -1175,19 +1172,19 @@ export default function Invoices() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] z-[70]">
-                      <SelectItem value="weekly">{'Weekly'}</SelectItem>
-                      <SelectItem value="biweekly">{'Biweekly'}</SelectItem>
-                      <SelectItem value="monthly">{'Monthly'}</SelectItem>
-                      <SelectItem value="quarterly">{'Quarterly'}</SelectItem>
-                      <SelectItem value="semiannually">{'Semiannually'}</SelectItem>
-                      <SelectItem value="annually">{'Annually'}</SelectItem>
+                      <SelectItem value="weekly">Semanal</SelectItem>
+                      <SelectItem value="biweekly">Quincenal</SelectItem>
+                      <SelectItem value="monthly">Mensual</SelectItem>
+                      <SelectItem value="quarterly">Trimestral</SelectItem>
+                      <SelectItem value="semiannually">Semestral</SelectItem>
+                      <SelectItem value="annually">Anual</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 
                 {/* End Date */}
                 <div>
-                  <Label className="text-white block mb-2">{'EndDate'} ({'opcional'})</Label>
+                  <Label className="text-white block mb-2">Fecha de Fin (opcional)</Label>
                   <Input
                     type="date"
                     value={formData.recurrence_end_date}
@@ -1196,14 +1193,14 @@ export default function Invoices() {
                     placeholder="Sin fecha de fin"
                   />
                   <p className="text-xs text-[#8B92A8] mt-2">
-                    {'RecurringEndDateInfo'}
+                    Si no especificas una fecha de fin, la factura se generará indefinidamente
                   </p>
                 </div>
                 
                 {/* Info */}
                 <div className="p-3 bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 rounded-lg">
                   <p className="text-xs text-[#C4FF3D]">
-                    {'RecurringInfo'}
+                    Las facturas recurrentes se generarán automáticamente según la frecuencia seleccionada
                   </p>
                 </div>
                 
