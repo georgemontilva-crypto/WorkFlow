@@ -417,9 +417,10 @@ export default function Finances() {
                 return (
                   <div 
                     key={transaction.id} 
-                    className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4 hover:border-[rgba(255,255,255,0.06)] transition-colors"
+                    className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-4 hover:border-[rgba(255,255,255,0.06)] transition-colors"
                   >
-                    <div className="flex items-center justify-between gap-3">
+                    {/* Desktop: Layout horizontal */}
+                    <div className="hidden md:flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                           isExpense ? 'bg-red-500/10' : 'bg-green-500/10'
@@ -442,6 +443,34 @@ export default function Finances() {
                       }`}>
                         {isExpense ? '-' : '+'}{formatCurrency(transaction.amount)}
                       </p>
+                    </div>
+                    
+                    {/* Mobile: Layout compacto */}
+                    <div className="md:hidden flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        isExpense ? 'bg-red-500/10' : 'bg-green-500/10'
+                      }`}>
+                        {isExpense ? (
+                          <TrendingDown className="w-5 h-5 text-red-500" />
+                        ) : (
+                          <TrendingUp className="w-5 h-5 text-green-500" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-medium truncate text-sm">
+                          {transaction.invoice_number || transaction.category || 'Transacción Manual'} {transaction.client_name}
+                        </p>
+                        <div className="flex items-center justify-between gap-2 mt-1">
+                          <p className={`font-bold text-base ${
+                            isExpense ? 'text-red-500' : 'text-green-500'
+                          }`}>
+                            {isExpense ? '-' : '+'}{formatCurrency(transaction.amount)}
+                          </p>
+                          <p className="text-[#8B92A8] text-xs">
+                            {transaction.invoice_number ? transaction.category : ''} {transaction.invoice_number ? '•' : ''} {format(new Date(transaction.date), 'dd MMM yyyy', { locale: es })}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 );
