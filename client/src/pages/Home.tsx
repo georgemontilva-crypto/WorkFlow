@@ -50,18 +50,6 @@ export default function Home() {
   const currentYear = new Date().getFullYear();
   const today = new Date();
   
-  // Debug: Log invoices data
-  console.log('=== DEBUG DASHBOARD ===');
-  console.log('Total invoices:', invoices?.length);
-  console.log('Current month:', currentMonth, 'Current year:', currentYear);
-  if (invoices && invoices.length > 0) {
-    console.log('Sample invoice:', invoices[0]);
-    console.log('Paid invoices this month:', invoices.filter(inv => {
-      const date = new Date(inv.issue_date);
-      return inv.status === 'paid' && date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-    }));
-  }
-  
   // Ingresos cobrados este mes (facturas pagadas)
   const monthlyPaid = invoices
     ?.filter(inv => {
@@ -70,12 +58,12 @@ export default function Home() {
              date.getMonth() === currentMonth && 
              date.getFullYear() === currentYear;
     })
-    .reduce((sum, inv) => sum + Number(inv.total_amount || 0), 0) || 0;
+    .reduce((sum, inv) => sum + Number(inv.total || 0), 0) || 0;
   
   // Total pendiente por cobrar (facturas enviadas)
   const totalPending = invoices
     ?.filter(inv => inv.status === 'sent' || inv.status === 'payment_submitted')
-    .reduce((sum, inv) => sum + Number(inv.total_amount || 0), 0) || 0;
+    .reduce((sum, inv) => sum + Number(inv.total || 0), 0) || 0;
   
   // Facturas vencidas
   const overdueInvoices = invoices
@@ -85,7 +73,7 @@ export default function Home() {
       return isBefore(dueDate, today);
     }) || [];
   
-  const totalOverdue = overdueInvoices.reduce((sum, inv) => sum + Number(inv.total_amount || 0), 0);
+  const totalOverdue = overdueInvoices.reduce((sum, inv) => sum + Number(inv.total || 0), 0);
   
   // Total facturado este mes (todas las facturas excepto borradores y canceladas)
   const monthlyInvoiced = invoices
@@ -95,7 +83,7 @@ export default function Home() {
              date.getMonth() === currentMonth && 
              date.getFullYear() === currentYear;
     })
-    .reduce((sum, inv) => sum + Number(inv.total_amount || 0), 0) || 0;
+    .reduce((sum, inv) => sum + Number(inv.total || 0), 0) || 0;
 
   // Calculate weekly data (last 7 days)
   const weeklyData = (() => {
@@ -112,7 +100,7 @@ export default function Home() {
           return (inv.status === 'sent' || inv.status === 'paid' || inv.status === 'payment_submitted') && 
                  invDate.getTime() === targetDate.getTime();
         })
-        .reduce((sum, inv) => sum + Number(inv.total_amount || 0), 0) || 0;
+        .reduce((sum, inv) => sum + Number(inv.total || 0), 0) || 0;
       
       data.push({
         day: format(targetDate, 'EEE', { locale: es }),
@@ -138,7 +126,7 @@ export default function Home() {
                  date.getMonth() === month && 
                  date.getFullYear() === year;
         })
-        .reduce((sum, inv) => sum + Number(inv.total_amount || 0), 0) || 0;
+        .reduce((sum, inv) => sum + Number(inv.total || 0), 0) || 0;
       
       const monthPaid = invoices
         ?.filter(inv => {
@@ -147,7 +135,7 @@ export default function Home() {
                  date.getMonth() === month && 
                  date.getFullYear() === year;
         })
-        .reduce((sum, inv) => sum + Number(inv.total_amount || 0), 0) || 0;
+        .reduce((sum, inv) => sum + Number(inv.total || 0), 0) || 0;
       
       data.push({
         month: format(targetDate, 'MMM', { locale: es }),
@@ -356,7 +344,7 @@ export default function Home() {
                             Vencida el {format(new Date(invoice.due_date), 'dd MMM yyyy', { locale: es })}
                           </p>
                           <p className="text-sm font-semibold text-red-500 mt-1">
-                            ${Number(invoice.total_amount || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                            ${Number(invoice.total || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                           </p>
                         </div>
                       </div>
@@ -495,6 +483,71 @@ export default function Home() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Historial de Notificaciones */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-foreground flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5" />
+                    Notificaciones
+                  </CardTitle>
+                  {notifications && notifications.length > 5 && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setLocation('/settings')}
+                      className="text-xs"
+                    >
+                      Ver todas
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {notifications && notifications.length > 0 ? (
+                  <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                    {notifications.slice(0, 5).map((notification) => (
+                      <div 
+                        key={notification.id} 
+                        className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${
+                          notification.is_read 
+                            ? 'bg-background border-border' 
+                            : 'bg-primary/5 border-primary/20'
+                        }`}
+                      >
+                        <div className={`p-2 rounded-full flex-shrink-0 ${
+                          notification.is_urgent 
+                            ? 'bg-red-500/10' 
+                            : 'bg-blue-500/10'
+                        }`}>
+                          <AlertTriangle className={`w-4 h-4 ${
+                            notification.is_urgent 
+                              ? 'text-red-500' 
+                              : 'text-blue-500'
+                          }`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground text-sm">{notification.title}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{notification.message}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {format(new Date(notification.created_at), 'dd MMM yyyy HH:mm', { locale: es })}
+                          </p>
+                        </div>
+                        {!notification.is_read && (
+                          <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-2" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6">
+                    <AlertTriangle className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">No hay notificaciones</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
 
@@ -528,7 +581,7 @@ export default function Home() {
                     </div>
                     <div className="flex items-center gap-3">
                       <p className="font-semibold text-sm">
-                        ${Number(invoice.total_amount || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                        ${Number(invoice.total || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                       </p>
                       {getStatusBadge(invoice.status)}
                     </div>
