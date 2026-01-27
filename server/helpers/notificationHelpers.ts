@@ -70,7 +70,7 @@ export async function createNotification(params: CreateNotificationParams): Prom
     }
 
     // Create notification
-    const [result] = await db.insert(notifications).values({
+    const result = await db.insert(notifications).values({
       user_id: params.user_id,
       type: params.type,
       title: params.title.trim(),
@@ -78,21 +78,24 @@ export async function createNotification(params: CreateNotificationParams): Prom
       source: params.source,
       source_id: params.source_id || null,
       is_read: 0,
-    }).returning({ id: notifications.id });
+    });
 
     console.log(`[NotificationHelper] Created successfully: ${params.title}`);
+    
+    // Get the created notification ID (SQLite lastInsertRowid)
+    const notificationId = result.lastInsertRowid ? Number(result.lastInsertRowid) : 0;
     
     // Publish real-time event via Redis (non-blocking)
     try {
       const { notificationsRealtimeService } = await import('../services/notificationsRealtimeService');
       await notificationsRealtimeService.publishNotification({
         userId: params.user_id,
-        notificationId: result.id,
+        notificationId: notificationId,
         type: 'new',
         source: params.source,
         timestamp: Date.now(),
       });
-      console.log(`[NotificationHelper] Real-time event published`);
+      console.log(`[NotificationHelper] Real-time event published for notification ID: ${notificationId}`);
     } catch (realtimeError: any) {
       console.error(`[NotificationHelper] Real-time publish error (non-blocking):`, realtimeError.message);
     }
@@ -193,6 +196,74 @@ export async function notifyPaymentProofUploaded(
     type: "info",
     title: `Comprobante recibido para ${invoiceNumber}`,
     message: `El cliente ha subido un comprobante de pago para la factura ${invoiceNumber}. Revisa y confirma el pago.`,
+    source: "invoice",
+    source_id: invoiceId,
+  });
+}
+
+/**
+ * INVOICE CREATION AND MANAGEMENT NOTIFICATIONS
+ */
+
+export async function notifyInvoiceCreated(
+  userId: number,
+  invoiceId: number,
+  invoiceNumber: string,
+  amount: number,
+  currency: string
+) {
+  return createNotification({
+    user_id: userId,
+    type: "success",
+    title: `Factura ${invoiceNumber} creada`,
+    message: `Factura creada exitosamente por ${amount} ${currency}.`,
+    source: "invoice",
+    source_id: invoiceId,
+  });
+}
+
+export async function notifyInvoiceSent(
+  userId: number,
+  invoiceId: number,
+  invoiceNumber: string,
+  clientName: string
+) {
+  return createNotification({
+    user_id: userId,
+    type: "success",
+    title: `Factura ${invoiceNumber} enviada`,
+    message: `La factura ${invoiceNumber} ha sido enviada por email a ${clientName}.`,
+    source: "invoice",
+    source_id: invoiceId,
+  });
+}
+
+export async function notifyInvoiceCancelled(
+  userId: number,
+  invoiceId: number,
+  invoiceNumber: string
+) {
+  return createNotification({
+    user_id: userId,
+    type: "warning",
+    title: `Factura ${invoiceNumber} cancelada`,
+    message: `La factura ${invoiceNumber} ha sido cancelada.`,
+    source: "invoice",
+    source_id: invoiceId,
+  });
+}
+
+export async function notifyInvoiceDueSoon(
+  userId: number,
+  invoiceId: number,
+  invoiceNumber: string,
+  daysUntilDue: number
+) {
+  return createNotification({
+    user_id: userId,
+    type: "warning",
+    title: `Factura ${invoiceNumber} por vencer`,
+    message: `La factura ${invoiceNumber} vence en ${daysUntilDue} ${daysUntilDue === 1 ? 'día' : 'días'}. Considera enviar un recordatorio al cliente.`,
     source: "invoice",
     source_id: invoiceId,
   });

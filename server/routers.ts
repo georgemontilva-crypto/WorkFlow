@@ -642,6 +642,20 @@ export const appRouter = router({
             email: client.email,
           });
           
+          // Create notification (non-blocking)
+          try {
+            const { createNotification } = await import('./helpers/notificationHelpers');
+            await createNotification({
+              user_id: ctx.user.id,
+              type: 'success',
+              title: 'Cliente creado',
+              message: `El cliente ${client.name} ha sido agregado exitosamente`,
+              source: 'system',
+            });
+          } catch (notifError: any) {
+            console.error(`[Clients] Notification error (non-blocking):`, notifError.message);
+          }
+          
           return { 
             success: true, 
             client: client 
