@@ -153,9 +153,11 @@ export default function PublicInvoice() {
                   className="h-12 w-12 object-contain rounded-[12px]"
                 />
               ) : (
-                <div className="h-12 w-12 bg-[#C4FF3D] rounded-[12px] flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-black" />
-                </div>
+                <img 
+                  src="/assets/finwrk-logo.png" 
+                  alt="FinWrk" 
+                  className="h-12 w-12 object-contain rounded-[12px]"
+                />
               )}
               <div>
                 <h1 className="text-xl font-bold text-white">{profile?.company_name || 'FinWrk'}</h1>
@@ -541,9 +543,11 @@ export default function PublicInvoice() {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 mb-2 hover:opacity-80 transition-opacity"
           >
-            <div className="w-6 h-6 rounded-lg bg-[#C4FF3D] flex items-center justify-center">
-              <FileText className="w-3 h-3 text-black" />
-            </div>
+            <img 
+              src="/assets/finwrk-logo.png" 
+              alt="FinWrk" 
+              className="w-6 h-6 object-contain rounded-lg"
+            />
             <span className="font-semibold text-white">FinWrk</span>
           </a>
           <p className="text-[#8B92A8] text-sm">

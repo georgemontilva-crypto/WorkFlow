@@ -49,7 +49,8 @@ export async function createNotification(params: CreateNotificationParams): Prom
       return false;
     }
 
-    // Check for duplicates (same source + source_id + type)
+    // Check for duplicates (same source + source_id + title)
+    // This allows multiple notification types for the same source, but prevents exact duplicate messages
     if (params.source_id) {
       const [existing] = await db
         .select()
@@ -59,13 +60,13 @@ export async function createNotification(params: CreateNotificationParams): Prom
             eq(notifications.user_id, params.user_id),
             eq(notifications.source, params.source),
             eq(notifications.source_id, params.source_id),
-            eq(notifications.type, params.type)
+            eq(notifications.title, params.title.trim())
           )
         )
         .limit(1);
 
       if (existing) {
-        console.log(`[NotificationHelper] DISCARDED: Duplicate notification for source ${params.source} id ${params.source_id}`);
+        console.log(`[NotificationHelper] DISCARDED: Duplicate notification "${params.title}" for source ${params.source} id ${params.source_id}`);
         return false;
       }
     }
