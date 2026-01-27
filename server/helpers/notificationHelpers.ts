@@ -205,94 +205,7 @@ export async function notifyPaymentProofUploaded(
   });
 }
 
-/**
- * INVOICE CREATION AND MANAGEMENT NOTIFICATIONS
- */
 
-export async function notifyInvoiceCreated(
-  userId: number,
-  invoiceId: number,
-  invoiceNumber: string,
-  amount: number,
-  currency: string
-) {
-  return createNotification({
-    user_id: userId,
-    type: "success",
-    title: `Factura ${invoiceNumber} creada`,
-    message: `Factura creada exitosamente por ${amount} ${currency}.`,
-    source: "invoice",
-    source_id: invoiceId,
-  });
-}
-
-export async function notifyInvoiceSent(
-  userId: number,
-  invoiceId: number,
-  invoiceNumber: string,
-  clientName: string
-) {
-  return createNotification({
-    user_id: userId,
-    type: "success",
-    title: `Factura ${invoiceNumber} enviada`,
-    message: `La factura ${invoiceNumber} ha sido enviada por email a ${clientName}.`,
-    source: "invoice",
-    source_id: invoiceId,
-  });
-}
-
-export async function notifyInvoiceCancelled(
-  userId: number,
-  invoiceId: number,
-  invoiceNumber: string
-) {
-  return createNotification({
-    user_id: userId,
-    type: "warning",
-    title: `Factura ${invoiceNumber} cancelada`,
-    message: `La factura ${invoiceNumber} ha sido cancelada.`,
-    source: "invoice",
-    source_id: invoiceId,
-  });
-}
-
-export async function notifyInvoiceDueSoon(
-  userId: number,
-  invoiceId: number,
-  invoiceNumber: string,
-  daysUntilDue: number
-) {
-  return createNotification({
-    user_id: userId,
-    type: "warning",
-    title: `Factura ${invoiceNumber} por vencer`,
-    message: `La factura ${invoiceNumber} vence en ${daysUntilDue} ${daysUntilDue === 1 ? 'día' : 'días'}. Considera enviar un recordatorio al cliente.`,
-    source: "invoice",
-    source_id: invoiceId,
-    is_urgent: true,  // ← URGENTE: factura próxima a vencer
-  });
-}
-
-
-/**
- * CLIENT NOTIFICATIONS
- */
-
-export async function notifyClientCreated(
-  userId: number,
-  clientId: number,
-  clientName: string
-) {
-  return createNotification({
-    user_id: userId,
-    type: "success",
-    title: `Cliente creado: ${clientName}`,
-    message: `El cliente "${clientName}" ha sido agregado exitosamente a tu cartera.`,
-    source: "system",
-    source_id: clientId,
-  });
-}
 
 /**
  * INVOICE NOTIFICATIONS (Extended)
@@ -345,6 +258,42 @@ export async function notifyInvoiceCancelled(
     message: `La factura ${invoiceNumber} ha sido marcada como cancelada.`,
     source: "invoice",
     source_id: invoiceId,
+  });
+}
+
+export async function notifyInvoiceDueSoon(
+  userId: number,
+  invoiceId: number,
+  invoiceNumber: string,
+  daysUntilDue: number
+) {
+  return createNotification({
+    user_id: userId,
+    type: "warning",
+    title: `Factura ${invoiceNumber} por vencer`,
+    message: `La factura ${invoiceNumber} vence en ${daysUntilDue} ${daysUntilDue === 1 ? 'día' : 'días'}. Considera enviar un recordatorio al cliente.`,
+    source: "invoice",
+    source_id: invoiceId,
+    is_urgent: true,
+  });
+}
+
+/**
+ * CLIENT NOTIFICATIONS
+ */
+
+export async function notifyClientCreated(
+  userId: number,
+  clientId: number,
+  clientName: string
+) {
+  return createNotification({
+    user_id: userId,
+    type: "success",
+    title: `Cliente creado: ${clientName}`,
+    message: `El cliente "${clientName}" ha sido agregado exitosamente a tu cartera.`,
+    source: "system",
+    source_id: clientId,
   });
 }
 
