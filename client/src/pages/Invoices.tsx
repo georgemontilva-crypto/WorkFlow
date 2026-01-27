@@ -205,10 +205,9 @@ export default function Invoices() {
       if (shouldSend && result.invoice?.id) {
         console.log('[Invoices] Sending email for invoice:', result.invoice.id);
         await sendEmailMutation.mutateAsync({ id: result.invoice.id });
-        success('CreatedAndSent');
-      } else {
-        success('Created');
+        // Toast will be shown by real-time notification system
       }
+      // Toast will be shown by real-time notification system
       
       handleCloseModal();
       await utils.invoices.invalidate();
@@ -268,7 +267,7 @@ export default function Invoices() {
           link.download = pdfResult.filename;
           link.click();
         }
-        success('CreatedAndDownloaded');
+        // Toast will be shown by real-time notification system
       }
       
       handleCloseModal();
