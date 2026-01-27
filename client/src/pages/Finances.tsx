@@ -107,20 +107,20 @@ export default function Finances() {
   const getCategories = () => {
     if (formData.type === 'income') {
       return [
-        { value: 'salary', label: 'Salary' },
+        { value: 'salary', label: 'Salario' },
         { value: 'freelance', label: 'Freelance' },
-        { value: 'investment', label: 'Investment' },
-        { value: 'other_income', label: 'Other_income' },
+        { value: 'investment', label: 'Inversión' },
+        { value: 'other_income', label: 'Otros ingresos' },
       ];
     } else {
       return [
-        { value: 'rent', label: 'Rent' },
-        { value: 'utilities', label: 'Utilities' },
-        { value: 'food', label: 'Food' },
-        { value: 'transportation', label: 'Transportation' },
-        { value: 'healthcare', label: 'Healthcare' },
-        { value: 'entertainment', label: 'Entertainment' },
-        { value: 'other_expense', label: 'Other_expense' },
+        { value: 'rent', label: 'Alquiler' },
+        { value: 'utilities', label: 'Servicios públicos' },
+        { value: 'food', label: 'Alimentación' },
+        { value: 'transportation', label: 'Transporte' },
+        { value: 'healthcare', label: 'Salud' },
+        { value: 'entertainment', label: 'Entretenimiento' },
+        { value: 'other_expense', label: 'Otros gastos' },
       ];
     }
   };
@@ -483,8 +483,8 @@ export default function Finances() {
       {/* Nueva Transacción Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-md">
-            <div className="p-6">
+          <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-md max-h-[90vh] flex flex-col">
+            <div className="p-6 overflow-y-auto">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">Nueva Transacción</h2>
