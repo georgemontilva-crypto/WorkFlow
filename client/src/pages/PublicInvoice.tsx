@@ -535,12 +535,17 @@ export default function PublicInvoice() {
 
         {/* Footer */}
         <div className="text-center mt-8">
-          <div className="flex items-center justify-center gap-2 mb-2">
+          <a 
+            href="https://www.finwrk.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 mb-2 hover:opacity-80 transition-opacity"
+          >
             <div className="w-6 h-6 rounded-lg bg-[#C4FF3D] flex items-center justify-center">
               <FileText className="w-3 h-3 text-black" />
             </div>
             <span className="font-semibold text-white">FinWrk</span>
-          </div>
+          </a>
           <p className="text-[#8B92A8] text-sm">
             {profile?.invoice_footer || 'Gracias por tu preferencia'}
           </p>
