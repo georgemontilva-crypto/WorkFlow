@@ -16,7 +16,22 @@ interface NotificationEvent {
   timestamp: number;
 }
 
-export function useRealtimeNotifications() {
+interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  source: 'invoice' | 'savings' | 'system';
+  source_id?: number | null;
+  is_read: number;
+  created_at: Date;
+}
+
+interface UseRealtimeNotificationsOptions {
+  onNotification?: (notification: Notification) => void | Promise<void>;
+}
+
+export function useRealtimeNotifications(options?: UseRealtimeNotificationsOptions) {
   const utils = trpc.useContext();
   const toast = useToast();
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -71,24 +86,33 @@ export function useRealtimeNotifications() {
                 
                 console.log('[Realtime Notifications] New notification:', latestNotification.title);
                 
-                // Determine toast variant based on notification type
-                let variant: 'info' | 'success' | 'warning' | 'error' = 'info';
-                if (latestNotification.type === 'success') variant = 'success';
-                else if (latestNotification.type === 'warning') variant = 'warning';
-                else if (latestNotification.type === 'error') variant = 'error';
-                
-                // Show toast immediately
-                toast.showToast({
-                  title: latestNotification.title,
-                  description: latestNotification.message,
-                  variant,
-                });
+                // Call custom callback if provided
+                if (options?.onNotification) {
+                  try {
+                    await options.onNotification(latestNotification);
+                  } catch (callbackError: any) {
+                    console.error('[Realtime Notifications] Callback error:', callbackError.message);
+                  }
+                } else {
+                  // Default behavior: show toast
+                  // Determine toast variant based on notification type
+                  let variant: 'info' | 'success' | 'warning' | 'error' = 'info';
+                  if (latestNotification.type === 'success') variant = 'success';
+                  else if (latestNotification.type === 'warning') variant = 'warning';
+                  else if (latestNotification.type === 'error') variant = 'error';
+                  
+                  // Show toast immediately
+                  toast.showToast({
+                    title: latestNotification.title,
+                    description: latestNotification.message,
+                    variant,
+                  });
+                }
               }
 
               // Invalidate queries to refresh UI
               utils.notifications.list.invalidate();
               utils.notifications.unreadCount.invalidate();
-              utils.invoices.list.invalidate();
             }
           } catch (error: any) {
             console.error('[Realtime Notifications] Parse error:', error.message);
