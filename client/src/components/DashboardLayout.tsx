@@ -16,16 +16,22 @@ import { NotificationsPanel } from '@/components/NotificationsPanel';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  console.log('[DashboardLayout] Component mounted');
+  
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     // Auth and access control
   const { user, isAuthenticated, logout } = useAuth();
+  
+  console.log('[DashboardLayout] Auth state:', { isAuthenticated, userId: user?.id });
   const { data: accessStatus } = trpc.auth.accessStatus.useQuery(undefined, {
     enabled: isAuthenticated,
     refetchInterval: 60000, // Check every minute
   });
   
   const utils = trpc.useContext();
+  
+  console.log('[DashboardLayout] About to call useRealtimeNotifications');
   
   // Real-time notifications via SSE
   useRealtimeNotifications({
