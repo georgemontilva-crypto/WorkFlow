@@ -12,8 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, CheckCircle2, ExternalLink, Upload, AlertCircle, FileText } from 'lucide-react';
-// import { toast } from 'sonner';
+import { Loader2, CheckCircle2, ExternalLink, Upload, AlertCircle, FileText, CreditCard, Download, Send, CheckCheck } from 'lucide-react';
 
 interface InvoiceData {
   id: number;
@@ -54,11 +53,9 @@ export default function PayInvoice() {
     onSuccess: () => {
       setUploadSuccess(true);
       setIsUploading(false);
-      // toast.success('Comprobante enviado exitosamente');
       refetch();
     },
     onError: (error) => {
-      // toast.error(error.message);
       setIsUploading(false);
     },
   });
@@ -66,9 +63,7 @@ export default function PayInvoice() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        // toast.error('El archivo no debe superar 5MB');
         return;
       }
       setProofFile(file);
@@ -80,7 +75,6 @@ export default function PayInvoice() {
 
     setIsUploading(true);
 
-    // Convert file to base64
     const reader = new FileReader();
     reader.onload = async () => {
       const base64 = reader.result as string;
@@ -154,18 +148,18 @@ export default function PayInvoice() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-6 max-w-4xl">
+    <div className="min-h-screen bg-[#0A0A0A]">
+      {/* Header with Logo */}
+      <div className="border-b border-[rgba(255,255,255,0.06)] bg-[#0A0A0A]">
+        <div className="container mx-auto px-4 py-6 max-w-6xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-foreground flex items-center justify-center">
-                <FileText className="w-5 h-5 text-background" />
+              <div className="w-12 h-12 rounded-[12px] bg-[#C4FF3D] flex items-center justify-center">
+                <FileText className="w-6 h-6 text-black" />
               </div>
               <div>
-                <h1 className="text-lg font-semibold text-foreground">Finwrk</h1>
-                <p className="text-sm text-muted-foreground">Factura de Pago</p>
+                <h1 className="text-xl font-bold text-white">FinWrk</h1>
+                <p className="text-sm text-[#8B92A8]">Portal de Pagos</p>
               </div>
             </div>
             {getStatusBadge()}
@@ -174,194 +168,361 @@ export default function PayInvoice() {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="grid md:grid-cols-5 gap-6">
-          {/* Invoice Details - 3 columns */}
-          <div className="md:col-span-3 space-y-6">
-            <Card className="border-border">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="text-2xl">#{invoice.invoice_number}</CardTitle>
-                    <CardDescription className="mt-1">
-                      {invoice.clientName && `Para: ${invoice.clientName}`}
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Dates */}
-                <div className="grid grid-cols-2 gap-4 pb-4 border-b border-border">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Fecha de emisión</p>
-                    <p className="font-medium text-foreground">
-                      {new Date(invoice.issue_date).toLocaleDateString('es-ES', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      })}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Fecha de vencimiento</p>
-                    <p className="font-medium text-foreground">
-                      {new Date(invoice.due_date).toLocaleDateString('es-ES', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                      })}
-                    </p>
-                  </div>
-                </div>
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Disclaimer - Prominente al inicio */}
+        <div className="mb-8 p-4 bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 rounded-[20px]">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-[#C4FF3D] flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm text-white font-medium mb-1">
+                Importante: FinWrk no procesa pagos directamente
+              </p>
+              <p className="text-xs text-[#8B92A8] leading-relaxed">
+                Somos una plataforma de gestión financiera. Los pagos se realizan a través de tus propios métodos de pago (transferencia bancaria, plataformas de pago, etc.). Solo te ayudamos a organizar y gestionar el proceso de cobro.
+              </p>
+            </div>
+          </div>
+        </div>
 
-                {/* Items */}
-                <div>
-                  <h3 className="font-semibold text-foreground mb-3">Conceptos</h3>
-                  <div className="space-y-2">
-                    {invoice.items.map((item, index) => (
-                      <div key={index} className="flex justify-between items-start py-2 border-b border-border last:border-0">
-                        <div className="flex-1">
-                          <p className="font-medium text-foreground">{item.description}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {item.quantity} × ${item.unitPrice.toFixed(2)}
-                          </p>
-                        </div>
-                        <p className="font-semibold text-foreground">${item.total.toFixed(2)}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Total */}
-                <div className="pt-4 border-t border-border space-y-2">
-                  <div className="flex justify-between text-lg">
-                    <span className="font-semibold text-foreground">Total</span>
-                    <span className="font-bold text-foreground">
-                      ${parseFloat(invoice.total).toFixed(2)} {invoice.currency}
-                    </span>
-                  </div>
-                  
-                  {parseFloat(invoice.paid_amount) > 0 && (
-                    <div className="flex justify-between text-sm text-muted-foreground">
-                      <span>Pagado</span>
-                      <span>-${parseFloat(invoice.paid_amount).toFixed(2)}</span>
-                    </div>
-                  )}
-                  
-                  {balance > 0 && (
-                    <div className="flex justify-between text-xl pt-2 border-t border-border">
-                      <span className="font-bold text-foreground">Balance</span>
-                      <span className="font-bold text-foreground">
-                        ${balance.toFixed(2)} {invoice.currency}
-                      </span>
-                    </div>
-                  )}
-                </div>
+        {isPaid ? (
+          /* Factura Pagada */
+          <div className="max-w-2xl mx-auto">
+            <Card className="border-[rgba(255,255,255,0.06)] bg-green-500/5">
+              <CardContent className="pt-8 pb-8 text-center">
+                <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto mb-4" />
+                <h3 className="text-2xl font-bold text-white mb-2">¡Factura Pagada!</h3>
+                <p className="text-[#8B92A8]">
+                  Esta factura ya ha sido pagada en su totalidad.
+                </p>
               </CardContent>
             </Card>
           </div>
+        ) : (
+          <>
+            {/* Payment Steps - PRIORIDAD MÁXIMA */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">
+                ¿Cómo pagar esta factura?
+              </h2>
+              
+              {/* Desktop: Grid */}
+              <div className="hidden md:grid md:grid-cols-4 gap-4">
+                {/* Step 1 */}
+                <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative">
+                  <div className="absolute -top-3 left-6">
+                    <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                      <span className="text-black font-bold text-sm">1</span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <CreditCard className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                    <h3 className="text-white font-semibold mb-2">Realiza el pago</h3>
+                    <p className="text-sm text-[#8B92A8]">
+                      Sigue las instrucciones de pago proporcionadas abajo
+                    </p>
+                  </div>
+                </div>
 
-          {/* Payment Section - 2 columns */}
-          <div className="md:col-span-2 space-y-6">
-            {isPaid ? (
-              <Card className="border-border bg-green-500/5">
-                <CardContent className="pt-6 text-center">
-                  <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-foreground mb-2">Factura Pagada</h3>
-                  <p className="text-muted-foreground">
-                    Esta factura ya ha sido pagada en su totalidad.
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <>
-                {/* Payment Button */}
+                {/* Step 2 */}
+                <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative">
+                  <div className="absolute -top-3 left-6">
+                    <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                      <span className="text-black font-bold text-sm">2</span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <Download className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                    <h3 className="text-white font-semibold mb-2">Descarga tu comprobante</h3>
+                    <p className="text-sm text-[#8B92A8]">
+                      Del banco o plataforma de pago que usaste
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative">
+                  <div className="absolute -top-3 left-6">
+                    <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                      <span className="text-black font-bold text-sm">3</span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <Upload className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                    <h3 className="text-white font-semibold mb-2">Súbelo aquí</h3>
+                    <p className="text-sm text-[#8B92A8]">
+                      Usa el formulario de abajo para enviar tu comprobante
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 4 */}
+                <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative">
+                  <div className="absolute -top-3 left-6">
+                    <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                      <span className="text-black font-bold text-sm">4</span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <CheckCheck className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                    <h3 className="text-white font-semibold mb-2">El emisor confirmará</h3>
+                    <p className="text-sm text-[#8B92A8]">
+                      Recibirás confirmación cuando se verifique
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile: Horizontal Scroll */}
+              <div className="md:hidden overflow-x-auto pb-4 -mx-4 px-4">
+                <div className="flex gap-4 min-w-max">
+                  {/* Step 1 */}
+                  <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative w-[280px] flex-shrink-0">
+                    <div className="absolute -top-3 left-6">
+                      <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                        <span className="text-black font-bold text-sm">1</span>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <CreditCard className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                      <h3 className="text-white font-semibold mb-2">Realiza el pago</h3>
+                      <p className="text-sm text-[#8B92A8]">
+                        Sigue las instrucciones de pago proporcionadas abajo
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative w-[280px] flex-shrink-0">
+                    <div className="absolute -top-3 left-6">
+                      <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                        <span className="text-black font-bold text-sm">2</span>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <Download className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                      <h3 className="text-white font-semibold mb-2">Descarga tu comprobante</h3>
+                      <p className="text-sm text-[#8B92A8]">
+                        Del banco o plataforma de pago que usaste
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative w-[280px] flex-shrink-0">
+                    <div className="absolute -top-3 left-6">
+                      <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                        <span className="text-black font-bold text-sm">3</span>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <Upload className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                      <h3 className="text-white font-semibold mb-2">Súbelo aquí</h3>
+                      <p className="text-sm text-[#8B92A8]">
+                        Usa el formulario de abajo para enviar tu comprobante
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 4 */}
+                  <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative w-[280px] flex-shrink-0">
+                    <div className="absolute -top-3 left-6">
+                      <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                        <span className="text-black font-bold text-sm">4</span>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <CheckCheck className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                      <h3 className="text-white font-semibold mb-2">El emisor confirmará</h3>
+                      <p className="text-sm text-[#8B92A8]">
+                        Recibirás confirmación cuando se verifique
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Invoice Details & Payment Section */}
+            <div className="grid lg:grid-cols-5 gap-6">
+              {/* Invoice Details - 3 columns */}
+              <div className="lg:col-span-3 space-y-6">
+                <Card className="border-[rgba(255,255,255,0.06)] bg-[#121212]">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-2xl text-white">Factura #{invoice.invoice_number}</CardTitle>
+                        <CardDescription className="mt-1 text-[#8B92A8]">
+                          {invoice.clientName && `Para: ${invoice.clientName}`}
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Dates */}
+                    <div className="grid grid-cols-2 gap-4 pb-4 border-b border-[rgba(255,255,255,0.06)]">
+                      <div>
+                        <p className="text-sm text-[#8B92A8] mb-1">Fecha de emisión</p>
+                        <p className="font-medium text-white">
+                          {new Date(invoice.issue_date).toLocaleDateString('es-ES', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-[#8B92A8] mb-1">Fecha de vencimiento</p>
+                        <p className="font-medium text-white">
+                          {new Date(invoice.due_date).toLocaleDateString('es-ES', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric'
+                          })}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Items */}
+                    <div>
+                      <h3 className="font-semibold text-white mb-3">Detalles de la Factura</h3>
+                      <div className="space-y-2">
+                        {invoice.items.map((item, index) => (
+                          <div key={index} className="flex justify-between items-start py-2 border-b border-[rgba(255,255,255,0.06)] last:border-0">
+                            <div className="flex-1">
+                              <p className="font-medium text-white">{item.description}</p>
+                              <p className="text-sm text-[#8B92A8]">
+                                {item.quantity} × ${item.unitPrice.toFixed(2)}
+                              </p>
+                            </div>
+                            <p className="font-semibold text-white">${item.total.toFixed(2)}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Total */}
+                    <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-2">
+                      <div className="flex justify-between text-lg">
+                        <span className="font-semibold text-white">Total</span>
+                        <span className="font-bold text-white">
+                          ${parseFloat(invoice.total).toFixed(2)} {invoice.currency}
+                        </span>
+                      </div>
+                      
+                      {parseFloat(invoice.paid_amount) > 0 && (
+                        <div className="flex justify-between text-sm text-[#8B92A8]">
+                          <span>Pagado</span>
+                          <span>-${parseFloat(invoice.paid_amount).toFixed(2)}</span>
+                        </div>
+                      )}
+                      
+                      {balance > 0 && (
+                        <div className="flex justify-between text-xl pt-2 border-t border-[rgba(255,255,255,0.06)]">
+                          <span className="font-bold text-white">Balance</span>
+                          <span className="font-bold text-[#C4FF3D]">
+                            ${balance.toFixed(2)} {invoice.currency}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Payment Section - 2 columns */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Payment Instructions */}
                 {invoice.payment_link && !isPaymentSent && (
-                  <Card className="border-border">
+                  <Card className="border-[rgba(255,255,255,0.06)] bg-[#121212]">
                     <CardHeader>
-                      <CardTitle>Realizar Pago</CardTitle>
-                      <CardDescription>
-                        Haz clic para proceder con el pago
+                      <CardTitle className="text-white">Instrucciones de Pago</CardTitle>
+                      <CardDescription className="text-[#8B92A8]">
+                        Haz clic para ver cómo pagar
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <Button
-                        className="w-full"
+                        className="w-full bg-[#C4FF3D] text-black hover:bg-[#C4FF3D]/90 font-semibold"
                         size="lg"
                         onClick={() => window.open(invoice.payment_link, '_blank')}
                       >
                         <ExternalLink className="w-4 h-4 mr-2" />
-                        Pagar Ahora
+                        Ver Instrucciones de Pago
                       </Button>
-                      <p className="text-xs text-muted-foreground text-center mt-3">
-                        El pago se realiza fuera de Finwrk
-                      </p>
                     </CardContent>
                   </Card>
                 )}
 
                 {/* Upload Proof */}
                 {!isPaid && (
-                  <Card className="border-border">
+                  <Card className="border-[rgba(255,255,255,0.06)] bg-[#121212]">
                     <CardHeader>
-                      <CardTitle>Comprobante de Pago</CardTitle>
-                      <CardDescription>
+                      <CardTitle className="text-white">
+                        {isPaymentSent ? '✓ Comprobante Enviado' : 'Subir Comprobante de Pago'}
+                      </CardTitle>
+                      <CardDescription className="text-[#8B92A8]">
                         {isPaymentSent
-                          ? 'Comprobante enviado. Esperando confirmación.'
-                          : 'Sube tu comprobante después de pagar'}
+                          ? 'Esperando confirmación del emisor'
+                          : 'Después de realizar el pago, sube tu comprobante aquí'}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {uploadSuccess || isPaymentSent ? (
-                        <div className="text-center py-4">
-                          <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                          <p className="font-medium text-foreground mb-1">¡Comprobante Enviado!</p>
-                          <p className="text-sm text-muted-foreground">
-                            Recibirás una confirmación cuando se verifique el pago.
+                        <div className="text-center py-6">
+                          <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-3" />
+                          <p className="font-medium text-white mb-1">¡Comprobante enviado exitosamente!</p>
+                          <p className="text-sm text-[#8B92A8]">
+                            El emisor revisará tu pago y actualizará el estado de la factura.
                           </p>
                         </div>
                       ) : (
                         <>
                           <div>
-                            <Label htmlFor="proof-file" className="text-foreground">
-                              Archivo (máx. 5MB)
+                            <Label htmlFor="proof-file" className="text-white mb-2 block">
+                              Selecciona tu comprobante
                             </Label>
-                            <Input
-                              id="proof-file"
-                              type="file"
-                              accept="image/*,.pdf"
-                              onChange={handleFileChange}
-                              className="mt-1.5 border-border"
-                            />
+                            <div className="relative">
+                              <Input
+                                id="proof-file"
+                                type="file"
+                                accept="image/*,.pdf"
+                                onChange={handleFileChange}
+                                className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#C4FF3D] file:text-black hover:file:bg-[#C4FF3D]/90"
+                              />
+                            </div>
+                            <p className="text-xs text-[#8B92A8] mt-2">
+                              Formatos aceptados: JPG, PNG, PDF (máx. 5MB)
+                            </p>
                           </div>
 
                           <div>
-                            <Label htmlFor="proof-comment" className="text-foreground">
+                            <Label htmlFor="proof-comment" className="text-white mb-2 block">
                               Comentario (opcional)
                             </Label>
                             <Textarea
                               id="proof-comment"
                               value={proofComment}
                               onChange={(e) => setProofComment(e.target.value)}
-                              placeholder="Referencia de pago, número de transacción, etc."
-                              className="mt-1.5 border-border resize-none"
+                              placeholder="Ej: Transferencia #123456, Pago realizado el 27/01/2026"
+                              className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white placeholder:text-[#8B92A8] resize-none"
                               rows={3}
                             />
                           </div>
 
                           <Button
-                            className="w-full"
+                            className="w-full bg-[#C4FF3D] text-black hover:bg-[#C4FF3D]/90 font-semibold"
+                            size="lg"
                             onClick={handleUploadProof}
                             disabled={!proofFile || isUploading}
                           >
                             {isUploading ? (
                               <>
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Enviando...
+                                Enviando comprobante...
                               </>
                             ) : (
                               <>
-                                <Upload className="w-4 h-4 mr-2" />
+                                <Send className="w-4 h-4 mr-2" />
                                 Enviar Comprobante
                               </>
                             )}
@@ -371,30 +532,26 @@ export default function PayInvoice() {
                     </CardContent>
                   </Card>
                 )}
-              </>
-            )}
-
-            {/* Disclaimer */}
-            <Card className="border-border bg-muted/30">
-              <CardContent className="pt-6">
-                <p className="text-xs text-muted-foreground text-center leading-relaxed">
-                  <strong className="text-foreground">Aviso:</strong> Finwrk no procesa ni custodia pagos. 
-                  La confirmación del pago es responsabilidad del emisor de la factura.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Footer */}
-      <div className="border-t border-border mt-12">
-        <div className="container mx-auto px-4 py-6 max-w-4xl">
-          <p className="text-center text-sm text-muted-foreground">
-            Procesado de forma segura por <span className="font-semibold text-foreground">Finwrk</span>
+      <div className="border-t border-[rgba(255,255,255,0.06)] mt-12">
+        <div className="container mx-auto px-4 py-6 max-w-6xl">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-lg bg-[#C4FF3D] flex items-center justify-center">
+              <FileText className="w-3 h-3 text-black" />
+            </div>
+            <span className="font-semibold text-white">FinWrk</span>
+          </div>
+          <p className="text-center text-sm text-[#8B92A8]">
+            Plataforma de gestión financiera
           </p>
-          <p className="text-center text-xs text-muted-foreground mt-2">
-            © {new Date().getFullYear()} Finwrk. Todos los derechos reservados.
+          <p className="text-center text-xs text-[#8B92A8] mt-2">
+            © {new Date().getFullYear()} FinWrk. Todos los derechos reservados.
           </p>
         </div>
       </div>
