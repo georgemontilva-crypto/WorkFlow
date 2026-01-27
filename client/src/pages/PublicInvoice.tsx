@@ -538,7 +538,7 @@ export default function PublicInvoice() {
         {/* Footer */}
         <div className="text-center mt-8">
           <a 
-            href="https://www.finwrk.com" 
+            href="https://www.finwrk.app" 
             target="_blank" 
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 mb-2 hover:opacity-80 transition-opacity"
