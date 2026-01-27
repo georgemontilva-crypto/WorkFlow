@@ -177,7 +177,7 @@ export default function PublicInvoice() {
             <AlertCircle className="w-5 h-5 text-[#C4FF3D] flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-sm text-white font-medium mb-1">
-                Importante: {profile?.company_name || 'El emisor'} no procesa pagos directamente
+                Importante: FinWrk no procesa pagos directamente
               </p>
               <p className="text-xs text-[#8B92A8] leading-relaxed">
                 Esta es una plataforma de gestión financiera. Los pagos se realizan a través de los métodos indicados en las instrucciones de pago. Solo ayudamos a organizar y gestionar el proceso de cobro.
