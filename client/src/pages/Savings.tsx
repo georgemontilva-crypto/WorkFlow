@@ -232,9 +232,9 @@ export default function Savings() {
             }
           }}>
             <DialogTrigger asChild>
-              <Button variant="default">
-                <Plus className="w-4 h-4 mr-2" />
-                Nueva Meta
+              <Button variant="default" className="w-12 h-12 md:w-auto md:h-auto rounded-full md:rounded-md p-0 md:px-4 md:py-2 flex items-center justify-center">
+                <Plus className="w-5 h-5 md:mr-2" />
+                <span className="hidden md:inline">Nueva Meta</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-[#0a0a0a] border-white/10 max-w-lg max-h-[90vh] overflow-y-auto">
@@ -404,7 +404,8 @@ export default function Savings() {
                   key={goal.id} 
                   className="bg-[#121212] rounded-[28px] border border-[#C4FF3D]/20 p-4 md:p-6 bg-[#C4FF3D]/5 transition-colors-smooth"
                 >
-                  <div className="flex items-center justify-between gap-6">
+                  {/* Desktop Layout */}
+                  <div className="hidden md:flex items-center justify-between gap-6">
                     {/* Información Principal - Izquierda */}
                     <div className="flex items-center gap-4 flex-1 min-w-0">
                       {goal.status === 'completed' ? (
@@ -425,7 +426,7 @@ export default function Savings() {
                     </div>
 
                     {/* Progreso y Monto - Centro */}
-                    <div className="hidden md:flex flex-col items-end gap-2 flex-1">
+                    <div className="flex flex-col items-end gap-2 flex-1">
                       <div className="flex items-baseline gap-2">
                         <span className="text-2xl font-semibold text-white">
                           {formatCurrency(currentAmount, goal.currency)}
@@ -483,30 +484,80 @@ export default function Savings() {
                     </div>
                   </div>
 
-                  {/* Progreso Mobile - Debajo */}
-                  <div className="md:hidden mt-4 pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-3">
-                    <div className="flex justify-between items-baseline">
-                      <span className="text-xl font-semibold text-white">
-                        {formatCurrency(currentAmount, goal.currency)}
-                      </span>
-                      <span className="text-[#8B92A8] text-sm">
-                        de {formatCurrency(targetAmount, goal.currency)}
-                      </span>
+                  {/* Mobile Layout - Simplificado */}
+                  <div className="md:hidden space-y-3">
+                    {/* Header: Ícono + Título en la misma línea + Menú */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        {goal.status === 'completed' ? (
+                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#C4FF3D]/20 flex items-center justify-center">
+                            <CheckCircle2 className="w-5 h-5 text-[#C4FF3D]" />
+                          </div>
+                        ) : (
+                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#C4FF3D]/20 flex items-center justify-center">
+                            <Target className="w-5 h-5 text-[#C4FF3D]" />
+                          </div>
+                        )}
+                        <h3 className="text-white text-base font-medium truncate">{goal.name}</h3>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-[#8B92A8] hover:text-white h-8 w-8 flex-shrink-0">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="bg-[#0E0F12] border-[#C4FF3D]/30">
+                          <DropdownMenuItem onClick={() => handleEdit(goal)} className="cursor-pointer text-white hover:bg-[#C4FF3D]/10">
+                            <Pencil className="w-4 h-4 mr-2" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator className="bg-[rgba(255,255,255,0.06)]" />
+                          <DropdownMenuItem 
+                            onClick={() => handleDelete(goal.id)} 
+                            className="cursor-pointer text-[#EF4444] hover:bg-[#EF4444]/10"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Eliminar
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
-                    <div className="w-full h-2 bg-[#121212] rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-[#C4FF3D] transition-all duration-300" 
-                        style={{ width: `${Math.min(progress, 100)}%` }}
-                      />
+                    
+                    {/* Fecha de vencimiento alineada con el ícono */}
+                    <div className="flex items-center gap-2">
+                      <div className="w-10 flex-shrink-0"></div>
+                      <p className="text-[#8B92A8] text-xs">
+                        {goal.deadline ? `Vencimiento: ${format(new Date(goal.deadline), 'dd MMM yyyy', { locale: es })}` : 'Sin fecha límite'}
+                      </p>
                     </div>
-                    <p className="text-sm text-[#8B92A8]">
-                      {progress.toFixed(1)}% completado
-                    </p>
+
+                    {/* Monto y Progreso */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-baseline">
+                        <span className="text-lg font-semibold text-white">
+                          {formatCurrency(currentAmount, goal.currency)}
+                        </span>
+                        <span className="text-[#8B92A8] text-xs">
+                          de {formatCurrency(targetAmount, goal.currency)}
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 bg-[#121212] rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-[#C4FF3D] transition-all duration-300" 
+                          style={{ width: `${Math.min(progress, 100)}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-[#8B92A8]">
+                        {progress.toFixed(1)}% completado
+                      </p>
+                    </div>
+
+                    {/* Falta + Botón Agregar */}
                     {goal.status !== 'completed' && remaining > 0 && (
-                      <div className="flex items-center justify-between pt-2">
+                      <div className="flex items-center justify-between pt-1">
                         <div>
                           <p className="text-xs text-[#8B92A8]">Falta</p>
-                          <p className="text-lg font-semibold text-white">
+                          <p className="text-base font-semibold text-white">
                             {formatCurrency(remaining, goal.currency)}
                           </p>
                         </div>
@@ -514,8 +565,9 @@ export default function Savings() {
                           onClick={() => handleAddAmount(goal)}
                           variant="default"
                           size="sm"
+                          className="h-9"
                         >
-                          <TrendingUp className="w-4 h-4 mr-2" />
+                          <TrendingUp className="w-4 h-4 mr-1.5" />
                           Agregar
                         </Button>
                       </div>
