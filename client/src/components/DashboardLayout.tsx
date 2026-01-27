@@ -4,7 +4,7 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { Users, Settings, Menu, X, LogOut, FileText, TrendingUp, Target } from 'lucide-react';
+import { Users, Settings, Menu, X, LogOut, FileText, TrendingUp, Target, LayoutDashboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -54,6 +54,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
   // Navigation organized by sections
   const navigationSections = [
+    {
+      title: 'GENERAL',
+      items: [
+        { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+      ]
+    },
     {
       title: 'GESTIÓN',
       items: [

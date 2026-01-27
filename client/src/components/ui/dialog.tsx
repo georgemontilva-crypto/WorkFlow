@@ -79,8 +79,8 @@ function DialogOverlay({
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        // FASE 3: Overlay oscuro sin sombras agresivas
-        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-[#0E0F12]/90 backdrop-blur-sm",
+        // Overlay sin fondo oscuro para que los toasts sean visibles
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-transparent",
         className
       )}
       {...props}

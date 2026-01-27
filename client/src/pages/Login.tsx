@@ -35,7 +35,7 @@ export default function Login() {
         setLocation('/verify-2fa');
       } else {
         // Redirect to dashboard after successful login
-        setLocation('/dashboard');
+        setLocation('/');
       }
     },
     onError: (error) => {
