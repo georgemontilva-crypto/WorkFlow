@@ -78,9 +78,15 @@ async function startServer() {
       // Verify JWT token
       const { verifyToken } = await import('./auth');
       const payload = await verifyToken(token);
-      const userId = payload.userId;
       
-      console.log(`[SSE] Token verified for user: ${userId}`);
+      if (!payload) {
+        console.log('[SSE] ❌ Token verification failed');
+        return res.status(401).json({ error: 'Invalid token' });
+      }
+      
+      const userId = payload.user_id;  // Note: JWT payload uses user_id (snake_case)
+      
+      console.log(`[SSE] ✅ Token verified for user: ${userId}`);
       
       // Set SSE headers
       res.setHeader('Content-Type', 'text/event-stream');
