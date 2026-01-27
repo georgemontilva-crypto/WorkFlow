@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import path from "path";
 import { createServer } from "http";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
@@ -46,6 +47,11 @@ async function startServer() {
       createContext,
     })
   );
+  
+  // Serve uploaded files (payment receipts, etc.)
+  const uploadsPath = path.join(process.cwd(), 'uploads');
+  app.use('/uploads', express.static(uploadsPath));
+  console.log('[Server] Serving uploads from:', uploadsPath);
   
   // SSE endpoint for real-time notifications
   app.get("/api/notifications/stream", async (req, res) => {
