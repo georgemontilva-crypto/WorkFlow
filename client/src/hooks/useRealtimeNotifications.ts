@@ -37,7 +37,10 @@ export function useRealtimeNotifications(options?: UseRealtimeNotificationsOptio
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  console.log('[Realtime Notifications] Hook initialized');
+
   useEffect(() => {
+    console.log('[Realtime Notifications] useEffect running');
     // Get auth token from localStorage
     const token = localStorage.getItem('token');
     if (!token) {
