@@ -20,7 +20,6 @@ import {
 } from '../components/ui/select';
 import { trpc } from '../lib/trpc';
 import { useToast } from '../contexts/ToastContext';
-import { useRealtimeNotifications } from '../hooks/useRealtimeNotifications';
 import { format } from 'date-fns';
 import { getCurrency } from '@shared/currencies';
 import { Badge } from '../components/ui/badge';
@@ -95,23 +94,7 @@ export default function Invoices() {
   const { data: invoices = [] } = trpc.invoices.list.useQuery({ status: statusFilter });
   const { data: clients = [] } = trpc.clients.list.useQuery();
   
-  // Real-time notifications
-  useRealtimeNotifications({
-    onNotification: async (notification) => {
-      console.log('[Invoices] Real-time notification received:', notification);
-      
-      // If it's an invoice notification, refresh the list
-      if (notification.source === 'invoice') {
-        await utils.invoices.invalidate();
-      }
-      
-      // Show toast for all notifications
-      const variant = notification.type === 'success' ? 'success' : 
-                     notification.type === 'warning' ? 'warning' : 
-                     notification.type === 'error' ? 'error' : 'info';
-      success(notification.title);
-    },
-  });
+  // Real-time notifications are handled in DashboardLayout
   const { data: viewInvoiceData } = trpc.invoices.getById.useQuery(
     { id: viewingInvoice! },
     { enabled: viewingInvoice !== null }

@@ -25,8 +25,26 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     refetchInterval: 60000, // Check every minute
   });
   
+  const utils = trpc.useContext();
+  
   // Real-time notifications via SSE
-  useRealtimeNotifications();
+  useRealtimeNotifications({
+    onNotification: async (notification) => {
+      console.log('[DashboardLayout] Real-time notification received:', notification);
+      
+      // Invalidate relevant queries based on notification source
+      if (notification.source === 'invoice') {
+        await utils.invoices.invalidate();
+        console.log('[DashboardLayout] Invalidated invoices queries');
+      } else if (notification.source === 'savings') {
+        await utils.savings.invalidate();
+        console.log('[DashboardLayout] Invalidated savings queries');
+      }
+      
+      // Show toast with notification
+      // Toast is handled by the hook's default behavior
+    },
+  });
 
   // Navigation organized by sections
   const navigationSections = [

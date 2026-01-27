@@ -89,27 +89,25 @@ export function useRealtimeNotifications(options?: UseRealtimeNotificationsOptio
                 
                 console.log('[Realtime Notifications] New notification:', latestNotification.title);
                 
-                // Call custom callback if provided
+                // Always show toast first
+                let variant: 'info' | 'success' | 'warning' | 'error' = 'info';
+                if (latestNotification.type === 'success') variant = 'success';
+                else if (latestNotification.type === 'warning') variant = 'warning';
+                else if (latestNotification.type === 'error') variant = 'error';
+                
+                toast.showToast({
+                  title: latestNotification.title,
+                  description: latestNotification.message,
+                  variant,
+                });
+                
+                // Then call custom callback if provided
                 if (options?.onNotification) {
                   try {
                     await options.onNotification(latestNotification);
                   } catch (callbackError: any) {
                     console.error('[Realtime Notifications] Callback error:', callbackError.message);
                   }
-                } else {
-                  // Default behavior: show toast
-                  // Determine toast variant based on notification type
-                  let variant: 'info' | 'success' | 'warning' | 'error' = 'info';
-                  if (latestNotification.type === 'success') variant = 'success';
-                  else if (latestNotification.type === 'warning') variant = 'warning';
-                  else if (latestNotification.type === 'error') variant = 'error';
-                  
-                  // Show toast immediately
-                  toast.showToast({
-                    title: latestNotification.title,
-                    description: latestNotification.message,
-                    variant,
-                  });
                 }
               }
 
