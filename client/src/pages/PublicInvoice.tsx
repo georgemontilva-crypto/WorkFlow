@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { useRoute } from 'wouter';
 import { trpc } from '@/lib/trpc';
 import { Button } from '@/components/ui/button';
-import { Upload, Download, CheckCircle, AlertCircle, FileText, Building2, DollarSign, Calendar } from 'lucide-react';
+import { Upload, Download, CheckCircle, AlertCircle, FileText, Building2, DollarSign, Calendar, CreditCard, Send, CheckCheck } from 'lucide-react';
 import { format } from 'date-fns';
 import Toast from '@/components/Toast';
 
@@ -94,7 +94,7 @@ export default function PublicInvoice() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center">
-        <div className="text-white">{'Loading'}</div>
+        <div className="text-white">Cargando...</div>
       </div>
     );
   }
@@ -104,7 +104,7 @@ export default function PublicInvoice() {
       <div className="min-h-screen bg-[#0D0D0D] flex items-center justify-center p-6">
         <div className="bg-[#121212] rounded-[28px] p-8 max-w-md w-full text-center" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}>
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-2">{'NotFound'}</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">Factura No Encontrada</h1>
           <p className="text-[#8B92A8]">
             El enlace de esta factura no es válido o ha expirado.
           </p>
@@ -140,25 +140,50 @@ export default function PublicInvoice() {
   const profile = invoice.companyProfile;
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] py-12 px-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            {profile?.logo_url ? (
-              <img 
-                src={profile.logo_url} 
-                alt={profile.company_name} 
-                className="h-12 w-12 object-contain rounded"
-              />
-            ) : (
-              <div className="h-12 w-12 bg-[#C4FF3D]/10 rounded flex items-center justify-center" style={{ boxShadow: 'inset 0 0 0 0.5px #C4FF3D' }}>
-                <Building2 className="w-6 h-6 text-[#C4FF3D]" />
+    <div className="min-h-screen bg-[#0D0D0D] py-8 px-4 md:px-6">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Header con Logo */}
+        <div className="bg-[#121212] rounded-[28px] p-6" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {profile?.logo_url ? (
+                <img 
+                  src={profile.logo_url} 
+                  alt={profile.company_name} 
+                  className="h-12 w-12 object-contain rounded-[12px]"
+                />
+              ) : (
+                <div className="h-12 w-12 bg-[#C4FF3D] rounded-[12px] flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-black" />
+                </div>
+              )}
+              <div>
+                <h1 className="text-xl font-bold text-white">{profile?.company_name || 'FinWrk'}</h1>
+                <p className="text-sm text-[#8B92A8]">Factura #{invoice.invoice_number}</p>
               </div>
-            )}
-            <h1 className="text-3xl font-bold text-white">{profile?.company_name || 'Finwrk'}</h1>
+            </div>
+            <span 
+              className={`inline-block px-4 py-1.5 rounded-[9999px] text-sm font-medium ${statusBadge.color}`}
+              style={{ boxShadow: `inset 0 0 0 0.5px ${statusBadge.outline}` }}
+            >
+              {statusBadge.label}
+            </span>
           </div>
-          <p className="text-[#8B92A8]">Factura #{invoice.invoice_number}</p>
+        </div>
+
+        {/* Disclaimer Prominente */}
+        <div className="bg-[#C4FF3D]/10 border border-[#C4FF3D]/30 rounded-[20px] p-4">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-[#C4FF3D] flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm text-white font-medium mb-1">
+                Importante: {profile?.company_name || 'El emisor'} no procesa pagos directamente
+              </p>
+              <p className="text-xs text-[#8B92A8] leading-relaxed">
+                Esta es una plataforma de gestión financiera. Los pagos se realizan a través de los métodos indicados en las instrucciones de pago. Solo ayudamos a organizar y gestionar el proceso de cobro.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Success Message */}
@@ -176,41 +201,176 @@ export default function PublicInvoice() {
           </div>
         )}
 
-        {/* Invoice Summary Card */}
-        <div className="bg-[#121212] rounded-[28px] p-8" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}>
-          <div className="flex justify-between items-start mb-6">
-            <h2 className="text-xl font-bold text-white">{'InvoiceSummary'}</h2>
-            <span 
-              className={`inline-block px-4 py-1.5 rounded-[9999px] text-sm font-medium ${statusBadge.color}`}
-              style={{ boxShadow: `inset 0 0 0 0.5px ${statusBadge.outline}` }}
-            >
-              {statusBadge.label}
-            </span>
+        {/* Pasos de Pago - PRIORIDAD MÁXIMA */}
+        <div className="bg-[#121212] rounded-[28px] p-6 md:p-8" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}>
+          <h2 className="text-2xl font-bold text-white mb-6 text-center md:text-left">
+            ¿Cómo pagar esta factura?
+          </h2>
+          
+          {/* Desktop: Grid */}
+          <div className="hidden md:grid md:grid-cols-4 gap-4">
+            {/* Paso 1 */}
+            <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative">
+              <div className="absolute -top-3 left-6">
+                <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                  <span className="text-black font-bold text-sm">1</span>
+                </div>
+              </div>
+              <div className="mt-4">
+                <CreditCard className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                <h3 className="text-white font-semibold mb-2">Realiza el pago</h3>
+                <p className="text-sm text-[#8B92A8]">
+                  Sigue las instrucciones de pago abajo
+                </p>
+              </div>
+            </div>
+
+            {/* Paso 2 */}
+            <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative">
+              <div className="absolute -top-3 left-6">
+                <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                  <span className="text-black font-bold text-sm">2</span>
+                </div>
+              </div>
+              <div className="mt-4">
+                <Download className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                <h3 className="text-white font-semibold mb-2">Descarga tu comprobante</h3>
+                <p className="text-sm text-[#8B92A8]">
+                  Del banco o plataforma de pago
+                </p>
+              </div>
+            </div>
+
+            {/* Paso 3 */}
+            <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative">
+              <div className="absolute -top-3 left-6">
+                <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                  <span className="text-black font-bold text-sm">3</span>
+                </div>
+              </div>
+              <div className="mt-4">
+                <Upload className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                <h3 className="text-white font-semibold mb-2">Súbelo aquí</h3>
+                <p className="text-sm text-[#8B92A8]">
+                  Usa el formulario de abajo
+                </p>
+              </div>
+            </div>
+
+            {/* Paso 4 */}
+            <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative">
+              <div className="absolute -top-3 left-6">
+                <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                  <span className="text-black font-bold text-sm">4</span>
+                </div>
+              </div>
+              <div className="mt-4">
+                <CheckCheck className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                <h3 className="text-white font-semibold mb-2">El emisor confirmará</h3>
+                <p className="text-sm text-[#8B92A8]">
+                  Recibirás confirmación
+                </p>
+              </div>
+            </div>
           </div>
+
+          {/* Mobile: Horizontal Scroll */}
+          <div className="md:hidden overflow-x-auto pb-4 -mx-4 px-4">
+            <div className="flex gap-4 min-w-max">
+              {/* Paso 1 */}
+              <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative w-[280px] flex-shrink-0">
+                <div className="absolute -top-3 left-6">
+                  <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                    <span className="text-black font-bold text-sm">1</span>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <CreditCard className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                  <h3 className="text-white font-semibold mb-2">Realiza el pago</h3>
+                  <p className="text-sm text-[#8B92A8]">
+                    Sigue las instrucciones de pago abajo
+                  </p>
+                </div>
+              </div>
+
+              {/* Paso 2 */}
+              <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative w-[280px] flex-shrink-0">
+                <div className="absolute -top-3 left-6">
+                  <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                    <span className="text-black font-bold text-sm">2</span>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <Download className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                  <h3 className="text-white font-semibold mb-2">Descarga tu comprobante</h3>
+                  <p className="text-sm text-[#8B92A8]">
+                    Del banco o plataforma de pago
+                  </p>
+                </div>
+              </div>
+
+              {/* Paso 3 */}
+              <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative w-[280px] flex-shrink-0">
+                <div className="absolute -top-3 left-6">
+                  <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                    <span className="text-black font-bold text-sm">3</span>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <Upload className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                  <h3 className="text-white font-semibold mb-2">Súbelo aquí</h3>
+                  <p className="text-sm text-[#8B92A8]">
+                    Usa el formulario de abajo
+                  </p>
+                </div>
+              </div>
+
+              {/* Paso 4 */}
+              <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 relative w-[280px] flex-shrink-0">
+                <div className="absolute -top-3 left-6">
+                  <div className="w-8 h-8 rounded-full bg-[#C4FF3D] flex items-center justify-center">
+                    <span className="text-black font-bold text-sm">4</span>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <CheckCheck className="w-8 h-8 text-[#C4FF3D] mb-3" />
+                  <h3 className="text-white font-semibold mb-2">El emisor confirmará</h3>
+                  <p className="text-sm text-[#8B92A8]">
+                    Recibirás confirmación
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Invoice Summary Card */}
+        <div className="bg-[#121212] rounded-[28px] p-6 md:p-8" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}>
+          <h2 className="text-xl font-bold text-white mb-6">Resumen de la Factura</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <p className="text-[#8B92A8] text-sm mb-1">{'From'}</p>
+              <p className="text-[#8B92A8] text-sm mb-1">De</p>
               <p className="text-white font-semibold">{profile?.company_name || 'N/A'}</p>
             </div>
             
             <div>
-              <p className="text-[#8B92A8] text-sm mb-1">{'BillTo'}</p>
+              <p className="text-[#8B92A8] text-sm mb-1">Para</p>
               <p className="text-white font-semibold">{invoice.client?.name || 'N/A'}</p>
             </div>
             
             <div>
-              <p className="text-[#8B92A8] text-sm mb-1">{'IssueDate'}</p>
+              <p className="text-[#8B92A8] text-sm mb-1">Fecha de Emisión</p>
               <p className="text-white font-semibold">{format(new Date(invoice.issue_date), 'dd/MM/yyyy')}</p>
             </div>
             
             <div>
-              <p className="text-[#8B92A8] text-sm mb-1">{'DueDate'}</p>
+              <p className="text-[#8B92A8] text-sm mb-1">Fecha de Vencimiento</p>
               <p className="text-white font-semibold">{format(new Date(invoice.due_date), 'dd/MM/yyyy')}</p>
             </div>
             
             <div className="md:col-span-2">
-              <p className="text-[#8B92A8] text-sm mb-1">{'Total'}</p>
+              <p className="text-[#8B92A8] text-sm mb-1">Total</p>
               <p className="text-white font-bold text-3xl">${total.toFixed(2)}</p>
               {balance > 0 && balance < total && (
                 <p className="text-yellow-400 text-sm mt-1">Saldo pendiente: ${balance.toFixed(2)}</p>
@@ -220,7 +380,7 @@ export default function PublicInvoice() {
 
           {/* Items */}
           <div className="mt-8">
-            <h3 className="text-white font-semibold mb-4">{'InvoiceDetails'}</h3>
+            <h3 className="text-white font-semibold mb-4">Detalles de la Factura</h3>
             <div className="space-y-3">
               {items.map((item: any, index: number) => (
                 <div 
@@ -232,7 +392,7 @@ export default function PublicInvoice() {
                     <div>
                       <p className="text-white font-medium">{item.description}</p>
                       <p className="text-[#8B92A8] text-sm">
-                        {item.quantity} x ${parseFloat(item.unitPrice || item.unit_price).toFixed(2)}
+                        {item.quantity} × ${parseFloat(item.unitPrice || item.unit_price).toFixed(2)}
                       </p>
                     </div>
                     <p className="text-white font-semibold">
@@ -261,7 +421,7 @@ export default function PublicInvoice() {
             </div>
           </div>
 
-          {/* Notes Section - OBLIGATORIA */}
+          {/* Instrucciones de Pago */}
           {invoice.notes && (
             <div className="mt-8 bg-[#0A0A0A] rounded-[20px] p-6" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}>
               <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
@@ -287,56 +447,17 @@ export default function PublicInvoice() {
           )}
         </div>
 
-        {/* Tutorial Module */}
-        <div className="bg-[#121212] rounded-[28px] p-8" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}>
-          <h2 className="text-xl font-bold text-white mb-6">¿Cómo pagar esta factura?</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-[#C4FF3D]/10 flex items-center justify-center mx-auto mb-3" style={{ boxShadow: 'inset 0 0 0 0.5px #C4FF3D' }}>
-                <span className="text-[#C4FF3D] font-bold text-lg">1</span>
-              </div>
-              <p className="text-white font-medium text-sm mb-1">Realiza el pago</p>
-              <p className="text-[#8B92A8] text-xs">Según las instrucciones arriba</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-[#C4FF3D]/10 flex items-center justify-center mx-auto mb-3" style={{ boxShadow: 'inset 0 0 0 0.5px #C4FF3D' }}>
-                <span className="text-[#C4FF3D] font-bold text-lg">2</span>
-              </div>
-              <p className="text-white font-medium text-sm mb-1">Descarga tu comprobante</p>
-              <p className="text-[#8B92A8] text-xs">Del banco o plataforma de pago</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-[#C4FF3D]/10 flex items-center justify-center mx-auto mb-3" style={{ boxShadow: 'inset 0 0 0 0.5px #C4FF3D' }}>
-                <span className="text-[#C4FF3D] font-bold text-lg">3</span>
-              </div>
-              <p className="text-white font-medium text-sm mb-1">Súbelo aquí</p>
-              <p className="text-[#8B92A8] text-xs">Usa el formulario abajo</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full bg-[#C4FF3D]/10 flex items-center justify-center mx-auto mb-3" style={{ boxShadow: 'inset 0 0 0 0.5px #C4FF3D' }}>
-                <span className="text-[#C4FF3D] font-bold text-lg">4</span>
-              </div>
-              <p className="text-white font-medium text-sm mb-1">El emisor confirmará</p>
-              <p className="text-[#8B92A8] text-xs">Recibirás confirmación</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Payment Proof Upload Card */}
+        {/* Formulario de Comprobante de Pago */}
         {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
-          <div className="bg-[#121212] rounded-[28px] p-8" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}>
+          <div className="bg-[#121212] rounded-[28px] p-6 md:p-8" style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}>
             <div className="flex items-start gap-4 mb-6">
               <div className="w-12 h-12 bg-[#C4FF3D]/10 rounded-[20px] flex items-center justify-center flex-shrink-0" style={{ boxShadow: 'inset 0 0 0 0.5px #C4FF3D' }}>
                 <Upload className="w-6 h-6 text-[#C4FF3D]" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white mb-2">{'UploadProof'}</h2>
+                <h2 className="text-xl font-bold text-white mb-2">Subir Comprobante de Pago</h2>
                 <p className="text-[#8B92A8] text-sm">
-                  {'UploadProofDescription'}
+                  Después de realizar el pago, sube tu comprobante aquí para que el emisor pueda verificarlo
                 </p>
               </div>
             </div>
@@ -363,13 +484,13 @@ export default function PublicInvoice() {
               
               <div>
                 <label className="block text-white text-sm font-medium mb-2">
-                  {'PaymentReference'}
+                  Referencia de Pago (opcional)
                 </label>
                 <input
                   type="text"
                   value={paymentReference}
                   onChange={(e) => setPaymentReference(e.target.value)}
-                  placeholder={'PaymentReferencePlaceholder'}
+                  placeholder="Ej: Transferencia #123456, Pago realizado el 27/01/2026"
                   className="w-full bg-[#0A0A0A] text-white rounded-[9999px] px-6 py-3 text-sm placeholder:text-[#8B92A8]"
                   style={{ boxShadow: 'inset 0 0 0 0.5px rgba(255,255,255,0.06)' }}
                 />
@@ -378,36 +499,54 @@ export default function PublicInvoice() {
               <Button
                 onClick={handleUpload}
                 disabled={!selectedFile || uploading || submitSuccess}
-                className="w-full"
-                variant={submitSuccess ? "secondary" : "default"}
+                className="w-full bg-[#C4FF3D] text-black hover:bg-[#C4FF3D]/90 font-semibold"
+                size="lg"
               >
                 {submitSuccess ? (
                   <span className="flex items-center gap-2">
                     <CheckCircle className="w-4 h-4" />
-                    {'ProofSubmittedSuccess'}
+                    Comprobante Enviado Exitosamente
                   </span>
-                ) : uploading ? 'Submitting' : 'SubmitProof'}
+                ) : uploading ? (
+                  'Enviando...'
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Enviar Comprobante
+                  </>
+                )}
               </Button>
             </div>
           </div>
         )}
 
-        {/* Action Buttons */}
+        {/* Botón de Descarga */}
         <div className="flex gap-4 justify-center">
           <Button 
             variant="secondary" 
             onClick={() => downloadPDF.mutate({ token: token! })}
             disabled={downloadPDF.isLoading}
+            className="bg-[#121212] border border-[rgba(255,255,255,0.06)] text-white hover:bg-[#1a1a1a]"
           >
             <Download className="w-4 h-4 mr-2" />
-            {downloadPDF.isLoading ? 'Submitting' : 'DownloadInvoice'}
+            {downloadPDF.isLoading ? 'Descargando...' : 'Descargar Factura'}
           </Button>
         </div>
 
         {/* Footer */}
-        <div className="text-center text-[#8B92A8] text-sm mt-8">
-          <p>{profile?.invoice_footer || 'Gracias por tu preferencia'}</p>
-          <p className="mt-2">Portal seguro de Finwrk</p>
+        <div className="text-center mt-8">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-6 h-6 rounded-lg bg-[#C4FF3D] flex items-center justify-center">
+              <FileText className="w-3 h-3 text-black" />
+            </div>
+            <span className="font-semibold text-white">FinWrk</span>
+          </div>
+          <p className="text-[#8B92A8] text-sm">
+            {profile?.invoice_footer || 'Gracias por tu preferencia'}
+          </p>
+          <p className="text-[#8B92A8] text-xs mt-2">
+            Portal seguro de gestión financiera
+          </p>
         </div>
       </div>
       
