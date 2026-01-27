@@ -3,9 +3,9 @@
  * Focused ONLY on cryptocurrencies with conversion and scenario calculators
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
-import { TrendingUp, TrendingDown, ArrowRightLeft, Target } from 'lucide-react';
+import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown } from 'lucide-react';
 
 interface Crypto {
   id: string;
@@ -20,6 +20,75 @@ interface Crypto {
 
 interface ExchangeRates {
   [key: string]: number;
+}
+
+// Custom Dropdown Component
+function CustomDropdown({ 
+  options, 
+  value, 
+  onChange, 
+  placeholder = 'Seleccionar',
+  maxHeight = '300px'
+}: { 
+  options: { value: string; label: string }[]; 
+  value: string; 
+  onChange: (value: string) => void;
+  placeholder?: string;
+  maxHeight?: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find(opt => opt.value === value);
+
+  return (
+    <div ref={dropdownRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40 flex items-center justify-between hover:border-[rgba(255,255,255,0.1)] transition-colors"
+      >
+        <span className="truncate">{selectedOption?.label || placeholder}</span>
+        <ChevronDown className={`w-4 h-4 flex-shrink-0 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div 
+          className="absolute z-50 w-full mt-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.1)] rounded-lg shadow-xl overflow-hidden"
+          style={{ maxHeight }}
+        >
+          <div className="overflow-y-auto" style={{ maxHeight }}>
+            {options.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => {
+                  onChange(option.value);
+                  setIsOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2.5 hover:bg-[#1A1A1A] transition-colors ${
+                  option.value === value ? 'bg-[#1A1A1A] text-[#C4FF3D]' : 'text-white'
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function Markets() {
@@ -114,6 +183,16 @@ export default function Markets() {
     { code: 'CNY', name: 'Yuan Chino' },
   ];
 
+  const currencyOptions = currencies.map(c => ({
+    value: c.code,
+    label: `${c.code} - ${c.name}`
+  }));
+
+  const cryptoOptions = cryptos.map(c => ({
+    value: c.id,
+    label: `${c.name} (${c.symbol.toUpperCase()})`
+  }));
+
   return (
     <DashboardLayout>
       <div className="max-w-[1440px] mx-auto p-4 md:p-6 space-y-6 overflow-x-hidden">
@@ -195,17 +274,12 @@ export default function Markets() {
 
                 <div>
                   <label className="block text-sm text-[#8B92A8] mb-2">Moneda destino</label>
-                  <select
+                  <CustomDropdown
+                    options={currencyOptions}
                     value={converterCurrency}
-                    onChange={(e) => setConverterCurrency(e.target.value)}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                  >
-                    {currencies.map((currency) => (
-                      <option key={currency.code} value={currency.code}>
-                        {currency.code} - {currency.name}
-                      </option>
-                    ))}
-                  </select>
+                    onChange={setConverterCurrency}
+                    placeholder="Seleccionar moneda"
+                  />
                 </div>
 
                 <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
@@ -227,17 +301,13 @@ export default function Markets() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm text-[#8B92A8] mb-2">Criptomoneda</label>
-                  <select
+                  <CustomDropdown
+                    options={cryptoOptions}
                     value={scenarioData.crypto}
-                    onChange={(e) => setScenarioData({ ...scenarioData, crypto: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                  >
-                    {cryptos.slice(0, 20).map((crypto) => (
-                      <option key={crypto.id} value={crypto.id}>
-                        {crypto.name} ({crypto.symbol.toUpperCase()})
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(value) => setScenarioData({ ...scenarioData, crypto: value })}
+                    placeholder="Seleccionar criptomoneda"
+                    maxHeight="400px"
+                  />
                 </div>
 
                 <div>
