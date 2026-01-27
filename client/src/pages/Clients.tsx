@@ -127,7 +127,26 @@ export default function Clients() {
       refetch();
     } catch (error: any) {
       console.error('Error al guardar cliente:', error);
-      showError(error.message || 'Error al guardar cliente');
+      
+      // Detectar tipo de error y mostrar mensaje apropiado
+      const errorMessage = error.message || 'Error desconocido';
+      
+      if (errorMessage.includes('Ya existe un cliente con el email')) {
+        // Error de duplicado - usar warning
+        showError('Email duplicado: Ya existe un cliente con este email. Por favor, usa un email diferente o edita el cliente existente.');
+      } else if (errorMessage.includes('Ya existe un cliente con el nombre')) {
+        // Error de nombre duplicado - usar warning
+        showError('Nombre duplicado: Ya existe un cliente con este nombre. Por favor, usa un nombre diferente o edita el cliente existente.');
+      } else if (errorMessage.includes('formato') || errorMessage.includes('inválido')) {
+        // Error de validación - usar warning
+        showError('Datos inválidos: ' + errorMessage);
+      } else if (errorMessage.includes('requerido') || errorMessage.includes('obligatorio')) {
+        // Error de campo requerido - usar warning
+        showError('Campos incompletos: ' + errorMessage);
+      } else {
+        // Error genérico - usar error
+        showError('Error al guardar cliente: ' + errorMessage);
+      }
     }
   };
 
