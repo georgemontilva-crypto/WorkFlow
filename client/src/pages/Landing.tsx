@@ -1,14 +1,16 @@
 /**
  * Finwrk Landing Page
- * Diseño inspirado en Mercuryo: minimalista, visual, sin repeticiones
+ * Landing completa con todas las funcionalidades
  */
 
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { 
-  FileText, TrendingUp, Users, ArrowRight, Menu, X, Check
+  FileText, TrendingUp, Users, ArrowRight, Menu, X, Check,
+  Bell, Globe, Shield, Lock, Database, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/_core/hooks/useAuth';
 
 export default function Landing() {
@@ -21,6 +23,57 @@ export default function Landing() {
       setLocation('/dashboard');
     }
   }, [isAuthenticated, loading, setLocation]);
+
+  const features = [
+    {
+      icon: FileText,
+      title: "Facturación Profesional",
+      description: "Crea y envía facturas hermosas en segundos. Tus clientes las reciben por email y pueden pagarlas desde un enlace único."
+    },
+    {
+      icon: Users,
+      title: "Gestión de Clientes",
+      description: "Organiza todos tus clientes y proyectos en un solo lugar. Historial completo de cada relación comercial."
+    },
+    {
+      icon: TrendingUp,
+      title: "Dashboard Financiero",
+      description: "Vista en tiempo real de ingresos, gastos y balance. Gráficos claros que te muestran cómo va tu mes."
+    },
+    {
+      icon: Globe,
+      title: "Multimoneda y Cripto",
+      description: "Acepta pagos en cualquier moneda, incluyendo criptomonedas. Finwrk se adapta a como trabajas."
+    },
+    {
+      icon: Bell,
+      title: "Recordatorios Automáticos",
+      description: "Nunca pierdas un pago. Finwrk envía recordatorios automáticos a tus clientes cuando una factura está por vencer."
+    },
+    {
+      icon: Zap,
+      title: "Portal de Clientes",
+      description: "Tus clientes pueden ver facturas, descargar PDFs y subir comprobantes de pago sin necesidad de crear una cuenta."
+    }
+  ];
+
+  const securityFeatures = [
+    {
+      icon: Lock,
+      title: "Autenticación de Dos Factores",
+      description: "Capa adicional de seguridad para tu cuenta."
+    },
+    {
+      icon: Database,
+      title: "Encriptación de Extremo a Extremo",
+      description: "Tus datos están encriptados y seguros."
+    },
+    {
+      icon: Shield,
+      title: "Exportación de Datos",
+      description: "Eres dueño de tu información, expórtala cuando quieras."
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -82,9 +135,8 @@ export default function Landing() {
         </div>
       </nav>
 
-      {/* Hero Section - Full viewport con imagen de fondo */}
+      {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
             src="/landing-images/team-working.jpg" 
@@ -94,14 +146,14 @@ export default function Landing() {
           <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background"></div>
         </div>
         
-        {/* Content */}
         <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-8 max-w-5xl mx-auto">
             Claridad real sobre tu dinero.{' '}
             <span className="text-primary">Sin complicarte.</span>
           </h1>
-          <p className="text-xl sm:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto">
-            Organiza clientes, facturas y pagos en un solo lugar.
+          <p className="text-xl sm:text-2xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
+            Organiza clientes, facturas y pagos en un solo lugar. Finwrk te dice qué cobraste, 
+            qué falta y cómo va tu mes.
           </p>
           <Button 
             size="lg"
@@ -114,34 +166,49 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Problem Section - Visual con imagen */}
-      <section className="min-h-screen flex items-center py-20 px-4 sm:px-6 lg:px-8">
+      {/* Problem Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/20">
         <div className="container mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-8 leading-tight">
-                Facturas por aquí, pagos por allá, Excel para entender todo.
-              </h2>
-              <p className="text-xl text-muted-foreground leading-relaxed">
-                Finwrk centraliza tu flujo financiero para que sepas exactamente qué cobraste, 
-                qué falta y cómo va tu mes.
-              </p>
-            </div>
-            <div className="relative">
-              <div className="relative rounded-3xl overflow-hidden border border-border shadow-2xl">
-                <img 
-                  src="/landing-images/freelancer-focus.jpg" 
-                  alt="Freelancer enfocado" 
-                  className="w-full h-auto"
-                />
-              </div>
-            </div>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">¿Te suena familiar?</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="bg-card border-border hover:border-destructive/50 transition-colors">
+              <CardContent className="p-8 space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-destructive/10 flex items-center justify-center">
+                  <FileText className="w-7 h-7 text-destructive" strokeWidth={1.5} />
+                </div>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Facturas por aquí, pagos por allá, y un Excel para intentar entender todo.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="bg-card border-border hover:border-destructive/50 transition-colors">
+              <CardContent className="p-8 space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-destructive/10 flex items-center justify-center">
+                  <TrendingUp className="w-7 h-7 text-destructive" strokeWidth={1.5} />
+                </div>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  No saber con certeza cuándo te pagarán o cuánto dinero tienes realmente disponible.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="bg-card border-border hover:border-destructive/50 transition-colors">
+              <CardContent className="p-8 space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-destructive/10 flex items-center justify-center">
+                  <Users className="w-7 h-7 text-destructive" strokeWidth={1.5} />
+                </div>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  La sensación de no tener el control de tus finanzas y tomar decisiones a ciegas.
+                </p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
-      {/* Solution Section - Screenshot real de la plataforma */}
-      <section className="min-h-screen flex items-center py-20 px-4 sm:px-6 lg:px-8 bg-muted/20">
+      {/* Solution Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1">
@@ -155,37 +222,37 @@ export default function Landing() {
             </div>
             <div className="order-1 lg:order-2">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-8 leading-tight">
-                Un workspace financiero diseñado para personas que trabajan.
+                Tu workspace financiero, diseñado para personas que trabajan.
               </h2>
               <p className="text-xl text-muted-foreground leading-relaxed mb-8">
                 No es un ERP complicado ni un banco. Es tu espacio para tener control real.
               </p>
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    <Check className="w-5 h-5 text-primary" strokeWidth={3} />
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                    <Check className="w-6 h-6 text-primary" strokeWidth={3} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-1">Gestión de clientes y facturas</h3>
-                    <p className="text-muted-foreground">Todo centralizado, nada se pierde.</p>
+                    <h3 className="text-xl font-semibold mb-2">Gestión de clientes y facturas</h3>
+                    <p className="text-muted-foreground leading-relaxed">Todo centralizado, nada se pierde.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    <Check className="w-5 h-5 text-primary" strokeWidth={3} />
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                    <Check className="w-6 h-6 text-primary" strokeWidth={3} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-1">Control de pagos en tiempo real</h3>
-                    <p className="text-muted-foreground">Sabe qué está pagado y qué no.</p>
+                    <h3 className="text-xl font-semibold mb-2">Control de pagos en tiempo real</h3>
+                    <p className="text-muted-foreground leading-relaxed">Sabe qué está pagado y qué no.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                    <Check className="w-5 h-5 text-primary" strokeWidth={3} />
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
+                    <Check className="w-6 h-6 text-primary" strokeWidth={3} />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold mb-1">Reportes financieros claros</h3>
-                    <p className="text-muted-foreground">Visualiza ingresos, gastos y balance al instante.</p>
+                    <h3 className="text-xl font-semibold mb-2">Reportes financieros claros</h3>
+                    <p className="text-muted-foreground leading-relaxed">Visualiza ingresos, gastos y balance al instante.</p>
                   </div>
                 </div>
               </div>
@@ -194,10 +261,36 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* How It Works - Minimalista, 3 pasos */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8">
+      {/* Features Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/20">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
+              Todo lo que necesitas para tener el control.
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <Card key={index} className="bg-card border-border hover:border-primary/50 transition-colors">
+                <CardContent className="p-8 space-y-4">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                    <feature.icon className="w-8 h-8 text-primary" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-xl font-semibold">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-20">
+          <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
               Tres pasos. Claridad inmediata.
             </h2>
@@ -234,13 +327,39 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Final CTA - Amplio y directo */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-muted/20">
+      {/* Security Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/20">
+        <div className="container mx-auto max-w-7xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
+              Tu tranquilidad es nuestra prioridad.
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {securityFeatures.map((feature, index) => (
+              <Card key={index} className="bg-card border-border">
+                <CardContent className="p-8 space-y-4 text-center">
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+                    <feature.icon className="w-8 h-8 text-primary" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-xl font-semibold">{feature.title}</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-32 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-8">
-            Recupera el control de tus finanzas.
+            Recupera el control de tus finanzas hoy.
           </h2>
-          <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
             Únete a freelancers y agencias que ya tienen claridad sobre su dinero.
           </p>
           <Button 
