@@ -63,6 +63,11 @@ export default function Invoices() {
   const [showRecurringModal, setShowRecurringModal] = useState(false);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   
+  // Mobile filter modals state
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showClientFilterModal, setShowClientFilterModal] = useState(false);
+  const [showStatusFilterModal, setShowStatusFilterModal] = useState(false);
+  
   // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
@@ -421,10 +426,10 @@ export default function Invoices() {
             <Button
               onClick={handleOpenModal}
               variant="default"
-              className="w-full md:w-auto"
+              className="md:w-auto fixed md:relative bottom-6 right-6 md:bottom-auto md:right-auto w-14 h-14 md:w-auto md:h-auto rounded-full md:rounded-md p-0 md:p-2 shadow-lg md:shadow-none z-50"
             >
-              <Plus className="w-5 h-5 mr-2" />
-              {'Crear Factura'}
+              <Plus className="w-6 h-6 md:w-5 md:h-5 md:mr-2" />
+              <span className="hidden md:inline">{'Crear Factura'}</span>
             </Button>
           </div>
         </Card>
@@ -432,7 +437,30 @@ export default function Invoices() {
         {/* Invoices List Card with Filters */}
         <Card>
           {/* Filters Section */}
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
+          {/* Mobile: 3 botones circulares */}
+          <div className="md:hidden flex items-center justify-center gap-4 mb-6">
+            <button
+              onClick={() => setShowSearchModal(true)}
+              className="w-12 h-12 rounded-full bg-[#121212] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 flex items-center justify-center transition-colors"
+            >
+              <Search className="w-5 h-5 text-[#8B92A8]" />
+            </button>
+            <button
+              onClick={() => setShowClientFilterModal(true)}
+              className="w-12 h-12 rounded-full bg-[#121212] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 flex items-center justify-center transition-colors"
+            >
+              <Users className="w-5 h-5 text-[#8B92A8]" />
+            </button>
+            <button
+              onClick={() => setShowStatusFilterModal(true)}
+              className="w-12 h-12 rounded-full bg-[#121212] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 flex items-center justify-center transition-colors"
+            >
+              <FileText className="w-5 h-5 text-[#8B92A8]" />
+            </button>
+          </div>
+          
+          {/* Desktop: Filtros completos */}
+          <div className="hidden md:flex flex-row gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
               <Input
@@ -444,7 +472,7 @@ export default function Invoices() {
               />
             </div>
             <Select value={clientFilter.toString()} onValueChange={(value: any) => setClientFilter(value === 'all' ? 'all' : parseInt(value))}>
-              <SelectTrigger className="w-full md:w-[220px] h-12 text-base">
+              <SelectTrigger className="w-[220px] h-12 text-base">
                 <SelectValue placeholder={'FilterByClient'} />
               </SelectTrigger>
               <SelectContent>
@@ -455,7 +483,7 @@ export default function Invoices() {
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={(value: any) => setStatusFilter(value)}>
-              <SelectTrigger className="w-full md:w-[220px] h-12 text-base">
+              <SelectTrigger className="w-[220px] h-12 text-base">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -474,7 +502,7 @@ export default function Invoices() {
             <p className="text-[#8B92A8] text-sm">{filteredInvoices.length} factura{filteredInvoices.length !== 1 ? 's' : ''}</p>
           </div>
           
-          <div className="h-[calc(100vh-400px)] overflow-y-auto space-y-3">
+          <div className="h-[calc(100vh-400px)] overflow-y-auto overflow-x-hidden space-y-3">
             {filteredInvoices.length === 0 ? (
               <div className="py-16 text-center">
                 <p className="text-[#8B92A8] text-base">No se encontraron facturas</p>
@@ -488,7 +516,7 @@ export default function Invoices() {
               return (
                 <div
                   key={invoice.id}
-                  className="bg-[#121212] rounded-[28px] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 transition-all duration-200 group"
+                  className="bg-[#121212] rounded-[28px] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 transition-all duration-200 group max-w-full overflow-hidden"
                 >
                   {/* Header - Always Visible */}
                   <div className="p-4 lg:p-6">
@@ -505,7 +533,7 @@ export default function Invoices() {
                               <FileText className="w-5 h-5 text-[#C4FF3D]" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-sm font-medium text-[#EDEDED] truncate">{client?.name || 'Desconocido'}</h3>
+                              <h3 className="text-sm font-medium text-[#EDEDED] truncate break-words">{client?.name || 'Desconocido'}</h3>
                             </div>
                           </div>
                           <span className={`px-3 py-1 rounded-[9999px] text-xs font-medium border whitespace-nowrap flex-shrink-0 ${
@@ -528,7 +556,7 @@ export default function Invoices() {
                         </div>
 
                         {/* Línea 3: Fecha + Número */}
-                        <div className="flex items-center gap-4 text-xs text-[#8B92A8]">
+                        <div className="flex items-center gap-4 text-xs text-[#8B92A8] flex-wrap">
                           <div className="flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5" />
                             <span>{format(new Date(invoice.due_date), 'dd/MM/yyyy')}</span>
@@ -1430,6 +1458,121 @@ export default function Invoices() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Mobile Search Modal */}
+      {showSearchModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center">
+          <div className="bg-[#0A0A0A] w-full md:max-w-md md:rounded-lg rounded-t-[28px] p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white font-semibold">Buscar Facturas</h3>
+              <button onClick={() => setShowSearchModal(false)} className="text-[#8B92A8] hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
+              <Input
+                type="text"
+                placeholder="Buscar facturas..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 h-12 text-base"
+                autoFocus
+              />
+            </div>
+            <Button
+              onClick={() => setShowSearchModal(false)}
+              className="w-full mt-4"
+            >
+              Aplicar
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Client Filter Modal */}
+      {showClientFilterModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center">
+          <div className="bg-[#0A0A0A] w-full md:max-w-md md:rounded-lg rounded-t-[28px] p-6 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white font-semibold">Filtrar por Cliente</h3>
+              <button onClick={() => setShowClientFilterModal(false)} className="text-[#8B92A8] hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              <button
+                onClick={() => {
+                  setClientFilter('all');
+                  setShowClientFilterModal(false);
+                }}
+                className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                  clientFilter === 'all'
+                    ? 'bg-[#C4FF3D]/10 border-[#C4FF3D]/30 text-[#C4FF3D]'
+                    : 'bg-[#121212] border-[rgba(255,255,255,0.06)] text-[#8B92A8] hover:border-[#C4FF3D]/20'
+                }`}
+              >
+                Todos los clientes
+              </button>
+              {clients.map(client => (
+                <button
+                  key={client.id}
+                  onClick={() => {
+                    setClientFilter(client.id);
+                    setShowClientFilterModal(false);
+                  }}
+                  className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                    clientFilter === client.id
+                      ? 'bg-[#C4FF3D]/10 border-[#C4FF3D]/30 text-[#C4FF3D]'
+                      : 'bg-[#121212] border-[rgba(255,255,255,0.06)] text-[#8B92A8] hover:border-[#C4FF3D]/20'
+                  }`}
+                >
+                  {client.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Status Filter Modal */}
+      {showStatusFilterModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center">
+          <div className="bg-[#0A0A0A] w-full md:max-w-md md:rounded-lg rounded-t-[28px] p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-white font-semibold">Filtrar por Estado</h3>
+              <button onClick={() => setShowStatusFilterModal(false)} className="text-[#8B92A8] hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {[
+                { value: 'all', label: 'Todos' },
+                { value: 'draft', label: 'Borradores' },
+                { value: 'sent', label: 'Enviadas' },
+                { value: 'paid', label: 'Pagadas' },
+                { value: 'partial', label: 'Parciales' },
+                { value: 'cancelled', label: 'Canceladas' },
+              ].map(status => (
+                <button
+                  key={status.value}
+                  onClick={() => {
+                    setStatusFilter(status.value as any);
+                    setShowStatusFilterModal(false);
+                  }}
+                  className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                    statusFilter === status.value
+                      ? 'bg-[#C4FF3D]/10 border-[#C4FF3D]/30 text-[#C4FF3D]'
+                      : 'bg-[#121212] border-[rgba(255,255,255,0.06)] text-[#8B92A8] hover:border-[#C4FF3D]/20'
+                  }`}
+                >
+                  {status.label}
+                </button>
+              ))}
             </div>
           </div>
         </div>
