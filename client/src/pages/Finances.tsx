@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
-import { Download, TrendingUp, TrendingDown, DollarSign, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Download, TrendingUp, TrendingDown, DollarSign, X, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { trpc } from '../lib/trpc';
 import { useToast } from '../contexts/ToastContext';
