@@ -55,10 +55,11 @@ async function startServer() {
   
   // SSE endpoint for real-time notifications
   app.get("/api/notifications/stream", async (req, res) => {
-    // Verify authentication (token from query parameter since EventSource doesn't support headers)
-    const token = req.query.token as string;
+    // Verify authentication (read token from cookie since it's HTTP-only)
+    const token = req.cookies?.auth_token;
     if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+      console.log('[SSE] No auth token found in cookies');
+      return res.status(401).json({ error: 'Unauthorized - No auth token' });
     }
     
     try {
@@ -66,6 +67,8 @@ async function startServer() {
       const { verifyToken } = await import('./auth');
       const payload = await verifyToken(token);
       const userId = payload.userId;
+      
+      console.log(`[SSE] Token verified for user: ${userId}`);
       
       // Set SSE headers
       res.setHeader('Content-Type', 'text/event-stream');

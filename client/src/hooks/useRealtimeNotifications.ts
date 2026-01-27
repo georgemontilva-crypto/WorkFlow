@@ -41,23 +41,17 @@ export function useRealtimeNotifications(options?: UseRealtimeNotificationsOptio
 
   useEffect(() => {
     console.log('[Realtime Notifications] useEffect running');
-    // Get auth token from localStorage
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.log('[Realtime Notifications] No auth token found, skipping SSE connection');
-      return;
-    }
 
     // Connect to SSE endpoint
     const connectSSE = () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || '';
-        const sseUrl = `${apiUrl}/api/notifications/stream?token=${encodeURIComponent(token)}`;
+        const sseUrl = `${apiUrl}/api/notifications/stream`;
         
-        console.log('[Realtime Notifications] Connecting to SSE...');
+        console.log('[Realtime Notifications] Connecting to SSE:', sseUrl);
         
-        // Create EventSource with auth token in URL (EventSource doesn't support custom headers)
-        const eventSource = new EventSource(sseUrl);
+        // Create EventSource (auth token will be sent via cookies automatically)
+        const eventSource = new EventSource(sseUrl, { withCredentials: true });
         eventSourceRef.current = eventSource;
 
         // Connection opened
