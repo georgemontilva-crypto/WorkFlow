@@ -945,7 +945,7 @@ export default function Invoices() {
                     </Badge>
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
-                    {'CurrencyAutoAssigned'}
+                    Moneda asignada automáticamente
                   </p>
                 </div>
                 
@@ -1022,7 +1022,7 @@ export default function Invoices() {
                   
                   <div className="mt-4 text-right">
                     <p className="text-white font-semibold">
-                      {'Subtotal'}: ${calculateSubtotal().toFixed(2)}
+                      Subtotal: ${calculateSubtotal().toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -1030,7 +1030,7 @@ export default function Invoices() {
                 {/* Notes and Terms - Side by Side */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-white block mb-2">{'Notes'}</Label>
+                    <Label className="text-white block mb-2">Notas</Label>
                     <textarea
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -1040,7 +1040,7 @@ export default function Invoices() {
                   </div>
                   
                   <div>
-                    <Label className="text-white block mb-2">{'Terms'}</Label>
+                    <Label className="text-white block mb-2">Términos</Label>
                     <textarea
                       value={formData.terms}
                       onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
@@ -1080,7 +1080,7 @@ export default function Invoices() {
                   {/* Action Buttons - Bottom Right */}
                   <div className="flex gap-3 items-center">
                   <Button type="button" variant="outline" onClick={handleCloseModal} className="border-[rgba(255,255,255,0.06)] text-white hover:bg-gray-800">
-                    {'Cancelar'}
+                    Cancelar
                   </Button>
                   
                   {/* Dropdown Button */}
@@ -1092,7 +1092,7 @@ export default function Invoices() {
                       className="px-6 py-2.5 bg-[#C4FF3D] text-black rounded-[9999px] font-medium hover:bg-[#C4FF3D]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                       style={{ boxShadow: 'inset 0 0 0 0.5px rgba(0,0,0,0.1)' }}
                     >
-                      {isCreatingAndSending ? 'Processing' : 'CreateInvoice'}
+                      {isCreatingAndSending ? 'Procesando...' : 'Crear Factura'}
                       <ChevronDown className="w-4 h-4" />
                     </button>
                     
@@ -1108,7 +1108,8 @@ export default function Invoices() {
                             <Send className="w-4 h-4 text-[#C4FF3D]" />
                             <div>
                               <p className="font-medium">Crear y Enviar</p>
-                              <p className="text-xs text-[#8B92A8]">Moneda asignada automáticamente</p>                          </div>
+                              <p className="text-xs text-[#8B92A8]">Crear factura y enviar por email</p>
+                            </div>
                           </button>
                           
                           <button
@@ -1119,7 +1120,7 @@ export default function Invoices() {
                             <Download className="w-4 h-4 text-[#C4FF3D]" />
                             <div>
                               <p className="font-medium">Crear y Descargar</p>
-                              <p className="text-xs text-[#8B92A8]">Crear factura y enviar por email</p></p>
+                              <p className="text-xs text-[#8B92A8]">Crear factura y descargar PDF</p>
                             </div>
                           </button>
                           
@@ -1131,7 +1132,8 @@ export default function Invoices() {
                             <FileText className="w-4 h-4 text-[#C4FF3D]" />
                             <div>
                               <p className="font-medium">Solo Crear</p>
-                         <p className="text-xs text-[#8B92A8]">Crear factura y descargar PDF</p>                           </div>
+                              <p className="text-xs text-[#8B92A8]">Crear como borrador</p>
+                            </div>
                           </button>
                         </div>
                       </div>
@@ -1220,7 +1222,7 @@ export default function Invoices() {
                     }}
                     className="border-[rgba(255,255,255,0.06)] text-white hover:bg-gray-800"
                   >
-                    {'Cancelar'}
+                    Cancelar
                   </Button>
                   <Button 
                     type="button" 
