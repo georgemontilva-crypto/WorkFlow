@@ -112,12 +112,19 @@ export default function Markets() {
   useEffect(() => {
     fetchCryptos();
     fetchExchangeRates();
+    
+    // Auto-refresh every 60 seconds to avoid rate limit
+    const interval = setInterval(() => {
+      fetchCryptos();
+    }, 60000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const fetchCryptos = async () => {
     try {
       const response = await fetch(
-        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false'
+        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=24h'
       );
       const data = await response.json();
       setCryptos(data);
