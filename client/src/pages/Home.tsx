@@ -104,7 +104,7 @@ export default function Home() {
       
       data.push({
         day: format(targetDate, 'EEE', { locale: es }),
-        amount: dayInvoiced / 1000,
+        amount: dayInvoiced,
       });
     }
     return data;
@@ -115,16 +115,16 @@ export default function Home() {
     const data = [];
     for (let i = 5; i >= 0; i--) {
       const targetDate = new Date();
-      targetDate.setMonth(targetDate.getMonth() - i);
-      const month = targetDate.getMonth();
-      const year = targetDate.getFullYear();
+      targetDate.setMonth(currentMonth - i);
+      const targetMonth = targetDate.getMonth();
+      const targetYear = targetDate.getFullYear();
       
       const monthInvoiced = invoices
         ?.filter(inv => {
           const date = new Date(inv.issue_date);
           return (inv.status === 'sent' || inv.status === 'paid' || inv.status === 'payment_submitted') && 
-                 date.getMonth() === month && 
-                 date.getFullYear() === year;
+                 date.getMonth() === targetMonth && 
+                 date.getFullYear() === targetYear;
         })
         .reduce((sum, inv) => sum + Number(inv.total || 0), 0) || 0;
       
@@ -132,57 +132,81 @@ export default function Home() {
         ?.filter(inv => {
           const date = new Date(inv.issue_date);
           return inv.status === 'paid' && 
-                 date.getMonth() === month && 
-                 date.getFullYear() === year;
+                 date.getMonth() === targetMonth && 
+                 date.getFullYear() === targetYear;
         })
         .reduce((sum, inv) => sum + Number(inv.total || 0), 0) || 0;
       
       data.push({
         month: format(targetDate, 'MMM', { locale: es }),
-        facturado: monthInvoiced / 1000,
-        cobrado: monthPaid / 1000,
+        facturado: monthInvoiced,
+        cobrado: monthPaid,
       });
     }
     return data;
   })();
 
-  // Get recent activity (last 10 invoices)
+  // Recent activity (last 10 invoices)
   const recentActivity = invoices
-    ?.slice()
+    ?.filter(inv => inv.status !== 'draft')
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 10) || [];
 
-  // Get urgent notifications (last 5)
-  const urgentNotifications = notifications
-    ?.filter(n => !n.is_read && n.is_urgent)
-    .slice(0, 5) || [];
+  // Recent notifications (last 5)
+  const recentNotifications = notifications?.slice(0, 5) || [];
 
-  // Status badge helper
+  // Urgent notifications (overdue invoices + payment_submitted)
+  const urgentNotifications = [
+    ...overdueInvoices.slice(0, 3).map(inv => ({
+      id: `overdue-${inv.id}`,
+      title: `Factura ${inv.invoice_number} vencida`,
+      message: `Vencida el ${format(new Date(inv.due_date), 'dd MMM yyyy', { locale: es })}`,
+      created_at: inv.due_date,
+      is_read: false,
+    })),
+    ...(invoices
+      ?.filter(inv => inv.status === 'payment_submitted')
+      .slice(0, 2)
+      .map(inv => ({
+        id: `payment-${inv.id}`,
+        title: `Pago recibido - ${inv.invoice_number}`,
+        message: 'Requiere verificación',
+        created_at: inv.updated_at,
+        is_read: false,
+      })) || [])
+  ];
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       draft: { label: 'Borrador', variant: 'secondary' as const },
       sent: { label: 'Enviada', variant: 'default' as const },
       paid: { label: 'Pagada', variant: 'default' as const },
-      payment_submitted: { label: 'En Revisión', variant: 'default' as const },
+      payment_submitted: { label: 'En revisión', variant: 'default' as const },
       cancelled: { label: 'Cancelada', variant: 'destructive' as const },
     };
+    
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.draft;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    
+    return (
+      <Badge 
+        variant={config.variant}
+        className={
+          status === 'paid' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
+          status === 'payment_submitted' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' :
+          status === 'sent' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+          ''
+        }
+      >
+        {config.label}
+      </Badge>
+    );
   };
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1440px] mx-auto p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-sm text-muted-foreground mt-1">Resumen de tu actividad financiera</p>
-          </div>
-        </div>
-
-        {/* ZONA 1: KPIs - Tarjetas de Resumen */}
-        <div className="lg:grid lg:grid-cols-4 lg:gap-4 flex lg:flex-none overflow-x-auto gap-4 snap-x snap-mandatory scrollbar-hide pb-2 -mx-4 px-4 lg:mx-0 lg:px-0">
+      <div className="space-y-6">
+        {/* ZONA 1: Métricas Principales */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none pb-2 lg:pb-0">
           {/* Ingresos Cobrados */}
           <Card className="bg-card border-border min-w-[280px] lg:min-w-0 snap-center shrink-0">
             <CardContent className="p-6">
@@ -194,7 +218,7 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="p-3 rounded-full bg-green-500/10">
-                  <CheckCircle2 className="w-6 h-6 text-green-500" />
+                  <DollarSign className="w-6 h-6 text-green-500" />
                 </div>
               </div>
             </CardContent>
@@ -314,289 +338,108 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        {/* ZONA 3: Información Secundaria - Dos Columnas */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-          {/* Columna Izquierda: Alertas */}
-          <div className="flex flex-col gap-6">
-            {/* Facturas Vencidas */}
-            {overdueInvoices.length > 0 && (
-              <Card className="bg-card border-border">
-                <CardHeader>
-                  <CardTitle className="text-foreground flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-red-500" />
-                    Facturas Vencidas
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {overdueInvoices.slice(0, 5).map((invoice) => (
-                      <div 
-                        key={invoice.id} 
-                        className="flex items-start gap-3 p-3 bg-background rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
-                        onClick={() => setLocation('/invoices')}
-                      >
-                        <div className="p-2 rounded-full bg-red-500/10 flex-shrink-0">
-                          <XCircle className="w-4 h-4 text-red-500" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground text-sm">{invoice.invoice_number}</p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Vencida el {format(new Date(invoice.due_date), 'dd MMM yyyy', { locale: es })}
-                          </p>
-                          <p className="text-sm font-semibold text-red-500 mt-1">
-                            ${Number(invoice.total || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Notificaciones Urgentes */}
-            {urgentNotifications.length > 0 && (
-              <Card className="bg-card border-border">
-                <CardHeader>
-                  <CardTitle className="text-foreground flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5 text-yellow-500" />
-                    Requieren Atención
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {urgentNotifications.map((notification) => (
-                      <div 
-                        key={notification.id} 
-                        className="flex items-start gap-3 p-3 bg-background rounded-lg border border-border"
-                      >
-                        <div className="p-2 rounded-full bg-yellow-500/10 flex-shrink-0">
-                          <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground text-sm">{notification.title}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{notification.message}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Acciones Rápidas */}
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="text-foreground">Acciones Rápidas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={() => setLocation('/invoices')}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Crear Factura
-                  </Button>
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={() => setLocation('/invoices')}
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    Ver Facturas
-                  </Button>
-                  <Button 
-                    className="w-full justify-start" 
-                    variant="outline"
-                    onClick={() => setLocation('/clients')}
-                  >
-                    <Users className="w-4 h-4 mr-2" />
-                    Ver Clientes
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Columna Derecha: Resumen */}
-          <div className="flex flex-col gap-6">
-            {/* Resumen de Clientes */}
-            <Card className="bg-card border-border">
-              <CardHeader>
+        {/* ZONA 3: Notificaciones y Actividad Reciente - Lado a Lado */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Notificaciones Recientes */}
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <div className="flex items-center justify-between">
                 <CardTitle className="text-foreground flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  Clientes
+                  <AlertTriangle className="w-5 h-5" />
+                  Notificaciones Recientes
                 </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Total de clientes</span>
-                    <span className="text-2xl font-bold">{clients?.length || 0}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Clientes activos</span>
-                    <span className="text-lg font-semibold text-green-500">
-                      {clients?.filter(c => c.status === 'active').length || 0}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Resumen de Facturas */}
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <CardTitle className="text-foreground flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  Estado de Facturas
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Enviadas</span>
-                    <span className="text-lg font-semibold">
-                      {invoices?.filter(i => i.status === 'sent').length || 0}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Pagadas</span>
-                    <span className="text-lg font-semibold text-green-500">
-                      {invoices?.filter(i => i.status === 'paid').length || 0}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">En revisión</span>
-                    <span className="text-lg font-semibold text-yellow-500">
-                      {invoices?.filter(i => i.status === 'payment_submitted').length || 0}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Borradores</span>
-                    <span className="text-lg font-semibold text-muted-foreground">
-                      {invoices?.filter(i => i.status === 'draft').length || 0}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Historial de Notificaciones */}
-            <Card className="bg-card border-border">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-foreground flex items-center gap-2">
-                    <AlertTriangle className="w-5 h-5" />
-                    Notificaciones
-                  </CardTitle>
-                  {notifications && notifications.length > 5 && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => setLocation('/settings')}
-                      className="text-xs"
-                    >
-                      Ver todas
-                    </Button>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                {notifications && notifications.length > 0 ? (
-                  <div className="space-y-3 max-h-[300px] overflow-y-auto">
-                    {notifications.slice(0, 5).map((notification) => (
-                      <div 
-                        key={notification.id} 
-                        className={`flex items-start gap-3 p-3 rounded-lg border transition-colors ${
-                          notification.is_read 
-                            ? 'bg-background border-border' 
-                            : 'bg-primary/5 border-primary/20'
-                        }`}
-                      >
-                        <div className={`p-2 rounded-full flex-shrink-0 ${
-                          notification.is_urgent 
-                            ? 'bg-red-500/10' 
-                            : 'bg-blue-500/10'
-                        }`}>
-                          <AlertTriangle className={`w-4 h-4 ${
-                            notification.is_urgent 
-                              ? 'text-red-500' 
-                              : 'text-blue-500'
-                          }`} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground text-sm">{notification.title}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{notification.message}</p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {format(new Date(notification.created_at), 'dd MMM yyyy HH:mm', { locale: es })}
-                          </p>
-                        </div>
-                        {!notification.is_read && (
-                          <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-2" />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <AlertTriangle className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-sm text-muted-foreground">No hay notificaciones</p>
-                  </div>
+                {notifications && notifications.length > 5 && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setLocation('/settings')}
+                    className="text-xs"
+                  >
+                    Ver todas
+                  </Button>
                 )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* ZONA 4: Actividad Reciente */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="text-foreground flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" />
-              Actividad Reciente
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {recentActivity.length > 0 ? (
-              <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                {recentActivity.map((invoice) => (
-                  <div 
-                    key={invoice.id} 
-                    className="flex items-center justify-between p-3 bg-background rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
-                    onClick={() => setLocation('/invoices')}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-full bg-primary/10">
-                        <FileText className="w-4 h-4 text-primary" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              {recentNotifications.length > 0 ? (
+                <div className="space-y-3 h-[400px] overflow-y-auto">
+                  {recentNotifications.map((notification) => (
+                    <div 
+                      key={notification.id} 
+                      className="flex items-start gap-3 p-3 bg-background rounded-lg border border-border"
+                    >
+                      <div className="p-2 rounded-full bg-primary/10 flex-shrink-0">
+                        <AlertTriangle className="w-4 h-4 text-primary" />
                       </div>
-                      <div>
-                        <p className="font-medium text-sm">{invoice.invoice_number}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {format(new Date(invoice.created_at), 'dd MMM yyyy HH:mm', { locale: es })}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-foreground text-sm">{notification.title}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{notification.message}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {format(new Date(notification.created_at), 'dd MMM yyyy HH:mm', { locale: es })}
                         </p>
                       </div>
+                      {!notification.is_read && (
+                        <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-2" />
+                      )}
                     </div>
-                    <div className="flex items-center gap-3">
-                      <p className="font-semibold text-sm">
-                        ${Number(invoice.total || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                      </p>
-                      {getStatusBadge(invoice.status)}
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-6 h-[400px] flex flex-col items-center justify-center">
+                  <AlertTriangle className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground">No hay notificaciones</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Actividad Reciente (Movimientos Recientes) */}
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                Movimientos Recientes
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {recentActivity.length > 0 ? (
+                <div className="space-y-3 h-[400px] overflow-y-auto">
+                  {recentActivity.map((invoice) => (
+                    <div 
+                      key={invoice.id} 
+                      className="flex items-center justify-between p-3 bg-background rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
+                      onClick={() => setLocation('/invoices')}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-primary/10">
+                          <FileText className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{invoice.invoice_number}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(invoice.created_at), 'dd MMM yyyy HH:mm', { locale: es })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <p className="font-semibold text-sm">
+                          ${Number(invoice.total || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
+                        </p>
+                        {getStatusBadge(invoice.status)}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">Aún no hay actividad</p>
-                <p className="text-sm text-muted-foreground mt-1">Las facturas que crees aparecerán aquí</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 h-[400px] flex flex-col items-center justify-center">
+                  <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">Aún no hay actividad</p>
+                  <p className="text-sm text-muted-foreground mt-1">Las facturas que crees aparecerán aquí</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </DashboardLayout>
   );
