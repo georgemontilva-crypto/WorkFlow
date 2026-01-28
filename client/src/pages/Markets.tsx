@@ -1,11 +1,20 @@
 /**
  * Markets Page - Cryptocurrency Markets (Simplified)
  * Focused ONLY on cryptocurrencies with conversion and scenario calculators
+ * Using Binance API for real-time prices with CoinGecko icons
  */
 
 import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown } from 'lucide-react';
+
+interface BinanceTicker {
+  symbol: string;
+  priceChange: string;
+  priceChangePercent: string;
+  lastPrice: string;
+  volume: string;
+}
 
 interface Crypto {
   id: string;
@@ -13,14 +22,67 @@ interface Crypto {
   name: string;
   current_price: number;
   price_change_percentage_24h: number;
-  market_cap: number;
-  total_volume: number;
   image: string;
+  binanceSymbol: string;
 }
 
 interface ExchangeRates {
   [key: string]: number;
 }
+
+// Mapping of top cryptocurrencies with their Binance symbols and CoinGecko IDs
+const CRYPTO_MAPPING = [
+  { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', binanceSymbol: 'BTCUSDT' },
+  { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', binanceSymbol: 'ETHUSDT' },
+  { id: 'tether', name: 'Tether', symbol: 'USDT', binanceSymbol: 'USDCUSDT' },
+  { id: 'binancecoin', name: 'BNB', symbol: 'BNB', binanceSymbol: 'BNBUSDT' },
+  { id: 'solana', name: 'Solana', symbol: 'SOL', binanceSymbol: 'SOLUSDT' },
+  { id: 'ripple', name: 'XRP', symbol: 'XRP', binanceSymbol: 'XRPUSDT' },
+  { id: 'usd-coin', name: 'USDC', symbol: 'USDC', binanceSymbol: 'USDCUSDT' },
+  { id: 'cardano', name: 'Cardano', symbol: 'ADA', binanceSymbol: 'ADAUSDT' },
+  { id: 'dogecoin', name: 'Dogecoin', symbol: 'DOGE', binanceSymbol: 'DOGEUSDT' },
+  { id: 'tron', name: 'TRON', symbol: 'TRX', binanceSymbol: 'TRXUSDT' },
+  { id: 'avalanche-2', name: 'Avalanche', symbol: 'AVAX', binanceSymbol: 'AVAXUSDT' },
+  { id: 'shiba-inu', name: 'Shiba Inu', symbol: 'SHIB', binanceSymbol: 'SHIBUSDT' },
+  { id: 'chainlink', name: 'Chainlink', symbol: 'LINK', binanceSymbol: 'LINKUSDT' },
+  { id: 'polkadot', name: 'Polkadot', symbol: 'DOT', binanceSymbol: 'DOTUSDT' },
+  { id: 'bitcoin-cash', name: 'Bitcoin Cash', symbol: 'BCH', binanceSymbol: 'BCHUSDT' },
+  { id: 'near', name: 'NEAR Protocol', symbol: 'NEAR', binanceSymbol: 'NEARUSDT' },
+  { id: 'uniswap', name: 'Uniswap', symbol: 'UNI', binanceSymbol: 'UNIUSDT' },
+  { id: 'litecoin', name: 'Litecoin', symbol: 'LTC', binanceSymbol: 'LTCUSDT' },
+  { id: 'polygon', name: 'Polygon', symbol: 'MATIC', binanceSymbol: 'MATICUSDT' },
+  { id: 'internet-computer', name: 'Internet Computer', symbol: 'ICP', binanceSymbol: 'ICPUSDT' },
+  { id: 'ethereum-classic', name: 'Ethereum Classic', symbol: 'ETC', binanceSymbol: 'ETCUSDT' },
+  { id: 'stellar', name: 'Stellar', symbol: 'XLM', binanceSymbol: 'XLMUSDT' },
+  { id: 'filecoin', name: 'Filecoin', symbol: 'FIL', binanceSymbol: 'FILUSDT' },
+  { id: 'cosmos', name: 'Cosmos Hub', symbol: 'ATOM', binanceSymbol: 'ATOMUSDT' },
+  { id: 'hedera-hashgraph', name: 'Hedera', symbol: 'HBAR', binanceSymbol: 'HBARUSDT' },
+  { id: 'aptos', name: 'Aptos', symbol: 'APT', binanceSymbol: 'APTUSDT' },
+  { id: 'arbitrum', name: 'Arbitrum', symbol: 'ARB', binanceSymbol: 'ARBUSDT' },
+  { id: 'optimism', name: 'Optimism', symbol: 'OP', binanceSymbol: 'OPUSDT' },
+  { id: 'vechain', name: 'VeChain', symbol: 'VET', binanceSymbol: 'VETUSDT' },
+  { id: 'the-graph', name: 'The Graph', symbol: 'GRT', binanceSymbol: 'GRTUSDT' },
+  { id: 'algorand', name: 'Algorand', symbol: 'ALGO', binanceSymbol: 'ALGOUSDT' },
+  { id: 'fantom', name: 'Fantom', symbol: 'FTM', binanceSymbol: 'FTMUSDT' },
+  { id: 'elrond-erd-2', name: 'MultiversX', symbol: 'EGLD', binanceSymbol: 'EGLDUSDT' },
+  { id: 'flow', name: 'Flow', symbol: 'FLOW', binanceSymbol: 'FLOWUSDT' },
+  { id: 'aave', name: 'Aave', symbol: 'AAVE', binanceSymbol: 'AAVEUSDT' },
+  { id: 'eos', name: 'EOS', symbol: 'EOS', binanceSymbol: 'EOSUSDT' },
+  { id: 'theta-token', name: 'Theta Network', symbol: 'THETA', binanceSymbol: 'THETAUSDT' },
+  { id: 'axie-infinity', name: 'Axie Infinity', symbol: 'AXS', binanceSymbol: 'AXSUSDT' },
+  { id: 'tezos', name: 'Tezos', symbol: 'XTZ', binanceSymbol: 'XTZUSDT' },
+  { id: 'sandbox', name: 'The Sandbox', symbol: 'SAND', binanceSymbol: 'SANDUSDT' },
+  { id: 'decentraland', name: 'Decentraland', symbol: 'MANA', binanceSymbol: 'MANAUSDT' },
+  { id: 'neo', name: 'NEO', symbol: 'NEO', binanceSymbol: 'NEOUSDT' },
+  { id: 'kucoin-shares', name: 'KuCoin', symbol: 'KCS', binanceSymbol: 'KCSUSDT' },
+  { id: 'maker', name: 'Maker', symbol: 'MKR', binanceSymbol: 'MKRUSDT' },
+  { id: 'pancakeswap-token', name: 'PancakeSwap', symbol: 'CAKE', binanceSymbol: 'CAKEUSDT' },
+  { id: 'iota', name: 'IOTA', symbol: 'IOTA', binanceSymbol: 'IOTAUSDT' },
+  { id: 'zcash', name: 'Zcash', symbol: 'ZEC', binanceSymbol: 'ZECUSDT' },
+  { id: 'compound', name: 'Compound', symbol: 'COMP', binanceSymbol: 'COMPUSDT' },
+  { id: 'dash', name: 'Dash', symbol: 'DASH', binanceSymbol: 'DASHUSDT' },
+  { id: 'monero', name: 'Monero', symbol: 'XMR', binanceSymbol: 'XMRUSDT' },
+];
 
 // Custom Dropdown Component
 function CustomDropdown({ 
@@ -113,21 +175,60 @@ export default function Markets() {
     fetchCryptos();
     fetchExchangeRates();
     
-    // Auto-refresh every 60 seconds to avoid rate limit
+    // Auto-refresh every 10 seconds
     const interval = setInterval(() => {
       fetchCryptos();
-    }, 60000);
+    }, 10000);
     
     return () => clearInterval(interval);
   }, []);
 
   const fetchCryptos = async () => {
     try {
-      const response = await fetch(
-        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&page=1&sparkline=false&price_change_percentage=24h'
+      // Fetch Binance ticker data for all symbols
+      const binanceResponse = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+      const binanceData: BinanceTicker[] = await binanceResponse.json();
+      
+      // Create a map of Binance data by symbol
+      const binanceMap = new Map<string, BinanceTicker>();
+      binanceData.forEach(ticker => {
+        binanceMap.set(ticker.symbol, ticker);
+      });
+      
+      // Fetch CoinGecko data for icons only
+      const coinGeckoIds = CRYPTO_MAPPING.map(c => c.id).join(',');
+      const coinGeckoResponse = await fetch(
+        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinGeckoIds}&order=market_cap_desc&per_page=50&sparkline=false`
       );
-      const data = await response.json();
-      setCryptos(data);
+      const coinGeckoData = await coinGeckoResponse.json();
+      
+      // Create a map of CoinGecko data by id
+      const coinGeckoMap = new Map();
+      coinGeckoData.forEach((coin: any) => {
+        coinGeckoMap.set(coin.id, coin);
+      });
+      
+      // Merge data: Binance prices + CoinGecko icons
+      const mergedData: Crypto[] = CRYPTO_MAPPING
+        .map(crypto => {
+          const binanceTicker = binanceMap.get(crypto.binanceSymbol);
+          const coinGeckoData = coinGeckoMap.get(crypto.id);
+          
+          if (!binanceTicker || !coinGeckoData) return null;
+          
+          return {
+            id: crypto.id,
+            symbol: crypto.symbol,
+            name: crypto.name,
+            current_price: parseFloat(binanceTicker.lastPrice),
+            price_change_percentage_24h: parseFloat(binanceTicker.priceChangePercent),
+            image: coinGeckoData.image,
+            binanceSymbol: crypto.binanceSymbol,
+          };
+        })
+        .filter((crypto): crypto is Crypto => crypto !== null);
+      
+      setCryptos(mergedData);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching cryptos:', error);
@@ -214,7 +315,10 @@ export default function Markets() {
           {/* Left Column: Crypto List (2/3 width on desktop) */}
           <div className="lg:col-span-2">
             <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
-              <h2 className="text-lg md:text-xl font-bold text-white mb-4">Criptomonedas</h2>
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <h2 className="text-lg md:text-xl font-bold text-white">Criptomonedas</h2>
+                <span className="text-xs text-[#8B92A8] whitespace-nowrap">Precios en tiempo real • Binance</span>
+              </div>
               
               {loading ? (
                 <div className="h-96 flex items-center justify-center text-[#8B92A8]">
