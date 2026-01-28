@@ -41,6 +41,7 @@ function Router() {
   return (
     <Switch>
       {/* Public routes */}
+      <Route path="/" component={Landing} />
       <Route path="/landing" component={Landing} />
       <Route path="/signup" component={Signup} />
       <Route path="/login" component={Login} />
@@ -53,12 +54,6 @@ function Router() {
       <Route path="/invoice/:token" component={PublicInvoice} />
       
       {/* Protected routes - require authentication */}
-      {/* Dashboard as default route */}
-      <Route path="/">
-        <ProtectedRoute>
-          <Home />
-        </ProtectedRoute>
-      </Route>
       <Route path="/dashboard">
         <ProtectedRoute>
           <Home />
