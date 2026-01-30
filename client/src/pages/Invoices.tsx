@@ -759,12 +759,12 @@ export default function Invoices() {
                             <>
                               {/* Backdrop to close dropdown */}
                               <div 
-                                className="fixed inset-0 z-10" 
+                                className="fixed inset-0 z-40" 
                                 onClick={() => setOpenDropdownId(null)}
                               />
                               
                               {/* Dropdown Menu */}
-                              <div className="absolute right-0 mt-2 w-56 bg-[#0E0F12] border border-[#C4FF3D]/30 rounded-[28px] shadow-lg z-20 py-1">
+                              <div className="absolute right-0 mt-2 w-56 bg-[#0E0F12] border border-[#C4FF3D]/30 rounded-[28px] shadow-lg z-50 py-1">
                                 {/* Marcar como Pendiente */}
                                 {invoice.status !== 'draft' && invoice.status !== 'cancelled' && (
                                   <button
