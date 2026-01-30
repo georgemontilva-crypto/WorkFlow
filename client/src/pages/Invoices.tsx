@@ -516,7 +516,7 @@ export default function Invoices() {
               return (
                 <div
                   key={invoice.id}
-                  className="bg-[#121212] rounded-[28px] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 transition-all duration-200 group max-w-full overflow-hidden"
+                  className="bg-[#121212] rounded-[28px] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 transition-all duration-200 group max-w-full overflow-visible"
                 >
                   {/* Header - Always Visible */}
                   <div className="p-4 lg:p-6">
