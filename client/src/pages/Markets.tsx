@@ -222,18 +222,25 @@ export default function Markets() {
   const handleAddPurchase = () => {
     if (!selectedCrypto) return;
     
+    // Validate that fields are not empty
+    if (!purchaseForm.quantity || !purchaseForm.buyPrice) {
+      alert('Por favor completa todos los campos');
+      return;
+    }
+    
     const quantity = parseFloat(purchaseForm.quantity);
     const buyPrice = parseFloat(purchaseForm.buyPrice);
 
-    if (quantity <= 0 || buyPrice <= 0) {
-      alert('Por favor ingresa valores válidos');
+    // Validate that values are valid numbers and positive
+    if (isNaN(quantity) || isNaN(buyPrice) || quantity <= 0 || buyPrice <= 0) {
+      alert('Por favor ingresa valores válidos (números positivos)');
       return;
     }
 
     addPurchaseMutation.mutate({
       symbol: selectedCrypto,
       quantity,
-      buyPrice,
+      buy_price: buyPrice,
       currency: purchaseForm.currency,
     });
   };
