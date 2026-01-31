@@ -1,12 +1,11 @@
 /**
- * Markets Page - Cryptocurrency Markets with Investment Tracking
- * Focused on cryptocurrencies with conversion, scenario calculators, and portfolio tracking
+ * Markets Page - Cryptocurrency Markets (Simplified)
+ * Focused ONLY on cryptocurrencies with conversion and scenario calculators
  */
 
 import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
-import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown, Plus, Trash2, Wallet, X } from 'lucide-react';
-import { trpc } from '../lib/trpc';
+import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown } from 'lucide-react';
 
 interface Crypto {
   id: string;
@@ -21,15 +20,6 @@ interface Crypto {
 
 interface ExchangeRates {
   [key: string]: number;
-}
-
-interface CryptoPurchase {
-  id: number;
-  project_id: number;
-  quantity: string;
-  buy_price: string;
-  currency: string;
-  created_at: Date;
 }
 
 // Custom Dropdown Component
@@ -105,8 +95,6 @@ export default function Markets() {
   const [cryptos, setCryptos] = useState<Crypto[]>([]);
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates>({});
   const [loading, setLoading] = useState(true);
-  const [selectedCrypto, setSelectedCrypto] = useState<string | null>(null);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
   // Currency Converter State
   const [converterAmount, setConverterAmount] = useState<string>('1');
@@ -118,45 +106,6 @@ export default function Markets() {
     buyPrice: '',
     quantity: '',
     targetPrice: '',
-  });
-
-  // Purchase Form State
-  const [purchaseForm, setPurchaseForm] = useState({
-    quantity: '',
-    buyPrice: '',
-    currency: 'USD',
-  });
-
-  // tRPC queries and mutations
-  const utils = trpc.useContext();
-  const { data: projectSummary, refetch: refetchSummary } = trpc.crypto.getProjectSummary.useQuery(
-    {
-      symbol: selectedCrypto || 'BTC',
-      currentPrice: cryptos.find(c => c.symbol.toUpperCase() === selectedCrypto)?.current_price || 0,
-    },
-    {
-      enabled: !!selectedCrypto && cryptos.length > 0,
-    }
-  );
-
-  const { data: projectData, refetch: refetchProject } = trpc.crypto.getProject.useQuery(
-    { id: projectSummary?.symbol ? 1 : 0 }, // We'll need to get the project ID properly
-    { enabled: false }
-  );
-
-  const addPurchaseMutation = trpc.crypto.addPurchase.useMutation({
-    onSuccess: () => {
-      refetchSummary();
-      setShowPurchaseModal(false);
-      setPurchaseForm({ quantity: '', buyPrice: '', currency: 'USD' });
-    },
-  });
-
-  const deletePurchaseMutation = trpc.crypto.deletePurchase.useMutation({
-    onSuccess: () => {
-      refetchSummary();
-      refetchProject();
-    },
   });
 
   // Fetch cryptocurrencies
@@ -219,29 +168,6 @@ export default function Markets() {
 
   const scenarioResults = calculateScenario();
 
-  const handleAddPurchase = () => {
-    if (!selectedCrypto) return;
-    
-    const quantity = parseFloat(purchaseForm.quantity);
-    const buyPrice = parseFloat(purchaseForm.buyPrice);
-
-    if (quantity <= 0 || buyPrice <= 0) {
-      alert('Por favor ingresa valores válidos');
-      return;
-    }
-
-    addPurchaseMutation.mutate({
-      symbol: selectedCrypto,
-      quantity,
-      buyPrice,
-      currency: purchaseForm.currency,
-    });
-  };
-
-  const handleCryptoClick = (symbol: string) => {
-    setSelectedCrypto(symbol.toUpperCase());
-  };
-
   const currencies = [
     { code: 'COP', name: 'Peso Colombiano' },
     { code: 'MXN', name: 'Peso Mexicano' },
@@ -282,7 +208,6 @@ export default function Markets() {
           <div className="lg:col-span-2">
             <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
               <h2 className="text-lg md:text-xl font-bold text-white mb-4">Criptomonedas</h2>
-              <p className="text-sm text-[#8B92A8] mb-4">Precios en tiempo real • Binance</p>
               
               {loading ? (
                 <div className="h-96 flex items-center justify-center text-[#8B92A8]">
@@ -293,12 +218,7 @@ export default function Markets() {
                   {cryptos.map((crypto) => (
                     <div
                       key={crypto.id}
-                      onClick={() => handleCryptoClick(crypto.symbol)}
-                      className={`flex items-center justify-between p-3 md:p-4 bg-[#0A0A0A] border rounded-xl transition-colors cursor-pointer ${
-                        selectedCrypto === crypto.symbol.toUpperCase()
-                          ? 'border-[#C4FF3D] bg-[#C4FF3D]/5'
-                          : 'border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.1)]'
-                      }`}
+                      className="flex items-center justify-between p-3 md:p-4 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl hover:border-[rgba(255,255,255,0.1)] transition-colors"
                     >
                       <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
                         <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full flex-shrink-0" />
@@ -461,138 +381,6 @@ export default function Markets() {
             </div>
           </div>
         </div>
-
-        {/* Investment Tracking Section */}
-        {selectedCrypto && (
-          <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <Wallet className="w-5 h-5 text-[#C4FF3D]" />
-                <h2 className="text-lg md:text-xl font-bold text-white">
-                  Seguimiento de Inversión - {selectedCrypto}
-                </h2>
-              </div>
-              <button
-                onClick={() => setShowPurchaseModal(true)}
-                className="flex items-center gap-2 bg-[#C4FF3D] text-black px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/90 transition-colors font-medium"
-              >
-                <Plus className="w-4 h-4" />
-                Registrar Compra
-              </button>
-            </div>
-
-            {projectSummary ? (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Cantidad Total</div>
-                  <div className="text-xl font-bold text-white">
-                    {projectSummary.totalQuantity.toFixed(8)}
-                  </div>
-                </div>
-                
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Inversión Total</div>
-                  <div className="text-xl font-bold text-white">
-                    ${projectSummary.totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </div>
-                </div>
-                
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Valor Actual</div>
-                  <div className="text-xl font-bold text-white">
-                    ${projectSummary.currentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </div>
-                </div>
-                
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Ganancia/Pérdida</div>
-                  <div className={`text-xl font-bold ${projectSummary.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    ${projectSummary.profitLoss.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    <span className="text-sm ml-2">
-                      ({projectSummary.profitLossPercentage.toFixed(2)}%)
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-8 text-[#8B92A8]">
-                No tienes compras registradas para {selectedCrypto}. Haz clic en "Registrar Compra" para comenzar.
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Purchase Modal */}
-        {showPurchaseModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-[#121212] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 max-w-md w-full">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-white">Registrar Compra - {selectedCrypto}</h3>
-                <button
-                  onClick={() => setShowPurchaseModal(false)}
-                  className="text-[#8B92A8] hover:text-white transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Cantidad comprada</label>
-                  <input
-                    type="number"
-                    value={purchaseForm.quantity}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, quantity: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                    placeholder="0.00000000"
-                    step="0.00000001"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Precio de compra</label>
-                  <input
-                    type="number"
-                    value={purchaseForm.buyPrice}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, buyPrice: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                    placeholder="0.00"
-                    step="0.01"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Moneda</label>
-                  <select
-                    value={purchaseForm.currency}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, currency: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                  >
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="COP">COP</option>
-                  </select>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    onClick={() => setShowPurchaseModal(false)}
-                    className="flex-1 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] text-white px-4 py-2 rounded-lg hover:border-[rgba(255,255,255,0.1)] transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={handleAddPurchase}
-                    disabled={addPurchaseMutation.isLoading}
-                    className="flex-1 bg-[#C4FF3D] text-black px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/90 transition-colors font-medium disabled:opacity-50"
-                  >
-                    {addPurchaseMutation.isLoading ? 'Guardando...' : 'Guardar'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </DashboardLayout>
   );
