@@ -306,12 +306,7 @@ export default function Markets() {
                   {cryptos.map((crypto) => (
                     <div
                       key={crypto.id}
-                      onClick={() => handleCryptoClick(crypto.symbol)}
-                      className={`flex items-center justify-between p-3 md:p-4 bg-[#0A0A0A] border rounded-xl transition-colors cursor-pointer ${
-                        selectedCrypto === crypto.symbol.toUpperCase()
-                          ? 'border-[#C4FF3D] bg-[#C4FF3D]/5'
-                          : 'border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.1)]'
-                      }`}
+                      className="flex items-center justify-between p-3 md:p-4 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl"
                     >
                       <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
                         <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full flex-shrink-0" />
@@ -344,35 +339,21 @@ export default function Markets() {
             </div>
 
             {/* Investment Tracking Section */}
-            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6 mt-6">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <Wallet className="w-5 h-5 text-[#C4FF3D]" />
               <h2 className="text-lg md:text-xl font-bold text-white">
                 Seguimiento de Inversión
               </h2>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-64">
-                <CustomDropdown
-                  options={cryptoOptions}
-                  value={selectedCrypto ? cryptos.find(c => c.symbol.toUpperCase() === selectedCrypto)?.id || 'bitcoin' : 'bitcoin'}
-                  onChange={(value) => {
-                    const crypto = cryptos.find(c => c.id === value);
-                    if (crypto) setSelectedCrypto(crypto.symbol.toUpperCase());
-                  }}
-                  placeholder="Seleccionar criptomoneda"
-                  maxHeight="400px"
-                />
-              </div>
-              <button
-                onClick={() => setShowPurchaseModal(true)}
-                className="flex items-center gap-2 bg-[#C4FF3D] text-black px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/90 transition-colors font-medium whitespace-nowrap"
-              >
-                <Plus className="w-4 h-4" />
-                Registrar Compra
-              </button>
-            </div>
+            <button
+              onClick={() => setShowPurchaseModal(true)}
+              className="flex items-center gap-2 bg-[#C4FF3D] text-black px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/90 transition-colors font-medium whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4" />
+              Registrar Compra
+            </button>
           </div>
 
           {selectedCrypto && projectSummary ? (
