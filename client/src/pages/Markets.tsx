@@ -342,6 +342,82 @@ export default function Markets() {
                 </div>
               )}
             </div>
+
+            {/* Investment Tracking Section */}
+            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              <Wallet className="w-5 h-5 text-[#C4FF3D]" />
+              <h2 className="text-lg md:text-xl font-bold text-white">
+                Seguimiento de Inversión
+              </h2>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-64">
+                <CustomDropdown
+                  options={cryptoOptions}
+                  value={selectedCrypto ? cryptos.find(c => c.symbol.toUpperCase() === selectedCrypto)?.id || 'bitcoin' : 'bitcoin'}
+                  onChange={(value) => {
+                    const crypto = cryptos.find(c => c.id === value);
+                    if (crypto) setSelectedCrypto(crypto.symbol.toUpperCase());
+                  }}
+                  placeholder="Seleccionar criptomoneda"
+                  maxHeight="400px"
+                />
+              </div>
+              <button
+                onClick={() => setShowPurchaseModal(true)}
+                className="flex items-center gap-2 bg-[#C4FF3D] text-black px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/90 transition-colors font-medium whitespace-nowrap"
+              >
+                <Plus className="w-4 h-4" />
+                Registrar Compra
+              </button>
+            </div>
+          </div>
+
+          {selectedCrypto && projectSummary ? (
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
+                  <div className="text-sm text-[#8B92A8] mb-1">Cantidad Total</div>
+                  <div className="text-xl font-bold text-white">
+                    {projectSummary.totalQuantity.toFixed(8)}
+                  </div>
+                </div>
+                
+                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
+                  <div className="text-sm text-[#8B92A8] mb-1">Inversión Total</div>
+                  <div className="text-xl font-bold text-white">
+                    ${projectSummary.totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+                
+                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
+                  <div className="text-sm text-[#8B92A8] mb-1">Valor Actual</div>
+                  <div className="text-xl font-bold text-white">
+                    ${projectSummary.currentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+                
+                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
+                  <div className="text-sm text-[#8B92A8] mb-1">Ganancia/Pérdida</div>
+                  <div className={`text-xl font-bold ${projectSummary.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    ${projectSummary.profitLoss.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <span className="text-sm ml-2">
+                      ({projectSummary.profitLossPercentage.toFixed(2)}%)
+                    </span>
+                  </div>
+                </div>
+              </div>
+          ) : selectedCrypto ? (
+            <div className="text-center py-8 text-[#8B92A8]">
+              No tienes compras registradas para {selectedCrypto}. Haz clic en "Registrar Compra" para comenzar.
+            </div>
+          ) : (
+            <div className="text-center py-8 text-[#8B92A8]">
+              Selecciona una criptomoneda para ver tu seguimiento de inversión.
+            </div>
+          )}
+            </div>
           </div>
 
           {/* Right Column: Calculators (1/3 width on desktop) */}
@@ -471,82 +547,6 @@ export default function Markets() {
                   <strong>Disclaimer:</strong> Este es un escenario hipotético. No constituye recomendación de inversión.
                 </div>
               </div>
-            </div>
-
-            {/* Investment Tracking Section */}
-            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-            <div className="flex items-center gap-2">
-              <Wallet className="w-5 h-5 text-[#C4FF3D]" />
-              <h2 className="text-lg md:text-xl font-bold text-white">
-                Seguimiento de Inversión
-              </h2>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-64">
-                <CustomDropdown
-                  options={cryptoOptions}
-                  value={selectedCrypto ? cryptos.find(c => c.symbol.toUpperCase() === selectedCrypto)?.id || 'bitcoin' : 'bitcoin'}
-                  onChange={(value) => {
-                    const crypto = cryptos.find(c => c.id === value);
-                    if (crypto) setSelectedCrypto(crypto.symbol.toUpperCase());
-                  }}
-                  placeholder="Seleccionar criptomoneda"
-                  maxHeight="400px"
-                />
-              </div>
-              <button
-                onClick={() => setShowPurchaseModal(true)}
-                className="flex items-center gap-2 bg-[#C4FF3D] text-black px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/90 transition-colors font-medium whitespace-nowrap"
-              >
-                <Plus className="w-4 h-4" />
-                Registrar Compra
-              </button>
-            </div>
-          </div>
-
-          {selectedCrypto && projectSummary ? (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Cantidad Total</div>
-                  <div className="text-xl font-bold text-white">
-                    {projectSummary.totalQuantity.toFixed(8)}
-                  </div>
-                </div>
-                
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Inversión Total</div>
-                  <div className="text-xl font-bold text-white">
-                    ${projectSummary.totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </div>
-                </div>
-                
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Valor Actual</div>
-                  <div className="text-xl font-bold text-white">
-                    ${projectSummary.currentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </div>
-                </div>
-                
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Ganancia/Pérdida</div>
-                  <div className={`text-xl font-bold ${projectSummary.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    ${projectSummary.profitLoss.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    <span className="text-sm ml-2">
-                      ({projectSummary.profitLossPercentage.toFixed(2)}%)
-                    </span>
-                  </div>
-                </div>
-              </div>
-          ) : selectedCrypto ? (
-            <div className="text-center py-8 text-[#8B92A8]">
-              No tienes compras registradas para {selectedCrypto}. Haz clic en "Registrar Compra" para comenzar.
-            </div>
-          ) : (
-            <div className="text-center py-8 text-[#8B92A8]">
-              Selecciona una criptomoneda para ver tu seguimiento de inversión.
-            </div>
-          )}
             </div>
           </div>
         </div>
