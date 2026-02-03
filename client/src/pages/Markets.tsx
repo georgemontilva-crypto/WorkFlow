@@ -147,9 +147,15 @@ export default function Markets() {
 
   const addPurchaseMutation = trpc.crypto.addPurchase.useMutation({
     onSuccess: () => {
+      console.log('Purchase added successfully');
       refetchSummary();
       setShowPurchaseModal(false);
       setPurchaseForm({ crypto: 'bitcoin', quantity: '', buyPrice: '', currency: 'USD' });
+      alert('Compra registrada exitosamente');
+    },
+    onError: (error) => {
+      console.error('Error adding purchase:', error);
+      alert(`Error al registrar la compra: ${error.message}`);
     },
   });
 
@@ -221,8 +227,11 @@ export default function Markets() {
   const scenarioResults = calculateScenario();
 
   const handleAddPurchase = () => {
+    console.log('handleAddPurchase called', purchaseForm);
+    
     // Validate that fields are not empty
     if (!purchaseForm.crypto || !purchaseForm.quantity || !purchaseForm.buyPrice) {
+      console.log('Validation failed: empty fields');
       alert('Por favor completa todos los campos');
       return;
     }
@@ -230,25 +239,34 @@ export default function Markets() {
     const quantity = parseFloat(purchaseForm.quantity);
     const buyPrice = parseFloat(purchaseForm.buyPrice);
 
+    console.log('Parsed values:', { quantity, buyPrice });
+
     // Validate that values are valid numbers and positive
     if (isNaN(quantity) || isNaN(buyPrice) || quantity <= 0 || buyPrice <= 0) {
+      console.log('Validation failed: invalid numbers');
       alert('Por favor ingresa valores válidos (números positivos)');
       return;
     }
 
     // Get the symbol from the selected crypto
     const selectedCryptoData = cryptos.find(c => c.id === purchaseForm.crypto);
+    console.log('Selected crypto data:', selectedCryptoData);
+    
     if (!selectedCryptoData) {
+      console.log('Validation failed: invalid crypto');
       alert('Por favor selecciona una criptomoneda válida');
       return;
     }
 
-    addPurchaseMutation.mutate({
+    const mutationData = {
       symbol: selectedCryptoData.symbol.toUpperCase(),
       quantity,
       buy_price: buyPrice,
       currency: purchaseForm.currency,
-    });
+    };
+    
+    console.log('Calling mutation with:', mutationData);
+    addPurchaseMutation.mutate(mutationData);
   };
 
   const handleCryptoClick = (symbol: string) => {
