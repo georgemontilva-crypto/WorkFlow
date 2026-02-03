@@ -284,18 +284,9 @@ export default function Markets() {
     <DashboardLayout>
       <div className="max-w-[1440px] mx-auto p-4 md:p-6 space-y-6 overflow-x-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">Mercados</h1>
-            <p className="text-sm md:text-base text-[#8B92A8] mt-1">Consulta de criptomonedas y herramientas de conversión</p>
-          </div>
-          <button
-            onClick={() => setShowPurchaseModal(true)}
-            className="flex items-center gap-2 bg-[#C4FF3D] text-black px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/90 transition-colors font-medium"
-          >
-            <Plus className="w-4 h-4" />
-            Registrar Compra
-          </button>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-white">Mercados</h1>
+          <p className="text-sm md:text-base text-[#8B92A8] mt-1">Consulta de criptomonedas y herramientas de conversión</p>
         </div>
 
         {/* Desktop: Two Columns | Mobile: Stacked */}
@@ -481,11 +472,9 @@ export default function Markets() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Investment Tracking Section */}
-        <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
+            {/* Investment Tracking Section */}
+            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-2">
               <Wallet className="w-5 h-5 text-[#C4FF3D]" />
@@ -558,6 +547,8 @@ export default function Markets() {
               Selecciona una criptomoneda para ver tu seguimiento de inversión.
             </div>
           )}
+            </div>
+          </div>
         </div>
 
         {/* Purchase Modal */}
