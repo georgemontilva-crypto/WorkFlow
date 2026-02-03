@@ -67,7 +67,7 @@ function CustomDropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40 flex items-center justify-between hover:border-[rgba(255,255,255,0.1)] transition-colors"
+        className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[rgba(255,255,255,0.1)] flex items-center justify-between hover:border-[rgba(255,255,255,0.1)] transition-colors"
       >
         <span className="truncate">{selectedOption?.label || placeholder}</span>
         <ChevronDown className={`w-4 h-4 flex-shrink-0 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -87,8 +87,8 @@ function CustomDropdown({
                   onChange(option.value);
                   setIsOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 hover:bg-[#1A1A1A] transition-colors ${
-                  option.value === value ? 'bg-[#1A1A1A] text-[#C4FF3D]' : 'text-white'
+                className={`w-full text-left px-4 py-2.5 hover:bg-[rgba(255,255,255,0.05)] transition-colors ${
+                  option.value === value ? 'bg-[rgba(255,255,255,0.05)] text-white' : 'text-[#8B92A8]'
                 }`}
               >
                 {option.label}
