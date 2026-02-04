@@ -34,6 +34,7 @@ import Markets from "./pages/Markets";
 import PricingPage from "./pages/PricingPage";
 import CompanyProfile from "./pages/CompanyProfile";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { SuperAdminRoute } from "./components/SuperAdminRoute";
 
 
 function Router() {
@@ -91,7 +92,9 @@ function Router() {
       </Route>
       <Route path="/admin">
         <ProtectedRoute>
-          <Admin />
+          <SuperAdminRoute>
+            <Admin />
+          </SuperAdminRoute>
         </ProtectedRoute>
       </Route>
       <Route path="/markets">
