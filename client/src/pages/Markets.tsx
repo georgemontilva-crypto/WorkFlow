@@ -151,9 +151,10 @@ export default function Markets() {
   }) || [];
 
   const addPurchaseMutation = trpc.crypto.addPurchase.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       console.log('Purchase added successfully');
-      refetchProjects();
+      // Invalidate all crypto-related queries to force refresh
+      await utils.crypto.invalidate();
       setShowPurchaseModal(false);
       setPurchaseForm({ crypto: 'bitcoin', quantity: '', buyPrice: '', currency: 'USD' });
       toast.success('Compra registrada exitosamente');
@@ -165,8 +166,9 @@ export default function Markets() {
   });
 
   const deletePurchaseMutation = trpc.crypto.deletePurchase.useMutation({
-    onSuccess: () => {
-      refetchProjects();
+    onSuccess: async () => {
+      // Invalidate all crypto-related queries to force refresh
+      await utils.crypto.invalidate();
     },
   });
 
