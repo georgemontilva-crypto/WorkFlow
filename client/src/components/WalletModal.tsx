@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Plus, Copy, Edit2, Trash2, Check, Wallet2 } from 'lucide-react';
 import { trpc } from '../lib/trpc';
+import SearchableDropdown from './SearchableDropdown';
 
 interface WalletModalProps {
   isOpen: boolean;
@@ -21,17 +22,77 @@ const CRYPTO_ICONS: Record<string, string> = {
   MATIC: 'MATIC',
   TRX: 'TRX',
   USDC: 'USDC',
+  LTC: 'Ł',
+  LINK: 'LINK',
+  AVAX: 'AVAX',
+  ATOM: 'ATOM',
+  UNI: 'UNI',
+  XLM: 'XLM',
+  BCH: 'BCH',
+  ALGO: 'ALGO',
+  VET: 'VET',
+  FIL: 'FIL',
+  ICP: 'ICP',
+  APT: 'APT',
+  NEAR: 'NEAR',
+  HBAR: 'HBAR',
+  QNT: 'QNT',
+  ARB: 'ARB',
+  OP: 'OP',
+  IMX: 'IMX',
+  SAND: 'SAND',
+  MANA: 'MANA',
+  AXS: 'AXS',
+  THETA: 'THETA',
+  FTM: 'FTM',
+  EOS: 'EOS',
+  AAVE: 'AAVE',
+  GRT: 'GRT',
+  XTZ: 'XTZ',
+  FLOW: 'FLOW',
+  CHZ: 'CHZ',
+  EGLD: 'EGLD',
+  KLAY: 'KLAY',
+  RUNE: 'RUNE',
+  ZEC: 'ZEC',
+  DASH: 'DASH',
+  XMR: 'XMR',
+  CAKE: 'CAKE',
+  CRV: 'CRV',
+  SUSHI: 'SUSHI',
 };
 
 const NETWORKS = [
-  'Bitcoin',
-  'ERC20 (Ethereum)',
-  'TRC20 (Tron)',
-  'BEP20 (BSC)',
-  'Polygon',
-  'Solana',
-  'Cardano',
-  'Ripple',
+  { value: 'Bitcoin', label: 'Bitcoin (BTC)' },
+  { value: 'ERC20', label: 'ERC20 (Ethereum)' },
+  { value: 'TRC20', label: 'TRC20 (Tron)' },
+  { value: 'BEP20', label: 'BEP20 (Binance Smart Chain)' },
+  { value: 'Polygon', label: 'Polygon (MATIC)' },
+  { value: 'Solana', label: 'Solana (SOL)' },
+  { value: 'Cardano', label: 'Cardano (ADA)' },
+  { value: 'Ripple', label: 'Ripple (XRP)' },
+  { value: 'Avalanche', label: 'Avalanche C-Chain' },
+  { value: 'Arbitrum', label: 'Arbitrum One' },
+  { value: 'Optimism', label: 'Optimism' },
+  { value: 'Polkadot', label: 'Polkadot (DOT)' },
+  { value: 'Cosmos', label: 'Cosmos (ATOM)' },
+  { value: 'Algorand', label: 'Algorand (ALGO)' },
+  { value: 'Near', label: 'NEAR Protocol' },
+  { value: 'Fantom', label: 'Fantom Opera' },
+  { value: 'Hedera', label: 'Hedera (HBAR)' },
+  { value: 'Stellar', label: 'Stellar (XLM)' },
+  { value: 'Litecoin', label: 'Litecoin (LTC)' },
+  { value: 'BitcoinCash', label: 'Bitcoin Cash (BCH)' },
+  { value: 'Dogecoin', label: 'Dogecoin (DOGE)' },
+  { value: 'Zcash', label: 'Zcash (ZEC)' },
+  { value: 'Dash', label: 'Dash (DASH)' },
+  { value: 'Monero', label: 'Monero (XMR)' },
+  { value: 'EOS', label: 'EOS' },
+  { value: 'Tezos', label: 'Tezos (XTZ)' },
+  { value: 'Klaytn', label: 'Klaytn (KLAY)' },
+  { value: 'Flow', label: 'Flow (FLOW)' },
+  { value: 'Aptos', label: 'Aptos (APT)' },
+  { value: 'Sui', label: 'Sui' },
 ];
 
 const CRYPTOS = [
@@ -47,6 +108,44 @@ const CRYPTOS = [
   { symbol: 'MATIC', name: 'Polygon' },
   { symbol: 'TRX', name: 'Tron' },
   { symbol: 'USDC', name: 'USD Coin' },
+  { symbol: 'LTC', name: 'Litecoin' },
+  { symbol: 'LINK', name: 'Chainlink' },
+  { symbol: 'AVAX', name: 'Avalanche' },
+  { symbol: 'ATOM', name: 'Cosmos' },
+  { symbol: 'UNI', name: 'Uniswap' },
+  { symbol: 'XLM', name: 'Stellar' },
+  { symbol: 'BCH', name: 'Bitcoin Cash' },
+  { symbol: 'ALGO', name: 'Algorand' },
+  { symbol: 'VET', name: 'VeChain' },
+  { symbol: 'FIL', name: 'Filecoin' },
+  { symbol: 'ICP', name: 'Internet Computer' },
+  { symbol: 'APT', name: 'Aptos' },
+  { symbol: 'NEAR', name: 'NEAR Protocol' },
+  { symbol: 'HBAR', name: 'Hedera' },
+  { symbol: 'QNT', name: 'Quant' },
+  { symbol: 'ARB', name: 'Arbitrum' },
+  { symbol: 'OP', name: 'Optimism' },
+  { symbol: 'IMX', name: 'Immutable X' },
+  { symbol: 'SAND', name: 'The Sandbox' },
+  { symbol: 'MANA', name: 'Decentraland' },
+  { symbol: 'AXS', name: 'Axie Infinity' },
+  { symbol: 'THETA', name: 'Theta Network' },
+  { symbol: 'FTM', name: 'Fantom' },
+  { symbol: 'EOS', name: 'EOS' },
+  { symbol: 'AAVE', name: 'Aave' },
+  { symbol: 'GRT', name: 'The Graph' },
+  { symbol: 'XTZ', name: 'Tezos' },
+  { symbol: 'FLOW', name: 'Flow' },
+  { symbol: 'CHZ', name: 'Chiliz' },
+  { symbol: 'EGLD', name: 'MultiversX' },
+  { symbol: 'KLAY', name: 'Klaytn' },
+  { symbol: 'RUNE', name: 'THORChain' },
+  { symbol: 'ZEC', name: 'Zcash' },
+  { symbol: 'DASH', name: 'Dash' },
+  { symbol: 'XMR', name: 'Monero' },
+  { symbol: 'CAKE', name: 'PancakeSwap' },
+  { symbol: 'CRV', name: 'Curve DAO' },
+  { symbol: 'SUSHI', name: 'SushiSwap' },
 ];
 
 export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
@@ -264,37 +363,25 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
 
           {showAddForm && (
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm text-[#8B92A8] mb-2">Criptomoneda</label>
-                <select
-                  value={formData.crypto_symbol}
-                  onChange={(e) => setFormData({ ...formData, crypto_symbol: e.target.value })}
-                  className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                  required
-                >
-                  {CRYPTOS.map((crypto) => (
-                    <option key={crypto.symbol} value={crypto.symbol}>
-                      {crypto.name} ({crypto.symbol})
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SearchableDropdown
+                label="Criptomoneda"
+                options={CRYPTOS.map(crypto => ({
+                  value: crypto.symbol,
+                  label: `${crypto.name} (${crypto.symbol})`,
+                  icon: CRYPTO_ICONS[crypto.symbol],
+                }))}
+                value={formData.crypto_symbol}
+                onChange={(value) => setFormData({ ...formData, crypto_symbol: value })}
+                placeholder="Seleccionar criptomoneda"
+              />
 
-              <div>
-                <label className="block text-sm text-[#8B92A8] mb-2">Red / Blockchain</label>
-                <select
-                  value={formData.network}
-                  onChange={(e) => setFormData({ ...formData, network: e.target.value })}
-                  className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                  required
-                >
-                  {NETWORKS.map((network) => (
-                    <option key={network} value={network}>
-                      {network}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <SearchableDropdown
+                label="Red / Blockchain"
+                options={NETWORKS}
+                value={formData.network}
+                onChange={(value) => setFormData({ ...formData, network: value })}
+                placeholder="Seleccionar red"
+              />
 
               <div>
                 <label className="block text-sm text-[#8B92A8] mb-2">Dirección Pública</label>
