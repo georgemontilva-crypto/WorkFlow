@@ -110,6 +110,8 @@ export default function Markets() {
   const [loading, setLoading] = useState(true);
   const [selectedCrypto, setSelectedCrypto] = useState<string | null>(null);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   
   // Toast notifications
   const toast = useToast();
@@ -172,11 +174,37 @@ export default function Markets() {
     },
   });
 
-  // Fetch cryptocurrencies
+  // Fetch cryptocurrencies on mount
   useEffect(() => {
     fetchCryptos();
     fetchExchangeRates();
   }, []);
+
+  // Auto-refresh prices every 10 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshData();
+    }, 10000); // 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const refreshData = async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        fetchCryptos(),
+        fetchExchangeRates()
+      ]);
+      // Invalidate crypto queries to recalculate with new prices
+      await utils.crypto.invalidate();
+      setLastUpdate(new Date());
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const fetchCryptos = async () => {
     try {
@@ -186,9 +214,11 @@ export default function Markets() {
       const data = await response.json();
       setCryptos(data);
       setLoading(false);
+      return data;
     } catch (error) {
       console.error('Error fetching cryptos:', error);
       setLoading(false);
+      throw error;
     }
   };
 
@@ -308,9 +338,24 @@ export default function Markets() {
     <DashboardLayout>
       <div className="max-w-[1440px] mx-auto p-4 md:p-6 space-y-6 overflow-x-hidden">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">Mercados</h1>
-          <p className="text-sm md:text-base text-[#8B92A8] mt-1">Consulta de criptomonedas y herramientas de conversión</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-white">Mercados</h1>
+            <p className="text-sm md:text-base text-[#8B92A8] mt-1">Consulta de criptomonedas y herramientas de conversión</p>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-[#8B92A8]">
+            {isRefreshing ? (
+              <>
+                <div className="w-2 h-2 bg-[#C4FF3D] rounded-full animate-pulse"></div>
+                <span>Actualizando...</span>
+              </>
+            ) : (
+              <>
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span>Actualizado {lastUpdate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Desktop: Two Columns | Mobile: Stacked */}
@@ -318,8 +363,18 @@ export default function Markets() {
           {/* Left Column: Crypto List (2/3 width on desktop) */}
           <div className="lg:col-span-2">
             <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
-              <h2 className="text-lg md:text-xl font-bold text-white mb-4">Criptomonedas</h2>
-              <p className="text-sm text-[#8B92A8] mb-4">Precios en tiempo real • Binance</p>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-lg md:text-xl font-bold text-white">Criptomonedas</h2>
+                  <p className="text-sm text-[#8B92A8] mt-1">Actualización automática cada 10s</p>
+                </div>
+                {isRefreshing && (
+                  <div className="flex items-center gap-2 text-xs text-[#C4FF3D]">
+                    <div className="w-2 h-2 bg-[#C4FF3D] rounded-full animate-pulse"></div>
+                    <span>Actualizando precios...</span>
+                  </div>
+                )}
+              </div>
               
               {loading ? (
                 <div className="h-96 flex items-center justify-center text-[#8B92A8]">
