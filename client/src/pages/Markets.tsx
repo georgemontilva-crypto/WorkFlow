@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown, Plus, Trash2, Wallet, X } from 'lucide-react';
 import { trpc } from '../lib/trpc';
+import { InvestmentTracker } from '../components/InvestmentTracker';
 
 interface Crypto {
   id: string;
@@ -130,25 +131,24 @@ export default function Markets() {
 
   // tRPC queries and mutations
   const utils = trpc.useContext();
-  const { data: projectSummary, refetch: refetchSummary } = trpc.crypto.getProjectSummary.useQuery(
-    {
-      symbol: selectedCrypto || 'BTC',
-      currentPrice: cryptos.find(c => c.symbol.toUpperCase() === selectedCrypto)?.current_price || 0,
-    },
-    {
-      enabled: !!selectedCrypto && cryptos.length > 0,
-    }
-  );
-
-  const { data: projectData, refetch: refetchProject } = trpc.crypto.getProject.useQuery(
-    { id: projectSummary?.symbol ? 1 : 0 }, // We'll need to get the project ID properly
-    { enabled: false }
-  );
+  
+  // Get all user projects
+  const { data: allProjects, refetch: refetchProjects } = trpc.crypto.listProjects.useQuery();
+  
+  // Get summary for each project with current prices
+  const projectSummaries = allProjects?.map(project => {
+    const crypto = cryptos.find(c => c.symbol.toUpperCase() === project.symbol);
+    return {
+      project,
+      crypto,
+      currentPrice: crypto?.current_price || 0,
+    };
+  }) || [];
 
   const addPurchaseMutation = trpc.crypto.addPurchase.useMutation({
     onSuccess: () => {
       console.log('Purchase added successfully');
-      refetchSummary();
+      refetchProjects();
       setShowPurchaseModal(false);
       setPurchaseForm({ crypto: 'bitcoin', quantity: '', buyPrice: '', currency: 'USD' });
       alert('Compra registrada exitosamente');
@@ -161,8 +161,7 @@ export default function Markets() {
 
   const deletePurchaseMutation = trpc.crypto.deletePurchase.useMutation({
     onSuccess: () => {
-      refetchSummary();
-      refetchProject();
+      refetchProjects();
     },
   });
 
@@ -374,48 +373,7 @@ export default function Markets() {
             </button>
           </div>
 
-          {selectedCrypto && projectSummary ? (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Cantidad Total</div>
-                  <div className="text-xl font-bold text-white">
-                    {projectSummary.totalQuantity.toFixed(8)}
-                  </div>
-                </div>
-                
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Inversión Total</div>
-                  <div className="text-xl font-bold text-white">
-                    ${projectSummary.totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </div>
-                </div>
-                
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Valor Actual</div>
-                  <div className="text-xl font-bold text-white">
-                    ${projectSummary.currentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </div>
-                </div>
-                
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Ganancia/Pérdida</div>
-                  <div className={`text-xl font-bold ${projectSummary.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    ${projectSummary.profitLoss.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    <span className="text-sm ml-2">
-                      ({projectSummary.profitLossPercentage.toFixed(2)}%)
-                    </span>
-                  </div>
-                </div>
-              </div>
-          ) : selectedCrypto ? (
-            <div className="text-center py-8 text-[#8B92A8]">
-              No tienes compras registradas para {selectedCrypto}. Haz clic en "Registrar Compra" para comenzar.
-            </div>
-          ) : (
-            <div className="text-center py-8 text-[#8B92A8]">
-              Selecciona una criptomoneda para ver tu seguimiento de inversión.
-            </div>
-          )}
+          <InvestmentTracker projectSummaries={projectSummaries} />
             </div>
           </div>
 
