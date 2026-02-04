@@ -418,7 +418,7 @@ export default function Markets() {
             </div>
 
             {/* Investment Tracking Section */}
-            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6 mt-6 flex flex-col h-[calc(100vh-400px)] min-h-[800px]">
+            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6 mt-6 flex flex-col" style={{ height: '580px' }}>
           <div className="flex items-center justify-between mb-6 flex-shrink-0">
             <div className="flex items-center gap-2">
               <Wallet className="w-5 h-5 text-[#C4FF3D]" />
