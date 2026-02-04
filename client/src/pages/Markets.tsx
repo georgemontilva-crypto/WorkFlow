@@ -8,6 +8,8 @@ import { DashboardLayout } from '../components/DashboardLayout';
 import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown, Plus, Trash2, Wallet, X } from 'lucide-react';
 import { trpc } from '../lib/trpc';
 import { InvestmentTracker } from '../components/InvestmentTracker';
+import Toast from '../components/Toast';
+import { useToast } from '../hooks/useToast';
 
 interface Crypto {
   id: string;
@@ -108,6 +110,9 @@ export default function Markets() {
   const [loading, setLoading] = useState(true);
   const [selectedCrypto, setSelectedCrypto] = useState<string | null>(null);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  
+  // Toast notifications
+  const toast = useToast();
 
   // Currency Converter State
   const [converterAmount, setConverterAmount] = useState<string>('1');
@@ -151,11 +156,11 @@ export default function Markets() {
       refetchProjects();
       setShowPurchaseModal(false);
       setPurchaseForm({ crypto: 'bitcoin', quantity: '', buyPrice: '', currency: 'USD' });
-      alert('Compra registrada exitosamente');
+      toast.success('Compra registrada exitosamente');
     },
     onError: (error) => {
       console.error('Error adding purchase:', error);
-      alert(`Error al registrar la compra: ${error.message}`);
+      toast.error(`Error al registrar la compra: ${error.message}`);
     },
   });
 
@@ -231,7 +236,7 @@ export default function Markets() {
     // Validate that fields are not empty
     if (!purchaseForm.crypto || !purchaseForm.quantity || !purchaseForm.buyPrice) {
       console.log('Validation failed: empty fields');
-      alert('Por favor completa todos los campos');
+      toast.warning('Por favor completa todos los campos');
       return;
     }
     
@@ -243,7 +248,7 @@ export default function Markets() {
     // Validate that values are valid numbers and positive
     if (isNaN(quantity) || isNaN(buyPrice) || quantity <= 0 || buyPrice <= 0) {
       console.log('Validation failed: invalid numbers');
-      alert('Por favor ingresa valores válidos (números positivos)');
+      toast.warning('Por favor ingresa valores válidos (números positivos)');
       return;
     }
 
@@ -253,7 +258,7 @@ export default function Markets() {
     
     if (!selectedCryptoData) {
       console.log('Validation failed: invalid crypto');
-      alert('Por favor selecciona una criptomoneda válida');
+      toast.warning('Por favor selecciona una criptomoneda válida');
       return;
     }
 
@@ -590,6 +595,16 @@ export default function Markets() {
             </div>
           </div>
         )}
+
+        {/* Toast Notifications */}
+        {toast.toasts.map((t) => (
+          <Toast
+            key={t.id}
+            message={t.message}
+            type={t.type}
+            onClose={() => toast.removeToast(t.id)}
+          />
+        ))}
       </div>
     </DashboardLayout>
   );
