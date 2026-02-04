@@ -250,48 +250,97 @@ function ProjectCard({ project, crypto, currentPrice, isExpanded, onToggle, onSu
       {/* Project Header */}
       <button
         onClick={onToggle}
-        className="w-full p-4 flex items-center justify-between hover:bg-[rgba(255,255,255,0.02)] transition-colors"
+        className="w-full p-4 hover:bg-[rgba(255,255,255,0.02)] transition-colors"
       >
-        <div className="flex items-center gap-3">
-          {crypto?.image && (
-            <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />
-          )}
-          <div className="text-left">
-            <div className="font-bold text-white">{crypto?.name || project.symbol}</div>
-            <div className="text-sm text-[#8B92A8]">{project.symbol}</div>
+        {/* Mobile Layout */}
+        <div className="md:hidden">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              {crypto?.image && (
+                <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />
+              )}
+              <div className="text-left">
+                <div className="font-bold text-white text-sm">{crypto?.name || project.symbol}</div>
+                <div className="text-xs text-[#8B92A8]">{project.symbol}</div>
+              </div>
+            </div>
+            {isExpanded ? (
+              <ChevronUp className="w-4 h-4 text-[#8B92A8] flex-shrink-0" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-[#8B92A8] flex-shrink-0" />
+            )}
+          </div>
+          
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <div>
+              <div className="text-[#8B92A8] mb-1">Inversión</div>
+              <div className="font-medium text-white truncate">
+                ${summary.totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-[#8B92A8] mb-1">Valor Actual</div>
+              <div className="font-medium text-white truncate">
+                ${summary.currentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-[#8B92A8] mb-1">Ganancia/Pérdida</div>
+              <div className={`font-bold truncate ${summary.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {summary.profitLoss >= 0 ? '+' : ''}${Math.abs(summary.profitLoss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <div className="text-[10px] mt-0.5">
+                  ({summary.profitLossPercentage.toFixed(2)}%)
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="text-right">
-            <div className="text-sm text-[#8B92A8]">Inversión</div>
-            <div className="font-medium text-white">
-              ${summary.totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        {/* Desktop Layout */}
+        <div className="hidden md:flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {crypto?.image && (
+              <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />
+            )}
+            <div className="text-left">
+              <div className="font-bold text-white">{crypto?.name || project.symbol}</div>
+              <div className="text-sm text-[#8B92A8]">{project.symbol}</div>
             </div>
           </div>
 
-          <div className="text-right">
-            <div className="text-sm text-[#8B92A8]">Valor Actual</div>
-            <div className="font-medium text-white">
-              ${summary.currentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <div className="flex items-center gap-6">
+            <div className="text-right">
+              <div className="text-sm text-[#8B92A8]">Inversión</div>
+              <div className="font-medium text-white">
+                ${summary.totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
             </div>
-          </div>
 
-          <div className="text-right min-w-[120px]">
-            <div className="text-sm text-[#8B92A8]">Ganancia/Pérdida</div>
-            <div className={`font-bold ${summary.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {summary.profitLoss >= 0 ? '+' : '-'}${Math.abs(summary.profitLoss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              <span className="text-sm ml-1">
-                ({summary.profitLossPercentage.toFixed(2)}%)
-              </span>
+            <div className="text-right">
+              <div className="text-sm text-[#8B92A8]">Valor Actual</div>
+              <div className="font-medium text-white">
+                ${summary.currentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
             </div>
-          </div>
 
-          {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-[#8B92A8]" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-[#8B92A8]" />
-          )}
+            <div className="text-right min-w-[120px]">
+              <div className="text-sm text-[#8B92A8]">Ganancia/Pérdida</div>
+              <div className={`font-bold ${summary.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {summary.profitLoss >= 0 ? '+' : '-'}${Math.abs(summary.profitLoss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <span className="text-sm ml-1">
+                  ({summary.profitLossPercentage.toFixed(2)}%)
+                </span>
+              </div>
+            </div>
+
+            {isExpanded ? (
+              <ChevronUp className="w-5 h-5 text-[#8B92A8]" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-[#8B92A8]" />
+            )}
+          </div>
         </div>
       </button>
 
