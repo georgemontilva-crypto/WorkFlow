@@ -69,9 +69,13 @@ export default function SearchableDropdown({
         onClick={() => setIsOpen(!isOpen)}
         className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40 flex items-center justify-between hover:border-[rgba(255,255,255,0.1)] transition-colors"
       >
-        <span className="flex items-center gap-2 truncate">
+        <span className="flex items-center gap-3 truncate">
           {selectedOption?.icon && (
-            <span className="text-lg">{selectedOption.icon}</span>
+            <img
+              src={selectedOption.icon}
+              alt={selectedOption.value}
+              className="w-6 h-6 object-contain rounded-full"
+            />
           )}
           <span>{selectedOption?.label || placeholder}</span>
         </span>
@@ -114,7 +118,11 @@ export default function SearchableDropdown({
                   }`}
                 >
                   {option.icon && (
-                    <span className="text-lg flex-shrink-0">{option.icon}</span>
+                    <img
+                      src={option.icon}
+                      alt={option.value}
+                      className="w-6 h-6 object-contain rounded-full flex-shrink-0"
+                    />
                   )}
                   <span className="truncate">{option.label}</span>
                 </button>

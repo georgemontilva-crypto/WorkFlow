@@ -79,39 +79,95 @@ export function InvestmentTracker({ projectSummaries }: InvestmentTrackerProps) 
   const totalProfitLoss = totalCurrentValue - totalInvestment;
   const totalProfitLossPercentage = totalInvestment > 0 ? (totalProfitLoss / totalInvestment) * 100 : 0;
 
+  const [activeSlide, setActiveSlide] = useState(0);
+  const summaryCards = [
+    {
+      label: 'Proyectos Activos',
+      value: summaries.size.toString(),
+      color: 'text-white'
+    },
+    {
+      label: 'Inversión Total',
+      value: `$${totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      color: 'text-white'
+    },
+    {
+      label: 'Valor Actual',
+      value: `$${totalCurrentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      color: 'text-white'
+    },
+    {
+      label: 'Ganancia/Pérdida Total',
+      value: `$${Math.abs(totalProfitLoss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      subValue: `(${totalProfitLossPercentage.toFixed(2)}%)`,
+      color: totalProfitLoss >= 0 ? 'text-green-500' : 'text-red-500'
+    }
+  ];
+
   return (
     <div className="space-y-6">
       {/* Global Summary */}
       {summaries.size > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-            <div className="text-sm text-[#8B92A8] mb-1">Proyectos Activos</div>
-            <div className="text-xl font-bold text-white">
-              {summaries.size}
-            </div>
+        <div>
+          {/* Desktop: Grid */}
+          <div className="hidden md:grid md:grid-cols-4 gap-4">
+            {summaryCards.map((card, index) => (
+              <div key={index} className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
+                <div className="text-sm text-[#8B92A8] mb-1">{card.label}</div>
+                <div className={`text-xl font-bold ${card.color}`}>
+                  {card.value}
+                  {card.subValue && <span className="text-sm ml-2">{card.subValue}</span>}
+                </div>
+              </div>
+            ))}
           </div>
-          
-          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-            <div className="text-sm text-[#8B92A8] mb-1">Inversión Total</div>
-            <div className="text-xl font-bold text-white">
-              ${totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+
+          {/* Mobile: Horizontal Scroll with Dots */}
+          <div className="md:hidden">
+            <div 
+              className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
+              onScroll={(e) => {
+                const scrollLeft = e.currentTarget.scrollLeft;
+                const cardWidth = e.currentTarget.offsetWidth;
+                const newSlide = Math.round(scrollLeft / cardWidth);
+                setActiveSlide(newSlide);
+              }}
+            >
+              {summaryCards.map((card, index) => (
+                <div 
+                  key={index} 
+                  className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4 min-w-[85%] snap-center flex-shrink-0"
+                >
+                  <div className="text-sm text-[#8B92A8] mb-1">{card.label}</div>
+                  <div className={`text-xl font-bold ${card.color}`}>
+                    {card.value}
+                    {card.subValue && <span className="text-sm ml-2">{card.subValue}</span>}
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-          
-          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-            <div className="text-sm text-[#8B92A8] mb-1">Valor Actual</div>
-            <div className="text-xl font-bold text-white">
-              ${totalCurrentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </div>
-          </div>
-          
-          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-            <div className="text-sm text-[#8B92A8] mb-1">Ganancia/Pérdida Total</div>
-            <div className={`text-xl font-bold ${totalProfitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              ${Math.abs(totalProfitLoss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              <span className="text-sm ml-2">
-                ({totalProfitLossPercentage.toFixed(2)}%)
-              </span>
+            
+            {/* Dots Indicator */}
+            <div className="flex items-center justify-center gap-2 mt-2">
+              {summaryCards.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    const container = document.querySelector('.overflow-x-auto');
+                    if (container) {
+                      container.scrollTo({
+                        left: index * container.clientWidth,
+                        behavior: 'smooth'
+                      });
+                    }
+                  }}
+                  className={`h-2 rounded-full transition-all ${
+                    index === activeSlide 
+                      ? 'w-6 bg-[#C4FF3D]' 
+                      : 'w-2 bg-[rgba(255,255,255,0.2)]'
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </div>

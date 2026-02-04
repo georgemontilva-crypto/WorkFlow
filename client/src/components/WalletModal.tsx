@@ -8,58 +8,58 @@ interface WalletModalProps {
   onClose: () => void;
 }
 
-// Crypto icons mapping (using symbols as fallback)
-const CRYPTO_ICONS: Record<string, string> = {
-  BTC: '₿',
-  ETH: 'Ξ',
-  USDT: '₮',
-  BNB: 'BNB',
-  XRP: 'XRP',
-  ADA: 'ADA',
-  DOGE: 'Ð',
-  SOL: 'SOL',
-  DOT: 'DOT',
-  MATIC: 'MATIC',
-  TRX: 'TRX',
-  USDC: 'USDC',
-  LTC: 'Ł',
-  LINK: 'LINK',
-  AVAX: 'AVAX',
-  ATOM: 'ATOM',
-  UNI: 'UNI',
-  XLM: 'XLM',
-  BCH: 'BCH',
-  ALGO: 'ALGO',
-  VET: 'VET',
-  FIL: 'FIL',
-  ICP: 'ICP',
-  APT: 'APT',
-  NEAR: 'NEAR',
-  HBAR: 'HBAR',
-  QNT: 'QNT',
-  ARB: 'ARB',
-  OP: 'OP',
-  IMX: 'IMX',
-  SAND: 'SAND',
-  MANA: 'MANA',
-  AXS: 'AXS',
-  THETA: 'THETA',
-  FTM: 'FTM',
-  EOS: 'EOS',
-  AAVE: 'AAVE',
-  GRT: 'GRT',
-  XTZ: 'XTZ',
-  FLOW: 'FLOW',
-  CHZ: 'CHZ',
-  EGLD: 'EGLD',
-  KLAY: 'KLAY',
-  RUNE: 'RUNE',
-  ZEC: 'ZEC',
-  DASH: 'DASH',
-  XMR: 'XMR',
-  CAKE: 'CAKE',
-  CRV: 'CRV',
-  SUSHI: 'SUSHI',
+// Crypto logo URLs from CoinGecko CDN
+const CRYPTO_LOGOS: Record<string, string> = {
+  BTC: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png',
+  ETH: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png',
+  USDT: 'https://assets.coingecko.com/coins/images/325/small/Tether.png',
+  BNB: 'https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png',
+  XRP: 'https://assets.coingecko.com/coins/images/44/small/xrp-symbol-white-128.png',
+  ADA: 'https://assets.coingecko.com/coins/images/975/small/cardano.png',
+  DOGE: 'https://assets.coingecko.com/coins/images/5/small/dogecoin.png',
+  SOL: 'https://assets.coingecko.com/coins/images/4128/small/solana.png',
+  DOT: 'https://assets.coingecko.com/coins/images/12171/small/polkadot.png',
+  MATIC: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png',
+  TRX: 'https://assets.coingecko.com/coins/images/1094/small/tron-logo.png',
+  USDC: 'https://assets.coingecko.com/coins/images/6319/small/USD_Coin_icon.png',
+  LTC: 'https://assets.coingecko.com/coins/images/2/small/litecoin.png',
+  LINK: 'https://assets.coingecko.com/coins/images/877/small/chainlink-new-logo.png',
+  AVAX: 'https://assets.coingecko.com/coins/images/12559/small/Avalanche_Circle_RedWhite_Trans.png',
+  ATOM: 'https://assets.coingecko.com/coins/images/1481/small/cosmos_hub.png',
+  UNI: 'https://assets.coingecko.com/coins/images/12504/small/uni.jpg',
+  XLM: 'https://assets.coingecko.com/coins/images/100/small/Stellar_symbol_black_RGB.png',
+  BCH: 'https://assets.coingecko.com/coins/images/780/small/bitcoin-cash-circle.png',
+  ALGO: 'https://assets.coingecko.com/coins/images/4380/small/download.png',
+  VET: 'https://assets.coingecko.com/coins/images/1167/small/VeChain-Logo-768x725.png',
+  FIL: 'https://assets.coingecko.com/coins/images/12817/small/filecoin.png',
+  ICP: 'https://assets.coingecko.com/coins/images/14495/small/Internet_Computer_logo.png',
+  APT: 'https://assets.coingecko.com/coins/images/26455/small/aptos_round.png',
+  NEAR: 'https://assets.coingecko.com/coins/images/10365/small/near.jpg',
+  HBAR: 'https://assets.coingecko.com/coins/images/3688/small/hbar.png',
+  QNT: 'https://assets.coingecko.com/coins/images/3370/small/5ZOu7brX_400x400.jpg',
+  ARB: 'https://assets.coingecko.com/coins/images/16547/small/photo_2023-03-29_21.47.00.jpeg',
+  OP: 'https://assets.coingecko.com/coins/images/25244/small/Optimism.png',
+  IMX: 'https://assets.coingecko.com/coins/images/17233/small/immutableX-symbol-BLK-RGB.png',
+  SAND: 'https://assets.coingecko.com/coins/images/12129/small/sandbox_logo.jpg',
+  MANA: 'https://assets.coingecko.com/coins/images/878/small/decentraland-mana.png',
+  AXS: 'https://assets.coingecko.com/coins/images/13029/small/axie_infinity_logo.png',
+  THETA: 'https://assets.coingecko.com/coins/images/2538/small/theta-token-logo.png',
+  FTM: 'https://assets.coingecko.com/coins/images/4001/small/Fantom_round.png',
+  EOS: 'https://assets.coingecko.com/coins/images/738/small/eos-eos-logo.png',
+  AAVE: 'https://assets.coingecko.com/coins/images/12645/small/AAVE.png',
+  GRT: 'https://assets.coingecko.com/coins/images/13397/small/Graph_Token.png',
+  XTZ: 'https://assets.coingecko.com/coins/images/976/small/Tezos-logo.png',
+  FLOW: 'https://assets.coingecko.com/coins/images/13446/small/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.png',
+  CHZ: 'https://assets.coingecko.com/coins/images/8834/small/Chiliz.png',
+  EGLD: 'https://assets.coingecko.com/coins/images/12335/small/egld-token-logo.png',
+  KLAY: 'https://assets.coingecko.com/coins/images/9672/small/klaytn.png',
+  RUNE: 'https://assets.coingecko.com/coins/images/6595/small/thorchain.png',
+  ZEC: 'https://assets.coingecko.com/coins/images/486/small/circle-zcash-color.png',
+  DASH: 'https://assets.coingecko.com/coins/images/19/small/dash-logo.png',
+  XMR: 'https://assets.coingecko.com/coins/images/69/small/monero_logo.png',
+  CAKE: 'https://assets.coingecko.com/coins/images/12632/small/pancakeswap-cake-logo.png',
+  CRV: 'https://assets.coingecko.com/coins/images/12124/small/Curve.png',
+  SUSHI: 'https://assets.coingecko.com/coins/images/12271/small/512x512_Logo_no_chop.png',
 };
 
 const NETWORKS = [
@@ -285,10 +285,18 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-[#C4FF3D]/10 rounded-full flex items-center justify-center">
-                        <span className="text-2xl font-bold text-[#C4FF3D]">
-                          {CRYPTO_ICONS[addr.crypto_symbol] || addr.crypto_symbol}
-                        </span>
+                      <div className="w-14 h-14 bg-[#C4FF3D]/10 rounded-full flex items-center justify-center p-2">
+                        {CRYPTO_LOGOS[addr.crypto_symbol] ? (
+                          <img
+                            src={CRYPTO_LOGOS[addr.crypto_symbol]}
+                            alt={addr.crypto_symbol}
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <span className="text-lg font-bold text-[#C4FF3D]">
+                            {addr.crypto_symbol}
+                          </span>
+                        )}
                       </div>
                       <div>
                         <h3 className="text-lg font-bold text-white">{addr.crypto_symbol}</h3>
@@ -368,7 +376,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
                 options={CRYPTOS.map(crypto => ({
                   value: crypto.symbol,
                   label: `${crypto.name} (${crypto.symbol})`,
-                  icon: CRYPTO_ICONS[crypto.symbol],
+                  icon: CRYPTO_LOGOS[crypto.symbol],
                 }))}
                 value={formData.crypto_symbol}
                 onChange={(value) => setFormData({ ...formData, crypto_symbol: value })}
