@@ -13,6 +13,7 @@ import { paymentsRouter } from "./routers_payments";
 import { transactionsRouter } from "./routers_transactions";
 import { translationRouter } from "./modules/translation";
 import { cryptoRouter } from "./routers_crypto";
+import { walletRouter } from "./routers_wallet";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -768,6 +769,12 @@ export const appRouter = router({
    * Manages crypto projects and purchases for portfolio analysis
    */
   crypto: cryptoRouter,
+  
+  /**
+   * Wallet Router - Cryptocurrency wallet addresses management
+   * Stores public addresses for reference only (NO private keys, NO custody)
+   */
+  wallet: walletRouter,
 });
 
 export type AppRouter = typeof appRouter;

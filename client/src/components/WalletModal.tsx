@@ -1,0 +1,378 @@
+import { useState } from 'react';
+import { X, Plus, Copy, Edit2, Trash2, Check, Wallet2 } from 'lucide-react';
+import { trpc } from '../lib/trpc';
+
+interface WalletModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+// Crypto icons mapping (using symbols as fallback)
+const CRYPTO_ICONS: Record<string, string> = {
+  BTC: '₿',
+  ETH: 'Ξ',
+  USDT: '₮',
+  BNB: 'BNB',
+  XRP: 'XRP',
+  ADA: 'ADA',
+  DOGE: 'Ð',
+  SOL: 'SOL',
+  DOT: 'DOT',
+  MATIC: 'MATIC',
+  TRX: 'TRX',
+  USDC: 'USDC',
+};
+
+const NETWORKS = [
+  'Bitcoin',
+  'ERC20 (Ethereum)',
+  'TRC20 (Tron)',
+  'BEP20 (BSC)',
+  'Polygon',
+  'Solana',
+  'Cardano',
+  'Ripple',
+];
+
+const CRYPTOS = [
+  { symbol: 'BTC', name: 'Bitcoin' },
+  { symbol: 'ETH', name: 'Ethereum' },
+  { symbol: 'USDT', name: 'Tether' },
+  { symbol: 'BNB', name: 'Binance Coin' },
+  { symbol: 'XRP', name: 'Ripple' },
+  { symbol: 'ADA', name: 'Cardano' },
+  { symbol: 'DOGE', name: 'Dogecoin' },
+  { symbol: 'SOL', name: 'Solana' },
+  { symbol: 'DOT', name: 'Polkadot' },
+  { symbol: 'MATIC', name: 'Polygon' },
+  { symbol: 'TRX', name: 'Tron' },
+  { symbol: 'USDC', name: 'USD Coin' },
+];
+
+export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+
+  const [formData, setFormData] = useState({
+    crypto_symbol: 'BTC',
+    network: 'Bitcoin',
+    address: '',
+    alias: '',
+    note: '',
+  });
+
+  const utils = trpc.useContext();
+  const { data: addresses = [] } = trpc.wallet.listAddresses.useQuery();
+
+  const addMutation = trpc.wallet.addAddress.useMutation({
+    onSuccess: async () => {
+      await utils.wallet.invalidate();
+      setShowAddForm(false);
+      resetForm();
+    },
+  });
+
+  const updateMutation = trpc.wallet.updateAddress.useMutation({
+    onSuccess: async () => {
+      await utils.wallet.invalidate();
+      setEditingId(null);
+      resetForm();
+    },
+  });
+
+  const deleteMutation = trpc.wallet.deleteAddress.useMutation({
+    onSuccess: async () => {
+      await utils.wallet.invalidate();
+      setDeleteConfirmId(null);
+    },
+  });
+
+  const resetForm = () => {
+    setFormData({
+      crypto_symbol: 'BTC',
+      network: 'Bitcoin',
+      address: '',
+      alias: '',
+      note: '',
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (editingId) {
+      updateMutation.mutate({ id: editingId, ...formData });
+    } else {
+      addMutation.mutate(formData);
+    }
+  };
+
+  const handleEdit = (address: any) => {
+    setFormData({
+      crypto_symbol: address.crypto_symbol,
+      network: address.network,
+      address: address.address,
+      alias: address.alias || '',
+      note: address.note || '',
+    });
+    setEditingId(address.id);
+    setShowAddForm(true);
+  };
+
+  const handleCopy = (address: string, id: number) => {
+    navigator.clipboard.writeText(address);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const maskAddress = (address: string) => {
+    if (address.length <= 12) return address;
+    return `${address.slice(0, 6)}...${address.slice(-6)}`;
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+      <div className="bg-[#121212] border border-[rgba(255,255,255,0.1)] rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-[rgba(255,255,255,0.06)]">
+          <div className="flex items-center gap-3">
+            <Wallet2 className="w-6 h-6 text-[#C4FF3D]" />
+            <h2 className="text-2xl font-bold text-white">Wallet de Direcciones</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-[#8B92A8] hover:text-white transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Disclaimer */}
+        <div className="px-6 pt-4">
+          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl p-4">
+            <p className="text-xs text-[#8B92A8] text-center">
+              <strong className="text-[#C4FF3D]">Aviso:</strong> Finwrk no custodia fondos ni llaves privadas.
+              Estas direcciones son solo informativas.
+            </p>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {!showAddForm && addresses.length === 0 && (
+            <div className="text-center py-12">
+              <Wallet2 className="w-16 h-16 text-[#8B92A8] mx-auto mb-4" />
+              <p className="text-[#8B92A8] mb-6">No tienes direcciones guardadas</p>
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="inline-flex items-center gap-2 bg-transparent border-2 border-[#C4FF3D] text-[#C4FF3D] px-6 py-3 rounded-xl hover:bg-[#C4FF3D]/10 transition-colors font-medium"
+              >
+                <Plus className="w-5 h-5" />
+                Añadir Primera Dirección
+              </button>
+            </div>
+          )}
+
+          {!showAddForm && addresses.length > 0 && (
+            <div className="space-y-4">
+              {addresses.map((addr) => (
+                <div
+                  key={addr.id}
+                  className="bg-gradient-to-br from-[#1a1a1a] to-[#0A0A0A] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 hover:border-[#C4FF3D]/30 transition-all"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-[#C4FF3D]/10 rounded-full flex items-center justify-center">
+                        <span className="text-2xl font-bold text-[#C4FF3D]">
+                          {CRYPTO_ICONS[addr.crypto_symbol] || addr.crypto_symbol}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-white">{addr.crypto_symbol}</h3>
+                        <p className="text-sm text-[#8B92A8]">{addr.network}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleCopy(addr.address, addr.id)}
+                        className="p-2 text-[#8B92A8] hover:text-[#C4FF3D] transition-colors"
+                        title="Copiar dirección"
+                      >
+                        {copiedId === addr.id ? (
+                          <Check className="w-4 h-4 text-green-500" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => handleEdit(addr)}
+                        className="p-2 text-[#8B92A8] hover:text-[#C4FF3D] transition-colors"
+                        title="Editar"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      {deleteConfirmId === addr.id ? (
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => deleteMutation.mutate({ id: addr.id })}
+                            className="px-3 py-1 text-xs bg-red-500 text-white rounded-lg hover:bg-red-600"
+                          >
+                            Confirmar
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirmId(null)}
+                            className="px-3 py-1 text-xs bg-[#8B92A8] text-white rounded-lg hover:bg-[#8B92A8]/80"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setDeleteConfirmId(addr.id)}
+                          className="p-2 text-[#8B92A8] hover:text-red-500 transition-colors"
+                          title="Eliminar"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl p-4 mb-3">
+                    <p className="text-xs text-[#8B92A8] mb-1">Dirección</p>
+                    <p className="text-sm font-mono text-white break-all">{maskAddress(addr.address)}</p>
+                  </div>
+
+                  {addr.alias && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs text-[#8B92A8]">Alias:</span>
+                      <span className="text-sm text-white font-medium">{addr.alias}</span>
+                    </div>
+                  )}
+
+                  {addr.note && (
+                    <p className="text-xs text-[#8B92A8] mt-2">{addr.note}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {showAddForm && (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2">Criptomoneda</label>
+                <select
+                  value={formData.crypto_symbol}
+                  onChange={(e) => setFormData({ ...formData, crypto_symbol: e.target.value })}
+                  className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40"
+                  required
+                >
+                  {CRYPTOS.map((crypto) => (
+                    <option key={crypto.symbol} value={crypto.symbol}>
+                      {crypto.name} ({crypto.symbol})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2">Red / Blockchain</label>
+                <select
+                  value={formData.network}
+                  onChange={(e) => setFormData({ ...formData, network: e.target.value })}
+                  className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40"
+                  required
+                >
+                  {NETWORKS.map((network) => (
+                    <option key={network} value={network}>
+                      {network}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2">Dirección Pública</label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white font-mono text-sm focus:outline-none focus:border-[#C4FF3D]/40"
+                  placeholder="0x..."
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2">Alias (opcional)</label>
+                <input
+                  type="text"
+                  value={formData.alias}
+                  onChange={(e) => setFormData({ ...formData, alias: e.target.value })}
+                  className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40"
+                  placeholder="Ej: Binance, Personal, Cliente"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2">Nota (opcional)</label>
+                <textarea
+                  value={formData.note}
+                  onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                  className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40 resize-none"
+                  rows={3}
+                  placeholder="Información adicional..."
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={addMutation.isPending || updateMutation.isPending}
+                  className="flex-1 bg-[#C4FF3D] text-black px-6 py-3 rounded-xl hover:bg-[#C4FF3D]/90 transition-colors font-medium disabled:opacity-50"
+                >
+                  {editingId ? 'Actualizar' : 'Guardar'} Dirección
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddForm(false);
+                    setEditingId(null);
+                    resetForm();
+                  }}
+                  className="px-6 py-3 border-2 border-[#8B92A8] text-[#8B92A8] rounded-xl hover:bg-[#8B92A8]/10 transition-colors font-medium"
+                >
+                  Cancelar
+                </button>
+              </div>
+
+              {(addMutation.isError || updateMutation.isError) && (
+                <p className="text-red-500 text-sm text-center">
+                  {addMutation.error?.message || updateMutation.error?.message}
+                </p>
+              )}
+            </form>
+          )}
+        </div>
+
+        {/* Footer with Add Button */}
+        {!showAddForm && addresses.length > 0 && (
+          <div className="p-6 border-t border-[rgba(255,255,255,0.06)]">
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="w-full flex items-center justify-center gap-2 bg-transparent border-2 border-[#C4FF3D] text-[#C4FF3D] px-6 py-3 rounded-xl hover:bg-[#C4FF3D]/10 transition-colors font-medium"
+            >
+              <Plus className="w-5 h-5" />
+              Añadir Nueva Dirección
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

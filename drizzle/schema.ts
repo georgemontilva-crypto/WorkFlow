@@ -509,3 +509,31 @@ export const cryptoPurchases = mysqlTable("crypto_purchases", {
 
 export type CryptoPurchase = typeof cryptoPurchases.$inferSelect;
 export type InsertCryptoPurchase = typeof cryptoPurchases.$inferInsert;
+
+/**
+ * Crypto Wallet Addresses table - stores user's cryptocurrency wallet addresses
+ * This is NOT a real wallet - only stores public addresses for reference
+ * NO private keys, NO custody, NO transactions
+ */
+export const cryptoWalletAddresses = mysqlTable("crypto_wallet_addresses", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull(),
+  /** Cryptocurrency symbol (BTC, ETH, USDT, etc.) */
+  crypto_symbol: varchar("crypto_symbol", { length: 20 }).notNull(),
+  /** Network/Chain (ERC20, TRC20, BEP20, Bitcoin, etc.) */
+  network: varchar("network", { length: 50 }).notNull(),
+  /** Public wallet address */
+  address: varchar("address", { length: 255 }).notNull(),
+  /** Optional alias/label (e.g., "Binance", "Personal", "Cliente") */
+  alias: varchar("alias", { length: 100 }),
+  /** Optional note */
+  note: text("note"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  userIdx: index("idx_user").on(table.user_id),
+  userCryptoIdx: index("idx_user_crypto").on(table.user_id, table.crypto_symbol),
+}));
+
+export type CryptoWalletAddress = typeof cryptoWalletAddresses.$inferSelect;
+export type InsertCryptoWalletAddress = typeof cryptoWalletAddresses.$inferInsert;
