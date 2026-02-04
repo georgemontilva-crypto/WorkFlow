@@ -1,4 +1,4 @@
-import { mysqlTable, serial, varchar, text, mediumtext, int, bigint, timestamp, decimal, mysqlEnum, boolean } from "drizzle-orm/mysql-core";
+import { mysqlTable, serial, varchar, text, mediumtext, int, bigint, timestamp, decimal, mysqlEnum, boolean, index } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -471,3 +471,41 @@ export const notifications = mysqlTable("notifications", {
 
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = typeof notifications.$inferInsert;
+
+/**
+ * Crypto Projects table - stores user's cryptocurrency investment projects
+ * Each project represents a cryptocurrency that the user is tracking
+ */
+export const cryptoProjects = mysqlTable("crypto_projects", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull(),
+  /** Cryptocurrency symbol (BTC, ETH, XRP, etc.) */
+  symbol: varchar("symbol", { length: 20 }).notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  userSymbolIdx: index("idx_user_symbol").on(table.user_id, table.symbol),
+}));
+
+export type CryptoProject = typeof cryptoProjects.$inferSelect;
+export type InsertCryptoProject = typeof cryptoProjects.$inferInsert;
+
+/**
+ * Crypto Purchases table - stores individual cryptocurrency purchases
+ * Each purchase is linked to a crypto project
+ */
+export const cryptoPurchases = mysqlTable("crypto_purchases", {
+  id: serial("id").primaryKey(),
+  project_id: int("project_id").notNull(),
+  /** Quantity of cryptocurrency purchased */
+  quantity: decimal("quantity", { precision: 20, scale: 8 }).notNull(),
+  /** Price at which the cryptocurrency was bought */
+  buy_price: decimal("buy_price", { precision: 20, scale: 8 }).notNull(),
+  /** Currency used for the purchase (USD, EUR, etc.) */
+  currency: varchar("currency", { length: 3 }).notNull().default("USD"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  projectIdx: index("idx_project").on(table.project_id),
+}));
+
+export type CryptoPurchase = typeof cryptoPurchases.$inferSelect;
+export type InsertCryptoPurchase = typeof cryptoPurchases.$inferInsert;

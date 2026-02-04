@@ -1,13 +1,11 @@
 /**
- * Markets Page - Cryptocurrency Markets with Investment Tracking
- * Focused on cryptocurrencies with conversion, scenario calculators, and portfolio tracking
+ * Markets Page - Cryptocurrency Markets (Simplified)
+ * Focused ONLY on cryptocurrencies with conversion and scenario calculators
  */
 
 import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
-import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown, Plus, Trash2, Wallet, X } from 'lucide-react';
-import { trpc } from '../lib/trpc';
-import { InvestmentTracker } from '../components/InvestmentTracker';
+import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown } from 'lucide-react';
 
 interface Crypto {
   id: string;
@@ -22,15 +20,6 @@ interface Crypto {
 
 interface ExchangeRates {
   [key: string]: number;
-}
-
-interface CryptoPurchase {
-  id: number;
-  project_id: number;
-  quantity: string;
-  buy_price: string;
-  currency: string;
-  created_at: Date;
 }
 
 // Custom Dropdown Component
@@ -68,7 +57,7 @@ function CustomDropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[rgba(255,255,255,0.1)] flex items-center justify-between hover:border-[rgba(255,255,255,0.1)] transition-colors"
+        className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40 flex items-center justify-between hover:border-[rgba(255,255,255,0.1)] transition-colors"
       >
         <span className="truncate">{selectedOption?.label || placeholder}</span>
         <ChevronDown className={`w-4 h-4 flex-shrink-0 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -88,8 +77,8 @@ function CustomDropdown({
                   onChange(option.value);
                   setIsOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 hover:bg-[rgba(255,255,255,0.05)] transition-colors ${
-                  option.value === value ? 'bg-[rgba(255,255,255,0.05)] text-white' : 'text-[#8B92A8]'
+                className={`w-full text-left px-4 py-2.5 hover:bg-[#1A1A1A] transition-colors ${
+                  option.value === value ? 'bg-[#1A1A1A] text-[#C4FF3D]' : 'text-white'
                 }`}
               >
                 {option.label}
@@ -106,8 +95,6 @@ export default function Markets() {
   const [cryptos, setCryptos] = useState<Crypto[]>([]);
   const [exchangeRates, setExchangeRates] = useState<ExchangeRates>({});
   const [loading, setLoading] = useState(true);
-  const [selectedCrypto, setSelectedCrypto] = useState<string | null>(null);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
   // Currency Converter State
   const [converterAmount, setConverterAmount] = useState<string>('1');
@@ -119,50 +106,6 @@ export default function Markets() {
     buyPrice: '',
     quantity: '',
     targetPrice: '',
-  });
-
-  // Purchase Form State
-  const [purchaseForm, setPurchaseForm] = useState({
-    crypto: 'bitcoin',
-    quantity: '',
-    buyPrice: '',
-    currency: 'USD',
-  });
-
-  // tRPC queries and mutations
-  const utils = trpc.useContext();
-  
-  // Get all user projects
-  const { data: allProjects, refetch: refetchProjects } = trpc.crypto.listProjects.useQuery();
-  
-  // Get summary for each project with current prices
-  const projectSummaries = allProjects?.map(project => {
-    const crypto = cryptos.find(c => c.symbol.toUpperCase() === project.symbol);
-    return {
-      project,
-      crypto,
-      currentPrice: crypto?.current_price || 0,
-    };
-  }) || [];
-
-  const addPurchaseMutation = trpc.crypto.addPurchase.useMutation({
-    onSuccess: () => {
-      console.log('Purchase added successfully');
-      refetchProjects();
-      setShowPurchaseModal(false);
-      setPurchaseForm({ crypto: 'bitcoin', quantity: '', buyPrice: '', currency: 'USD' });
-      alert('Compra registrada exitosamente');
-    },
-    onError: (error) => {
-      console.error('Error adding purchase:', error);
-      alert(`Error al registrar la compra: ${error.message}`);
-    },
-  });
-
-  const deletePurchaseMutation = trpc.crypto.deletePurchase.useMutation({
-    onSuccess: () => {
-      refetchProjects();
-    },
   });
 
   // Fetch cryptocurrencies
@@ -225,53 +168,6 @@ export default function Markets() {
 
   const scenarioResults = calculateScenario();
 
-  const handleAddPurchase = () => {
-    console.log('handleAddPurchase called', purchaseForm);
-    
-    // Validate that fields are not empty
-    if (!purchaseForm.crypto || !purchaseForm.quantity || !purchaseForm.buyPrice) {
-      console.log('Validation failed: empty fields');
-      alert('Por favor completa todos los campos');
-      return;
-    }
-    
-    const quantity = parseFloat(purchaseForm.quantity);
-    const buyPrice = parseFloat(purchaseForm.buyPrice);
-
-    console.log('Parsed values:', { quantity, buyPrice });
-
-    // Validate that values are valid numbers and positive
-    if (isNaN(quantity) || isNaN(buyPrice) || quantity <= 0 || buyPrice <= 0) {
-      console.log('Validation failed: invalid numbers');
-      alert('Por favor ingresa valores válidos (números positivos)');
-      return;
-    }
-
-    // Get the symbol from the selected crypto
-    const selectedCryptoData = cryptos.find(c => c.id === purchaseForm.crypto);
-    console.log('Selected crypto data:', selectedCryptoData);
-    
-    if (!selectedCryptoData) {
-      console.log('Validation failed: invalid crypto');
-      alert('Por favor selecciona una criptomoneda válida');
-      return;
-    }
-
-    const mutationData = {
-      symbol: selectedCryptoData.symbol.toUpperCase(),
-      quantity,
-      buy_price: buyPrice,
-      currency: purchaseForm.currency,
-    };
-    
-    console.log('Calling mutation with:', mutationData);
-    addPurchaseMutation.mutate(mutationData);
-  };
-
-  const handleCryptoClick = (symbol: string) => {
-    setSelectedCrypto(symbol.toUpperCase());
-  };
-
   const currencies = [
     { code: 'COP', name: 'Peso Colombiano' },
     { code: 'MXN', name: 'Peso Mexicano' },
@@ -312,7 +208,6 @@ export default function Markets() {
           <div className="lg:col-span-2">
             <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
               <h2 className="text-lg md:text-xl font-bold text-white mb-4">Criptomonedas</h2>
-              <p className="text-sm text-[#8B92A8] mb-4">Precios en tiempo real • Binance</p>
               
               {loading ? (
                 <div className="h-96 flex items-center justify-center text-[#8B92A8]">
@@ -323,7 +218,7 @@ export default function Markets() {
                   {cryptos.map((crypto) => (
                     <div
                       key={crypto.id}
-                      className="flex items-center justify-between p-3 md:p-4 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl"
+                      className="flex items-center justify-between p-3 md:p-4 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl hover:border-[rgba(255,255,255,0.1)] transition-colors"
                     >
                       <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
                         <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full flex-shrink-0" />
@@ -353,27 +248,6 @@ export default function Markets() {
                   ))}
                 </div>
               )}
-            </div>
-
-            {/* Investment Tracking Section */}
-            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6 mt-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Wallet className="w-5 h-5 text-[#C4FF3D]" />
-              <h2 className="text-lg md:text-xl font-bold text-white">
-                Seguimiento de Inversión
-              </h2>
-            </div>
-            <button
-              onClick={() => setShowPurchaseModal(true)}
-              className="flex items-center gap-2 bg-[#C4FF3D] text-black px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/90 transition-colors font-medium whitespace-nowrap"
-            >
-              <Plus className="w-4 h-4" />
-              Registrar Compra
-            </button>
-          </div>
-
-          <InvestmentTracker projectSummaries={projectSummaries} />
             </div>
           </div>
 
@@ -507,89 +381,6 @@ export default function Markets() {
             </div>
           </div>
         </div>
-
-        {/* Purchase Modal */}
-        {showPurchaseModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-[#121212] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 max-w-md w-full">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-white">Registrar Compra</h3>
-                <button
-                  onClick={() => setShowPurchaseModal(false)}
-                  className="text-[#8B92A8] hover:text-white transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Criptomoneda</label>
-                  <CustomDropdown
-                    options={cryptoOptions}
-                    value={purchaseForm.crypto}
-                    onChange={(value) => setPurchaseForm({ ...purchaseForm, crypto: value })}
-                    placeholder="Seleccionar criptomoneda"
-                    maxHeight="400px"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Cantidad comprada</label>
-                  <input
-                    type="number"
-                    value={purchaseForm.quantity}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, quantity: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                    placeholder="0.00000000"
-                    step="0.00000001"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Precio de compra</label>
-                  <input
-                    type="number"
-                    value={purchaseForm.buyPrice}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, buyPrice: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                    placeholder="0.00"
-                    step="0.01"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Moneda</label>
-                  <select
-                    value={purchaseForm.currency}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, currency: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                  >
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="COP">COP</option>
-                  </select>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    onClick={() => setShowPurchaseModal(false)}
-                    className="flex-1 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] text-white px-4 py-2 rounded-lg hover:border-[rgba(255,255,255,0.1)] transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={handleAddPurchase}
-                    disabled={addPurchaseMutation.isLoading}
-                    className="flex-1 bg-[#C4FF3D] text-black px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/90 transition-colors font-medium disabled:opacity-50"
-                  >
-                    {addPurchaseMutation.isLoading ? 'Guardando...' : 'Guardar'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </DashboardLayout>
   );
