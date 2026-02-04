@@ -30,7 +30,14 @@ export default function Admin() {
   const [filterRole, setFilterRole] = useState<'all' | 'user' | 'admin' | 'super_admin'>('all');
 
   // Fetch all users
-  const { data: users, isLoading, refetch } = trpc.admin.getAllUsers.useQuery();
+  const { data: users, isLoading, refetch, error } = trpc.admin.getAllUsers.useQuery();
+  
+  // Debug
+  useEffect(() => {
+    console.log('Admin - users:', users);
+    console.log('Admin - isLoading:', isLoading);
+    console.log('Admin - error:', error);
+  }, [users, isLoading, error]);
   
   // Mutations
   const grantAccessMutation = trpc.admin.grantLifetimeAccess.useMutation({
