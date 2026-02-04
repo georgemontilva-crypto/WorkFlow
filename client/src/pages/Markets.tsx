@@ -361,8 +361,8 @@ export default function Markets() {
             </div>
 
             {/* Investment Tracking Section */}
-            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6 mt-6">
-          <div className="flex items-center justify-between mb-6">
+            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6 mt-6 flex flex-col" style={{ height: '600px' }}>
+          <div className="flex items-center justify-between mb-6 flex-shrink-0">
             <div className="flex items-center gap-2">
               <Wallet className="w-5 h-5 text-[#C4FF3D]" />
               <h2 className="text-lg md:text-xl font-bold text-white">
@@ -371,14 +371,16 @@ export default function Markets() {
             </div>
             <button
               onClick={() => setShowPurchaseModal(true)}
-              className="flex items-center gap-2 bg-[#C4FF3D] text-black px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/90 transition-colors font-medium whitespace-nowrap"
+              className="flex items-center gap-2 bg-transparent border-2 border-[#C4FF3D] text-[#C4FF3D] px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/10 transition-colors font-medium whitespace-nowrap"
             >
               <Plus className="w-4 h-4" />
               Registrar Compra
             </button>
           </div>
 
-          <InvestmentTracker projectSummaries={projectSummaries} />
+          <div className="flex-1 overflow-y-auto">
+            <InvestmentTracker projectSummaries={projectSummaries} />
+          </div>
             </div>
           </div>
 
