@@ -48,6 +48,7 @@ interface ProjectSummary {
 export function InvestmentTracker({ projectSummaries }: InvestmentTrackerProps) {
   const [expandedProjects, setExpandedProjects] = useState<Set<number>>(new Set());
   const [summaries, setSummaries] = useState<Map<string, ProjectSummary>>(new Map());
+  const [activeSlide, setActiveSlide] = useState(0);
 
   const toggleProject = (projectId: number) => {
     const newExpanded = new Set(expandedProjects);
@@ -79,7 +80,6 @@ export function InvestmentTracker({ projectSummaries }: InvestmentTrackerProps) 
   const totalProfitLoss = totalCurrentValue - totalInvestment;
   const totalProfitLossPercentage = totalInvestment > 0 ? (totalProfitLoss / totalInvestment) * 100 : 0;
 
-  const [activeSlide, setActiveSlide] = useState(0);
   const summaryCards = [
     {
       label: 'Proyectos Activos',
