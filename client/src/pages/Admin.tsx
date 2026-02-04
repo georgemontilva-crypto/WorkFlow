@@ -95,13 +95,13 @@ export default function Admin() {
     }
   };
 
-  // Show loading while checking authentication
-  if (loading || isLoading) {
+  // Show loading only for auth check
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-full min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground text-lg">Cargando panel de administración...</p>
+          <p className="text-muted-foreground text-lg">Verificando acceso...</p>
         </div>
       </div>
     );
@@ -142,8 +142,14 @@ export default function Admin() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold">{users?.length || 0}</div>
-              <p className="text-xs text-muted-foreground mt-2">Usuarios registrados</p>
+              {isLoading ? (
+                <div className="h-12 bg-muted animate-pulse rounded-md"></div>
+              ) : (
+                <>
+                  <div className="text-4xl font-bold">{users?.length || 0}</div>
+                  <p className="text-xs text-muted-foreground mt-2">Usuarios registrados</p>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -157,10 +163,16 @@ export default function Admin() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-green-600">
-                {users?.filter(u => u.has_lifetime_access === 1).length || 0}
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">Usuarios con acceso completo</p>
+              {isLoading ? (
+                <div className="h-12 bg-muted animate-pulse rounded-md"></div>
+              ) : (
+                <>
+                  <div className="text-4xl font-bold text-green-600">
+                    {users?.filter(u => u.has_lifetime_access === 1).length || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">Usuarios con acceso completo</p>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -174,10 +186,16 @@ export default function Admin() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-amber-600">
-                {users?.filter(u => u.has_lifetime_access === 0 && u.subscription_plan === 'free').length || 0}
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">Usuarios en plan gratuito</p>
+              {isLoading ? (
+                <div className="h-12 bg-muted animate-pulse rounded-md"></div>
+              ) : (
+                <>
+                  <div className="text-4xl font-bold text-amber-600">
+                    {users?.filter(u => u.has_lifetime_access === 0 && u.subscription_plan === 'free').length || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">Usuarios en plan gratuito</p>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -254,9 +272,17 @@ export default function Admin() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Mobile View - Cards */}
-            <div className="block lg:hidden space-y-4">
-              {filteredUsers?.map((user) => (
+            {isLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-32 bg-muted animate-pulse rounded-lg"></div>
+                ))}
+              </div>
+            ) : (
+              <>
+                {/* Mobile View - Cards */}
+                <div className="block lg:hidden space-y-4">
+                  {filteredUsers?.map((user) => (
                 <Card key={user.id} className="border">
                   <CardContent className="pt-6">
                     <div className="space-y-4">
@@ -382,13 +408,15 @@ export default function Admin() {
               </table>
             </div>
 
-            {/* Empty State */}
-            {filteredUsers?.length === 0 && (
-              <div className="text-center py-16">
-                <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium text-muted-foreground mb-2">No se encontraron usuarios</p>
-                <p className="text-sm text-muted-foreground">Intenta ajustar los filtros de búsqueda</p>
-              </div>
+                {/* Empty State */}
+                {filteredUsers?.length === 0 && (
+                  <div className="text-center py-16">
+                    <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+                    <p className="text-lg font-medium text-muted-foreground mb-2">No se encontraron usuarios</p>
+                    <p className="text-sm text-muted-foreground">Intenta ajustar los filtros de búsqueda</p>
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>
