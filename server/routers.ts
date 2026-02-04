@@ -14,6 +14,7 @@ import { transactionsRouter } from "./routers_transactions";
 import { translationRouter } from "./modules/translation";
 import { cryptoRouter } from "./routers_crypto";
 import { walletRouter } from "./routers_wallet";
+import { adminRouter } from "./routers_admin";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -775,6 +776,13 @@ export const appRouter = router({
    * Stores public addresses for reference only (NO private keys, NO custody)
    */
   wallet: walletRouter,
+
+  /**
+   * Admin Router - Super Admin Panel
+   * Only accessible by users with role 'super_admin'
+   * Provides user management and platform statistics
+   */
+  admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;
