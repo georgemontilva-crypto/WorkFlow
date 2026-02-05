@@ -1,6 +1,6 @@
 /**
  * Markets Page - Cryptocurrency Markets with Investment Tracking
- * Focused on cryptocurrencies with conversion, scenario calculators, and portfolio tracking
+ * Premium trading app design with professional dark mode
  */
 
 import { useState, useEffect, useRef } from 'react';
@@ -72,15 +72,15 @@ function CustomDropdown({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[rgba(255,255,255,0.1)] flex items-center justify-between hover:border-[rgba(255,255,255,0.1)] transition-colors"
+        className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[rgba(255,255,255,0.1)] flex items-center justify-between hover:border-[rgba(255,255,255,0.1)] transition-all"
       >
-        <span className="truncate">{selectedOption?.label || placeholder}</span>
+        <span className="truncate text-sm">{selectedOption?.label || placeholder}</span>
         <ChevronDown className={`w-4 h-4 flex-shrink-0 ml-2 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
         <div 
-          className="absolute z-50 w-full mt-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.1)] rounded-lg shadow-xl overflow-hidden"
+          className="absolute z-50 w-full mt-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.1)] rounded-xl shadow-2xl overflow-hidden"
           style={{ maxHeight }}
         >
           <div className="overflow-y-auto" style={{ maxHeight }}>
@@ -92,7 +92,7 @@ function CustomDropdown({
                   onChange(option.value);
                   setIsOpen(false);
                 }}
-                className={`w-full text-left px-4 py-2.5 hover:bg-[rgba(255,255,255,0.05)] transition-colors ${
+                className={`w-full text-left px-4 py-3 text-sm hover:bg-[rgba(255,255,255,0.05)] transition-colors ${
                   option.value === value ? 'bg-[rgba(255,255,255,0.05)] text-white' : 'text-[#8B92A8]'
                 }`}
               >
@@ -108,90 +108,75 @@ function CustomDropdown({
 
 export default function Markets() {
   const [cryptos, setCryptos] = useState<Crypto[]>([]);
-  const [exchangeRates, setExchangeRates] = useState<ExchangeRates>({});
   const [loading, setLoading] = useState(true);
-  const [selectedCrypto, setSelectedCrypto] = useState<string | null>(null);
-  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
-  const [showWalletModal, setShowWalletModal] = useState(false);
-  const [showPriceAlertModal, setShowPriceAlertModal] = useState(false);
-  const [selectedAlertCrypto, setSelectedAlertCrypto] = useState<Crypto | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
-  
-  // Toast notifications
-  const toast = useToast();
-
-  // Currency Converter State
-  const [converterAmount, setConverterAmount] = useState<string>('1');
-  const [converterCurrency, setConverterCurrency] = useState<string>('COP');
-
-  // Scenario Calculator State
+  const [converterAmount, setConverterAmount] = useState('1');
+  const [converterCurrency, setConverterCurrency] = useState('COP');
+  const [exchangeRates, setExchangeRates] = useState<ExchangeRates>({});
   const [scenarioData, setScenarioData] = useState({
-    crypto: 'bitcoin',
+    crypto: '',
     buyPrice: '',
     quantity: '',
     targetPrice: '',
   });
-
-  // Purchase Form State
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [purchaseForm, setPurchaseForm] = useState({
-    crypto: 'bitcoin',
+    crypto: '',
     quantity: '',
     buyPrice: '',
     currency: 'USD',
   });
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [showPriceAlertModal, setShowPriceAlertModal] = useState(false);
+  const [selectedAlertCrypto, setSelectedAlertCrypto] = useState<Crypto | null>(null);
+  const [selectedCrypto, setSelectedCrypto] = useState<string>('');
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // tRPC queries and mutations
-  const utils = trpc.useContext();
-  
-  // Get all user projects
-  const { data: allProjects, refetch: refetchProjects } = trpc.crypto.listProjects.useQuery();
-  
-  // Get summary for each project with current prices
-  const projectSummaries = allProjects?.map(project => {
-    const crypto = cryptos.find(c => c.symbol.toUpperCase() === project.symbol);
-    return {
-      project,
-      crypto,
-      currentPrice: crypto?.current_price || 0,
-    };
-  }) || [];
+  const utils = trpc.useUtils();
+  const toast = useToast();
 
-  const addPurchaseMutation = trpc.crypto.addPurchase.useMutation({
-    onSuccess: async () => {
-      console.log('Purchase added successfully');
-      // Invalidate all crypto-related queries to force refresh
-      await utils.crypto.invalidate();
-      setShowPurchaseModal(false);
-      setPurchaseForm({ crypto: 'bitcoin', quantity: '', buyPrice: '', currency: 'USD' });
+  // Fetch crypto purchases
+  const { data: projectSummaries = [] } = trpc.crypto.getProjectSummaries.useQuery();
+
+  // Mutation to add crypto purchase
+  const addPurchaseMutation = trpc.crypto.addCryptoPurchase.useMutation({
+    onSuccess: () => {
       toast.success('Compra registrada exitosamente');
+      setShowPurchaseModal(false);
+      setPurchaseForm({
+        crypto: '',
+        quantity: '',
+        buyPrice: '',
+        currency: 'USD',
+      });
+      utils.crypto.getProjectSummaries.invalidate();
     },
     onError: (error) => {
       console.error('Error adding purchase:', error);
-      toast.error(`Error al registrar la compra: ${error.message}`);
+      toast.error('Error al registrar la compra');
     },
   });
 
-  const deletePurchaseMutation = trpc.crypto.deletePurchase.useMutation({
-    onSuccess: async () => {
-      // Invalidate all crypto-related queries to force refresh
-      await utils.crypto.invalidate();
+  // Mutation to check price alerts
+  const checkAlertsMutation = trpc.priceAlerts.checkAlerts.useMutation({
+    onSuccess: (data) => {
+      if (data.triggered > 0) {
+        console.log(`${data.triggered} alerts triggered`);
+      }
+    },
+    onError: (error) => {
+      console.error('Error checking alerts:', error);
     },
   });
 
-  const checkAlertsMutation = trpc.priceAlerts.checkAlerts.useMutation();
-
-  // Fetch cryptocurrencies on mount
   useEffect(() => {
     fetchCryptos();
     fetchExchangeRates();
-  }, []);
 
-  // Auto-refresh prices every 10 seconds
-  useEffect(() => {
+    // Auto-refresh every 10 seconds
     const interval = setInterval(() => {
       refreshData();
-    }, 10000); // 10 seconds
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);
@@ -349,12 +334,12 @@ export default function Markets() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1440px] mx-auto p-4 md:p-6 space-y-6 overflow-x-hidden">
+      <div className="max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-white">Mercados</h1>
-            <p className="text-sm md:text-base text-[#8B92A8] mt-1">Consulta de criptomonedas y herramientas de conversión</p>
+            <p className="text-sm text-[#8B92A8] mt-1">Consulta de criptomonedas y herramientas de conversión</p>
           </div>
           <div className="flex items-center gap-2 text-xs text-[#8B92A8]">
             {isRefreshing ? (
@@ -371,352 +356,315 @@ export default function Markets() {
           </div>
         </div>
 
-        {/* Desktop: Two Columns | Mobile: Stacked */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column: Crypto List (2/3 width on desktop) */}
-          <div className="lg:col-span-2">
-            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-lg md:text-xl font-bold text-white">Criptomonedas</h2>
-                  <p className="text-sm text-[#8B92A8] mt-1">Actualización automática cada 10s</p>
-                </div>
-                {isRefreshing && (
-                  <div className="flex items-center gap-2 text-xs text-[#C4FF3D]">
-                    <div className="w-2 h-2 bg-[#C4FF3D] rounded-full animate-pulse"></div>
-                    <span>Actualizando precios...</span>
-                  </div>
-                )}
+        {/* SECTION 1: Criptomonedas */}
+        <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-white">Criptomonedas</h2>
+              <p className="text-xs text-[#8B92A8] mt-1">Actualización automática cada 10s</p>
+            </div>
+          </div>
+          
+          {loading ? (
+            <div className="h-96 flex items-center justify-center text-[#8B92A8]">
+              <div className="text-center">
+                <div className="w-8 h-8 border-2 border-[#C4FF3D] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p>Cargando datos...</p>
               </div>
-              
-              {loading ? (
-                <div className="h-96 flex items-center justify-center text-[#8B92A8]">
-                  Cargando datos...
-                </div>
-              ) : (
-                <div className="h-96 overflow-y-auto overflow-x-hidden pr-2 space-y-2">
-                  {cryptos.map((crypto) => (
-                    <div
-                      key={crypto.id}
-                      className="flex items-center justify-between p-3 md:p-4 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl hover:border-[rgba(255,255,255,0.1)] transition-colors"
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {cryptos.map((crypto) => (
+                <div
+                  key={crypto.id}
+                  className="flex items-center justify-between p-4 bg-[#121212] border border-[rgba(255,255,255,0.04)] rounded-xl hover:border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.02)] transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <img src={crypto.image} alt={crypto.name} className="w-10 h-10 rounded-full flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold text-white text-base">{crypto.name}</div>
+                      <div className="text-xs text-[#8B92A8] uppercase mt-0.5">{crypto.symbol}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedAlertCrypto(crypto);
+                        setShowPriceAlertModal(true);
+                      }}
+                      className="w-9 h-9 flex items-center justify-center hover:bg-[rgba(255,255,255,0.05)] rounded-lg transition-all flex-shrink-0"
+                      title="Configurar alerta de precio"
                     >
-                      <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
-                        <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <div className="font-medium text-white truncate text-sm md:text-base">{crypto.name}</div>
-                          <div className="text-xs md:text-sm text-[#8B92A8] uppercase">{crypto.symbol}</div>
-                        </div>
+                      <Bell className="w-4 h-4 text-[#8B92A8] group-hover:text-[#C4FF3D] transition-colors" />
+                    </button>
+                    
+                    <div className="text-right flex-shrink-0 min-w-[140px]">
+                      <div className="font-semibold text-white text-base">
+                        ${crypto.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
-                      <div className="flex items-center gap-2 md:gap-3">
-                        <button
-                          onClick={() => {
-                            setSelectedAlertCrypto(crypto);
-                            setShowPriceAlertModal(true);
-                          }}
-                          className="w-8 h-8 flex items-center justify-center hover:bg-[rgba(255,255,255,0.05)] rounded-lg transition-colors group flex-shrink-0"
-                          title="Configurar alerta de precio"
-                        >
-                          <Bell className="w-4 h-4 text-[#8B92A8] group-hover:text-[#C4FF3D] transition-colors" />
-                        </button>
-                        <div className="text-right flex-shrink-0 min-w-[100px] md:min-w-[120px]">
-                        <div className="font-medium text-white text-sm md:text-base">
-                          ${crypto.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </div>
-                        <div
-                          className={`text-xs md:text-sm flex items-center gap-1 justify-end ${
-                            crypto.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'
-                          }`}
-                        >
-                          {crypto.price_change_percentage_24h >= 0 ? (
-                            <TrendingUp className="w-3 h-3 md:w-4 md:h-4" />
-                          ) : (
-                            <TrendingDown className="w-3 h-3 md:w-4 md:h-4" />
-                          )}
-                          {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
-                        </div>
-                        </div>
+                      <div
+                        className={`text-sm flex items-center gap-1.5 justify-end mt-0.5 ${
+                          crypto.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'
+                        }`}
+                      >
+                        {crypto.price_change_percentage_24h >= 0 ? (
+                          <TrendingUp className="w-4 h-4" />
+                        ) : (
+                          <TrendingDown className="w-4 h-4" />
+                        )}
+                        {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
                       </div>
                     </div>
-                  ))}
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
+          )}
+        </div>
 
-            {/* Investment Tracking Section */}
-            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6 mt-6 flex flex-col" style={{ height: '510px' }}>
-          <div className="flex items-center justify-between mb-6 flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <Wallet className="w-5 h-5 text-[#C4FF3D]" />
-              <h2 className="text-lg md:text-xl font-bold text-white">
-                Seguimiento de Inversión
-              </h2>
+        {/* SECTION 2: Mis Activos */}
+        <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Wallet className="w-6 h-6 text-[#C4FF3D]" />
+              <h2 className="text-xl font-bold text-white">Mis activos</h2>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowWalletModal(true)}
-                className="flex items-center justify-center gap-2 bg-transparent border border-[#C4FF3D] text-[#C4FF3D] px-3 md:px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/10 transition-colors font-medium"
+                className="flex items-center gap-2 border border-[#C4FF3D] text-[#C4FF3D] px-4 py-2.5 rounded-xl hover:bg-[#C4FF3D]/10 transition-all font-medium text-sm"
               >
                 <Wallet2 className="w-4 h-4" />
                 <span className="hidden md:inline">Wallet de direcciones</span>
               </button>
               <button
                 onClick={() => setShowPurchaseModal(true)}
-                className="flex items-center justify-center gap-2 bg-transparent border border-[#C4FF3D] text-[#C4FF3D] px-3 md:px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/10 transition-colors font-medium"
+                className="flex items-center gap-2 border border-[#C4FF3D] text-[#C4FF3D] px-4 py-2.5 rounded-xl hover:bg-[#C4FF3D]/10 transition-all font-medium text-sm"
               >
                 <Plus className="w-4 h-4" />
-                <span className="hidden md:inline">Registrar Compra</span>
+                <span className="hidden md:inline">Habilitar más activos</span>
               </button>
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto">
+          <div className="overflow-x-auto">
             <InvestmentTracker projectSummaries={projectSummaries} />
           </div>
+        </div>
+
+        {/* SECTION 3: Herramientas */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Conversor de Divisas */}
+          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <ArrowRightLeft className="w-5 h-5 text-[#C4FF3D]" />
+              <h2 className="text-lg font-bold text-white">Conversor de Divisas</h2>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2 font-medium">Monto en USD</label>
+                <input
+                  type="number"
+                  value={converterAmount}
+                  onChange={(e) => setConverterAmount(e.target.value)}
+                  className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40 transition-all text-sm"
+                  placeholder="1.00"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2 font-medium">Moneda destino</label>
+                <CustomDropdown
+                  options={currencyOptions}
+                  value={converterCurrency}
+                  onChange={setConverterCurrency}
+                  placeholder="Seleccionar moneda"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-[rgba(255,255,255,0.06)]">
+                <p className="text-xs text-[#8B92A8] mb-2">Resultado</p>
+                <p className="text-3xl font-bold text-[#C4FF3D]">
+                  {convertedAmount()} {converterCurrency}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Right Column: Calculators (1/3 width on desktop) */}
-          <div className="space-y-6">
-            {/* Currency Converter */}
-            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <ArrowRightLeft className="w-5 h-5 text-[#C4FF3D]" />
-                <h2 className="text-base md:text-lg font-bold text-white">Conversor de Divisas</h2>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Monto en USD</label>
-                  <input
-                    type="number"
-                    value={converterAmount}
-                    onChange={(e) => setConverterAmount(e.target.value)}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                    placeholder="1.00"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Moneda destino</label>
-                  <CustomDropdown
-                    options={currencyOptions}
-                    value={converterCurrency}
-                    onChange={setConverterCurrency}
-                    placeholder="Seleccionar moneda"
-                  />
-                </div>
-
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-                  <div className="text-sm text-[#8B92A8] mb-1">Resultado</div>
-                  <div className="text-xl md:text-2xl font-bold text-[#C4FF3D] break-words">
-                    {convertedAmount()} {converterCurrency}
-                  </div>
-                </div>
-              </div>
+          {/* Calculadora de Escenarios */}
+          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <Target className="w-5 h-5 text-[#C4FF3D]" />
+              <h2 className="text-lg font-bold text-white">Calculadora de Escenarios</h2>
             </div>
-
-            {/* Scenario Calculator */}
-            <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-4 md:p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <Target className="w-5 h-5 text-[#C4FF3D]" />
-                <h2 className="text-base md:text-lg font-bold text-white">Calculadora de Escenarios</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2 font-medium">Criptomoneda</label>
+                <CustomDropdown
+                  options={cryptoOptions}
+                  value={scenarioData.crypto}
+                  onChange={(value) => setScenarioData({ ...scenarioData, crypto: value })}
+                  placeholder="Seleccionar criptomoneda"
+                  maxHeight="200px"
+                />
               </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Criptomoneda</label>
-                  <CustomDropdown
-                    options={cryptoOptions}
-                    value={scenarioData.crypto}
-                    onChange={(value) => setScenarioData({ ...scenarioData, crypto: value })}
-                    placeholder="Seleccionar criptomoneda"
-                    maxHeight="400px"
-                  />
-                </div>
 
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Precio de compra (USD)</label>
+                  <label className="block text-sm text-[#8B92A8] mb-2 font-medium">Precio de compra (USD)</label>
                   <input
                     type="number"
                     value={scenarioData.buyPrice}
                     onChange={(e) => setScenarioData({ ...scenarioData, buyPrice: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
+                    className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40 transition-all text-sm"
                     placeholder="0.00"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Cantidad</label>
+                  <label className="block text-sm text-[#8B92A8] mb-2 font-medium">Cantidad</label>
                   <input
                     type="number"
                     value={scenarioData.quantity}
                     onChange={(e) => setScenarioData({ ...scenarioData, quantity: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
+                    className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40 transition-all text-sm"
                     placeholder="0"
                   />
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Precio objetivo (USD)</label>
-                  <input
-                    type="number"
-                    value={scenarioData.targetPrice}
-                    onChange={(e) => setScenarioData({ ...scenarioData, targetPrice: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                    placeholder="0.00"
-                  />
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2 font-medium">Precio objetivo (USD)</label>
+                <input
+                  type="number"
+                  value={scenarioData.targetPrice}
+                  onChange={(e) => setScenarioData({ ...scenarioData, targetPrice: e.target.value })}
+                  className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40 transition-all text-sm"
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-[rgba(255,255,255,0.06)] space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-[#8B92A8]">Inversión inicial</span>
+                  <span className="text-sm font-semibold text-white">${scenarioResults.initialInvestment}</span>
                 </div>
-
-                <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4 space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-[#8B92A8]">Inversión inicial</span>
-                    <span className="text-sm font-medium text-white">${scenarioResults.initialInvestment}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-[#8B92A8]">Valor final</span>
-                    <span className="text-sm font-medium text-white">${scenarioResults.finalValue}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-[#8B92A8]">Ganancia/Pérdida</span>
-                    <span
-                      className={`text-sm font-medium ${
-                        scenarioResults.profitLossNum >= 0 ? 'text-green-500' : 'text-red-500'
-                      }`}
-                    >
-                      ${scenarioResults.profitLoss}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-[#8B92A8]">Retorno</span>
-                    <span
-                      className={`text-sm font-medium ${
-                        scenarioResults.returnPercentageNum >= 0 ? 'text-green-500' : 'text-red-500'
-                      }`}
-                    >
-                      {scenarioResults.returnPercentage}%
-                    </span>
-                  </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-[#8B92A8]">Valor final</span>
+                  <span className="text-sm font-semibold text-white">${scenarioResults.finalValue}</span>
                 </div>
-
-                <div className="text-xs text-[#8B92A8] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-3">
-                  <strong>Disclaimer:</strong> Este es un escenario hipotético. No constituye recomendación de inversión.
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-[#8B92A8]">Ganancia/Pérdida</span>
+                  <span className={`text-sm font-semibold ${scenarioResults.profitLossNum >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    ${scenarioResults.profitLoss}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-[#8B92A8]">Retorno</span>
+                  <span className={`text-lg font-bold ${scenarioResults.returnPercentageNum >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {scenarioResults.returnPercentage}%
+                  </span>
                 </div>
               </div>
+
+              <p className="text-xs text-[#8B92A8] pt-2 border-t border-[rgba(255,255,255,0.06)]">
+                Este es un escenario hipotético. No constituye asesoramiento financiero.
+              </p>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Purchase Modal */}
-        {showPurchaseModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-[#121212] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 max-w-md w-full">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-white">Registrar Compra</h3>
-                <button
-                  onClick={() => setShowPurchaseModal(false)}
-                  className="text-[#8B92A8] hover:text-white transition-colors"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+      {/* Modals */}
+      <Toast />
+      
+      {showWalletModal && (
+        <WalletModal onClose={() => setShowWalletModal(false)} />
+      )}
+
+      {showPriceAlertModal && selectedAlertCrypto && (
+        <PriceAlertModal
+          crypto={selectedAlertCrypto}
+          onClose={() => {
+            setShowPriceAlertModal(false);
+            setSelectedAlertCrypto(null);
+          }}
+        />
+      )}
+
+      {/* Purchase Modal */}
+      {showPurchaseModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 max-w-md w-full">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">Registrar Compra</h3>
+              <button
+                onClick={() => setShowPurchaseModal(false)}
+                className="text-[#8B92A8] hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2 font-medium">Criptomoneda</label>
+                <CustomDropdown
+                  options={cryptoOptions}
+                  value={purchaseForm.crypto}
+                  onChange={(value) => setPurchaseForm({ ...purchaseForm, crypto: value })}
+                  placeholder="Seleccionar criptomoneda"
+                  maxHeight="200px"
+                />
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Criptomoneda</label>
-                  <CustomDropdown
-                    options={cryptoOptions}
-                    value={purchaseForm.crypto}
-                    onChange={(value) => setPurchaseForm({ ...purchaseForm, crypto: value })}
-                    placeholder="Seleccionar criptomoneda"
-                    maxHeight="400px"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Cantidad comprada</label>
-                  <input
-                    type="number"
-                    value={purchaseForm.quantity}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, quantity: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                    placeholder="0.00000000"
-                    step="0.00000001"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Precio de compra</label>
-                  <input
-                    type="number"
-                    value={purchaseForm.buyPrice}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, buyPrice: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                    placeholder="0.00"
-                    step="0.01"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm text-[#8B92A8] mb-2">Moneda</label>
-                  <select
-                    value={purchaseForm.currency}
-                    onChange={(e) => setPurchaseForm({ ...purchaseForm, currency: e.target.value })}
-                    className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#C4FF3D]/40"
-                  >
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="COP">COP</option>
-                  </select>
-                </div>
-
-                <div className="flex gap-3 pt-4">
-                  <button
-                    onClick={() => setShowPurchaseModal(false)}
-                    className="flex-1 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] text-white px-4 py-2 rounded-lg hover:border-[rgba(255,255,255,0.1)] transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={handleAddPurchase}
-                    disabled={addPurchaseMutation.isLoading}
-                    className="flex-1 bg-[#C4FF3D] text-black px-4 py-2 rounded-lg hover:bg-[#C4FF3D]/90 transition-colors font-medium disabled:opacity-50"
-                  >
-                    {addPurchaseMutation.isLoading ? 'Guardando...' : 'Guardar'}
-                  </button>
-                </div>
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2 font-medium">Cantidad</label>
+                <input
+                  type="number"
+                  value={purchaseForm.quantity}
+                  onChange={(e) => setPurchaseForm({ ...purchaseForm, quantity: e.target.value })}
+                  className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40 transition-all text-sm"
+                  placeholder="0"
+                />
               </div>
+
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2 font-medium">Precio de compra (USD)</label>
+                <input
+                  type="number"
+                  value={purchaseForm.buyPrice}
+                  onChange={(e) => setPurchaseForm({ ...purchaseForm, buyPrice: e.target.value })}
+                  className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D]/40 transition-all text-sm"
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-[#8B92A8] mb-2 font-medium">Moneda</label>
+                <CustomDropdown
+                  options={currencyOptions}
+                  value={purchaseForm.currency}
+                  onChange={(value) => setPurchaseForm({ ...purchaseForm, currency: value })}
+                  placeholder="Seleccionar moneda"
+                />
+              </div>
+
+              <button
+                onClick={handleAddPurchase}
+                disabled={addPurchaseMutation.isPending}
+                className="w-full bg-[#C4FF3D] text-black font-semibold py-3 rounded-xl hover:bg-[#C4FF3D]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {addPurchaseMutation.isPending ? 'Registrando...' : 'Registrar Compra'}
+              </button>
             </div>
           </div>
-        )}
-
-        {/* Toast Notifications */}
-        {toast.toasts.map((t) => (
-          <Toast
-            key={t.id}
-            message={t.message}
-            type={t.type}
-            onClose={() => toast.removeToast(t.id)}
-          />
-        ))}
-
-        {/* Wallet Modal */}
-        <WalletModal
-          isOpen={showWalletModal}
-          onClose={() => setShowWalletModal(false)}
-        />
-
-        {/* Price Alert Modal */}
-        {selectedAlertCrypto && (
-          <PriceAlertModal
-            isOpen={showPriceAlertModal}
-            onClose={() => {
-              setShowPriceAlertModal(false);
-              setSelectedAlertCrypto(null);
-            }}
-            crypto={selectedAlertCrypto}
-          />
-        )}
-      </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
