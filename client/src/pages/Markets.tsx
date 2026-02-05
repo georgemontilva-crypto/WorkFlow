@@ -5,12 +5,13 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
-import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown, Plus, Trash2, Wallet, X, Wallet2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown, Plus, Trash2, Wallet, X, Wallet2, Bell } from 'lucide-react';
 import { trpc } from '../lib/trpc';
 import { InvestmentTracker } from '../components/InvestmentTracker';
 import Toast from '../components/Toast';
 import { useToast } from '../hooks/useToast';
 import WalletModal from '../components/WalletModal';
+import PriceAlertModal from '../components/PriceAlertModal';
 
 interface Crypto {
   id: string;
@@ -112,6 +113,8 @@ export default function Markets() {
   const [selectedCrypto, setSelectedCrypto] = useState<string | null>(null);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const [showWalletModal, setShowWalletModal] = useState(false);
+  const [showPriceAlertModal, setShowPriceAlertModal] = useState(false);
+  const [selectedAlertCrypto, setSelectedAlertCrypto] = useState<Crypto | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   
@@ -176,6 +179,8 @@ export default function Markets() {
     },
   });
 
+  const checkAlertsMutation = trpc.priceAlerts.checkAlerts.useMutation();
+
   // Fetch cryptocurrencies on mount
   useEffect(() => {
     fetchCryptos();
@@ -194,10 +199,20 @@ export default function Markets() {
   const refreshData = async () => {
     setIsRefreshing(true);
     try {
-      await Promise.all([
-        fetchCryptos(),
-        fetchExchangeRates()
-      ]);
+      const newCryptos = await fetchCryptos();
+      await fetchExchangeRates();
+      
+      // Check price alerts with new prices
+      if (newCryptos && newCryptos.length > 0) {
+        const prices = newCryptos.map((c: Crypto) => ({
+          symbol: c.symbol.toUpperCase(),
+          price: c.current_price,
+        }));
+        
+        // Check alerts in background (don't await to avoid blocking UI)
+        checkAlertsMutation.mutate({ prices });
+      }
+      
       // Invalidate crypto queries to recalculate with new prices
       await utils.crypto.invalidate();
       setLastUpdate(new Date());
@@ -387,7 +402,7 @@ export default function Markets() {
                   {cryptos.map((crypto) => (
                     <div
                       key={crypto.id}
-                      className="flex items-center justify-between p-3 md:p-4 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl"
+                      className="flex items-center justify-between p-3 md:p-4 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-xl hover:border-[rgba(255,255,255,0.1)] transition-colors"
                     >
                       <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
                         <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full flex-shrink-0" />
@@ -396,7 +411,18 @@ export default function Markets() {
                           <div className="text-xs md:text-sm text-[#8B92A8] uppercase">{crypto.symbol}</div>
                         </div>
                       </div>
-                      <div className="text-right flex-shrink-0">
+                      <div className="flex items-center gap-2 md:gap-3">
+                        <button
+                          onClick={() => {
+                            setSelectedAlertCrypto(crypto);
+                            setShowPriceAlertModal(true);
+                          }}
+                          className="p-2 hover:bg-[rgba(255,255,255,0.05)] rounded-lg transition-colors group"
+                          title="Configurar alerta de precio"
+                        >
+                          <Bell className="w-4 h-4 text-[#8B92A8] group-hover:text-[#C4FF3D] transition-colors" />
+                        </button>
+                        <div className="text-right flex-shrink-0">
                         <div className="font-medium text-white text-sm md:text-base">
                           ${crypto.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
@@ -411,6 +437,7 @@ export default function Markets() {
                             <TrendingDown className="w-3 h-3 md:w-4 md:h-4" />
                           )}
                           {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
+                        </div>
                         </div>
                       </div>
                     </div>
@@ -681,6 +708,18 @@ export default function Markets() {
           isOpen={showWalletModal}
           onClose={() => setShowWalletModal(false)}
         />
+
+        {/* Price Alert Modal */}
+        {selectedAlertCrypto && (
+          <PriceAlertModal
+            isOpen={showPriceAlertModal}
+            onClose={() => {
+              setShowPriceAlertModal(false);
+              setSelectedAlertCrypto(null);
+            }}
+            crypto={selectedAlertCrypto}
+          />
+        )}
       </div>
     </DashboardLayout>
   );

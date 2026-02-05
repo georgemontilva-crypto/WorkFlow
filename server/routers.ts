@@ -15,6 +15,7 @@ import { translationRouter } from "./modules/translation";
 import { cryptoRouter } from "./routers_crypto";
 import { walletRouter } from "./routers_wallet";
 import { adminRouter } from "./routers_admin";
+import { priceAlertsRouter } from "./routers_price_alerts";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -783,6 +784,12 @@ export const appRouter = router({
    * Provides user management and platform statistics
    */
   admin: adminRouter,
+
+  /**
+   * Price Alerts Router - Cryptocurrency price alerts
+   * Allows users to set price alerts with email and app notifications
+   */
+  priceAlerts: priceAlertsRouter,
 });
 
 export type AppRouter = typeof appRouter;
