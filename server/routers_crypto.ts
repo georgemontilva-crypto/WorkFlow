@@ -204,6 +204,67 @@ export const cryptoRouter = router({
     }),
 
   /**
+   * Get all project summaries for the current user
+   */
+  getProjectSummaries: protectedProcedure
+    .query(async ({ ctx }) => {
+      const db = await getDb();
+      
+      // Get all projects for user
+      const projects = await db
+        .select()
+        .from(cryptoProjects)
+        .where(eq(cryptoProjects.user_id, ctx.user.id));
+      
+      if (projects.length === 0) {
+        return [];
+      }
+      
+      const summaries = [];
+      
+      for (const project of projects) {
+        // Get all purchases for this project
+        const purchases = await db
+          .select()
+          .from(cryptoPurchases)
+          .where(eq(cryptoPurchases.project_id, project.id));
+        
+        if (purchases.length === 0) {
+          continue;
+        }
+        
+        // Calculate totals
+        let totalQuantity = 0;
+        let totalInvestment = 0;
+        
+        for (const purchase of purchases) {
+          const quantity = parseFloat(purchase.quantity);
+          const buyPrice = parseFloat(purchase.buy_price);
+          
+          totalQuantity += quantity;
+          totalInvestment += quantity * buyPrice;
+        }
+        
+        const avgBuyPrice = totalInvestment / totalQuantity;
+        
+        summaries.push({
+          symbol: project.symbol,
+          name: project.symbol, // Will be enriched with full name from frontend
+          total_quantity: totalQuantity,
+          avg_buy_price: avgBuyPrice,
+          current_price: 0, // Will be updated from frontend with real-time price
+          total_invested: totalInvestment,
+          current_value: 0, // Will be calculated in frontend
+          profit_loss: 0, // Will be calculated in frontend
+          profit_loss_percentage: 0, // Will be calculated in frontend
+          price_change_24h: 0, // Will be updated from frontend
+        });
+      }
+      
+      return summaries;
+    }),
+
+  /**
    * Get project summary with calculations
    */
   getProjectSummary: protectedProcedure

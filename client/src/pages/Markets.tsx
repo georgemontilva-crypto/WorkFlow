@@ -136,7 +136,8 @@ export default function Markets() {
   const toast = useToast();
 
   // Fetch crypto purchases
-  const { data: projectSummaries = [] } = trpc.crypto.getProjectSummaries.useQuery();
+  const { data: rawProjectSummaries = [] } = trpc.crypto.getProjectSummaries.useQuery();
+  const [projectSummaries, setProjectSummaries] = useState<any[]>([]);
 
   // Mutation to add crypto purchase
   const addPurchaseMutation = trpc.crypto.addCryptoPurchase.useMutation({
@@ -180,6 +181,38 @@ export default function Markets() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Enrich project summaries with current prices
+  useEffect(() => {
+    if (rawProjectSummaries.length > 0 && cryptos.length > 0) {
+      const enriched = rawProjectSummaries.map((project) => {
+        const crypto = cryptos.find(
+          (c) => c.symbol.toUpperCase() === project.symbol.toUpperCase()
+        );
+        
+        if (!crypto) return project;
+        
+        const currentPrice = crypto.current_price;
+        const currentValue = project.total_quantity * currentPrice;
+        const profitLoss = currentValue - project.total_invested;
+        const profitLossPercentage = (profitLoss / project.total_invested) * 100;
+        
+        return {
+          ...project,
+          name: crypto.name,
+          current_price: currentPrice,
+          current_value: currentValue,
+          profit_loss: profitLoss,
+          profit_loss_percentage: profitLossPercentage,
+          price_change_24h: crypto.price_change_percentage_24h,
+        };
+      });
+      
+      setProjectSummaries(enriched);
+    } else {
+      setProjectSummaries([]);
+    }
+  }, [rawProjectSummaries, cryptos]);
 
   const refreshData = async () => {
     setIsRefreshing(true);
