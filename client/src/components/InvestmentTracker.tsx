@@ -10,6 +10,7 @@ import PurchaseHistoryModal from './PurchaseHistoryModal';
 interface ProjectSummary {
   symbol: string;
   name: string;
+  image?: string;
   total_quantity: number;
   avg_buy_price: number;
   current_price: number;
@@ -63,8 +64,12 @@ export function InvestmentTracker({ projectSummaries }: InvestmentTrackerProps) 
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#0A0A0A] rounded-full flex items-center justify-center">
-                  <span className="text-sm font-bold text-[#C4FF3D]">{project.symbol.slice(0, 2)}</span>
+                <div className="w-10 h-10 bg-[#0A0A0A] rounded-full flex items-center justify-center overflow-hidden">
+                  {project.image ? (
+                    <img src={project.image} alt={project.name} className="w-8 h-8 object-contain" />
+                  ) : (
+                    <span className="text-sm font-bold text-[#C4FF3D]">{project.symbol.slice(0, 2)}</span>
+                  )}
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-white">{project.name}</h3>

@@ -200,6 +200,7 @@ export default function Markets() {
         return {
           ...project,
           name: crypto.name,
+          image: crypto.image,
           current_price: currentPrice,
           current_value: currentValue,
           profit_loss: profitLoss,
