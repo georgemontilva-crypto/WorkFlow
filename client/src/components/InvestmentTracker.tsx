@@ -3,7 +3,9 @@
  * Premium horizontal cards design for crypto portfolio tracking
  */
 
-import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
+import { useState } from 'react';
+import { TrendingUp, TrendingDown, ArrowRight, FileText } from 'lucide-react';
+import PurchaseHistoryModal from './PurchaseHistoryModal';
 
 interface ProjectSummary {
   symbol: string;
@@ -23,6 +25,19 @@ interface InvestmentTrackerProps {
 }
 
 export function InvestmentTracker({ projectSummaries }: InvestmentTrackerProps) {
+  const [selectedProject, setSelectedProject] = useState<ProjectSummary | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = (project: ProjectSummary) => {
+    setSelectedProject(project);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProject(null);
+  };
+
   if (!projectSummaries || projectSummaries.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -38,83 +53,99 @@ export function InvestmentTracker({ projectSummaries }: InvestmentTrackerProps) 
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {projectSummaries.map((project) => (
-        <div
-          key={project.symbol}
-          className="bg-[#121212] border border-[rgba(255,255,255,0.04)] rounded-2xl p-5 hover:border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.02)] transition-all cursor-pointer group"
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-[#0A0A0A] rounded-full flex items-center justify-center">
-                <span className="text-sm font-bold text-[#C4FF3D]">{project.symbol.slice(0, 2)}</span>
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {projectSummaries.map((project) => (
+          <div
+            key={project.symbol}
+            className="bg-[#121212] border border-[rgba(255,255,255,0.04)] rounded-2xl p-5 hover:border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.02)] transition-all group"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#0A0A0A] rounded-full flex items-center justify-center">
+                  <span className="text-sm font-bold text-[#C4FF3D]">{project.symbol.slice(0, 2)}</span>
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-white">{project.name}</h3>
+                  <p className="text-xs text-[#8B92A8]">{project.symbol}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-base font-semibold text-white">{project.name}</h3>
-                <p className="text-xs text-[#8B92A8]">{project.symbol}</p>
-              </div>
+              <ArrowRight className="w-5 h-5 text-[#8B92A8] group-hover:text-[#C4FF3D] group-hover:translate-x-1 transition-all" />
             </div>
-            <ArrowRight className="w-5 h-5 text-[#8B92A8] group-hover:text-[#C4FF3D] group-hover:translate-x-1 transition-all" />
-          </div>
 
-          {/* Value */}
-          <div className="mb-4">
-            <p className="text-xs text-[#8B92A8] mb-1">Valor total</p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-white">
-                {project.total_quantity.toLocaleString('en-US', { 
+            {/* Value */}
+            <div className="mb-4">
+              <p className="text-xs text-[#8B92A8] mb-1">Valor total</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold text-white">
+                  {project.total_quantity.toLocaleString('en-US', { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 8 
+                  })}
+                </span>
+                <span className="text-sm text-[#8B92A8]">{project.symbol}</span>
+              </div>
+              <p className="text-sm text-[#8B92A8] mt-1">
+                ${project.current_value.toLocaleString('en-US', { 
                   minimumFractionDigits: 2, 
                   maximumFractionDigits: 2 
                 })}
-              </span>
-              <span className="text-sm text-[#8B92A8]">{project.symbol}</span>
+              </p>
             </div>
-            <p className="text-sm text-[#8B92A8] mt-1">
-              ${project.current_value.toLocaleString('en-US', { 
-                minimumFractionDigits: 2, 
-                maximumFractionDigits: 2 
-              })}
-            </p>
-          </div>
 
-          {/* Stats */}
-          <div className="flex items-center justify-between pt-4 border-t border-[rgba(255,255,255,0.06)]">
-            <div>
-              <p className="text-xs text-[#8B92A8] mb-1">Precio</p>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-white">
-                  ${project.current_price.toLocaleString('en-US', { 
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2 
-                  })}
-                </span>
+            {/* Stats */}
+            <div className="flex items-center justify-between pt-4 border-t border-[rgba(255,255,255,0.06)]">
+              <div>
+                <p className="text-xs text-[#8B92A8] mb-1">Precio</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-white">
+                    ${project.current_price.toLocaleString('en-US', { 
+                      minimumFractionDigits: 2, 
+                      maximumFractionDigits: 2 
+                    })}
+                  </span>
+                </div>
+              </div>
+              
+              <div className="text-right">
+                <p className="text-xs text-[#8B92A8] mb-1">Ganancia/Pérdida</p>
+                <div
+                  className={`flex items-center gap-1.5 text-sm font-semibold ${
+                    project.profit_loss_percentage >= 0 ? 'text-green-500' : 'text-red-500'
+                  }`}
+                >
+                  {project.profit_loss_percentage >= 0 ? (
+                    <TrendingUp className="w-4 h-4" />
+                  ) : (
+                    <TrendingDown className="w-4 h-4" />
+                  )}
+                  {Math.abs(project.profit_loss_percentage).toFixed(2)}%
+                </div>
               </div>
             </div>
-            
-            <div className="text-right">
-              <p className="text-xs text-[#8B92A8] mb-1">Cambio en 7d</p>
-              <div
-                className={`flex items-center gap-1.5 text-sm font-semibold ${
-                  project.profit_loss_percentage >= 0 ? 'text-green-500' : 'text-red-500'
-                }`}
-              >
-                {project.profit_loss_percentage >= 0 ? (
-                  <TrendingUp className="w-4 h-4" />
-                ) : (
-                  <TrendingDown className="w-4 h-4" />
-                )}
-                {Math.abs(project.profit_loss_percentage).toFixed(2)}%
-              </div>
-            </div>
-          </div>
 
-          {/* Buy Button */}
-          <button className="w-full mt-4 border border-[rgba(255,255,255,0.1)] text-white py-2.5 rounded-xl hover:bg-[rgba(255,255,255,0.05)] hover:border-[rgba(255,255,255,0.2)] transition-all font-medium text-sm">
-            Comprar
-          </button>
-        </div>
-      ))}
-    </div>
+            {/* Registros Button */}
+            <button
+              onClick={() => handleOpenModal(project)}
+              className="w-full mt-4 border border-[rgba(255,255,255,0.1)] text-white py-2.5 rounded-xl hover:bg-[rgba(255,255,255,0.05)] hover:border-[rgba(255,255,255,0.2)] transition-all font-medium text-sm flex items-center justify-center gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              Registros
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Purchase History Modal */}
+      {selectedProject && (
+        <PurchaseHistoryModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          symbol={selectedProject.symbol}
+          name={selectedProject.name}
+        />
+      )}
+    </>
   );
 }

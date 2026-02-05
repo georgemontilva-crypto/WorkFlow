@@ -330,4 +330,40 @@ export const cryptoRouter = router({
         purchaseCount: purchases.length,
       };
     }),
+
+  /**
+   * Get all purchases for a specific symbol
+   */
+  getPurchasesBySymbol: protectedProcedure
+    .input(z.object({
+      symbol: z.string().min(1).max(20),
+    }))
+    .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      
+      // Get project
+      const project = await db
+        .select()
+        .from(cryptoProjects)
+        .where(
+          and(
+            eq(cryptoProjects.user_id, ctx.user.id),
+            eq(cryptoProjects.symbol, input.symbol.toUpperCase())
+          )
+        )
+        .limit(1);
+      
+      if (!project || project.length === 0) {
+        return [];
+      }
+      
+      // Get all purchases for this project
+      const purchases = await db
+        .select()
+        .from(cryptoPurchases)
+        .where(eq(cryptoPurchases.project_id, project[0].id))
+        .orderBy(desc(cryptoPurchases.created_at));
+      
+      return purchases;
+    }),
 });
