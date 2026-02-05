@@ -418,7 +418,7 @@ export default function Markets() {
                         >
                           <Bell className="w-4 h-4 text-[#8B92A8] group-hover:text-[#C4FF3D] transition-colors" />
                         </button>
-                        <div className="text-right flex-shrink-0">
+                        <div className="text-right flex-shrink-0 min-w-[100px] md:min-w-[120px]">
                         <div className="font-medium text-white text-sm md:text-base">
                           ${crypto.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </div>
