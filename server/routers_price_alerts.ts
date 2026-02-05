@@ -1,6 +1,7 @@
 import { router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import * as priceAlertsDb from "./db-price-alerts";
+import { checkPriceAlerts } from "./services/priceAlertsMonitor";
 
 /**
  * Price Alerts Router
@@ -202,7 +203,6 @@ export const priceAlertsRouter = router({
     }))
     .mutation(async ({ input }) => {
       try {
-        const { checkPriceAlerts } = await import('../services/priceAlertsMonitor');
         await checkPriceAlerts(input.prices);
         return { success: true };
       } catch (error: any) {
