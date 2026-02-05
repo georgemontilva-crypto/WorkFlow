@@ -225,10 +225,7 @@ export default function Markets() {
 
   const fetchCryptos = async () => {
     try {
-      const response = await fetch(
-        'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false'
-      );
-      const data = await response.json();
+      const data = await utils.client.markets.getCryptos.query();
       setCryptos(data);
       setLoading(false);
       return data;
@@ -241,9 +238,8 @@ export default function Markets() {
 
   const fetchExchangeRates = async () => {
     try {
-      const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-      const data = await response.json();
-      setExchangeRates(data.rates);
+      const rates = await utils.client.markets.getExchangeRates.query();
+      setExchangeRates(rates);
     } catch (error) {
       console.error('Error fetching exchange rates:', error);
     }

@@ -16,6 +16,7 @@ import { cryptoRouter } from "./routers_crypto";
 import { walletRouter } from "./routers_wallet";
 import { adminRouter } from "./routers_admin";
 import { priceAlertsRouter } from "./routers_price_alerts";
+import { marketsRouter } from "./routers_markets";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -790,6 +791,12 @@ export const appRouter = router({
    * Allows users to set price alerts with email and app notifications
    */
   priceAlerts: priceAlertsRouter,
+
+  /**
+   * Markets Router - Cryptocurrency market data proxy
+   * Fetches data from CoinGecko API server-side to avoid CORS issues
+   */
+  markets: marketsRouter,
 });
 
 export type AppRouter = typeof appRouter;
