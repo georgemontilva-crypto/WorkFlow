@@ -52,12 +52,15 @@ function CustomDropdown({
   maxHeight?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setSearchTerm('');
       }
     };
 
@@ -65,7 +68,17 @@ function CustomDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isOpen]);
+
   const selectedOption = options.find(opt => opt.value === value);
+  
+  const filteredOptions = options.filter(option => 
+    option.label.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div ref={dropdownRef} className="relative">
@@ -81,24 +94,43 @@ function CustomDropdown({
       {isOpen && (
         <div 
           className="absolute z-50 w-full mt-2 bg-[#0A0A0A] border border-[rgba(255,255,255,0.1)] rounded-xl shadow-2xl overflow-hidden"
-          style={{ maxHeight }}
         >
+          {/* Search Bar */}
+          <div className="p-3 border-b border-[rgba(255,255,255,0.06)]">
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Buscar criptomoneda..."
+              className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-lg px-3 py-2 text-sm text-white placeholder-[#8B92A8] focus:outline-none focus:border-[rgba(255,255,255,0.1)] transition-all"
+            />
+          </div>
+          
+          {/* Options List */}
           <div className="overflow-y-auto" style={{ maxHeight }}>
-            {options.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => {
-                  onChange(option.value);
-                  setIsOpen(false);
-                }}
-                className={`w-full text-left px-4 py-3 text-sm hover:bg-[rgba(255,255,255,0.05)] transition-colors ${
-                  option.value === value ? 'bg-[rgba(255,255,255,0.05)] text-white' : 'text-[#8B92A8]'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    onChange(option.value);
+                    setIsOpen(false);
+                    setSearchTerm('');
+                  }}
+                  className={`w-full text-left px-4 py-3 text-sm hover:bg-[rgba(255,255,255,0.05)] transition-colors ${
+                    option.value === value ? 'bg-[rgba(255,255,255,0.05)] text-white' : 'text-[#8B92A8]'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))
+            ) : (
+              <div className="px-4 py-8 text-center text-sm text-[#8B92A8]">
+                No se encontraron resultados
+              </div>
+            )}
           </div>
         </div>
       )}
