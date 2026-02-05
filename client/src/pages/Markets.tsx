@@ -413,7 +413,7 @@ export default function Markets() {
                             setSelectedAlertCrypto(crypto);
                             setShowPriceAlertModal(true);
                           }}
-                          className="p-2 hover:bg-[rgba(255,255,255,0.05)] rounded-lg transition-colors group"
+                          className="w-8 h-8 flex items-center justify-center hover:bg-[rgba(255,255,255,0.05)] rounded-lg transition-colors group flex-shrink-0"
                           title="Configurar alerta de precio"
                         >
                           <Bell className="w-4 h-4 text-[#8B92A8] group-hover:text-[#C4FF3D] transition-colors" />
