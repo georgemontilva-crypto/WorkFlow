@@ -2,7 +2,7 @@ import { mysqlTable, serial, varchar, text, int, bigint, timestamp, decimal, mys
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { ENV } from "./_core/env";
-import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts, dashboardWidgets, verificationTokens, companyProfiles, reminders, alerts, cryptoProjects, cryptoPurchases } from "../drizzle/schema";
+import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts, dashboardWidgets, verificationTokens, companyProfiles, reminders, alerts, cryptoProjects, cryptoPurchases, cryptoWalletAddresses } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { logClientCreated, logClientDuplicate } from "./utils/logger";
@@ -994,9 +994,12 @@ export async function getAllUsers() {
       name: users.name,
       email: users.email,
       role: users.role,
+      email_verified: users.email_verified,
+      two_factor_enabled: users.two_factor_enabled,
       subscription_plan: users.subscription_plan,
       subscription_status: users.subscription_status,
       has_lifetime_access: users.has_lifetime_access,
+      primary_currency: users.primary_currency,
       created_at: users.created_at,
 
     })
@@ -1836,4 +1839,71 @@ export async function markReminderEmailSent(id: number) {
     .update(reminders)
     .set({ email_sent: 1, updated_at: new Date() })
     .where(eq(reminders.id, id));
+}
+
+/**
+ * Get total count of all clients across all users
+ */
+export async function getTotalClientsCount() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(clients);
+  
+  return result[0]?.count || 0;
+}
+
+/**
+ * Get total count of all invoices across all users
+ */
+export async function getTotalInvoicesCount() {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(invoices);
+  
+  return result[0]?.count || 0;
+}
+
+/**
+ * Update user role
+ */
+export async function updateUserRole(userId: number, role: 'user' | 'admin' | 'super_admin') {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(users)
+    .set({ role, updated_at: new Date() })
+    .where(eq(users.id, userId));
+}
+
+/**
+ * Revoke lifetime access from user
+ */
+export async function revokeLifetimeAccess(userId: number) {
+  const db = await getDb();
+  if (!db) {
+    throw new Error("Database not available");
+  }
+
+  await db
+    .update(users)
+    .set({ 
+      has_lifetime_access: 0,
+      subscription_plan: 'free',
+      subscription_status: 'active',
+      updated_at: new Date() 
+    })
+    .where(eq(users.id, userId));
 }

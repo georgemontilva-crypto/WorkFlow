@@ -13,6 +13,10 @@ import { paymentsRouter } from "./routers_payments";
 import { transactionsRouter } from "./routers_transactions";
 import { translationRouter } from "./modules/translation";
 import { cryptoRouter } from "./routers_crypto";
+import { walletRouter } from "./routers_wallet";
+import { adminRouter } from "./routers_admin";
+import { priceAlertsRouter } from "./routers_price_alerts";
+import { marketsRouter } from "./routers_markets";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -768,6 +772,31 @@ export const appRouter = router({
    * Manages crypto projects and purchases for portfolio analysis
    */
   crypto: cryptoRouter,
+  
+  /**
+   * Wallet Router - Cryptocurrency wallet addresses management
+   * Stores public addresses for reference only (NO private keys, NO custody)
+   */
+  wallet: walletRouter,
+
+  /**
+   * Admin Router - Super Admin Panel
+   * Only accessible by users with role 'super_admin'
+   * Provides user management and platform statistics
+   */
+  admin: adminRouter,
+
+  /**
+   * Price Alerts Router - Cryptocurrency price alerts
+   * Allows users to set price alerts with email and app notifications
+   */
+  priceAlerts: priceAlertsRouter,
+
+  /**
+   * Markets Router - Cryptocurrency market data proxy
+   * Fetches data from CoinGecko API server-side to avoid CORS issues
+   */
+  markets: marketsRouter,
 });
 
 export type AppRouter = typeof appRouter;

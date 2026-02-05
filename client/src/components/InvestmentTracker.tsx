@@ -48,6 +48,7 @@ interface ProjectSummary {
 export function InvestmentTracker({ projectSummaries }: InvestmentTrackerProps) {
   const [expandedProjects, setExpandedProjects] = useState<Set<number>>(new Set());
   const [summaries, setSummaries] = useState<Map<string, ProjectSummary>>(new Map());
+  const [activeSlide, setActiveSlide] = useState(0);
 
   const toggleProject = (projectId: number) => {
     const newExpanded = new Set(expandedProjects);
@@ -79,39 +80,94 @@ export function InvestmentTracker({ projectSummaries }: InvestmentTrackerProps) 
   const totalProfitLoss = totalCurrentValue - totalInvestment;
   const totalProfitLossPercentage = totalInvestment > 0 ? (totalProfitLoss / totalInvestment) * 100 : 0;
 
+  const summaryCards = [
+    {
+      label: 'Proyectos Activos',
+      value: summaries.size.toString(),
+      color: 'text-white'
+    },
+    {
+      label: 'Inversión Total',
+      value: `$${totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      color: 'text-white'
+    },
+    {
+      label: 'Valor Actual',
+      value: `$${totalCurrentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      color: 'text-white'
+    },
+    {
+      label: 'Ganancia/Pérdida Total',
+      value: `$${Math.abs(totalProfitLoss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      subValue: `(${totalProfitLossPercentage.toFixed(2)}%)`,
+      color: totalProfitLoss >= 0 ? 'text-green-500' : 'text-red-500'
+    }
+  ];
+
   return (
     <div className="space-y-6">
       {/* Global Summary */}
       {summaries.size > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-            <div className="text-sm text-[#8B92A8] mb-1">Proyectos Activos</div>
-            <div className="text-xl font-bold text-white">
-              {summaries.size}
-            </div>
+        <div>
+          {/* Desktop: Grid */}
+          <div className="hidden md:grid md:grid-cols-4 gap-4">
+            {summaryCards.map((card, index) => (
+              <div key={index} className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
+                <div className="text-sm text-[#8B92A8] mb-1">{card.label}</div>
+                <div className={`text-xl font-bold ${card.color}`}>
+                  {card.value}
+                  {card.subValue && <span className="text-sm ml-2">{card.subValue}</span>}
+                </div>
+              </div>
+            ))}
           </div>
-          
-          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-            <div className="text-sm text-[#8B92A8] mb-1">Inversión Total</div>
-            <div className="text-xl font-bold text-white">
-              ${totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+
+          {/* Mobile: Horizontal Scroll with Dots */}
+          <div className="md:hidden">
+            <div 
+              className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
+              onScroll={(e) => {
+                const scrollLeft = e.currentTarget.scrollLeft;
+                const cardWidth = e.currentTarget.offsetWidth;
+                const newSlide = Math.round(scrollLeft / cardWidth);
+                setActiveSlide(newSlide);
+              }}
+            >
+              {summaryCards.map((card, index) => (
+                <div 
+                  key={index} 
+                  className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4 min-w-[85%] snap-center flex-shrink-0"
+                >
+                  <div className="text-sm text-[#8B92A8] mb-1">{card.label}</div>
+                  <div className={`text-xl font-bold ${card.color}`}>
+                    {card.value}
+                    {card.subValue && <span className="text-sm ml-2">{card.subValue}</span>}
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-          
-          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-            <div className="text-sm text-[#8B92A8] mb-1">Valor Actual</div>
-            <div className="text-xl font-bold text-white">
-              ${totalCurrentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </div>
-          </div>
-          
-          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-lg p-4">
-            <div className="text-sm text-[#8B92A8] mb-1">Ganancia/Pérdida Total</div>
-            <div className={`text-xl font-bold ${totalProfitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              ${Math.abs(totalProfitLoss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              <span className="text-sm ml-2">
-                ({totalProfitLossPercentage.toFixed(2)}%)
-              </span>
+            
+            {/* Dots Indicator */}
+            <div className="flex items-center justify-center gap-2 mt-2">
+              {summaryCards.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    const container = document.querySelector('.overflow-x-auto');
+                    if (container) {
+                      container.scrollTo({
+                        left: index * container.clientWidth,
+                        behavior: 'smooth'
+                      });
+                    }
+                  }}
+                  className={`h-2 rounded-full transition-all ${
+                    index === activeSlide 
+                      ? 'w-6 bg-[#C4FF3D]' 
+                      : 'w-2 bg-[rgba(255,255,255,0.2)]'
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -194,48 +250,97 @@ function ProjectCard({ project, crypto, currentPrice, isExpanded, onToggle, onSu
       {/* Project Header */}
       <button
         onClick={onToggle}
-        className="w-full p-4 flex items-center justify-between hover:bg-[rgba(255,255,255,0.02)] transition-colors"
+        className="w-full p-4 hover:bg-[rgba(255,255,255,0.02)] transition-colors"
       >
-        <div className="flex items-center gap-3">
-          {crypto?.image && (
-            <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />
-          )}
-          <div className="text-left">
-            <div className="font-bold text-white">{crypto?.name || project.symbol}</div>
-            <div className="text-sm text-[#8B92A8]">{project.symbol}</div>
+        {/* Mobile Layout */}
+        <div className="md:hidden">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              {crypto?.image && (
+                <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />
+              )}
+              <div className="text-left">
+                <div className="font-bold text-white text-sm">{crypto?.name || project.symbol}</div>
+                <div className="text-xs text-[#8B92A8]">{project.symbol}</div>
+              </div>
+            </div>
+            {isExpanded ? (
+              <ChevronUp className="w-4 h-4 text-[#8B92A8] flex-shrink-0" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-[#8B92A8] flex-shrink-0" />
+            )}
+          </div>
+          
+          <div className="grid grid-cols-3 gap-2 text-xs">
+            <div>
+              <div className="text-[#8B92A8] mb-1">Inversión</div>
+              <div className="font-medium text-white truncate">
+                ${summary.totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-[#8B92A8] mb-1">Valor Actual</div>
+              <div className="font-medium text-white truncate">
+                ${summary.currentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-[#8B92A8] mb-1">Ganancia/Pérdida</div>
+              <div className={`font-bold truncate ${summary.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {summary.profitLoss >= 0 ? '+' : ''}${Math.abs(summary.profitLoss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <div className="text-[10px] mt-0.5">
+                  ({summary.profitLossPercentage.toFixed(2)}%)
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="text-right">
-            <div className="text-sm text-[#8B92A8]">Inversión</div>
-            <div className="font-medium text-white">
-              ${summary.totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        {/* Desktop Layout */}
+        <div className="hidden md:flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {crypto?.image && (
+              <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full" />
+            )}
+            <div className="text-left">
+              <div className="font-bold text-white">{crypto?.name || project.symbol}</div>
+              <div className="text-sm text-[#8B92A8]">{project.symbol}</div>
             </div>
           </div>
 
-          <div className="text-right">
-            <div className="text-sm text-[#8B92A8]">Valor Actual</div>
-            <div className="font-medium text-white">
-              ${summary.currentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <div className="flex items-center gap-6">
+            <div className="text-right">
+              <div className="text-sm text-[#8B92A8]">Inversión</div>
+              <div className="font-medium text-white">
+                ${summary.totalInvestment.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
             </div>
-          </div>
 
-          <div className="text-right min-w-[120px]">
-            <div className="text-sm text-[#8B92A8]">Ganancia/Pérdida</div>
-            <div className={`font-bold ${summary.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {summary.profitLoss >= 0 ? '+' : '-'}${Math.abs(summary.profitLoss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              <span className="text-sm ml-1">
-                ({summary.profitLossPercentage.toFixed(2)}%)
-              </span>
+            <div className="text-right">
+              <div className="text-sm text-[#8B92A8]">Valor Actual</div>
+              <div className="font-medium text-white">
+                ${summary.currentValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
             </div>
-          </div>
 
-          {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-[#8B92A8]" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-[#8B92A8]" />
-          )}
+            <div className="text-right min-w-[120px]">
+              <div className="text-sm text-[#8B92A8]">Ganancia/Pérdida</div>
+              <div className={`font-bold ${summary.profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {summary.profitLoss >= 0 ? '+' : '-'}${Math.abs(summary.profitLoss).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                <span className="text-sm ml-1">
+                  ({summary.profitLossPercentage.toFixed(2)}%)
+                </span>
+              </div>
+            </div>
+
+            {isExpanded ? (
+              <ChevronUp className="w-5 h-5 text-[#8B92A8]" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-[#8B92A8]" />
+            )}
+          </div>
         </div>
       </button>
 
