@@ -373,7 +373,7 @@ export default function Markets() {
               </div>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[rgba(255,255,255,0.1)] scrollbar-track-transparent hover:scrollbar-thumb-[rgba(255,255,255,0.2)]">
               {cryptos.map((crypto) => (
                 <div
                   key={crypto.id}
