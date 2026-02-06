@@ -645,7 +645,6 @@ export default function Markets() {
       </div>
 
       {/* Modals */}
-      <Toast />
       
       {showWalletModal && (
         <WalletModal onClose={() => setShowWalletModal(false)} />
