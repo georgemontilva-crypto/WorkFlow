@@ -21,6 +21,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = React.useState<ToastProps[]>([]);
 
   const showToast = React.useCallback((options: Omit<ToastProps, "id" | "onClose">) => {
+    // Validar que el toast tenga contenido
+    if (!options.description || options.description.trim() === '') {
+      console.warn('[Toast] Attempted to show toast without description');
+      return;
+    }
+    
     const id = Math.random().toString(36).substring(7);
     const newToast: ToastProps = {
       ...options,
