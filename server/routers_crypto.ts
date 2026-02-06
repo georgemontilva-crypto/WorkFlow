@@ -237,13 +237,19 @@ export const cryptoRouter = router({
         let totalQuantity = 0;
         let totalInvestment = 0;
         
+        console.log(`[${project.symbol}] Processing ${purchases.length} purchases`);
+        
         for (const purchase of purchases) {
           const quantity = parseFloat(purchase.quantity);
           const buyPrice = parseFloat(purchase.buy_price);
           
+          console.log(`  Purchase: quantity=${purchase.quantity} (parsed: ${quantity}), buyPrice=${purchase.buy_price} (parsed: ${buyPrice}), total=${quantity * buyPrice}`);
+          
           totalQuantity += quantity;
           totalInvestment += quantity * buyPrice;
         }
+        
+        console.log(`[${project.symbol}] Total: quantity=${totalQuantity}, investment=${totalInvestment}, avgPrice=${totalInvestment / totalQuantity}`)
         
         const avgBuyPrice = totalInvestment / totalQuantity;
         
