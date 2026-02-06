@@ -372,4 +372,68 @@ export const cryptoRouter = router({
       
       return purchases;
     }),
+
+  /**
+   * Update a crypto purchase
+   */
+  updatePurchase: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+      quantity: z.string().optional(),
+      buy_price: z.string().optional(),
+      currency: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      
+      // Verify purchase belongs to user
+      const purchase = await db
+        .select({
+          id: cryptoPurchases.id,
+          project_id: cryptoPurchases.project_id,
+        })
+        .from(cryptoPurchases)
+        .where(eq(cryptoPurchases.id, input.id))
+        .limit(1);
+      
+      if (!purchase || purchase.length === 0) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Purchase not found',
+        });
+      }
+      
+      // Verify project belongs to user
+      const project = await db
+        .select()
+        .from(cryptoProjects)
+        .where(
+          and(
+            eq(cryptoProjects.id, purchase[0].project_id),
+            eq(cryptoProjects.user_id, ctx.user.id)
+          )
+        )
+        .limit(1);
+      
+      if (!project || project.length === 0) {
+        throw new TRPCError({
+          code: 'FORBIDDEN',
+          message: 'Not authorized to update this purchase',
+        });
+      }
+      
+      // Build update object
+      const updateData: any = {};
+      if (input.quantity !== undefined) updateData.quantity = input.quantity;
+      if (input.buy_price !== undefined) updateData.buy_price = input.buy_price;
+      if (input.currency !== undefined) updateData.currency = input.currency;
+      
+      // Update purchase
+      await db
+        .update(cryptoPurchases)
+        .set(updateData)
+        .where(eq(cryptoPurchases.id, input.id));
+      
+      return { success: true };
+    }),
 });

@@ -3,8 +3,10 @@
  * Shows all purchase records for a specific cryptocurrency
  */
 
-import { X, Calendar, TrendingUp, DollarSign, Hash } from 'lucide-react';
+import { useState } from 'react';
+import { X, Calendar, TrendingUp, DollarSign, Hash, Edit2, Check, XIcon } from 'lucide-react';
 import { trpc } from '../lib/trpc';
+import { useToast } from '../hooks/useToast';
 
 interface PurchaseHistoryModalProps {
   isOpen: boolean;
@@ -19,11 +21,50 @@ export default function PurchaseHistoryModal({
   symbol,
   name,
 }: PurchaseHistoryModalProps) {
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editValues, setEditValues] = useState({ quantity: '', buy_price: '' });
+  const toast = useToast();
+  const utils = trpc.useUtils();
+  
   // Fetch purchases for this symbol
   const { data: purchases = [], isLoading } = trpc.crypto.getPurchasesBySymbol.useQuery(
     { symbol },
     { enabled: isOpen && !!symbol }
   );
+  
+  // Update purchase mutation
+  const updatePurchaseMutation = trpc.crypto.updatePurchase.useMutation({
+    onSuccess: () => {
+      toast.success('Compra actualizada exitosamente');
+      utils.crypto.getPurchasesBySymbol.invalidate({ symbol });
+      utils.crypto.getProjectSummaries.invalidate();
+      setEditingId(null);
+    },
+    onError: (error) => {
+      toast.error('Error al actualizar: ' + error.message);
+    },
+  });
+  
+  const handleStartEdit = (purchase: any) => {
+    setEditingId(purchase.id);
+    setEditValues({
+      quantity: purchase.quantity,
+      buy_price: purchase.buy_price,
+    });
+  };
+  
+  const handleSaveEdit = (purchaseId: number) => {
+    updatePurchaseMutation.mutate({
+      id: purchaseId,
+      quantity: editValues.quantity,
+      buy_price: editValues.buy_price,
+    });
+  };
+  
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditValues({ quantity: '', buy_price: '' });
+  };
 
   if (!isOpen) return null;
 
@@ -112,6 +153,31 @@ export default function PurchaseHistoryModal({
                         <p className="text-xs text-[#8B92A8]">Fecha de compra</p>
                       </div>
                     </div>
+                    <div className="flex items-center gap-2">
+                      {editingId === purchase.id ? (
+                        <>
+                          <button
+                            onClick={() => handleSaveEdit(purchase.id)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-green-500/10 border border-green-500/20 hover:bg-green-500/20 transition-all"
+                          >
+                            <Check className="w-4 h-4 text-green-500" />
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-all"
+                          >
+                            <XIcon className="w-4 h-4 text-red-500" />
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => handleStartEdit(purchase)}
+                          className="w-8 h-8 flex items-center justify-center rounded-lg border border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.05)] hover:border-[rgba(255,255,255,0.2)] transition-all"
+                        >
+                          <Edit2 className="w-4 h-4 text-[#8B92A8]" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -121,9 +187,18 @@ export default function PurchaseHistoryModal({
                         <Hash className="w-4 h-4 text-[#C4FF3D]" />
                         <p className="text-xs text-[#8B92A8]">Cantidad</p>
                       </div>
-                      <p className="text-lg font-bold text-white">
-                        {formatNumber(purchase.quantity)} {symbol}
-                      </p>
+                      {editingId === purchase.id ? (
+                        <input
+                          type="text"
+                          value={editValues.quantity}
+                          onChange={(e) => setEditValues({ ...editValues, quantity: e.target.value })}
+                          className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.1)] rounded-lg px-3 py-2 text-lg font-bold text-white focus:outline-none focus:border-[#C4FF3D]"
+                        />
+                      ) : (
+                        <p className="text-lg font-bold text-white">
+                          {formatNumber(purchase.quantity)} {symbol}
+                        </p>
+                      )}
                     </div>
 
                     {/* Price */}
@@ -132,10 +207,21 @@ export default function PurchaseHistoryModal({
                         <DollarSign className="w-4 h-4 text-[#C4FF3D]" />
                         <p className="text-xs text-[#8B92A8]">Precio de compra</p>
                       </div>
-                      <p className="text-lg font-bold text-white">
-                        ${formatNumber(purchase.buy_price)}
-                      </p>
-                      <p className="text-xs text-[#8B92A8] mt-1">{purchase.currency}</p>
+                      {editingId === purchase.id ? (
+                        <input
+                          type="text"
+                          value={editValues.buy_price}
+                          onChange={(e) => setEditValues({ ...editValues, buy_price: e.target.value })}
+                          className="w-full bg-[#0A0A0A] border border-[rgba(255,255,255,0.1)] rounded-lg px-3 py-2 text-lg font-bold text-white focus:outline-none focus:border-[#C4FF3D]"
+                        />
+                      ) : (
+                        <>
+                          <p className="text-lg font-bold text-white">
+                            ${formatNumber(purchase.buy_price)}
+                          </p>
+                          <p className="text-xs text-[#8B92A8] mt-1">{purchase.currency}</p>
+                        </>
+                      )}
                     </div>
 
                     {/* Total */}
