@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { X, Calendar, TrendingUp, DollarSign, Hash, Edit2, Check, XIcon } from 'lucide-react';
 import { trpc } from '../lib/trpc';
-import { useToast } from '../hooks/useToast';
+import { useToast } from '../contexts/ToastContext';
 
 interface PurchaseHistoryModalProps {
   isOpen: boolean;
