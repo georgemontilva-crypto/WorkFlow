@@ -64,7 +64,8 @@ export function Toast({
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [duration]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duration, id]);
 
   const handleClose = () => {
     setIsExiting(true);
