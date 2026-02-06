@@ -647,7 +647,7 @@ export default function Markets() {
       {/* Modals */}
       
       {showWalletModal && (
-        <WalletModal onClose={() => setShowWalletModal(false)} />
+        <WalletModal isOpen={showWalletModal} onClose={() => setShowWalletModal(false)} />
       )}
 
       {showPriceAlertModal && selectedAlertCrypto && (
