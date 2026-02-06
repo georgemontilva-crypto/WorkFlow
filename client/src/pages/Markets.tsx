@@ -8,8 +8,7 @@ import { DashboardLayout } from '../components/DashboardLayout';
 import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown, Plus, Trash2, Wallet, X, Wallet2, Bell } from 'lucide-react';
 import { trpc } from '../lib/trpc';
 import { InvestmentTracker } from '../components/InvestmentTracker';
-import Toast from '../components/Toast';
-import { useToast } from '../hooks/useToast';
+import { useToast } from '../contexts/ToastContext';
 import WalletModal from '../components/WalletModal';
 import PriceAlertModal from '../components/PriceAlertModal';
 
