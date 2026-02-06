@@ -81,8 +81,8 @@ export function InvestmentTracker({ projectSummaries }: InvestmentTrackerProps) 
 
             {/* Value */}
             <div className="mb-4">
-              <p className="text-xs text-[#8B92A8] mb-1">Valor total</p>
-              <div className="flex items-baseline gap-2">
+              <p className="text-xs text-[#8B92A8] mb-1">Cantidad total</p>
+              <div className="flex items-baseline gap-2 mb-3">
                 <span className="text-3xl font-bold text-white">
                   {project.total_quantity.toLocaleString('en-US', { 
                     minimumFractionDigits: 2, 
@@ -91,12 +91,27 @@ export function InvestmentTracker({ projectSummaries }: InvestmentTrackerProps) 
                 </span>
                 <span className="text-sm text-[#8B92A8]">{project.symbol}</span>
               </div>
-              <p className="text-sm text-[#8B92A8] mt-1">
-                ${project.current_value.toLocaleString('en-US', { 
-                  minimumFractionDigits: 2, 
-                  maximumFractionDigits: 2 
-                })}
-              </p>
+              <div className="flex items-center gap-3">
+                <div>
+                  <p className="text-xs text-[#8B92A8] mb-0.5">Invertido</p>
+                  <p className="text-sm font-semibold text-white">
+                    ${project.total_invested.toLocaleString('en-US', { 
+                      minimumFractionDigits: 2, 
+                      maximumFractionDigits: 2 
+                    })}
+                  </p>
+                </div>
+                <div className="w-px h-8 bg-[rgba(255,255,255,0.06)]"></div>
+                <div>
+                  <p className="text-xs text-[#8B92A8] mb-0.5">Valor actual</p>
+                  <p className="text-sm font-semibold text-white">
+                    ${project.current_value.toLocaleString('en-US', { 
+                      minimumFractionDigits: 2, 
+                      maximumFractionDigits: 2 
+                    })}
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Stats */}

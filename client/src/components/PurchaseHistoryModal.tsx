@@ -165,7 +165,7 @@ export default function PurchaseHistoryModal({
                 <p className="text-2xl font-bold text-white">{purchases.length}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-[#8B92A8] mb-1">Inversión total</p>
+                <p className="text-xs text-[#8B92A8] mb-1">Total invertido</p>
                 <p className="text-2xl font-bold text-[#C4FF3D]">
                   $
                   {purchases
