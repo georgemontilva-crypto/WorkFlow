@@ -444,28 +444,28 @@ export default function Markets() {
                   key={crypto.id}
                   className="flex items-center justify-between p-4 bg-[#121212] border border-[rgba(255,255,255,0.04)] rounded-xl hover:border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.02)] transition-all cursor-pointer group"
                 >
-                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                     <img src={crypto.image} alt={crypto.name} className="w-10 h-10 rounded-full flex-shrink-0" />
                     <div className="min-w-0 flex-1">
-                      <div className="font-semibold text-white text-base">{crypto.name}</div>
+                      <div className="font-semibold text-white text-sm sm:text-base truncate">{crypto.name}</div>
                       <div className="text-xs text-[#8B92A8] uppercase mt-0.5">{crypto.symbol}</div>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 sm:gap-4">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedAlertCrypto(crypto);
                         setShowPriceAlertModal(true);
                       }}
-                      className="w-9 h-9 flex items-center justify-center hover:bg-[rgba(255,255,255,0.05)] rounded-lg transition-all flex-shrink-0"
+                      className="hidden sm:flex w-9 h-9 items-center justify-center hover:bg-[rgba(255,255,255,0.05)] rounded-lg transition-all flex-shrink-0"
                       title="Configurar alerta de precio"
                     >
                       <Bell className="w-4 h-4 text-[#8B92A8] group-hover:text-[#C4FF3D] transition-colors" />
                     </button>
                     
-                    <div className="text-right flex-shrink-0 min-w-[140px]">
+                    <div className="text-right flex-shrink-0 min-w-[100px] sm:min-w-[140px]">
                       <div className="font-semibold text-white text-base">
                         ${crypto.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
