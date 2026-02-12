@@ -180,10 +180,10 @@ export default function PurchaseHistoryModal({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowAddForm(!showAddForm)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#C4FF3D] text-black rounded-xl font-semibold hover:bg-[#b3e835] transition-all"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-[#C4FF3D] hover:bg-[#b3e835] transition-all"
+              title="Agregar compra"
             >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Agregar Compra</span>
+              <Plus className="w-5 h-5 text-black" />
             </button>
             <button
               onClick={onClose}
