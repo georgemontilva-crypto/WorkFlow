@@ -451,11 +451,11 @@ export default function Savings() {
                         <Button
                           onClick={() => handleAddAmount(goal)}
                           variant="default"
-                          size="sm"
-                          className="min-h-[44px]"
+                          size="icon"
+                          className="w-10 h-10 rounded-full"
+                          title="Agregar monto"
                         >
-                          <TrendingUp className="w-4 h-4 mr-2" />
-                          Agregar
+                          <TrendingUp className="w-5 h-5" />
                         </Button>
                       )}
                       
@@ -563,11 +563,11 @@ export default function Savings() {
                         <Button
                           onClick={() => handleAddAmount(goal)}
                           variant="default"
-                          size="sm"
-                          className="h-9"
+                          size="icon"
+                          className="w-10 h-10 rounded-full flex-shrink-0"
+                          title="Agregar monto"
                         >
-                          <TrendingUp className="w-4 h-4 mr-1.5" />
-                          Agregar
+                          <TrendingUp className="w-5 h-5" />
                         </Button>
                       </div>
                     )}
