@@ -220,7 +220,7 @@ export default function Clients() {
               <Button
                 onClick={() => handleOpenModal()}
                 variant="default"
-                className="w-10 h-10 rounded-full p-0 flex items-center justify-center"
+                className="w-10 h-10 rounded-full p-0 flex items-center justify-center border-2 border-[#C4FF3D]"
                 title="Agregar Cliente"
               >
                 <Plus className="w-5 h-5" />

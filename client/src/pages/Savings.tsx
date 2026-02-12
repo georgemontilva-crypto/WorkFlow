@@ -232,7 +232,7 @@ export default function Savings() {
             }
           }}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="w-10 h-10 rounded-full p-0 flex items-center justify-center border-[#C4FF3D]/40 hover:border-[#C4FF3D] text-[#C4FF3D]" title="Nueva Meta">
+              <Button variant="outline" className="w-10 h-10 rounded-full p-0 flex items-center justify-center border-2 border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10" title="Nueva Meta">
                 <Plus className="w-5 h-5" />
               </Button>
             </DialogTrigger>
@@ -452,7 +452,7 @@ export default function Savings() {
                           onClick={() => handleAddAmount(goal)}
                           variant="default"
                           size="icon"
-                          className="w-10 h-10 rounded-full"
+                          className="w-10 h-10 rounded-full border-2 border-[#C4FF3D]"
                           title="Agregar monto"
                         >
                           <TrendingUp className="w-5 h-5" />
@@ -564,7 +564,7 @@ export default function Savings() {
                           onClick={() => handleAddAmount(goal)}
                           variant="default"
                           size="icon"
-                          className="w-10 h-10 rounded-full flex-shrink-0"
+                          className="w-10 h-10 rounded-full flex-shrink-0 border-2 border-[#C4FF3D]"
                           title="Agregar monto"
                         >
                           <TrendingUp className="w-5 h-5" />
