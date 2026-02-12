@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { X, Calendar, TrendingUp, DollarSign, Hash, Edit2, Check, XIcon, Trash2 } from 'lucide-react';
+import { X, Calendar, TrendingUp, DollarSign, Hash, Edit2, Check, XIcon, Trash2, Plus } from 'lucide-react';
 import { trpc } from '../lib/trpc';
 import { useToast } from '../contexts/ToastContext';
 
@@ -24,6 +24,8 @@ export default function PurchaseHistoryModal({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editValues, setEditValues] = useState({ quantity: '', buy_price: '' });
   const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newPurchase, setNewPurchase] = useState({ quantity: '', buy_price: '' });
   const toast = useToast();
   const utils = trpc.useUtils();
   
@@ -60,6 +62,20 @@ export default function PurchaseHistoryModal({
     },
   });
   
+  // Add purchase mutation
+  const addPurchaseMutation = trpc.crypto.addPurchase.useMutation({
+    onSuccess: () => {
+      toast.success('Compra agregada exitosamente');
+      utils.crypto.getPurchasesBySymbol.invalidate({ symbol });
+      utils.crypto.getProjectSummaries.invalidate();
+      setNewPurchase({ quantity: '', buy_price: '' });
+      setShowAddForm(false);
+    },
+    onError: (error) => {
+      toast.error('Error al agregar compra: ' + error.message);
+    },
+  });
+  
   const handleStartEdit = (purchase: any) => {
     setEditingId(purchase.id);
     setEditValues({
@@ -91,6 +107,33 @@ export default function PurchaseHistoryModal({
   
   const handleCancelDelete = () => {
     setDeletingId(null);
+  };
+  
+  const handleAddPurchase = () => {
+    if (!newPurchase.quantity || !newPurchase.buy_price) {
+      toast.warning('Por favor completa todos los campos');
+      return;
+    }
+    
+    const quantity = parseFloat(newPurchase.quantity);
+    const buyPrice = parseFloat(newPurchase.buy_price);
+    
+    if (isNaN(quantity) || quantity <= 0) {
+      toast.warning('La cantidad debe ser un número positivo');
+      return;
+    }
+    
+    if (isNaN(buyPrice) || buyPrice <= 0) {
+      toast.warning('El precio debe ser un número positivo');
+      return;
+    }
+    
+    addPurchaseMutation.mutate({
+      symbol: symbol.toUpperCase(),
+      quantity,
+      buy_price: buyPrice,
+      currency: 'USD',
+    });
   };
 
   if (!isOpen) return null;
@@ -134,16 +177,75 @@ export default function PurchaseHistoryModal({
               {name} ({symbol})
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="w-10 h-10 flex items-center justify-center rounded-xl border border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.05)] hover:border-[rgba(255,255,255,0.2)] transition-all"
-          >
-            <X className="w-5 h-5 text-[#8B92A8]" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#C4FF3D] text-black rounded-xl font-semibold hover:bg-[#b3e835] transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden sm:inline">Agregar Compra</span>
+            </button>
+            <button
+              onClick={onClose}
+              className="w-10 h-10 flex items-center justify-center rounded-xl border border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.05)] hover:border-[rgba(255,255,255,0.2)] transition-all"
+            >
+              <X className="w-5 h-5 text-[#8B92A8]" />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
+          {/* Add Purchase Form */}
+          {showAddForm && (
+            <div className="bg-[#0A0A0A] border border-[#C4FF3D] rounded-xl p-5 mb-4">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <Plus className="w-5 h-5 text-[#C4FF3D]" />
+                Nueva Compra
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm text-[#8B92A8] mb-2">Cantidad ({symbol})</label>
+                  <input
+                    type="text"
+                    value={newPurchase.quantity}
+                    onChange={(e) => setNewPurchase({ ...newPurchase, quantity: e.target.value })}
+                    placeholder="0.00"
+                    className="w-full bg-[#121212] border border-[rgba(255,255,255,0.1)] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D] transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-[#8B92A8] mb-2">Precio de Compra (USD)</label>
+                  <input
+                    type="text"
+                    value={newPurchase.buy_price}
+                    onChange={(e) => setNewPurchase({ ...newPurchase, buy_price: e.target.value })}
+                    placeholder="0.00"
+                    className="w-full bg-[#121212] border border-[rgba(255,255,255,0.1)] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#C4FF3D] transition-all"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleAddPurchase}
+                  disabled={addPurchaseMutation.isLoading}
+                  className="flex-1 bg-[#C4FF3D] text-black font-semibold py-3 rounded-lg hover:bg-[#b3e835] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {addPurchaseMutation.isLoading ? 'Agregando...' : 'Agregar Compra'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAddForm(false);
+                    setNewPurchase({ quantity: '', buy_price: '' });
+                  }}
+                  className="px-6 py-3 border border-[rgba(255,255,255,0.1)] text-white rounded-lg hover:bg-[rgba(255,255,255,0.05)] transition-all"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
+          
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="w-8 h-8 border-2 border-[#C4FF3D] border-t-transparent rounded-full animate-spin"></div>
