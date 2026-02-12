@@ -499,17 +499,17 @@ export default function Markets() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowWalletModal(true)}
-                className="flex items-center gap-2 border border-[#C4FF3D] text-[#C4FF3D] px-4 py-2.5 rounded-xl hover:bg-[#C4FF3D]/10 transition-all font-medium text-sm"
+                className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
+                title="Wallet de direcciones"
               >
-                <Wallet2 className="w-4 h-4" />
-                <span className="hidden md:inline">Wallet de direcciones</span>
+                <Wallet2 className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setShowPurchaseModal(true)}
-                className="flex items-center gap-2 border border-[#C4FF3D] text-[#C4FF3D] px-4 py-2.5 rounded-xl hover:bg-[#C4FF3D]/10 transition-all font-medium text-sm"
+                className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
+                title="Habilitar más activos"
               >
-                <Plus className="w-4 h-4" />
-                <span className="hidden md:inline">Habilitar más activos</span>
+                <Plus className="w-5 h-5" />
               </button>
             </div>
           </div>
