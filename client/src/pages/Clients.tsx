@@ -220,10 +220,10 @@ export default function Clients() {
               <Button
                 onClick={() => handleOpenModal()}
                 variant="default"
-                className="md:w-auto w-12 h-12 md:h-auto rounded-full md:rounded-[9999px] p-0 md:px-4 md:py-2 flex items-center justify-center"
+                className="w-10 h-10 rounded-full p-0 flex items-center justify-center"
+                title="Agregar Cliente"
               >
-                <Plus className="w-5 h-5 md:mr-2" />
-                <span className="hidden md:inline">{'Agregar Cliente'}</span>
+                <Plus className="w-5 h-5" />
               </Button>
             </div>
           </div>

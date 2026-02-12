@@ -232,9 +232,8 @@ export default function Savings() {
             }
           }}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="w-12 h-12 md:w-auto md:h-auto rounded-full md:rounded-md p-0 md:px-4 md:py-2 flex items-center justify-center border-[#C4FF3D]/40 hover:border-[#C4FF3D] text-[#C4FF3D]">
-                <Plus className="w-5 h-5 md:mr-2" />
-                <span className="hidden md:inline">Nueva Meta</span>
+              <Button variant="outline" className="w-10 h-10 rounded-full p-0 flex items-center justify-center border-[#C4FF3D]/40 hover:border-[#C4FF3D] text-[#C4FF3D]" title="Nueva Meta">
+                <Plus className="w-5 h-5" />
               </Button>
             </DialogTrigger>
             <DialogContent className="bg-[#0a0a0a] border-white/10 max-w-lg max-h-[90vh] overflow-y-auto">
