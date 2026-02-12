@@ -7,7 +7,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router } from "./_core/trpc";
 import { getDb } from "./db";
-import { cryptoProjects, cryptoPurchases } from "../drizzle/schema";
+import { cryptoProjects, cryptoPurchases, priceAlerts } from "../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
 
 export const cryptoRouter = router({
@@ -435,5 +435,55 @@ export const cryptoRouter = router({
         .where(eq(cryptoPurchases.id, input.id));
       
       return { success: true };
+    }),
+
+  /**
+   * Create a price alert
+   */
+  createPriceAlert: protectedProcedure
+    .input(z.object({
+      symbol: z.string().min(1).max(20),
+      targetPrice: z.number().positive(),
+      condition: z.enum(['above', 'below']),
+      notifyEmail: z.boolean().optional(),
+      notifyApp: z.boolean().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      
+      // Create price alert
+      await db.insert(priceAlerts).values({
+        user_id: ctx.user.id,
+        symbol: input.symbol.toUpperCase(),
+        type: 'crypto',
+        target_price: input.targetPrice.toString(),
+        condition: input.condition,
+        is_active: 1,
+        notify_email: input.notifyEmail ? 1 : 0,
+        notify_app: input.notifyApp ? 1 : 0,
+      });
+      
+      return { success: true };
+    }),
+
+  /**
+   * Get all price alerts for the current user
+   */
+  getPriceAlerts: protectedProcedure
+    .query(async ({ ctx }) => {
+      const db = await getDb();
+      
+      const alerts = await db
+        .select()
+        .from(priceAlerts)
+        .where(
+          and(
+            eq(priceAlerts.user_id, ctx.user.id),
+            eq(priceAlerts.type, 'crypto')
+          )
+        )
+        .orderBy(desc(priceAlerts.created_at));
+      
+      return alerts;
     }),
 });

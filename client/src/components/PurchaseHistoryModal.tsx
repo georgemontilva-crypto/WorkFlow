@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { X, Calendar, TrendingUp, DollarSign, Hash, Edit2, Check, XIcon } from 'lucide-react';
+import { X, Calendar, TrendingUp, DollarSign, Hash, Edit2, Check, XIcon, Trash2 } from 'lucide-react';
 import { trpc } from '../lib/trpc';
 import { useToast } from '../contexts/ToastContext';
 
@@ -23,6 +23,7 @@ export default function PurchaseHistoryModal({
 }: PurchaseHistoryModalProps) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editValues, setEditValues] = useState({ quantity: '', buy_price: '' });
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const toast = useToast();
   const utils = trpc.useUtils();
   
@@ -45,6 +46,20 @@ export default function PurchaseHistoryModal({
     },
   });
   
+  // Delete purchase mutation
+  const deletePurchaseMutation = trpc.crypto.deletePurchase.useMutation({
+    onSuccess: () => {
+      toast.success('Compra eliminada exitosamente');
+      utils.crypto.getPurchasesBySymbol.invalidate({ symbol });
+      utils.crypto.getProjectSummaries.invalidate();
+      setDeletingId(null);
+    },
+    onError: (error) => {
+      toast.error('Error al eliminar: ' + error.message);
+      setDeletingId(null);
+    },
+  });
+  
   const handleStartEdit = (purchase: any) => {
     setEditingId(purchase.id);
     setEditValues({
@@ -64,6 +79,18 @@ export default function PurchaseHistoryModal({
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditValues({ quantity: '', buy_price: '' });
+  };
+  
+  const handleDelete = (purchaseId: number) => {
+    setDeletingId(purchaseId);
+  };
+  
+  const handleConfirmDelete = (purchaseId: number) => {
+    deletePurchaseMutation.mutate({ id: purchaseId });
+  };
+  
+  const handleCancelDelete = () => {
+    setDeletingId(null);
   };
 
   if (!isOpen) return null;
@@ -154,7 +181,24 @@ export default function PurchaseHistoryModal({
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {editingId === purchase.id ? (
+                      {deletingId === purchase.id ? (
+                        <>
+                          <button
+                            onClick={() => handleConfirmDelete(purchase.id)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-all"
+                            title="Confirmar eliminación"
+                          >
+                            <Check className="w-4 h-4 text-red-500" />
+                          </button>
+                          <button
+                            onClick={handleCancelDelete}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.1)] transition-all"
+                            title="Cancelar"
+                          >
+                            <XIcon className="w-4 h-4 text-[#8B92A8]" />
+                          </button>
+                        </>
+                      ) : editingId === purchase.id ? (
                         <>
                           <button
                             onClick={() => handleSaveEdit(purchase.id)}
@@ -170,12 +214,22 @@ export default function PurchaseHistoryModal({
                           </button>
                         </>
                       ) : (
-                        <button
-                          onClick={() => handleStartEdit(purchase)}
-                          className="w-8 h-8 flex items-center justify-center rounded-lg border border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.05)] hover:border-[rgba(255,255,255,0.2)] transition-all"
-                        >
-                          <Edit2 className="w-4 h-4 text-[#8B92A8]" />
-                        </button>
+                        <>
+                          <button
+                            onClick={() => handleStartEdit(purchase)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg border border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.05)] hover:border-[rgba(255,255,255,0.2)] transition-all"
+                            title="Editar"
+                          >
+                            <Edit2 className="w-4 h-4 text-[#8B92A8]" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(purchase.id)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg border border-[rgba(255,255,255,0.1)] hover:bg-red-500/10 hover:border-red-500/20 transition-all group"
+                            title="Eliminar"
+                          >
+                            <Trash2 className="w-4 h-4 text-[#8B92A8] group-hover:text-red-500" />
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>

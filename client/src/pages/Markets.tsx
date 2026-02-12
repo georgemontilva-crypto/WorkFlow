@@ -652,6 +652,7 @@ export default function Markets() {
 
       {showPriceAlertModal && selectedAlertCrypto && (
         <PriceAlertModal
+          isOpen={showPriceAlertModal}
           crypto={selectedAlertCrypto}
           onClose={() => {
             setShowPriceAlertModal(false);

@@ -6,7 +6,7 @@
 import { useState, useEffect } from 'react';
 import { X, Bell, TrendingUp, TrendingDown, Mail, Smartphone } from 'lucide-react';
 import { trpc } from '../lib/trpc';
-import { useToast } from '../hooks/useToast';
+import { useToast } from '../contexts/ToastContext';
 
 interface PriceAlertModalProps {
   isOpen: boolean;
