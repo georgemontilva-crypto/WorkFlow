@@ -162,12 +162,29 @@ export default function Markets() {
   const [selectedAlertCrypto, setSelectedAlertCrypto] = useState<Crypto | null>(null);
   const [selectedCrypto, setSelectedCrypto] = useState<string>('');
   const [cryptoSearchTerm, setCryptoSearchTerm] = useState('');
-  const [activeCharts, setActiveCharts] = useState<string[]>([]);
+  // Load active charts from localStorage on mount
+  const [activeCharts, setActiveCharts] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('activeCharts');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const utils = trpc.useUtils();
   const toast = useToast();
+
+  // Save active charts to localStorage whenever it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('activeCharts', JSON.stringify(activeCharts));
+    } catch (error) {
+      console.error('Error saving active charts to localStorage:', error);
+    }
+  }, [activeCharts]);
 
   // Fetch crypto purchases
   const { data: rawProjectSummaries = [] } = trpc.crypto.getProjectSummaries.useQuery();
