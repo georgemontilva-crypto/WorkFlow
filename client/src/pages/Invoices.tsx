@@ -418,11 +418,8 @@ export default function Invoices() {
         
         {/* Header Card - Isla 1 */}
         <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold text-[#EDEDED]">{'Facturas'}</h1>
-              <p className="text-[#8B92A8] mt-1">{'Gestiona tus facturas'}</p>
-            </div>
+          <div className="flex items-start justify-between">
+            <h1 className="text-2xl font-semibold text-[#EDEDED]">{'Facturas'}</h1>
             <button
               onClick={handleOpenModal}
               className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
@@ -431,6 +428,7 @@ export default function Invoices() {
               <Plus className="w-5 h-5" />
             </button>
           </div>
+          <p className="text-[#8B92A8] mt-1">{'Gestiona tus facturas'}</p>
         </Card>
 
         {/* Invoices List Card with Filters */}
@@ -500,7 +498,7 @@ export default function Invoices() {
           </div>
           
           {/* Header - Solo contador */}
-          <div className="mb-6">
+          <div className="mb-6 text-center">
             <p className="text-[#8B92A8] text-sm">{filteredInvoices.length} factura{filteredInvoices.length !== 1 ? 's' : ''}</p>
           </div>
           
