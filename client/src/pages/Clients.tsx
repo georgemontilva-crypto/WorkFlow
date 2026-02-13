@@ -217,14 +217,13 @@ export default function Clients() {
               </Button>
               
               {/* Botón de Agregar Cliente */}
-              <Button
+              <button
                 onClick={() => handleOpenModal()}
-                variant="outline"
-                className="w-10 h-10 min-w-[2.5rem] max-w-[2.5rem] rounded-full p-0 flex items-center justify-center border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 flex-shrink-0"
+                className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
                 title="Agregar Cliente"
               >
                 <Plus className="w-5 h-5" />
-              </Button>
+              </button>
             </div>
           </div>
         </Card>

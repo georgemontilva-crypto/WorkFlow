@@ -423,14 +423,13 @@ export default function Invoices() {
               <h1 className="text-2xl font-semibold text-[#EDEDED]">{'Facturas'}</h1>
               <p className="text-[#8B92A8] mt-1">{'Gestiona tus facturas'}</p>
             </div>
-            <Button
+            <button
               onClick={handleOpenModal}
-              variant="outline"
-              className="w-10 h-10 min-w-[2.5rem] max-w-[2.5rem] rounded-full p-0 flex items-center justify-center border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 flex-shrink-0"
+              className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
               title="Crear Factura"
             >
               <Plus className="w-5 h-5" />
-            </Button>
+            </button>
           </div>
         </Card>
 
