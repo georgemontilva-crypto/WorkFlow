@@ -420,13 +420,22 @@ export default function Invoices() {
         <Card>
           <div className="flex items-start justify-between">
             <h1 className="text-2xl font-semibold text-[#EDEDED]">{'Facturas'}</h1>
-            <button
-              onClick={handleOpenModal}
-              className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
-              title="Crear Factura"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowSearchModal(true)}
+                className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
+                title="Buscar"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleOpenModal}
+                className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
+                title="Crear Factura"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            </div>
           </div>
           <p className="text-[#8B92A8] mt-1">{'Gestiona tus facturas'}</p>
         </Card>
