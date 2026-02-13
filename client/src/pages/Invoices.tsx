@@ -418,7 +418,7 @@ export default function Invoices() {
         
         {/* Header Card - Isla 1 */}
         <Card>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold text-[#EDEDED]">{'Facturas'}</h1>
               <p className="text-[#8B92A8] mt-1">{'Gestiona tus facturas'}</p>
