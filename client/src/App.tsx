@@ -12,7 +12,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
 import { ToastProvider } from "./contexts/ToastContext";
-import Landing from "./pages/Landing";
+import RootRedirect from "./pages/RootRedirect";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -42,8 +42,7 @@ function Router() {
   return (
     <Switch>
       {/* Public routes */}
-      <Route path="/" component={Landing} />
-      <Route path="/landing" component={Landing} />
+      <Route path="/" component={RootRedirect} />
       <Route path="/signup" component={Signup} />
       <Route path="/login" component={Login} />
       <Route path="/verify-email" component={VerifyEmail} />
