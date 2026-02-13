@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { DashboardLayout } from '../components/DashboardLayout';
-import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown, Plus, Trash2, Wallet, X, Wallet2, Bell } from 'lucide-react';
+import { TrendingUp, TrendingDown, ArrowRightLeft, Target, ChevronDown, Plus, Trash2, Wallet, X, Wallet2, Bell, Search } from 'lucide-react';
 import { trpc } from '../lib/trpc';
 import { InvestmentTracker } from '../components/InvestmentTracker';
 import { useToast } from '../contexts/ToastContext';
@@ -160,6 +160,7 @@ export default function Markets() {
   const [showPriceAlertModal, setShowPriceAlertModal] = useState(false);
   const [selectedAlertCrypto, setSelectedAlertCrypto] = useState<Crypto | null>(null);
   const [selectedCrypto, setSelectedCrypto] = useState<string>('');
+  const [cryptoSearchTerm, setCryptoSearchTerm] = useState('');
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -423,10 +424,24 @@ export default function Markets() {
 
         {/* SECTION 1: Criptomonedas */}
         <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-bold text-white">Criptomonedas</h2>
-              <p className="text-xs text-[#8B92A8] mt-1">Actualización automática cada 10s</p>
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-white">Criptomonedas</h2>
+                <p className="text-xs text-[#8B92A8] mt-1">Actualización automática cada 10s</p>
+              </div>
+            </div>
+            
+            {/* Buscador de criptomonedas */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B92A8]" />
+              <input
+                type="text"
+                value={cryptoSearchTerm}
+                onChange={(e) => setCryptoSearchTerm(e.target.value)}
+                placeholder="Buscar por nombre o símbolo..."
+                className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder-[#8B92A8] focus:outline-none focus:border-[#C4FF3D]/50 transition-all"
+              />
             </div>
           </div>
           
@@ -439,7 +454,12 @@ export default function Markets() {
             </div>
           ) : (
             <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[rgba(255,255,255,0.1)] scrollbar-track-transparent hover:scrollbar-thumb-[rgba(255,255,255,0.2)]">
-              {cryptos.map((crypto) => (
+              {cryptos
+                .filter(crypto => 
+                  crypto.name.toLowerCase().includes(cryptoSearchTerm.toLowerCase()) ||
+                  crypto.symbol.toLowerCase().includes(cryptoSearchTerm.toLowerCase())
+                )
+                .map((crypto) => (
                 <div
                   key={crypto.id}
                   className="flex items-center justify-between p-4 bg-[#121212] border border-[rgba(255,255,255,0.04)] rounded-xl hover:border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.02)] transition-all cursor-pointer group"
