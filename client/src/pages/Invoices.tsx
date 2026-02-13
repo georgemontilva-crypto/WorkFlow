@@ -440,21 +440,24 @@ export default function Invoices() {
           <div className="md:hidden flex items-center justify-center gap-4 mb-6">
             <button
               onClick={() => setShowSearchModal(true)}
-              className="w-12 h-12 rounded-full bg-[#121212] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 flex items-center justify-center transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
+              title="Buscar"
             >
-              <Search className="w-5 h-5 text-[#8B92A8]" />
+              <Search className="w-5 h-5" />
             </button>
             <button
               onClick={() => setShowClientFilterModal(true)}
-              className="w-12 h-12 rounded-full bg-[#121212] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 flex items-center justify-center transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
+              title="Filtrar por Cliente"
             >
-              <Users className="w-5 h-5 text-[#8B92A8]" />
+              <Users className="w-5 h-5" />
             </button>
             <button
               onClick={() => setShowStatusFilterModal(true)}
-              className="w-12 h-12 rounded-full bg-[#121212] border border-[rgba(255,255,255,0.06)] hover:border-[#C4FF3D]/40 flex items-center justify-center transition-colors"
+              className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
+              title="Filtrar por Estado"
             >
-              <FileText className="w-5 h-5 text-[#8B92A8]" />
+              <FileText className="w-5 h-5" />
             </button>
           </div>
           
