@@ -206,7 +206,7 @@ export default function Home() {
     <DashboardLayout>
       <div className="max-w-[1440px] mx-auto p-6 space-y-6">
         {/* ZONA 1: Métricas Principales */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none pb-2 lg:pb-0">
+        <div className="flex lg:grid lg:grid-cols-4 gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none pb-2 lg:pb-0 -mx-6 px-6 lg:mx-0 lg:px-0">
           {/* Ingresos Cobrados */}
           <Card className="bg-card border-border min-w-[280px] lg:min-w-0 snap-center shrink-0">
             <CardContent className="p-6">
