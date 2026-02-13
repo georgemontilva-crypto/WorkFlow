@@ -231,7 +231,7 @@ export default function PurchaseHistoryModal({
                   disabled={addPurchaseMutation.isLoading}
                   className="flex-1 bg-[#C4FF3D] text-black font-semibold py-3 rounded-lg hover:bg-[#b3e835] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {addPurchaseMutation.isLoading ? 'Agregando...' : 'Agregar Compra'}
+                  {addPurchaseMutation.isLoading ? 'Agregando...' : 'Agregar'}
                 </button>
                 <button
                   onClick={() => {
