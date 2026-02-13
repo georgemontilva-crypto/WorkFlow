@@ -11,6 +11,7 @@ import { InvestmentTracker } from '../components/InvestmentTracker';
 import { useToast } from '../contexts/ToastContext';
 import WalletModal from '../components/WalletModal';
 import PriceAlertModal from '../components/PriceAlertModal';
+import { CryptoChart } from '../components/CryptoChart';
 
 interface Crypto {
   id: string;
@@ -568,13 +569,13 @@ export default function Markets() {
                           </div>
                         </div>
                         
-                        {/* Placeholder para gráfica */}
-                        <div className="h-48 bg-[#0A0A0A] border border-[rgba(255,255,255,0.04)] rounded-lg flex items-center justify-center">
-                          <div className="text-center text-[#8B92A8]">
-                            <BarChart3 className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                            <p className="text-xs">Gráfica de {crypto.symbol}</p>
-                            <p className="text-xs opacity-70">(Próximamente)</p>
-                          </div>
+                        {/* Gráfica de precios */}
+                        <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.04)] rounded-lg p-4">
+                          <CryptoChart 
+                            cryptoId={crypto.id} 
+                            cryptoSymbol={crypto.symbol}
+                            days={7}
+                          />
                         </div>
                       </div>
                     );
