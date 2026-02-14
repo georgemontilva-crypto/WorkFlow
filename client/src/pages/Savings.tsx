@@ -206,15 +206,13 @@ export default function Savings() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1440px] mx-auto p-6 space-y-6">
+      <div className="max-w-[1440px] mx-auto px-2 py-4 md:p-6 space-y-4 md:space-y-6 overflow-x-hidden">
         {/* Header Card - Isla 1 */}
         <Card>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6">
+          <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Metas de Ahorro</h1>
-              <p className="text-sm sm:text-base text-[#8B92A8]">
-                Define y alcanza tus objetivos financieros
-              </p>
+              <h1 className="text-2xl font-semibold text-[#EDEDED]">Metas de Ahorro</h1>
+              <p className="text-[#8B92A8] mt-1">Define y alcanza tus objetivos financieros</p>
             </div>
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
@@ -360,9 +358,9 @@ export default function Savings() {
         </Card>
 
         {/* Savings Goals Card - Isla 2 */}
-        <Card className="py-4">
+        <Card className="bg-transparent md:bg-[#121212] border-0 md:border md:border-[rgba(255,255,255,0.06)] p-0 md:py-4">
           {/* Contador */}
-          <div className="mb-4 px-6">
+          <div className="mb-4 md:px-6">
             <p className="text-[#8B92A8] text-sm">{savingsGoals?.length || 0} meta{(savingsGoals?.length || 0) !== 1 ? 's' : ''}</p>
           </div>
 
@@ -391,7 +389,7 @@ export default function Savings() {
             </p>
           </div>
         ) : (
-          <div className="space-y-4 px-6">
+          <div className="space-y-4 md:px-6">
             {savingsGoals.map((goal) => {
               const targetAmount = parseFloat(goal.target_amount) || 0;
               const currentAmount = parseFloat(goal.current_amount) || 0;
