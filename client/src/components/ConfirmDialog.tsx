@@ -57,9 +57,9 @@ export function ConfirmDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
       <div 
-        className="bg-[#121212] rounded-[28px] border border-[#C4FF3D]/20 p-6 max-w-md w-full shadow-2xl"
+        className="bg-[#0A0A0A] rounded-[20px] border border-[rgba(255,255,255,0.06)] p-6 max-w-md w-full max-h-[70vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header con icono */}

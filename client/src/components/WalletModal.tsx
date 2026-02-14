@@ -234,8 +234,8 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#121212] border border-[rgba(255,255,255,0.1)] rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] w-full max-w-2xl max-h-[70vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[rgba(255,255,255,0.06)]">
           <div className="flex items-center gap-3">

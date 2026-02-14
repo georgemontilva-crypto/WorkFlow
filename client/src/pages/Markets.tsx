@@ -757,8 +757,8 @@ export default function Markets() {
 
       {/* Purchase Modal */}
       {showPurchaseModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.1)] rounded-2xl p-6 max-w-md w-full">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-6 max-w-md w-full max-h-[70vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-white">Registrar Compra</h3>
               <button

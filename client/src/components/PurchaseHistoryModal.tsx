@@ -167,8 +167,8 @@ export default function PurchaseHistoryModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-      <div className="bg-[#121212] border border-[rgba(255,255,255,0.1)] rounded-2xl w-full max-w-3xl max-h-[85vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+      <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] w-full max-w-3xl max-h-[70vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[rgba(255,255,255,0.06)]">
           <div>
