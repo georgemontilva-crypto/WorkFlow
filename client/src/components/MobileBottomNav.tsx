@@ -22,7 +22,7 @@ export function MobileBottomNav() {
     <nav 
       className="md:hidden fixed left-4 right-4 z-50"
       style={{ 
-        bottom: 'calc(8px + env(safe-area-inset-bottom))',
+        bottom: 'max(4px, env(safe-area-inset-bottom))',
       }}
     >
       {/* Isla con glassmorfismo */}
