@@ -366,7 +366,7 @@ export default function Finances() {
         </div>
 
         {/* Transacciones Recientes */}
-        <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
+        <div className="bg-transparent md:bg-[#121212] border-0 md:border md:border-[rgba(255,255,255,0.06)] rounded-none md:rounded-2xl p-0 md:p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
             <h2 className="text-xl font-bold text-white">Transacciones Recientes</h2>
             
@@ -426,7 +426,7 @@ export default function Finances() {
                 return (
                   <div 
                     key={transaction.id} 
-                    className="bg-transparent md:bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-none md:rounded-[20px] p-4 hover:border-[rgba(255,255,255,0.06)] transition-colors"
+                    className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-4 hover:border-[rgba(255,255,255,0.06)] transition-colors"
                   >
                     {/* Desktop: Layout horizontal */}
                     <div className="hidden md:flex items-center justify-between gap-3">
