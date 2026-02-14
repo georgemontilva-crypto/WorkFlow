@@ -27,9 +27,9 @@ export function Card({
 }: CardProps) {
   const paddingClasses = {
     none: '',
-    small: 'p-4',      // 16px
-    medium: 'p-6',     // 24px
-    large: 'p-6',      // 24px (default)
+    small: 'p-3 md:p-4',      // 12px móvil, 16px desktop
+    medium: 'p-4 md:p-6',     // 16px móvil, 24px desktop
+    large: 'p-4 md:p-6',      // 16px móvil, 24px desktop (default)
   };
 
   return (
