@@ -26,18 +26,16 @@ export function SplashScreen({ onComplete, minDuration = 2000 }: SplashScreenPro
 
   return (
     <div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center"
+      className="fixed inset-0 z-[9999]"
       style={{
-        background: 'linear-gradient(135deg, #1a2a1a 0%, #0a0a0a 50%, #1a1a0a 100%)',
+        backgroundColor: '#0a0a0a',
       }}
     >
-      <div className="animate-fade-in">
-        <img 
-          src="/splash-screen.jpg" 
-          alt="Finwrk" 
-          className="w-full h-screen object-contain"
-        />
-      </div>
+      <img 
+        src="/splash-screen.jpg" 
+        alt="Finwrk" 
+        className="w-full h-full object-cover"
+      />
     </div>
   );
 }

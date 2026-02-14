@@ -35,8 +35,6 @@ import PricingPage from "./pages/PricingPage";
 import CompanyProfile from "./pages/CompanyProfile";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { SuperAdminRoute } from "./components/SuperAdminRoute";
-import { SplashScreen } from "./components/SplashScreen";
-import { useState } from "react";
 
 
 function Router() {
@@ -122,19 +120,11 @@ function Router() {
 }
 
 function App() {
-  const [showSplash, setShowSplash] = useState(true);
-
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
         <ToastProvider>
           <TooltipProvider>
-            {showSplash && (
-              <SplashScreen 
-                onComplete={() => setShowSplash(false)} 
-                minDuration={2000}
-              />
-            )}
             <Router />
           </TooltipProvider>
         </ToastProvider>
