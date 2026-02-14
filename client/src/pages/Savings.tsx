@@ -230,7 +230,7 @@ export default function Savings() {
             }
           }}>
             <DialogTrigger asChild>
-              <button className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all" title="Nueva Meta">
+              <button className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all" title="Nueva Meta">
                 <Plus className="w-5 h-5" />
               </button>
             </DialogTrigger>
