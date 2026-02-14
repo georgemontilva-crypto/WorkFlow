@@ -204,7 +204,7 @@ export default function Home() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1440px] mx-auto px-4 py-4 md:p-6 space-y-4 md:space-y-6">
+      <div className="max-w-[1440px] mx-auto px-2 py-4 md:p-6 space-y-4 md:space-y-6">
         {/* ZONA 1: Métricas Principales */}
         <div className="flex lg:grid lg:grid-cols-4 gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none pb-2 lg:pb-0 -mx-6 px-6 lg:mx-0 lg:px-0">
           {/* Ingresos Cobrados */}
@@ -394,51 +394,51 @@ export default function Home() {
           </Card>
 
           {/* Actividad Reciente (Movimientos Recientes) */}
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="text-foreground flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" />
-                Movimientos Recientes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {recentActivity.length > 0 ? (
-                <div className="space-y-3 h-[400px] overflow-y-auto">
-                  {recentActivity.map((invoice) => (
-                    <div 
-                      key={invoice.id} 
-                      className="flex items-center justify-between p-3 bg-background rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer"
-                      onClick={() => setLocation('/invoices')}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-full bg-primary/10">
-                          <FileText className="w-4 h-4 text-primary" />
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-foreground" />
+              <h2 className="text-xl font-semibold text-foreground">Movimientos Recientes</h2>
+            </div>
+            {recentActivity.length > 0 ? (
+              <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                {recentActivity.map((invoice) => (
+                  <Card 
+                    key={invoice.id} 
+                    className="bg-card border-border hover:border-primary/50 transition-colors cursor-pointer"
+                    onClick={() => setLocation('/invoices')}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 rounded-full bg-primary/10">
+                            <FileText className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-sm">{invoice.invoice_number}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(invoice.created_at), 'dd MMM yyyy HH:mm', { locale: es })}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-sm">{invoice.invoice_number}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {format(new Date(invoice.created_at), 'dd MMM yyyy HH:mm', { locale: es })}
+                        <div className="flex items-center gap-3">
+                          <p className="font-semibold text-sm">
+                            ${Number(invoice.total || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
                           </p>
+                          {getStatusBadge(invoice.status)}
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <p className="font-semibold text-sm">
-                          ${Number(invoice.total || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}
-                        </p>
-                        {getStatusBadge(invoice.status)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 h-[400px] flex flex-col items-center justify-center">
-                  <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">Aún no hay actividad</p>
-                  <p className="text-sm text-muted-foreground mt-1">Las facturas que crees aparecerán aquí</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 flex flex-col items-center justify-center">
+                <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Aún no hay actividad</p>
+                <p className="text-sm text-muted-foreground mt-1">Las facturas que crees aparecerán aquí</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </DashboardLayout>
