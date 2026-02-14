@@ -234,7 +234,7 @@ export default function Savings() {
                 <Plus className="w-5 h-5" />
               </button>
             </DialogTrigger>
-            <DialogContent className="bg-[#0a0a0a] border-white/10 max-w-lg max-h-[calc(100vh-9rem)] md:max-h-[90vh] overflow-y-auto overflow-x-hidden">
+            <DialogContent className="bg-[#0a0a0a] border-white/10 max-w-lg max-h-[70vh] md:max-h-[90vh] overflow-y-auto overflow-x-hidden">
               <DialogHeader>
                 <DialogTitle className="text-white text-2xl">
                   {editingGoal ? 'Editar Meta de Ahorro' : 'Nueva Meta de Ahorro'}

@@ -851,7 +851,7 @@ export default function Invoices() {
       {/* Create Invoice Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-[#0A0A0A] rounded-lg border border-[rgba(255,255,255,0.06)] w-full max-w-3xl max-h-[calc(100vh-9rem)] md:max-h-[90vh] overflow-y-auto overflow-x-hidden my-auto">
+          <div className="bg-[#0A0A0A] rounded-lg border border-[rgba(255,255,255,0.06)] w-full max-w-3xl max-h-[70vh] md:max-h-[90vh] overflow-y-auto overflow-x-hidden my-auto">
             <div className="p-4 sm:p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">{'Crear Factura'}</h2>
@@ -1268,7 +1268,7 @@ export default function Invoices() {
       {/* View Invoice Modal */}
       {viewingInvoice && viewInvoiceData && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-2xl max-h-[calc(100vh-9rem)] md:max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-2xl max-h-[70vh] md:max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">Detalle de Factura</h2>
@@ -1494,7 +1494,7 @@ export default function Invoices() {
       {/* Mobile Client Filter Modal */}
       {showClientFilterModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center">
-          <div className="bg-[#0A0A0A] w-full md:max-w-md md:rounded-lg rounded-t-[28px] p-6 max-h-[calc(100vh-9rem)] md:max-h-[80vh] overflow-y-auto">
+          <div className="bg-[#0A0A0A] w-full md:max-w-md md:rounded-lg rounded-t-[28px] p-6 max-h-[70vh] md:max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-white font-semibold">Filtrar por Cliente</h3>
               <button onClick={() => setShowClientFilterModal(false)} className="text-[#8B92A8] hover:text-white">

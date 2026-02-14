@@ -463,7 +463,7 @@ export default function Clients() {
 
       {/* Modal para Crear/Editar Cliente */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="bg-[#121212] border-[rgba(255,255,255,0.06)] max-w-2xl max-h-[calc(100vh-9rem)] md:max-h-[90vh] overflow-y-auto my-auto">
+        <DialogContent className="bg-[#121212] border-[rgba(255,255,255,0.06)] max-w-2xl max-h-[70vh] md:max-h-[90vh] overflow-y-auto my-auto">
           <DialogHeader>
             <DialogTitle className="text-[#EDEDED] text-2xl font-semibold">
               {editingClient ? 'Editar Cliente' : 'Agregar Cliente'}
