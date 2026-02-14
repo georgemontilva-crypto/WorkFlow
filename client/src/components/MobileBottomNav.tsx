@@ -20,7 +20,7 @@ export function MobileBottomNav() {
 
   return (
     <nav 
-      className="md:hidden fixed bottom-4 left-4 right-4 z-50"
+      className="md:hidden fixed bottom-2 left-4 right-4 z-50"
       style={{ 
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
