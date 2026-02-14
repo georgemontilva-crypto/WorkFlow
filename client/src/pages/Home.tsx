@@ -204,7 +204,7 @@ export default function Home() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1440px] mx-auto px-4 py-4 md:p-6 space-y-4 md:space-y-6">4 md:space-y-6">
+      <div className="max-w-[1440px] mx-auto px-4 py-4 md:p-6 space-y-4 md:space-y-6">
         {/* ZONA 1: Métricas Principales */}
         <div className="flex lg:grid lg:grid-cols-4 gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none pb-2 lg:pb-0 -mx-6 px-6 lg:mx-0 lg:px-0">
           {/* Ingresos Cobrados */}
