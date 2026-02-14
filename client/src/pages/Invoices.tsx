@@ -423,14 +423,14 @@ export default function Invoices() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowSearchModal(true)}
-                className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
+                className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
                 title="Buscar"
               >
                 <Search className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setShowStatusFilterModal(true)}
-                className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
+                className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
                 title="Filtrar por Estado"
               >
                 <FileText className="w-5 h-5" />
