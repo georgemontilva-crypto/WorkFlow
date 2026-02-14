@@ -3,38 +3,12 @@
  * Design: Inspirado en iOS con botón central destacado
  */
 
-import React from 'react';
 import { Link, useLocation } from 'wouter';
 import { Users, FileText, LayoutDashboard, TrendingUp, LineChart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function MobileBottomNav() {
   const [location] = useLocation();
-  const [bottomPosition, setBottomPosition] = React.useState(0);
-
-  React.useEffect(() => {
-    // Detectar cambios en el visualViewport para mantener la barra fija
-    const handleResize = () => {
-      if (window.visualViewport) {
-        // Calcular la diferencia entre el viewport y la ventana
-        const offsetY = window.innerHeight - window.visualViewport.height;
-        setBottomPosition(offsetY);
-      }
-    };
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', handleResize);
-      window.visualViewport.addEventListener('scroll', handleResize);
-      handleResize(); // Llamar inicialmente
-    }
-
-    return () => {
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', handleResize);
-        window.visualViewport.removeEventListener('scroll', handleResize);
-      }
-    };
-  }, []);
 
   const navItems = [
     { name: 'Clientes', href: '/clients', icon: Users },
@@ -46,9 +20,8 @@ export function MobileBottomNav() {
 
   return (
     <nav 
-      className="md:hidden fixed left-0 right-0 z-50 bg-[#0A0A0A] border-t border-[rgba(255,255,255,0.06)]"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0A0A0A] border-t border-[rgba(255,255,255,0.06)]"
       style={{ 
-        bottom: `${bottomPosition}px`,
         paddingBottom: 'env(safe-area-inset-bottom)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
