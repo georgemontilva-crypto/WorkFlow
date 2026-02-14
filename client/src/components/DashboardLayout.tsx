@@ -14,6 +14,8 @@ import { useAuth } from '@/_core/hooks/useAuth';
 import { trpc } from '@/lib/trpc';
 import { NotificationsPanel } from '@/components/NotificationsPanel';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
+import { MobileBottomNav } from '@/components/MobileBottomNav';
+import { MobileHeader } from '@/components/MobileHeader';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   console.log('[DashboardLayout] Component mounted');
@@ -220,17 +222,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main Content with Fixed Header */}
       <main className="flex-1 overflow-hidden flex flex-col">
-        {/* Fixed Header */}
-        <header className="h-16 bg-background border-b border-border flex items-center justify-between px-4 sm:px-6 flex-shrink-0" style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(4rem + env(safe-area-inset-top))' }}>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden min-h-[44px] min-w-[44px]"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </Button>
-          
+        {/* Fixed Header - Solo en desktop */}
+        <header className="hidden md:flex h-16 bg-background border-b border-border items-center justify-between px-4 sm:px-6 flex-shrink-0" style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(4rem + env(safe-area-inset-top))' }}>
           <div className="flex-1" />
           
           {/* Notifications Panel */}
@@ -238,9 +231,15 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
+          {/* Mobile Header */}
+          <MobileHeader />
+          
           {children}
         </div>
+        
+        {/* Mobile Bottom Navigation */}
+        <MobileBottomNav />
       </main>
     </div>
   );
