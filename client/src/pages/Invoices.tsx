@@ -857,7 +857,7 @@ export default function Invoices() {
       {/* Create Invoice Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0A0A0A] rounded-[20px] border border-[rgba(255,255,255,0.06)] w-full max-w-3xl max-h-[70vh] overflow-y-auto">
+          <div className="bg-[#0A0A0A] rounded-[20px] border border-[rgba(255,255,255,0.06)] w-full max-w-3xl h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)] overflow-y-auto overflow-x-hidden">
             <div className="p-4 sm:p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">{'Crear Factura'}</h2>
@@ -999,8 +999,8 @@ export default function Invoices() {
                           />
                         </div>
                         
-                        {/* Cantidad y Precio - 2 columnas en móvil, 3 en desktop */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {/* Cantidad y Precio - columnas en móvil, 3 en desktop */}
+                        <div className="flex flex-col md:grid md:grid-cols-3 gap-3">
                           <div>
                             <Label className="text-white text-sm mb-2 block">Cantidad</Label>
                             <Input
@@ -1021,7 +1021,7 @@ export default function Invoices() {
                               className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white h-11"
                             />
                           </div>
-                          <div className="col-span-2 md:col-span-1">
+                          <div>
                             <Label className="text-white text-sm mb-2 block">Total</Label>
                             <Input
                               type="number"
@@ -1274,7 +1274,7 @@ export default function Invoices() {
       {/* View Invoice Modal */}
       {viewingInvoice && viewInvoiceData && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0A0A0A] rounded-[20px] border border-[rgba(255,255,255,0.06)] w-full max-w-2xl max-h-[70vh] overflow-y-auto">
+          <div className="bg-[#0A0A0A] rounded-[20px] border border-[rgba(255,255,255,0.06)] w-full max-w-2xl h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)] overflow-y-auto overflow-x-hidden">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">Detalle de Factura</h2>
