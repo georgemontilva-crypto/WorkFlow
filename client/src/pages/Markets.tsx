@@ -420,33 +420,23 @@ export default function Markets() {
   return (
     <DashboardLayout>
       <div className="max-w-[1440px] mx-auto px-2 py-4 md:p-6 space-y-4 md:space-y-6 overflow-x-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">Mercados</h1>
-            <p className="text-sm text-[#8B92A8] mt-1">Consulta de criptomonedas y herramientas de conversión</p>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-[#8B92A8]">
-            {isRefreshing ? (
-              <>
-                <div className="w-2 h-2 bg-[#C4FF3D] rounded-full animate-pulse"></div>
-                <span className="hidden sm:inline">Actualizando...</span>
-              </>
-            ) : (
-              <>
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="hidden sm:inline">Actualizado {lastUpdate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
-              </>
-            )}
-          </div>
-        </div>
-
         {/* SECTION 1: Criptomonedas - Layout de dos columnas */}
         <div className="bg-transparent md:bg-[#0A0A0A] border-0 md:border md:border-[rgba(255,255,255,0.06)] rounded-none md:rounded-2xl p-0 md:p-6">
-          {/* Header */}
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-white">Criptomonedas</h2>
-            <p className="text-xs text-[#8B92A8] mt-1">Actualización automática cada 10s</p>
+          {/* Header - Solo aviso de actualización */}
+          <div className="mb-6 flex items-center justify-end">
+            <div className="flex items-center gap-2 text-xs text-[#8B92A8]">
+              {isRefreshing ? (
+                <>
+                  <div className="w-2 h-2 bg-[#C4FF3D] rounded-full animate-pulse"></div>
+                  <span className="hidden sm:inline">Actualizando...</span>
+                </>
+              ) : (
+                <>
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="hidden sm:inline">Actualizado {lastUpdate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Layout de dos columnas */}
