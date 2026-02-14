@@ -419,7 +419,7 @@ export default function Markets() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1600px] mx-auto p-4 md:p-6 lg:p-8 space-y-6">
+      <div className="max-w-[1440px] mx-auto px-2 py-4 md:p-6 space-y-4 md:space-y-6 overflow-x-hidden">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -442,7 +442,7 @@ export default function Markets() {
         </div>
 
         {/* SECTION 1: Criptomonedas - Layout de dos columnas */}
-        <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
+        <div className="bg-transparent md:bg-[#0A0A0A] border-0 md:border md:border-[rgba(255,255,255,0.06)] rounded-none md:rounded-2xl p-0 md:p-6">
           {/* Header */}
           <div className="mb-6">
             <h2 className="text-xl font-bold text-white">Criptomonedas</h2>
