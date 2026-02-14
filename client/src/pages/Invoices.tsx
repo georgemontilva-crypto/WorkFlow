@@ -1462,7 +1462,7 @@ export default function Invoices() {
       
       {/* Mobile Search Modal */}
       {showSearchModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center pb-20 md:pb-0">
           <div className="bg-[#0A0A0A] w-full md:max-w-md md:rounded-lg rounded-t-[28px] p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-white font-semibold">Buscar Facturas</h3>
@@ -1538,7 +1538,7 @@ export default function Invoices() {
 
       {/* Mobile Status Filter Modal */}
       {showStatusFilterModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center pb-20 md:pb-0">
           <div className="bg-[#0A0A0A] w-full md:max-w-md md:rounded-lg rounded-t-[28px] p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-white font-semibold">Filtrar por Estado</h3>
