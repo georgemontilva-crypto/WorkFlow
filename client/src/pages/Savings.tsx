@@ -209,7 +209,7 @@ export default function Savings() {
       <div className="max-w-[1440px] mx-auto px-2 py-4 md:p-6 space-y-4 md:space-y-6 overflow-x-hidden">
         {/* Header Card - Isla 1 */}
         <Card>
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between px-6">
             <div>
               <h1 className="text-2xl font-semibold text-[#EDEDED]">Metas de Ahorro</h1>
               <p className="text-[#8B92A8] mt-1">Define y alcanza tus objetivos financieros</p>
