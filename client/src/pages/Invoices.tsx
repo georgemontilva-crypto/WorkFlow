@@ -498,7 +498,7 @@ export default function Invoices() {
           <div className="relative">
             <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none z-10"></div>
             
-            <div className="h-[calc(100vh-350px)] overflow-y-auto overflow-x-hidden space-y-3">
+            <div className="h-[calc(100vh-280px)] overflow-y-auto overflow-x-hidden space-y-3">
             {filteredInvoices.length === 0 ? (
               <div className="py-16 text-center">
                 <p className="text-[#8B92A8] text-base">No se encontraron facturas</p>
