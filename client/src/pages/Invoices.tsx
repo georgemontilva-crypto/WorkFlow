@@ -1272,7 +1272,7 @@ export default function Invoices() {
       {/* View Invoice Modal */}
       {viewingInvoice && viewInvoiceData && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-2xl max-h-[85vh] md:max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">Detalle de Factura</h2>
