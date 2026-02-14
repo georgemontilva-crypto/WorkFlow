@@ -229,7 +229,7 @@ export default function Clients() {
         </Card>
 
         {/* Clients List Card with Filters */}
-        <Card>
+        <Card padding="none" className="md:p-6">
           {/* Filters Section - Pills y Búsqueda */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             {/* Pills de Filtro de Estado */}
