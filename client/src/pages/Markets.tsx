@@ -423,7 +423,7 @@ export default function Markets() {
         {/* SECTION 1: Criptomonedas - Layout de dos columnas */}
         <div className="bg-transparent md:bg-[#0A0A0A] border-0 md:border md:border-[rgba(255,255,255,0.06)] rounded-none md:rounded-2xl p-0 md:p-6">
           {/* Header - Solo aviso de actualización */}
-          <div className="mb-6 flex items-center justify-end">
+          <div className="mb-6 flex items-center justify-start">
             <p className="text-xs text-[#8B92A8]">Actualización automática cada 10s</p>
           </div>
 
