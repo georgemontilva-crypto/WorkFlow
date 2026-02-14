@@ -474,7 +474,7 @@ export default function Markets() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[rgba(255,255,255,0.1)] scrollbar-track-transparent hover:scrollbar-thumb-[rgba(255,255,255,0.2)]">
+                <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-x-visible md:overflow-y-auto md:max-h-[600px] pb-2 md:pb-0 md:pr-2 snap-x md:snap-none scrollbar-thin scrollbar-thumb-[rgba(255,255,255,0.1)] scrollbar-track-transparent hover:scrollbar-thumb-[rgba(255,255,255,0.2)]">
                   {cryptos
                     .filter(crypto => 
                       crypto.name.toLowerCase().includes(cryptoSearchTerm.toLowerCase()) ||
@@ -483,7 +483,7 @@ export default function Markets() {
                     .map((crypto) => (
                     <div
                       key={crypto.id}
-                      className="flex items-center justify-between p-3 bg-[#121212] border border-[rgba(255,255,255,0.04)] rounded-xl hover:border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.02)] transition-all group"
+                      className="flex flex-col md:flex-row items-start md:items-center justify-between p-3 bg-[#121212] border border-[rgba(255,255,255,0.04)] rounded-xl hover:border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.02)] transition-all group min-w-[280px] md:min-w-0 flex-shrink-0 md:flex-shrink snap-start"
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full flex-shrink-0" />
@@ -604,7 +604,7 @@ export default function Markets() {
         </div>
 
         {/* SECTION 2: Mis Activos */}
-        <div className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
+        <div className="bg-transparent md:bg-[#0A0A0A] border-0 md:border md:border-[rgba(255,255,255,0.06)] rounded-none md:rounded-2xl p-0 md:p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <Wallet className="w-6 h-6 text-[#C4FF3D]" />
