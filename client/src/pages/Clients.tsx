@@ -249,12 +249,12 @@ export default function Clients() {
             {/* Búsqueda */}
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
-              <Input
+              <input
                 type="text"
-                placeholder={'Buscar clientes...'}
+                placeholder="Buscar clientes..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-12 text-base w-full"
+                className="w-full bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-lg pl-12 pr-4 py-3 text-base text-white placeholder-[#8B92A8] focus:outline-none focus:border-[#C4FF3D]/50 transition-all h-12"
               />
               {searchTerm && (
                 <button
