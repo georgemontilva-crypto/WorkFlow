@@ -483,7 +483,7 @@ export default function Markets() {
                     .map((crypto) => (
                     <div
                       key={crypto.id}
-                      className="flex flex-col md:flex-row items-start md:items-center justify-between p-3 bg-[#121212] border border-[rgba(255,255,255,0.04)] rounded-xl hover:border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.02)] transition-all group min-w-[280px] md:min-w-0 flex-shrink-0 md:flex-shrink snap-start"
+                      className="flex flex-col md:flex-row items-start md:items-center justify-between py-5 px-3 md:p-3 bg-[#121212] border border-[rgba(255,255,255,0.04)] rounded-xl hover:border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.02)] transition-all group min-w-[280px] md:min-w-0 flex-shrink-0 md:flex-shrink snap-start"
                     >
                       <div className="flex items-center justify-between gap-3 w-full md:flex-1">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
