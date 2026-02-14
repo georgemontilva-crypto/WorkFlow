@@ -233,7 +233,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
           {/* Mobile Header */}
-          <MobileHeader />
+          <MobileHeader onProfileClick={() => setIsMobileMenuOpen(true)} />
           
           {children}
         </div>
