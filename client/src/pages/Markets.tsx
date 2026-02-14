@@ -424,19 +424,7 @@ export default function Markets() {
         <div className="bg-transparent md:bg-[#0A0A0A] border-0 md:border md:border-[rgba(255,255,255,0.06)] rounded-none md:rounded-2xl p-0 md:p-6">
           {/* Header - Solo aviso de actualización */}
           <div className="mb-6 flex items-center justify-end">
-            <div className="flex items-center gap-2 text-xs text-[#8B92A8]">
-              {isRefreshing ? (
-                <>
-                  <div className="w-2 h-2 bg-[#C4FF3D] rounded-full animate-pulse"></div>
-                  <span className="hidden sm:inline">Actualizando...</span>
-                </>
-              ) : (
-                <>
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="hidden sm:inline">Actualizado {lastUpdate.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
-                </>
-              )}
-            </div>
+            <p className="text-xs text-[#8B92A8]">Actualización automática cada 10s</p>
           </div>
 
           {/* Layout de dos columnas */}
