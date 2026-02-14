@@ -417,7 +417,7 @@ export default function Invoices() {
       <div className="max-w-[1440px] mx-auto px-2 py-4 md:p-6 space-y-4 md:space-y-6 overflow-x-hidden">
         
         {/* Header Card - Isla 1 */}
-        <Card>
+        <Card className="relative">
           <div className="flex items-start justify-between">
             <div className="hidden md:block">
               <h1 className="text-2xl font-semibold text-[#EDEDED]">{'Facturas'}</h1>
