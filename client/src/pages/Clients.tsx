@@ -196,7 +196,7 @@ export default function Clients() {
   return (
     <DashboardLayout>
       {/* Main Container - Max Width 1280px */}
-      <div className="max-w-[1440px] mx-auto px-2 py-4 md:p-6 space-y-4 md:space-y-6 overflow-x-hidden">
+      <div className="max-w-[1440px] mx-auto px-1 py-4 md:p-6 space-y-4 md:space-y-6 overflow-x-hidden">
         
         {/* Header Card */}
         <Card>
