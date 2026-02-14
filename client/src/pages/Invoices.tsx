@@ -1053,12 +1053,12 @@ export default function Invoices() {
                 {/* Notes and Terms - Side by Side */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-white block mb-2">Notas</Label>
+                    <Label className="text-white block mb-2">Método de pago</Label>
                     <textarea
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       className="w-full min-h-[80px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-md p-2 text-white"
-                      placeholder="Notas adicionales..."
+                      placeholder="Ej: Transferencia bancaria, Zelle, PayPal..."
                     />
                   </div>
                   
