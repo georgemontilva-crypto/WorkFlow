@@ -208,13 +208,13 @@ export default function Clients() {
             {/* Botones circulares en móvil, normales en desktop */}
             <div className="flex items-center gap-2">
               {/* Botón de Búsqueda */}
-              <Button
+              <button
                 onClick={() => setIsSearchModalOpen(true)}
-                variant="default"
-                className="md:hidden w-12 h-12 rounded-full p-0 flex items-center justify-center"
+                className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
+                title="Buscar"
               >
                 <Search className="w-5 h-5" />
-              </Button>
+              </button>
               
               {/* Botón de Agregar Cliente */}
               <button
