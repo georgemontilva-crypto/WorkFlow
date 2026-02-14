@@ -419,12 +419,13 @@ export default function Invoices() {
         {/* Header Card - Isla 1 */}
         <Card>
           <div className="flex items-start justify-between">
-            <div>
+            <div className="hidden md:block">
               <h1 className="text-2xl font-semibold text-[#EDEDED]">{'Facturas'}</h1>
               <p className="text-[#8B92A8] mt-1">{'Gestiona tus facturas'}</p>
             </div>
-            <div className="flex flex-col items-end gap-1">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between w-full md:w-auto md:flex-col md:items-end gap-3 md:gap-1">
+              <p className="text-[#8B92A8] text-sm md:order-2">{filteredInvoices.length} factura{filteredInvoices.length !== 1 ? 's' : ''}</p>
+              <div className="flex items-center gap-3 md:order-1">
               <button
                 onClick={() => setShowSearchModal(true)}
                 className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
@@ -447,7 +448,6 @@ export default function Invoices() {
                 <Plus className="w-5 h-5" />
               </button>
               </div>
-              <p className="text-[#8B92A8] text-sm">{filteredInvoices.length} factura{filteredInvoices.length !== 1 ? 's' : ''}</p>
             </div>
           </div>
         </Card>

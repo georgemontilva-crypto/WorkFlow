@@ -210,7 +210,7 @@ export default function Savings() {
         {/* Header Card - Isla 1 */}
         <Card>
           <div className="flex items-start justify-between px-6">
-            <div>
+            <div className="hidden md:block">
               <h1 className="text-2xl font-semibold text-[#EDEDED]">Metas de Ahorro</h1>
               <p className="text-[#8B92A8] mt-1">Define y alcanza tus objetivos financieros</p>
             </div>
