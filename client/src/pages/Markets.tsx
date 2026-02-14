@@ -485,15 +485,16 @@ export default function Markets() {
                       key={crypto.id}
                       className="flex flex-col md:flex-row items-start md:items-center justify-between p-3 bg-[#121212] border border-[rgba(255,255,255,0.04)] rounded-xl hover:border-[rgba(255,255,255,0.1)] hover:bg-[rgba(255,255,255,0.02)] transition-all group min-w-[280px] md:min-w-0 flex-shrink-0 md:flex-shrink snap-start"
                     >
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <div className="font-semibold text-white text-sm truncate">{crypto.name}</div>
-                          <div className="text-xs text-[#8B92A8] uppercase">{crypto.symbol}</div>
+                      <div className="flex items-center justify-between gap-3 w-full md:flex-1">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <img src={crypto.image} alt={crypto.name} className="w-8 h-8 rounded-full flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <div className="font-semibold text-white text-sm truncate">{crypto.name}</div>
+                            <div className="text-xs text-[#8B92A8] uppercase">{crypto.symbol}</div>
+                          </div>
                         </div>
-                      </div>
                       
-                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
                         {/* Botón de gráfica */}
                         <button
                           onClick={() => {
@@ -522,6 +523,7 @@ export default function Markets() {
                         >
                           <Bell className="w-4 h-4 text-[#8B92A8] group-hover:text-[#C4FF3D] transition-colors" />
                         </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -540,7 +542,7 @@ export default function Markets() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-[rgba(255,255,255,0.1)] scrollbar-track-transparent hover:scrollbar-thumb-[rgba(255,255,255,0.2)]">
+                <div className="space-y-4 md:max-h-[600px] md:overflow-y-auto md:pr-2 scrollbar-thin scrollbar-thumb-[rgba(255,255,255,0.1)] scrollbar-track-transparent hover:scrollbar-thumb-[rgba(255,255,255,0.2)]">
                   {activeCharts.map((cryptoId) => {
                     const crypto = cryptos.find(c => c.id === cryptoId);
                     if (!crypto) return null;
