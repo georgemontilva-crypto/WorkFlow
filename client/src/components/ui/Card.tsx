@@ -35,18 +35,18 @@ export function Card({
   return (
     <div 
       className={`
-        bg-[var(--color-bg-card)]
-        ${noBorder ? '' : 'border border-[var(--color-border-subtle)]'}
-        rounded-[28px]
+        md:bg-[var(--color-bg-card)]
+        ${noBorder ? '' : 'md:border md:border-[var(--color-border-subtle)]'}
+        md:rounded-[28px]
         transition-colors-smooth
         ${paddingClasses[padding]}
         ${className}
       `}
       style={{
-        backgroundColor: 'var(--color-bg-card)',
+        backgroundColor: 'transparent',
         borderColor: noBorder ? 'transparent' : 'var(--color-border-subtle)',
-        borderWidth: noBorder ? '0' : '1px',
-        borderRadius: '28px',
+        borderWidth: '0',
+        borderRadius: '0',
       }}
     >
       {children}
