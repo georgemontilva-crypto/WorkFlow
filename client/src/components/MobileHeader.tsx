@@ -20,10 +20,14 @@ export function MobileHeader({ onProfileClick }: MobileHeaderProps) {
 
   return (
     <>
-      {/* Header móvil */}
+      {/* Header móvil - Fixed con glassmorfismo */}
       <div 
-        className="md:hidden px-4 pb-3" 
-        style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top))' }}
+        className="md:hidden fixed top-0 left-0 right-0 z-30 px-4 pb-3 bg-black/40 border-b border-white/5" 
+        style={{ 
+          paddingTop: 'calc(1rem + env(safe-area-inset-top))',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+        }}
       >
         <div className="flex items-center justify-between">
           {/* Saludo y perfil - Clickeable */}

@@ -16,6 +16,7 @@ import { NotificationsPanel } from '@/components/NotificationsPanel';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { MobileHeader } from '@/components/MobileHeader';
+import { MobileHeaderSpacer } from '@/components/MobileHeaderSpacer';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   console.log('[DashboardLayout] Component mounted');
@@ -232,8 +233,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
-          {/* Mobile Header */}
+          {/* Mobile Header - Fixed */}
           <MobileHeader onProfileClick={() => setIsMobileMenuOpen(true)} />
+          
+          {/* Spacer para compensar header fijo */}
+          <MobileHeaderSpacer />
           
           {children}
         </div>
