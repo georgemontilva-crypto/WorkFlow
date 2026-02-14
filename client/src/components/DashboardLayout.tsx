@@ -99,13 +99,19 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed lg:static inset-y-0 left-0 z-40 w-64 bg-sidebar border-r border-sidebar-border flex flex-col transition-transform duration-300 ease-in-out',
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          'hidden lg:flex fixed left-4 top-4 bottom-4 z-40 w-64 flex-col transition-all duration-300 ease-in-out rounded-[24px] overflow-hidden',
         )}
-        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        style={{ 
+          paddingTop: 'env(safe-area-inset-top)',
+          background: 'rgba(10, 10, 10, 0.8)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.06)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+        }}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center gap-3 px-6 border-b border-border">
+        <div className="h-16 flex items-center gap-3 px-6">
           <img src="/finwrk-logo.png" alt="Finwrk" className="h-7 w-auto object-contain" />
         </div>
 
@@ -173,7 +179,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           )}
 
           {/* Settings - Separate at bottom */}
-          <div className="mt-auto pt-4 border-t border-border">
+          <div className="mt-auto pt-4">
             <div className="px-3 mb-2">
               <h3 className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider">
                 CONFIGURACIÓN
@@ -214,7 +220,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-border">
+        <div className="p-4">
           <p className="text-xs text-muted-foreground text-center">
             Finwrk v1.0.0
           </p>
@@ -222,14 +228,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Main Content with Fixed Header */}
-      <main className="flex-1 overflow-hidden flex flex-col">
-        {/* Fixed Header - Solo en desktop */}
-        <header className="hidden md:flex h-16 bg-background border-b border-border items-center justify-between px-4 sm:px-6 flex-shrink-0" style={{ paddingTop: 'env(safe-area-inset-top)', height: 'calc(4rem + env(safe-area-inset-top))' }}>
-          <div className="flex-1" />
-          
-          {/* Notifications Panel */}
-          <NotificationsPanel />
-        </header>
+      <main className="flex-1 overflow-hidden flex flex-col lg:ml-72">
+
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
