@@ -492,7 +492,7 @@ export default function Finances() {
       {/* Nueva Transacción Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-md max-h-[90vh] flex flex-col">
+          <div className="bg-[#0A0A0A] rounded-[28px] border border-[rgba(255,255,255,0.06)] w-full max-w-md max-h-[calc(100vh-9rem)] md:max-h-[90vh] flex flex-col">
             <div className="p-6 overflow-y-auto">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
