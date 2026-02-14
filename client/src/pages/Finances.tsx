@@ -232,7 +232,7 @@ export default function Finances() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1440px] mx-auto p-6 space-y-6">
+      <div className="max-w-[1440px] mx-auto px-1 py-4 md:p-6 space-y-4 md:space-y-6 overflow-x-hidden">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
@@ -368,17 +368,17 @@ export default function Finances() {
         {/* Transacciones Recientes */}
         <div className="bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-2xl p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
-            <div className="flex flex-col gap-2">
-              <h2 className="text-xl font-bold text-white">Transacciones Recientes</h2>
-              {/* Botón Exportar en móvil, debajo del título */}
+            <h2 className="text-xl font-bold text-white">Transacciones Recientes</h2>
+            
+            <div className="flex items-center justify-between md:gap-4">
+              {/* Botón Exportar en móvil, al lado del selector */}
               <button
                 onClick={handleExportHistory}
-                className="text-sm text-[#8B92A8] hover:text-white transition-colors text-left md:hidden"
+                className="text-sm text-[#8B92A8] hover:text-white transition-colors md:hidden"
               >
                 Exportar historial
               </button>
-            </div>
-            <div className="flex items-center justify-between md:gap-4">
+              
               {/* Month Navigation */}
               <div className="flex items-center gap-1">
                 <button
@@ -426,7 +426,7 @@ export default function Finances() {
                 return (
                   <div 
                     key={transaction.id} 
-                    className="bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] p-4 hover:border-[rgba(255,255,255,0.06)] transition-colors"
+                    className="bg-transparent md:bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-none md:rounded-[20px] p-4 hover:border-[rgba(255,255,255,0.06)] transition-colors"
                   >
                     {/* Desktop: Layout horizontal */}
                     <div className="hidden md:flex items-center justify-between gap-3">
