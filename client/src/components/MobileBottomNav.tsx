@@ -19,10 +19,11 @@ export function MobileBottomNav() {
   ];
 
   return (
-    <nav 
-      className="md:hidden fixed left-4 right-4 z-50"
+    <div 
+      className="md:hidden fixed left-0 right-0 z-50 px-4"
       style={{ 
-        bottom: 'max(4px, env(safe-area-inset-bottom))',
+        bottom: '0',
+        paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
       }}
     >
       {/* Isla con glassmorfismo */}
@@ -56,6 +57,6 @@ export function MobileBottomNav() {
           );
         })}
       </div>
-    </nav>
+    </div>
   );
 }
