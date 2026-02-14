@@ -927,7 +927,7 @@ export default function Invoices() {
                 </div>
                 
                 {/* Dates */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-white block mb-2">Fecha de Emisión *</Label>
                     <Input
@@ -978,63 +978,67 @@ export default function Invoices() {
                     </Button>
                   </div>
                   
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {items.map((item, index) => (
-                      <div key={index} className="space-y-2">
-                        <div className="grid grid-cols-12 gap-2 items-end">
-                          <div className="col-span-6">
-                            <Label className="text-white text-xs mb-1">Descripción</Label>
-                            <Input
-                              placeholder="Descripción del artículo..."
-                              value={item.description}
-                              onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                              className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
-                            />
-                          </div>
-                          <div className="col-span-2">
-                            <Label className="text-white text-xs mb-1">Cantidad</Label>
+                      <div key={index} className="p-4 bg-[#121212] rounded-lg border border-[rgba(255,255,255,0.06)] space-y-3">
+                        {/* Descripción - Full width */}
+                        <div>
+                          <Label className="text-white text-sm mb-2 block">Descripción</Label>
+                          <Input
+                            placeholder="Descripción del artículo..."
+                            value={item.description}
+                            onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                            className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white h-11"
+                          />
+                        </div>
+                        
+                        {/* Cantidad y Precio - 2 columnas en móvil, 3 en desktop */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          <div>
+                            <Label className="text-white text-sm mb-2 block">Cantidad</Label>
                             <Input
                               type="number"
                               placeholder="1"
                               value={item.quantity}
                               onChange={(e) => handleItemChange(index, 'quantity', parseFloat(e.target.value) || 0)}
-                              className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
+                              className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white h-11"
                             />
                           </div>
-                          <div className="col-span-2">
-                            <Label className="text-white text-xs mb-1">Precio Unitario</Label>
+                          <div>
+                            <Label className="text-white text-sm mb-2 block">Precio Unit.</Label>
                             <Input
                               type="number"
                               placeholder="0.00"
                               value={item.unit_price}
                               onChange={(e) => handleItemChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                              className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white"
+                              className="bg-[#0A0A0A] border-[rgba(255,255,255,0.06)] text-white h-11"
                             />
                           </div>
-                          <div className="col-span-2">
-                            <Label className="text-white text-xs mb-1">Total</Label>
+                          <div className="col-span-2 md:col-span-1">
+                            <Label className="text-white text-sm mb-2 block">Total</Label>
                             <Input
                               type="number"
                               placeholder="0.00"
                               value={item.total}
                               readOnly
-                              className="bg-[#2a2a2a] border-[rgba(255,255,255,0.06)] text-white"
+                              className="bg-[#2a2a2a] border-[rgba(255,255,255,0.06)] text-white h-11 font-semibold"
                             />
                           </div>
                         </div>
-                        <div className="col-span-1">
-                          {items.length > 1 && (
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleRemoveItem(index)}
-                              className="border-red-700 text-red-500 hover:bg-red-900/20 w-full"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          )}
-                        </div>
+                        
+                        {/* Botón eliminar */}
+                        {items.length > 1 && (
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleRemoveItem(index)}
+                            className="border-red-700 text-red-500 hover:bg-red-900/20 w-full mt-2"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Eliminar artículo
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -1047,7 +1051,7 @@ export default function Invoices() {
                 </div>
                 
                 {/* Notes and Terms - Side by Side */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-white block mb-2">Notas</Label>
                     <textarea
@@ -1070,7 +1074,7 @@ export default function Invoices() {
                 </div>
                 
                 {/* Actions */}
-                <div className="flex gap-3 justify-between items-center">
+                <div className="flex flex-col md:flex-row gap-4 md:justify-between md:items-center">
                   {/* Recurring Invoice - Bottom Left */}
                   <div className="flex items-center gap-3">
                     <input
@@ -1097,7 +1101,7 @@ export default function Invoices() {
                   </div>
                   
                   {/* Action Buttons - Bottom Right */}
-                  <div className="flex gap-3 items-center">
+                  <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                   <Button type="button" variant="outline" onClick={handleCloseModal} className="border-[rgba(255,255,255,0.06)] text-white hover:bg-gray-800">
                     Cancelar
                   </Button>
