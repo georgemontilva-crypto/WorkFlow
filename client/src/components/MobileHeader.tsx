@@ -17,7 +17,10 @@ export function MobileHeader() {
   return (
     <>
       {/* Header móvil */}
-      <div className="md:hidden px-4 pt-4 pb-3">
+      <div 
+        className="md:hidden px-4 pb-3" 
+        style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top))' }}
+      >
         <div className="flex items-center justify-between">
           {/* Saludo y perfil */}
           <div className="flex items-center gap-3">
@@ -38,7 +41,10 @@ export function MobileHeader() {
       </div>
 
       {/* Botón flotante de notificaciones - Solo móvil */}
-      <div className="md:hidden fixed top-4 right-4 z-40">
+      <div 
+        className="md:hidden fixed right-4 z-40" 
+        style={{ top: 'calc(1rem + env(safe-area-inset-top))' }}
+      >
         <NotificationsPanel />
       </div>
     </>
