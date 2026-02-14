@@ -494,11 +494,8 @@ export default function Invoices() {
             </Select>
           </div>
           
-          {/* Degradado superior */}
-          <div className="relative">
-            <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-black/80 via-black/40 to-transparent pointer-events-none z-10"></div>
-            
-            <div className="h-[calc(100vh-280px)] overflow-y-auto overflow-x-hidden space-y-3">
+          {/* Lista de facturas */}
+          <div className="h-[calc(100vh-280px)] overflow-y-auto overflow-x-hidden space-y-3">
             {filteredInvoices.length === 0 ? (
               <div className="py-16 text-center">
                 <p className="text-[#8B92A8] text-base">No se encontraron facturas</p>
@@ -847,7 +844,6 @@ export default function Invoices() {
               );
             })
             )}
-            </div>
           </div>
         </Card>
       </div>
@@ -855,7 +851,7 @@ export default function Invoices() {
       {/* Create Invoice Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-[#0A0A0A] rounded-lg border border-[rgba(255,255,255,0.06)] w-full max-w-3xl max-h-[90vh] overflow-y-auto overflow-x-hidden my-auto">
+          <div className="bg-[#0A0A0A] rounded-lg border border-[rgba(255,255,255,0.06)] w-full max-w-3xl max-h-[80vh] md:max-h-[90vh] overflow-y-auto overflow-x-hidden my-auto">
             <div className="p-4 sm:p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">{'Crear Factura'}</h2>
