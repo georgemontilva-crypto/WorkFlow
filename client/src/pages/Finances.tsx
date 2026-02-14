@@ -232,7 +232,7 @@ export default function Finances() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1440px] mx-auto px-1 py-4 md:p-6 space-y-4 md:space-y-6 overflow-x-hidden">
+      <div className="max-w-[1440px] mx-auto px-2 py-4 md:p-6 space-y-4 md:space-y-6 overflow-x-hidden">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
