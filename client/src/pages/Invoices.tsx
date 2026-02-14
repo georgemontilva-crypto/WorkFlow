@@ -64,7 +64,6 @@ export default function Invoices() {
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
   
   // Mobile filter modals state
-  const [showSearchModal, setShowSearchModal] = useState(false);
   const [showClientFilterModal, setShowClientFilterModal] = useState(false);
   const [showStatusFilterModal, setShowStatusFilterModal] = useState(false);
   
@@ -427,13 +426,6 @@ export default function Invoices() {
               <p className="text-[#8B92A8] text-sm md:order-2">{filteredInvoices.length} factura{filteredInvoices.length !== 1 ? 's' : ''}</p>
               <div className="flex items-center gap-3 md:order-1">
               <button
-                onClick={() => setShowSearchModal(true)}
-                className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
-                title="Buscar"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-              <button
                 onClick={() => setShowStatusFilterModal(true)}
                 className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
                 title="Filtrar por Estado"
@@ -455,6 +447,20 @@ export default function Invoices() {
         {/* Invoices List Card with Filters */}
         <Card padding="none" className="md:p-6">
           {/* Filters Section */}
+          
+          {/* Mobile: Buscador inline */}
+          <div className="md:hidden mb-4">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
+              <Input
+                type="text"
+                placeholder="Buscar facturas..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 h-12 text-base"
+              />
+            </div>
+          </div>
           
           {/* Desktop: Filtros completos */}
           <div className="hidden md:flex flex-row gap-4 mb-6">
@@ -1460,36 +1466,7 @@ export default function Invoices() {
         </div>
       )}
       
-      {/* Mobile Search Modal */}
-      {showSearchModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0A0A0A] w-full max-w-md rounded-[20px] p-6 max-h-[70vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-white font-semibold">Buscar Facturas</h3>
-              <button onClick={() => setShowSearchModal(false)} className="text-[#8B92A8] hover:text-white">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
-              <Input
-                type="text"
-                placeholder="Buscar facturas..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-12 text-base"
-                autoFocus
-              />
-            </div>
-            <Button
-              onClick={() => setShowSearchModal(false)}
-              className="w-full mt-4"
-            >
-              Aplicar
-            </Button>
-          </div>
-        </div>
-      )}
+
 
       {/* Mobile Client Filter Modal */}
       {showClientFilterModal && (

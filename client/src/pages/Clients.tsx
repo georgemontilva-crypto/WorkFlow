@@ -46,7 +46,6 @@ export default function Clients() {
   const [expandedClientId, setExpandedClientId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('active');
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -207,15 +206,6 @@ export default function Clients() {
             </div>
             {/* Botones circulares en móvil, normales en desktop */}
             <div className="flex items-center gap-2">
-              {/* Botón de Búsqueda */}
-              <button
-                onClick={() => setIsSearchModalOpen(true)}
-                className="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
-                title="Buscar"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-              
               {/* Botón de Agregar Cliente */}
               <button
                 onClick={() => handleOpenModal()}
@@ -256,8 +246,8 @@ export default function Clients() {
               </button>
             </div>
             
-            {/* Búsqueda - Solo visible en desktop */}
-            <div className="hidden md:flex relative flex-1">
+            {/* Búsqueda */}
+            <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
               <Input
                 type="text"
@@ -586,48 +576,7 @@ export default function Clients() {
         </DialogContent>
       </Dialog>
       
-      {/* Search Modal */}
-      <Dialog open={isSearchModalOpen} onOpenChange={setIsSearchModalOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle className="text-[#EDEDED]">{'Buscar Clientes'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8B92A8] w-5 h-5" />
-              <Input
-                type="text"
-                placeholder={'Buscar por nombre, empresa o email...'}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-12 text-base"
-                autoFocus
-              />
-            </div>
-            <div className="flex gap-3 pt-2">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => {
-                  setSearchTerm('');
-                  setIsSearchModalOpen(false);
-                }}
-                className="flex-1 h-12"
-              >
-                {'Limpiar'}
-              </Button>
-              <Button
-                type="button"
-                variant="default"
-                onClick={() => setIsSearchModalOpen(false)}
-                className="flex-1 h-12"
-              >
-                {'Buscar'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+
       
       {/* Confirm Dialog */}
       <ConfirmDialog
