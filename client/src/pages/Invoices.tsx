@@ -453,7 +453,7 @@ export default function Invoices() {
         </Card>
 
         {/* Invoices List Card with Filters */}
-        <Card>
+        <Card padding="none" className="md:p-6">
           {/* Filters Section */}
           
           {/* Desktop: Filtros completos */}
