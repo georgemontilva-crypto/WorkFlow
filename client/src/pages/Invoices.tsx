@@ -429,6 +429,13 @@ export default function Invoices() {
                 <Search className="w-5 h-5" />
               </button>
               <button
+                onClick={() => setShowStatusFilterModal(true)}
+                className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
+                title="Filtrar por Estado"
+              >
+                <FileText className="w-5 h-5" />
+              </button>
+              <button
                 onClick={handleOpenModal}
                 className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
                 title="Crear Factura"
@@ -443,30 +450,6 @@ export default function Invoices() {
         {/* Invoices List Card with Filters */}
         <Card>
           {/* Filters Section */}
-          {/* Mobile: 3 botones circulares */}
-          <div className="md:hidden flex items-center justify-center gap-4 mb-6">
-            <button
-              onClick={() => setShowSearchModal(true)}
-              className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
-              title="Buscar"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setShowClientFilterModal(true)}
-              className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
-              title="Filtrar por Cliente"
-            >
-              <Users className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setShowStatusFilterModal(true)}
-              className="w-10 h-10 flex items-center justify-center rounded-full border border-[#C4FF3D] text-[#C4FF3D] hover:bg-[#C4FF3D]/10 transition-all"
-              title="Filtrar por Estado"
-            >
-              <FileText className="w-5 h-5" />
-            </button>
-          </div>
           
           {/* Desktop: Filtros completos */}
           <div className="hidden md:flex flex-row gap-4 mb-6">
