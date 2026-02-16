@@ -34,7 +34,7 @@ export default function Admin() {
   const { data: users, isLoading, refetch, error } = trpc.admin.getAllUsers.useQuery();
 
   // Fetch support conversations to show unread count
-  const { data: conversations } = trpc.bugs.admin.getAllConversations.useQuery();
+  const { data: conversations } = trpc.support.admin.getConversations.useQuery();
   const unreadCount = conversations?.filter(c => c.unreadCount > 0).length || 0;
   
   // Debug
@@ -142,7 +142,7 @@ export default function Admin() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Link href="/admin/bugs">
+              <Link href="/admin/support">
                 <Button className="flex items-center gap-2 relative">
                   <Headphones className="w-4 h-4" />
                   Soporte

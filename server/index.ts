@@ -6,6 +6,7 @@ import { startRecurringInvoicesScheduler } from "./_core/recurring-invoices-job.
 import { startOverdueInvoicesScheduler } from "./_core/overdue-invoices-job.js";
 import { startProactiveAIScheduler } from "./_core/proactive-ai-job.js";
 import { testRedisConnection } from "./config/redis.js";
+import { initializeSocketIO } from "./services/socketService.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -33,6 +34,10 @@ async function startServer() {
   });
 
   const port = process.env.PORT || 3000;
+
+  // Initialize Socket.IO for real-time support chat
+  initializeSocketIO(server);
+  console.log('[Server] Socket.IO initialized for support chat');
 
   server.listen(port, async () => {
     console.log(`Server running on http://localhost:${port}/`);

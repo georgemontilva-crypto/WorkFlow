@@ -17,8 +17,7 @@ import { walletRouter } from "./routers_wallet";
 import { adminRouter } from "./routers_admin";
 import { priceAlertsRouter } from "./routers_price_alerts";
 import { marketsRouter } from "./routers_markets";
-import { bugsRouter } from "./routers_bugs";
-import { bugReportsRouter } from "./routers_bug_reports";
+import { supportRouter } from "./routers_support";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -801,11 +800,10 @@ export const appRouter = router({
   markets: marketsRouter,
   
   /**
-   * Bugs Router - Bug reporting system with chat interface
-   * Allows users to report bugs and communicate with support team
+   * Support Router - Real-time support chat system
+   * WebSocket-based chat with bot and human agents
    */
-  bugs: bugsRouter,
-  bugReports: bugReportsRouter,
+  support: supportRouter,
 });
 
 export type AppRouter = typeof appRouter;
