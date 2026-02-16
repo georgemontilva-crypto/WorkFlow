@@ -50,13 +50,19 @@ export default function BugReports() {
   const [replyMessage, setReplyMessage] = useState("");
   const { showToast } = useToast();
 
-  // Fetch all conversations
-  const { data: conversations, refetch: refetchConversations } = trpc.bugs.admin.getConversations.useQuery();
+  // Fetch all conversations with auto-refresh every 5 seconds
+  const { data: conversations, refetch: refetchConversations } = trpc.bugs.admin.getConversations.useQuery(
+    undefined,
+    { refetchInterval: 5000 } // Poll every 5 seconds
+  );
 
-  // Fetch selected conversation details
+  // Fetch selected conversation details with auto-refresh
   const { data: conversationData, refetch: refetchConversation } = trpc.bugs.admin.getConversation.useQuery(
     { id: selectedConversation || 0 },
-    { enabled: !!selectedConversation }
+    { 
+      enabled: !!selectedConversation,
+      refetchInterval: selectedConversation ? 3000 : false // Poll every 3 seconds when viewing a conversation
+    }
   );
 
   // Reply mutation

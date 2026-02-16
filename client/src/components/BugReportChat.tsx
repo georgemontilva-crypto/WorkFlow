@@ -44,16 +44,22 @@ export function BugReportChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { showToast } = useToast();
 
-  // Fetch conversations
+  // Fetch conversations with auto-refresh every 3 seconds when open
   const { data: conversations, refetch: refetchConversations } = trpc.bugs.getConversations.useQuery(
     undefined,
-    { enabled: isOpen }
+    { 
+      enabled: isOpen,
+      refetchInterval: isOpen && !isMinimized ? 3000 : false // Poll every 3 seconds when chat is open
+    }
   );
 
-  // Fetch conversation details
+  // Fetch conversation details with auto-refresh
   const { data: conversationData, refetch: refetchConversation } = trpc.bugs.getConversation.useQuery(
     { id: conversation?.id || 0 },
-    { enabled: !!conversation }
+    { 
+      enabled: !!conversation,
+      refetchInterval: conversation && isOpen && !isMinimized ? 3000 : false // Poll every 3 seconds
+    }
   );
 
   // Send message mutation
