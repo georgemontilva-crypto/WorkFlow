@@ -253,3 +253,5 @@ export function BugReportsAdmin() {
     </div>
   );
 }
+
+export default BugReportsAdmin;

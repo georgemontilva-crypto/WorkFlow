@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { router, protectedProcedure, publicProcedure } from "./trpc";
-import { db } from "./db";
+import { router, protectedProcedure, superAdminProcedure } from "./_core/trpc";
+import { getDb } from "./db";
 import { bugReportsForm } from "../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
 
@@ -18,6 +18,7 @@ export const bugReportsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
       const [report] = await db.insert(bugReportsForm).values({
         user_id: ctx.user.id,
         title: input.title,
@@ -35,6 +36,7 @@ export const bugReportsRouter = router({
 
   // Get user's own bug reports
   getMyReports: protectedProcedure.query(async ({ ctx }) => {
+    const db = await getDb();
     const reports = await db
       .select()
       .from(bugReportsForm)
@@ -47,11 +49,8 @@ export const bugReportsRouter = router({
   // Admin procedures
   admin: router({
     // Get all bug reports
-    getAllReports: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role !== "super_admin") {
-        throw new Error("No autorizado");
-      }
-
+    getAllReports: superAdminProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
       const reports = await db
         .select()
         .from(bugReportsForm)
@@ -61,7 +60,7 @@ export const bugReportsRouter = router({
     }),
 
     // Update report status
-    updateStatus: protectedProcedure
+    updateStatus: superAdminProcedure
       .input(
         z.object({
           id: z.number(),
@@ -69,10 +68,7 @@ export const bugReportsRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "super_admin") {
-          throw new Error("No autorizado");
-        }
-
+        const db = await getDb();
         await db
           .update(bugReportsForm)
           .set({ status: input.status, updated_at: new Date() })
@@ -82,7 +78,7 @@ export const bugReportsRouter = router({
       }),
 
     // Update report priority
-    updatePriority: protectedProcedure
+    updatePriority: superAdminProcedure
       .input(
         z.object({
           id: z.number(),
@@ -90,10 +86,7 @@ export const bugReportsRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "super_admin") {
-          throw new Error("No autorizado");
-        }
-
+        const db = await getDb();
         await db
           .update(bugReportsForm)
           .set({ priority: input.priority, updated_at: new Date() })
@@ -103,7 +96,7 @@ export const bugReportsRouter = router({
       }),
 
     // Add admin notes
-    addNotes: protectedProcedure
+    addNotes: superAdminProcedure
       .input(
         z.object({
           id: z.number(),
@@ -111,10 +104,7 @@ export const bugReportsRouter = router({
         })
       )
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "super_admin") {
-          throw new Error("No autorizado");
-        }
-
+        const db = await getDb();
         await db
           .update(bugReportsForm)
           .set({ admin_notes: input.notes, updated_at: new Date() })

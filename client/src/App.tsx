@@ -99,7 +99,6 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/admin/bugs">
-       <Route path="/admin/bugs">
         <SuperAdminRoute>
           <BugReports />
         </SuperAdminRoute>
