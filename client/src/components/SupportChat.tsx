@@ -200,7 +200,7 @@ export function SupportChat() {
     return (
       <button
         onClick={handleOpen}
-        className="group fixed right-4 z-[60] flex items-center gap-0 bg-[#C4FF3D] text-black rounded-full shadow-lg hover:bg-[#b3ee2c] transition-all duration-300 relative overflow-hidden"
+        className="fixed right-4 z-[60] flex items-center justify-center bg-transparent border border-[#C4FF3D] text-[#C4FF3D] rounded-full hover:bg-[#C4FF3D] hover:text-black transition-all duration-300"
         style={{
           width: '56px',
           height: '56px',
@@ -210,12 +210,7 @@ export function SupportChat() {
           position: 'fixed',
         }}
       >
-        <div className="flex items-center justify-center w-14 h-14 flex-shrink-0">
-          <Headphones className="w-6 h-6" />
-        </div>
-        <span className="font-medium whitespace-nowrap pr-4 opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-[100px] transition-all duration-300 ease-out overflow-hidden">
-          Soporte
-        </span>
+        <Headphones className="w-5 h-5" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold z-10">
             {unreadCount}
