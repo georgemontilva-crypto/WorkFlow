@@ -65,12 +65,15 @@ export default function BugReports() {
     }
   );
 
-  // Reply mutation
+  // Reply mutation with immediate refetch
   const replyMutation = trpc.bugs.admin.reply.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       setReplyMessage("");
-      refetchConversation();
-      refetchConversations();
+      // Immediate refetch for instant message display
+      await Promise.all([
+        refetchConversation(),
+        refetchConversations()
+      ]);
       showToast({
         type: "success",
         title: "Respuesta enviada",
@@ -304,26 +307,15 @@ export default function BugReports() {
                     </button>
                   </div>
 
-                  {/* Status and Priority Controls */}
-                  <div className="flex flex-wrap gap-2">
+                  {/* Status Control */}
+                  <div className="flex gap-2">
                     <select
                       value={conversationData.conversation.status}
                       onChange={(e) => handleUpdateStatus(e.target.value as any)}
                       className="px-3 py-1.5 bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-lg text-white text-sm focus:outline-none focus:border-[#C4FF3D]/50"
                     >
                       <option value="open">Abierto</option>
-                      <option value="pending">Pendiente</option>
                       <option value="closed">Cerrado</option>
-                    </select>
-
-                    <select
-                      value={conversationData.conversation.priority}
-                      onChange={(e) => handleUpdatePriority(e.target.value as any)}
-                      className="px-3 py-1.5 bg-[#121212] border border-[rgba(255,255,255,0.06)] rounded-lg text-white text-sm focus:outline-none focus:border-[#C4FF3D]/50"
-                    >
-                      <option value="low">Prioridad Baja</option>
-                      <option value="medium">Prioridad Media</option>
-                      <option value="high">Prioridad Alta</option>
                     </select>
                   </div>
                 </div>

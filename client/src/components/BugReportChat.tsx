@@ -62,17 +62,15 @@ export function BugReportChat() {
     }
   );
 
-  // Send message mutation
+  // Send message mutation with immediate refetch
   const sendMessageMutation = trpc.bugs.sendMessage.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setMessage("");
-      refetchConversations();
-      if (conversation) {
-        refetchConversation();
-      } else {
-        // New conversation created, fetch it
-        refetchConversations();
-      }
+      // Immediate refetch for instant message display
+      await Promise.all([
+        refetchConversations(),
+        conversation ? refetchConversation() : Promise.resolve()
+      ]);
     },
     onError: (error) => {
       showToast({
@@ -161,7 +159,7 @@ export function BugReportChat() {
         className="fixed bottom-20 right-4 md:bottom-4 md:right-4 z-40 flex items-center gap-2 px-4 py-3 bg-[#C4FF3D] text-black rounded-full shadow-lg hover:bg-[#b3ee2c] transition-all relative"
       >
         <Headphones className="w-5 h-5" />
-        <span className="font-medium">Chat de Soporte</span>
+        <span className="font-medium">Soporte</span>
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
             {unreadCount}
@@ -178,7 +176,7 @@ export function BugReportChat() {
         className="fixed bottom-20 right-4 md:bottom-4 md:right-4 z-40 flex items-center gap-2 px-4 py-3 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] text-white rounded-full shadow-lg hover:bg-[#121212] transition-all"
       >
         <MessageCircle className="w-5 h-5" />
-        <span className="font-medium">Soporte Finwrk</span>
+        <span className="font-medium">Soporte</span>
         {conversations && conversations[0]?.unreadCount > 0 && (
           <span className="px-2 py-0.5 bg-[#C4FF3D] text-black text-xs rounded-full font-medium">
             {conversations[0].unreadCount}
@@ -197,7 +195,7 @@ export function BugReportChat() {
             <Headphones className="w-5 h-5 text-black" />
           </div>
           <div>
-            <h3 className="text-white font-medium">Soporte Finwrk</h3>
+            <h3 className="text-white font-medium">Soporte</h3>
             <p className="text-[#8B92A8] text-xs">Describe el problema que estás experimentando</p>
           </div>
         </div>
