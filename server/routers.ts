@@ -18,6 +18,7 @@ import { adminRouter } from "./routers_admin";
 import { priceAlertsRouter } from "./routers_price_alerts";
 import { marketsRouter } from "./routers_markets";
 import { bugsRouter } from "./routers_bugs";
+import { bugReportsRouter } from "./routers_bug_reports";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -804,6 +805,7 @@ export const appRouter = router({
    * Allows users to report bugs and communicate with support team
    */
   bugs: bugsRouter,
+  bugReports: bugReportsRouter,
 });
 
 export type AppRouter = typeof appRouter;

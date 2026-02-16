@@ -18,6 +18,7 @@ import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { MobileHeader } from '@/components/MobileHeader';
 import { MobileHeaderSpacer } from '@/components/MobileHeaderSpacer';
 import { BugReportChat } from '@/components/BugReportChat';
+import { BugReportForm } from '@/components/BugReportForm';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   console.log('[DashboardLayout] Component mounted');
@@ -249,6 +250,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       
       {/* Bug Report Chat - Available globally */}
       <BugReportChat />
+      <BugReportForm />
     </div>
   );
 }

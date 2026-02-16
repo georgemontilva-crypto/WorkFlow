@@ -1,9 +1,9 @@
 /**
- * BugReports - Admin panel for managing bug reports
+ * BugReports - Admin panel for managing support tickets
  * Only accessible by super admin
  * 
  * Features:
- * - List all bug conversations
+ * - List all support conversations
  * - View conversation details
  * - Reply to users
  * - Change status and priority
@@ -15,7 +15,7 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { trpc } from "@/lib/trpc";
 import { useToast } from "@/contexts/ToastContext";
 import { cn } from "@/lib/utils";
-import { Bug, MessageCircle, Send, X, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { Headphones, MessageCircle, Send, X, AlertCircle, CheckCircle2, Clock } from "lucide-react";
 
 interface Conversation {
   id: number;
@@ -201,11 +201,11 @@ export default function BugReports() {
       <div className="p-6">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Bug className="w-6 h-6 text-[#C4FF3D]" />
-            Reportes de Bugs
+            <Headphones className="w-6 h-6 text-[#C4FF3D]" />
+            Chat de Soporte
           </h1>
           <p className="text-[#8B92A8] mt-1">
-            Gestiona los reportes de bugs de los usuarios
+            Gestiona las conversaciones de soporte con los usuarios
           </p>
         </div>
 
@@ -223,9 +223,9 @@ export default function BugReports() {
             {!conversations || conversations.length === 0 ? (
               <div className="text-center py-8">
                 <div className="w-16 h-16 bg-[rgba(139,146,168,0.1)] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Bug className="w-8 h-8 text-[#8B92A8]" />
+                  <Headphones className="w-8 h-8 text-[#8B92A8]" />
                 </div>
-                <p className="text-[#8B92A8] text-sm">No hay reportes de bugs</p>
+                <p className="text-[#8B92A8] text-sm">No hay conversaciones de soporte</p>
               </div>
             ) : (
               <div className="space-y-2">

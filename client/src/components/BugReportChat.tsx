@@ -1,5 +1,5 @@
 /**
- * BugReportChat - WhatsApp-style bug reporting chat interface
+ * BugReportChat - WhatsApp-style support chat interface
  * 
  * Features:
  * - Minimizable chat modal
@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useRef } from "react";
-import { X, Send, Paperclip, MessageCircle, Minimize2, Bug } from "lucide-react";
+import { X, Send, Paperclip, MessageCircle, Minimize2, Headphones } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useToast } from "@/contexts/ToastContext";
 import { cn } from "@/lib/utils";
@@ -151,14 +151,22 @@ export function BugReportChat() {
     );
   };
 
+  // Calculate unread messages
+  const unreadCount = conversations?.[0]?.unreadCount || 0;
+
   if (!isOpen) {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 right-4 md:bottom-4 md:right-4 z-40 flex items-center gap-2 px-4 py-3 bg-[#C4FF3D] text-black rounded-full shadow-lg hover:bg-[#b3ee2c] transition-all"
+        className="fixed bottom-20 right-4 md:bottom-4 md:right-4 z-40 flex items-center gap-2 px-4 py-3 bg-[#C4FF3D] text-black rounded-full shadow-lg hover:bg-[#b3ee2c] transition-all relative"
       >
-        <Bug className="w-5 h-5" />
-        <span className="font-medium">Reportar un bug</span>
+        <Headphones className="w-5 h-5" />
+        <span className="font-medium">Chat de Soporte</span>
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+            {unreadCount}
+          </span>
+        )}
       </button>
     );
   }
@@ -186,7 +194,7 @@ export function BugReportChat() {
       <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(255,255,255,0.06)]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-[#C4FF3D] rounded-full flex items-center justify-center">
-            <Bug className="w-5 h-5 text-black" />
+            <Headphones className="w-5 h-5 text-black" />
           </div>
           <div>
             <h3 className="text-white font-medium">Soporte Finwrk</h3>
@@ -215,11 +223,11 @@ export function BugReportChat() {
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <div className="w-16 h-16 bg-[rgba(196,255,61,0.1)] rounded-full flex items-center justify-center mb-4">
-              <Bug className="w-8 h-8 text-[#C4FF3D]" />
+              <Headphones className="w-8 h-8 text-[#C4FF3D]" />
             </div>
             <h4 className="text-white font-medium mb-2">¿Encontraste un problema?</h4>
             <p className="text-[#8B92A8] text-sm max-w-xs">
-              Describe el bug que encontraste y nuestro equipo te ayudará a resolverlo.
+              Describe tu consulta o problema y nuestro equipo te ayudará a resolverlo.
             </p>
           </div>
         ) : (

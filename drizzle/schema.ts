@@ -587,3 +587,40 @@ export const bugMessages = mysqlTable("bug_messages", {
 
 export type BugMessage = typeof bugMessages.$inferSelect;
 export type InsertBugMessage = typeof bugMessages.$inferInsert;
+
+/**
+ * Bug Reports Form table - stores one-way bug reports from users
+ * Simple form submission without conversation thread
+ */
+export const bugReportsForm = mysqlTable("bug_reports_form", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull(),
+  /** Bug title/summary */
+  title: varchar("title", { length: 255 }).notNull(),
+  /** Detailed bug description */
+  description: text("description").notNull(),
+  /** Steps to reproduce the bug */
+  steps_to_reproduce: text("steps_to_reproduce"),
+  /** Expected behavior */
+  expected_behavior: text("expected_behavior"),
+  /** Actual behavior */
+  actual_behavior: text("actual_behavior"),
+  /** Screenshot or attachment URL */
+  attachment_url: varchar("attachment_url", { length: 500 }),
+  /** Report status: new, in_progress, resolved, closed */
+  status: mysqlEnum("status", ["new", "in_progress", "resolved", "closed"]).notNull().default("new"),
+  /** Priority level: low, medium, high, critical */
+  priority: mysqlEnum("priority", ["low", "medium", "high", "critical"]).notNull().default("medium"),
+  /** Admin notes (internal) */
+  admin_notes: text("admin_notes"),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  userIdx: index("idx_user").on(table.user_id),
+  statusIdx: index("idx_status").on(table.status),
+  priorityIdx: index("idx_priority").on(table.priority),
+  userStatusIdx: index("idx_user_status").on(table.user_id, table.status),
+}));
+
+export type BugReportForm = typeof bugReportsForm.$inferSelect;
+export type InsertBugReportForm = typeof bugReportsForm.$inferInsert;

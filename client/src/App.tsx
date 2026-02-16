@@ -33,6 +33,7 @@ import Admin from "./pages/Admin";
 import Markets from "./pages/Markets";
 import PricingPage from "./pages/PricingPage";
 import BugReports from "./pages/BugReports";
+import BugReportsAdmin from "./pages/BugReportsAdmin";
 import CompanyProfile from "./pages/CompanyProfile";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { SuperAdminRoute } from "./components/SuperAdminRoute";
@@ -98,11 +99,16 @@ function Router() {
         </ProtectedRoute>
       </Route>
       <Route path="/admin/bugs">
-        <ProtectedRoute>
-          <SuperAdminRoute>
-            <BugReports />
-          </SuperAdminRoute>
-        </ProtectedRoute>
+       <Route path="/admin/bugs">
+        <SuperAdminRoute>
+          <BugReports />
+        </SuperAdminRoute>
+      </Route>
+      <Route path="/admin/bug-reports">
+        <SuperAdminRoute>
+          <BugReportsAdmin />
+        </SuperAdminRoute>
+      </Route>edRoute>
       </Route>
       <Route path="/markets">
         <ProtectedRoute>

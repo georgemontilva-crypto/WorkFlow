@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Shield, Users, CheckCircle, XCircle, Search, Calendar, Mail, User, Bug } from 'lucide-react';
+import { Shield, Users, CheckCircle, XCircle, Search, Calendar, Mail, User, Headphones, Bug } from 'lucide-react';
 import { Link } from 'wouter';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useLocation } from 'wouter';
@@ -32,6 +32,10 @@ export default function Admin() {
 
   // Fetch all users
   const { data: users, isLoading, refetch, error } = trpc.admin.getAllUsers.useQuery();
+
+  // Fetch support conversations to show unread count
+  const { data: conversations } = trpc.bugs.admin.getAllConversations.useQuery();
+  const unreadCount = conversations?.filter(c => c.unreadCount > 0).length || 0;
   
   // Debug
   useEffect(() => {
@@ -137,12 +141,25 @@ export default function Admin() {
                 </p>
               </div>
             </div>
-            <Link href="/admin/bugs">
-              <Button className="flex items-center gap-2">
-                <Bug className="w-4 h-4" />
-                Reportes de Bugs
-              </Button>
-            </Link>
+            <div className="flex gap-2">
+              <Link href="/admin/bugs">
+                <Button className="flex items-center gap-2 relative">
+                  <Headphones className="w-4 h-4" />
+                  Chat de Soporte
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                      {unreadCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+              <Link href="/admin/bug-reports">
+                <Button className="flex items-center gap-2 bg-red-500 hover:bg-red-600">
+                  <Bug className="w-4 h-4" />
+                  Reportes de Bugs
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
 
