@@ -17,6 +17,7 @@ import { walletRouter } from "./routers_wallet";
 import { adminRouter } from "./routers_admin";
 import { priceAlertsRouter } from "./routers_price_alerts";
 import { marketsRouter } from "./routers_markets";
+import { bugsRouter } from "./routers_bugs";
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -797,6 +798,12 @@ export const appRouter = router({
    * Fetches data from CoinGecko API server-side to avoid CORS issues
    */
   markets: marketsRouter,
+  
+  /**
+   * Bugs Router - Bug reporting system with chat interface
+   * Allows users to report bugs and communicate with support team
+   */
+  bugs: bugsRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -32,6 +32,7 @@ import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import Markets from "./pages/Markets";
 import PricingPage from "./pages/PricingPage";
+import BugReports from "./pages/BugReports";
 import CompanyProfile from "./pages/CompanyProfile";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { SuperAdminRoute } from "./components/SuperAdminRoute";
@@ -93,6 +94,13 @@ function Router() {
         <ProtectedRoute>
           <SuperAdminRoute>
             <Admin />
+          </SuperAdminRoute>
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/bugs">
+        <ProtectedRoute>
+          <SuperAdminRoute>
+            <BugReports />
           </SuperAdminRoute>
         </ProtectedRoute>
       </Route>

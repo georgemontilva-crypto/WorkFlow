@@ -17,6 +17,7 @@ import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { MobileHeader } from '@/components/MobileHeader';
 import { MobileHeaderSpacer } from '@/components/MobileHeaderSpacer';
+import { BugReportChat } from '@/components/BugReportChat';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   console.log('[DashboardLayout] Component mounted');
@@ -245,6 +246,9 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         {/* Mobile Bottom Navigation */}
         <MobileBottomNav />
       </main>
+      
+      {/* Bug Report Chat - Available globally */}
+      <BugReportChat />
     </div>
   );
 }

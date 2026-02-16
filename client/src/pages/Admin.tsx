@@ -4,7 +4,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Shield, Users, CheckCircle, XCircle, Search, Calendar, Mail, User } from 'lucide-react';
+import { Shield, Users, CheckCircle, XCircle, Search, Calendar, Mail, User, Bug } from 'lucide-react';
+import { Link } from 'wouter';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useLocation } from 'wouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -124,16 +125,24 @@ export default function Admin() {
       <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-full">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-3 bg-primary/10 rounded-lg">
-              <Shield className="w-8 h-8 text-primary" />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-primary/10 rounded-lg">
+                <Shield className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-bold">Panel de Administración</h1>
+                <p className="text-muted-foreground mt-1">
+                  Gestiona usuarios, permisos y accesos del sistema
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-bold">Panel de Administración</h1>
-              <p className="text-muted-foreground mt-1">
-                Gestiona usuarios, permisos y accesos del sistema
-              </p>
-            </div>
+            <Link href="/admin/bugs">
+              <Button className="flex items-center gap-2">
+                <Bug className="w-4 h-4" />
+                Reportes de Bugs
+              </Button>
+            </Link>
           </div>
         </div>
 

@@ -539,3 +539,51 @@ export const cryptoWalletAddresses = mysqlTable("crypto_wallet_addresses", {
 
 export type CryptoWalletAddress = typeof cryptoWalletAddresses.$inferSelect;
 export type InsertCryptoWalletAddress = typeof cryptoWalletAddresses.$inferInsert;
+
+/**
+ * Bug Conversations table - stores bug report conversations
+ * Each conversation represents a bug report thread between user and admin
+ */
+export const bugConversations = mysqlTable("bug_conversations", {
+  id: serial("id").primaryKey(),
+  user_id: int("user_id").notNull(),
+  /** Conversation status: open, pending, closed */
+  status: mysqlEnum("status", ["open", "pending", "closed"]).notNull().default("open"),
+  /** Priority level: low, medium, high */
+  priority: mysqlEnum("priority", ["low", "medium", "high"]).notNull().default("medium"),
+  /** Timestamp of last message in conversation */
+  last_message_at: timestamp("last_message_at").defaultNow().notNull(),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at").defaultNow().notNull(),
+}, (table) => ({
+  userIdx: index("idx_user").on(table.user_id),
+  statusIdx: index("idx_status").on(table.status),
+  userStatusIdx: index("idx_user_status").on(table.user_id, table.status),
+}));
+
+export type BugConversation = typeof bugConversations.$inferSelect;
+export type InsertBugConversation = typeof bugConversations.$inferInsert;
+
+/**
+ * Bug Messages table - stores individual messages in bug conversations
+ * Each message belongs to a conversation and can be from user, admin, or system
+ */
+export const bugMessages = mysqlTable("bug_messages", {
+  id: serial("id").primaryKey(),
+  conversation_id: int("conversation_id").notNull(),
+  /** Sender type: user, admin, system */
+  sender_type: mysqlEnum("sender_type", ["user", "admin", "system"]).notNull(),
+  /** Message content */
+  message: text("message").notNull(),
+  /** Optional attachment URL (max 1MB) */
+  attachment_url: varchar("attachment_url", { length: 500 }),
+  /** Whether the message has been read */
+  is_read: int("is_read").notNull().default(0),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  conversationIdx: index("idx_conversation").on(table.conversation_id),
+  conversationCreatedIdx: index("idx_conversation_created").on(table.conversation_id, table.created_at),
+}));
+
+export type BugMessage = typeof bugMessages.$inferSelect;
+export type InsertBugMessage = typeof bugMessages.$inferInsert;
