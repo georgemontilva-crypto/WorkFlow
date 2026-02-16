@@ -200,11 +200,14 @@ export function SupportChat() {
     return (
       <button
         onClick={handleOpen}
-        className={`group fixed right-4 top-auto z-[60] flex items-center gap-0 bg-[#C4FF3D] text-black rounded-full shadow-lg hover:bg-[#b3ee2c] transition-all duration-300 relative overflow-hidden ${isMobile ? '!bottom-[88px]' : '!bottom-4'}`}
+        className="group fixed right-4 z-[60] flex items-center gap-0 bg-[#C4FF3D] text-black rounded-full shadow-lg hover:bg-[#b3ee2c] transition-all duration-300 relative overflow-hidden"
         style={{
           width: '56px',
           height: '56px',
           padding: '0',
+          top: 'auto',
+          bottom: isMobile ? '88px' : '16px',
+          position: 'fixed',
         }}
       >
         <div className="flex items-center justify-center w-14 h-14 flex-shrink-0">
@@ -227,7 +230,12 @@ export function SupportChat() {
     return (
       <button
         onClick={() => setIsMinimized(false)}
-        className={`fixed right-4 top-auto z-[60] flex items-center gap-2 px-4 py-3 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] text-white rounded-full shadow-lg hover:bg-[#121212] transition-all ${isMobile ? '!bottom-[88px]' : '!bottom-4'}`}
+        className="fixed right-4 z-[60] flex items-center gap-2 px-4 py-3 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] text-white rounded-full shadow-lg hover:bg-[#121212] transition-all"
+        style={{
+          top: 'auto',
+          bottom: isMobile ? '88px' : '16px',
+          position: 'fixed',
+        }}
       >
         <MessageCircle className="w-5 h-5" />
         <span className="font-medium">Soporte</span>
@@ -243,7 +251,12 @@ export function SupportChat() {
   // Chat window (open state)
   return (
     <div 
-      className={`fixed right-4 top-auto z-[60] w-[calc(100vw-2rem)] md:w-96 h-[500px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] shadow-2xl flex flex-col overflow-hidden ${isMobile ? '!bottom-[88px]' : '!bottom-4'}`}
+      className="fixed right-4 z-[60] w-[calc(100vw-2rem)] md:w-96 h-[500px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] shadow-2xl flex flex-col overflow-hidden"
+      style={{
+        top: 'auto',
+        bottom: isMobile ? '88px' : '16px',
+        position: 'fixed',
+      }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(255,255,255,0.06)]">
