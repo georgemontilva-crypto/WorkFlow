@@ -4,7 +4,7 @@
  */
 
 import { Link, useLocation } from 'wouter';
-import { Users, Settings, Menu, X, LogOut, FileText, TrendingUp, Target, LayoutDashboard, LineChart, Shield } from 'lucide-react';
+import { Users, Settings, Menu, X, LogOut, FileText, TrendingUp, Target, LayoutDashboard, LineChart, Shield, Bug } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,6 @@ import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { MobileHeader } from '@/components/MobileHeader';
 import { MobileHeaderSpacer } from '@/components/MobileHeaderSpacer';
 import { BugReportChat } from '@/components/BugReportChat';
-import { BugReportForm } from '@/components/BugReportForm';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   console.log('[DashboardLayout] Component mounted');
@@ -80,6 +79,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Settings at the bottom (separate)
   const settingsItems = [
     { name: 'Configuración', href: '/settings', icon: Settings },
+    { name: 'Reportar Bug', href: '/bug-report', icon: Bug },
   ];
 
   // Admin section - only for super_admin
@@ -250,7 +250,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       
       {/* Bug Report Chat - Available globally */}
       <BugReportChat />
-      <BugReportForm />
     </div>
   );
 }

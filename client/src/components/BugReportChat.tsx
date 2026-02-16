@@ -156,12 +156,21 @@ export function BugReportChat() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 right-4 md:bottom-4 md:right-4 z-40 flex items-center gap-2 px-4 py-3 bg-[#C4FF3D] text-black rounded-full shadow-lg hover:bg-[#b3ee2c] transition-all relative"
+        className="group fixed bottom-20 right-4 md:bottom-4 md:right-4 z-40 flex items-center gap-0 bg-[#C4FF3D] text-black rounded-full shadow-lg hover:bg-[#b3ee2c] transition-all duration-300 relative overflow-hidden"
+        style={{
+          width: '56px',
+          height: '56px',
+          padding: '0',
+        }}
       >
-        <Headphones className="w-5 h-5" />
-        <span className="font-medium">Soporte</span>
+        <div className="flex items-center justify-center w-14 h-14 flex-shrink-0">
+          <Headphones className="w-6 h-6" />
+        </div>
+        <span className="font-medium whitespace-nowrap pr-4 opacity-0 max-w-0 group-hover:opacity-100 group-hover:max-w-[100px] transition-all duration-300 ease-out overflow-hidden">
+          Soporte
+        </span>
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+          <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold z-10">
             {unreadCount}
           </span>
         )}
