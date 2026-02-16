@@ -46,7 +46,17 @@ export function SupportChat() {
   const [inputMessage, setInputMessage] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Detect mobile screen size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const utils = trpc.useContext();
 
@@ -190,8 +200,9 @@ export function SupportChat() {
     return (
       <button
         onClick={handleOpen}
-        className="group fixed bottom-4 right-4 z-40 flex items-center gap-0 bg-[#C4FF3D] text-black rounded-full shadow-lg hover:bg-[#b3ee2c] transition-all duration-300 relative overflow-hidden"
+        className="group fixed right-4 z-[60] flex items-center gap-0 bg-[#C4FF3D] text-black rounded-full shadow-lg hover:bg-[#b3ee2c] transition-all duration-300 relative overflow-hidden"
         style={{
+          bottom: isMobile ? '88px' : '16px',
           width: '56px',
           height: '56px',
           padding: '0',
@@ -217,7 +228,10 @@ export function SupportChat() {
     return (
       <button
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-4 right-4 z-40 flex items-center gap-2 px-4 py-3 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] text-white rounded-full shadow-lg hover:bg-[#121212] transition-all"
+        className="fixed right-4 z-[60] flex items-center gap-2 px-4 py-3 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] text-white rounded-full shadow-lg hover:bg-[#121212] transition-all"
+        style={{
+          bottom: isMobile ? '88px' : '16px',
+        }}
       >
         <MessageCircle className="w-5 h-5" />
         <span className="font-medium">Soporte</span>
@@ -232,7 +246,12 @@ export function SupportChat() {
 
   // Chat window (open state)
   return (
-    <div className="fixed bottom-4 right-4 z-40 w-[calc(100vw-2rem)] md:w-96 h-[500px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] shadow-2xl flex flex-col overflow-hidden">
+    <div 
+      className="fixed right-4 z-[60] w-[calc(100vw-2rem)] md:w-96 h-[500px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] shadow-2xl flex flex-col overflow-hidden"
+      style={{
+        bottom: isMobile ? '88px' : '16px',
+      }}
+    >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(255,255,255,0.06)]">
         <div className="flex items-center gap-3">
