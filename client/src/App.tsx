@@ -108,7 +108,6 @@ function Router() {
         <SuperAdminRoute>
           <BugReportsAdmin />
         </SuperAdminRoute>
-      </Route>edRoute>
       </Route>
       <Route path="/markets">
         <ProtectedRoute>
