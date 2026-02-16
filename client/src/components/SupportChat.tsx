@@ -153,25 +153,30 @@ export function SupportChat() {
   };
 
   const handleSendMessage = () => {
-    if (!inputMessage.trim() || !socket) return;
+    if (!inputMessage.trim()) return;
+    
+    const messageToSend = inputMessage.trim();
+    setInputMessage(''); // Clear input immediately
 
     if (!conversation) {
       // Start conversation first
       startConversation.mutate(undefined, {
         onSuccess: (data) => {
-          socket.emit('send_message', {
-            conversationId: data.conversationId,
-            message: inputMessage.trim(),
-          });
-          setInputMessage('');
+          if (socket) {
+            socket.emit('send_message', {
+              conversationId: data.conversationId,
+              message: messageToSend,
+            });
+          }
         },
       });
     } else {
-      socket.emit('send_message', {
-        conversationId: conversation.id,
-        message: inputMessage.trim(),
-      });
-      setInputMessage('');
+      if (socket) {
+        socket.emit('send_message', {
+          conversationId: conversation.id,
+          message: messageToSend,
+        });
+      }
     }
   };
 
@@ -185,7 +190,7 @@ export function SupportChat() {
     return (
       <button
         onClick={handleOpen}
-        className="group fixed bottom-20 right-4 md:bottom-4 md:right-4 z-40 flex items-center gap-0 bg-[#C4FF3D] text-black rounded-full shadow-lg hover:bg-[#b3ee2c] transition-all duration-300 relative overflow-hidden"
+        className="group fixed bottom-4 right-4 z-40 flex items-center gap-0 bg-[#C4FF3D] text-black rounded-full shadow-lg hover:bg-[#b3ee2c] transition-all duration-300 relative overflow-hidden"
         style={{
           width: '56px',
           height: '56px',
@@ -212,7 +217,7 @@ export function SupportChat() {
     return (
       <button
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-20 right-4 md:bottom-4 md:right-4 z-40 flex items-center gap-2 px-4 py-3 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] text-white rounded-full shadow-lg hover:bg-[#121212] transition-all"
+        className="fixed bottom-4 right-4 z-40 flex items-center gap-2 px-4 py-3 bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] text-white rounded-full shadow-lg hover:bg-[#121212] transition-all"
       >
         <MessageCircle className="w-5 h-5" />
         <span className="font-medium">Soporte</span>
@@ -227,7 +232,7 @@ export function SupportChat() {
 
   // Chat window (open state)
   return (
-    <div className="fixed bottom-20 right-4 md:bottom-4 md:right-4 z-40 w-[calc(100vw-2rem)] md:w-96 h-[500px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] shadow-2xl flex flex-col overflow-hidden">
+    <div className="fixed bottom-4 right-4 z-40 w-[calc(100vw-2rem)] md:w-96 h-[500px] bg-[#0A0A0A] border border-[rgba(255,255,255,0.06)] rounded-[20px] shadow-2xl flex flex-col overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[rgba(255,255,255,0.06)]">
         <div className="flex items-center gap-3">
