@@ -200,15 +200,21 @@ export function SupportChat() {
     return (
       <button
         onClick={handleOpen}
-        className="fixed right-4 z-[60] flex items-center justify-center bg-transparent border border-[#C4FF3D] text-[#C4FF3D] rounded-full hover:bg-[#C4FF3D] hover:text-black transition-all duration-300"
+        className="fixed right-4 z-[60] flex items-center justify-center border border-[#C4FF3D] text-[#C4FF3D] rounded-full hover:bg-[#C4FF3D] hover:text-black transition-all duration-300"
         style={{
-          width: '56px',
-          height: '56px',
-          padding: '0',
-          top: 'auto',
-          bottom: isMobile ? '88px' : '16px',
-          position: 'fixed',
+          ...{
+            width: '56px',
+            height: '56px',
+            padding: '0',
+            top: 'auto',
+            bottom: isMobile ? '88px' : '16px',
+            position: 'fixed',
+          },
+          background: 'rgba(10, 10, 10, 0.8)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
         }}
+
       >
         <Headphones className="w-5 h-5" />
         {unreadCount > 0 && (
