@@ -17,7 +17,7 @@ import { walletRouter } from "./routers_wallet";
 import { adminRouter } from "./routers_admin";
 import { priceAlertsRouter } from "./routers_price_alerts";
 import { marketsRouter } from "./routers_markets";
-import { supportRouter } from "./routers_support";
+
 
 /**
  * ROUTER SIMPLIFICADO - SOLO AUTH Y CLIENTS
@@ -799,11 +799,7 @@ export const appRouter = router({
    */
   markets: marketsRouter,
   
-  /**
-   * Support Router - Real-time support chat system
-   * WebSocket-based chat with bot and human agents
-   */
-  support: supportRouter,
+
 });
 
 export type AppRouter = typeof appRouter;
