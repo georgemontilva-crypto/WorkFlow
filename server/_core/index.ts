@@ -10,6 +10,7 @@ import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { testRedisConnection } from "../config/redis";
 import { runMigrations } from "../migrate";
+import { initializeSocketIO } from "../services/socketService";
 
 async function startServer() {
   // Run database migrations first
@@ -43,6 +44,10 @@ async function startServer() {
   
   // OAuth callback under /api/oauth/callback (disabled - using JWT auth instead)
   // registerOAuthRoutes(app);
+  
+  // Initialize Socket.IO for real-time support chat
+  const socketIO = initializeSocketIO(server);
+  console.log('[Server] Socket.IO initialized');
   
   // tRPC API
   app.use(
