@@ -27,9 +27,15 @@ export function initializeSocketIO(httpServer: HTTPServer) {
   console.log('[Socket.IO] Initializing...');
 
   // Create Socket.IO server
+  // In production, allow same-origin requests
+  // In development, allow localhost:5173
+  const corsOrigin = process.env.NODE_ENV === 'production'
+    ? true // Allow same-origin in production
+    : (process.env.CLIENT_URL || 'http://localhost:5173');
+  
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:5173',
+      origin: corsOrigin,
       credentials: true,
     },
     transports: ['websocket', 'polling'],
