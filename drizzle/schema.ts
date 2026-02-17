@@ -214,42 +214,8 @@ export const savingsGoals = mysqlTable("savings_goals", {
 export type SavingsGoal = typeof savingsGoals.$inferSelect;
 export type InsertSavingsGoal = typeof savingsGoals.$inferInsert;
 
-/**
- * Support Tickets table - stores user support requests
- */
-export const supportTickets = mysqlTable("support_tickets", {
-  id: serial("id").primaryKey(),
-  user_id: int("user_id").notNull(),
-  subject: text("subject").notNull(),
-  status: mysqlEnum("status", ["open", "in_progress", "waiting_user", "waiting_agent", "resolved", "closed"]).notNull().default("open"),
-  priority: mysqlEnum("priority", ["low", "medium", "high", "urgent"]).notNull().default("medium"),
-  assigned_to: int("assigned_to"),
-  has_unread_user: int("has_unread_user").notNull().default(0),
-  has_unread_agent: int("has_unread_agent").notNull().default(0),
-  resolved_at: timestamp("resolved_at"),
-  closed_at: timestamp("closed_at"),
-  created_at: timestamp("created_at").defaultNow().notNull(),
-  updated_at: timestamp("updated_at").defaultNow().notNull(),
-});
-
-export type SupportTicket = typeof supportTickets.$inferSelect;
-export type InsertSupportTicket = typeof supportTickets.$inferInsert;
-
-/**
- * Support Messages table - stores messages in support tickets
- */
-export const supportMessages = mysqlTable("support_messages", {
-  id: serial("id").primaryKey(),
-  ticket_id: int("ticket_id").notNull(),
-  sender_id: int("sender_id").notNull(),
-  sender_type: mysqlEnum("sender_type", ["user", "agent", "ai"]).notNull().default("user"),
-  message: text("message").notNull(),
-  is_read: int("is_read").notNull().default(0),
-  created_at: timestamp("created_at").defaultNow().notNull(),
-});
-
-export type SupportMessage = typeof supportMessages.$inferSelect;
-export type InsertSupportMessage = typeof supportMessages.$inferInsert;
+// Old support tables removed - now using schema_support.ts
+// See schema_support.ts for new support chat system
 
 /**
  * Market Favorites table - stores user's favorite market assets
