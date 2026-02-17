@@ -2,7 +2,7 @@ import { mysqlTable, serial, varchar, text, int, bigint, timestamp, decimal, mys
 import { drizzle } from "drizzle-orm/mysql2";
 import mysql from "mysql2/promise";
 import { ENV } from "./_core/env";
-import { users, clients, invoices, transactions, savingsGoals, supportTickets, supportMessages, marketFavorites, priceAlerts, dashboardWidgets, verificationTokens, companyProfiles, reminders, alerts, cryptoProjects, cryptoPurchases, cryptoWalletAddresses, bugConversations, bugMessages } from "../drizzle/schema";
+import { users, clients, invoices, transactions, savingsGoals, marketFavorites, priceAlerts, dashboardWidgets, verificationTokens, companyProfiles, reminders, alerts, cryptoProjects, cryptoPurchases, cryptoWalletAddresses, bugConversations, bugMessages } from "../drizzle/schema";
 import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { logClientCreated, logClientDuplicate } from "./utils/logger";
@@ -848,135 +848,12 @@ export async function updateClient(id: number, user_id: number, data: any) {
 // Support Tickets Functions
 // ============================================
 
-export async function createSupportTicket(data: {
-  user_id: number;
-  subject: string;
-  priority?: "low" | "medium" | "high" | "urgent";
-}) {
-  const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
-  const result = await db.insert(supportTickets).values({
-    user_id: data.user_id,
-    subject: data.subject,
-    status: "open",
-    priority: data.priority || "medium",
-    created_at: new Date(),
-    updated_at: new Date(),
-  });
-
-  // Get the last inserted ticket
-  const tickets = await db
-    .select()
-    .from(supportTickets)
-    .where(eq(supportTickets.user_id, data.user_id))
-    .orderBy(supportTickets.id)
-    .limit(1);
-
-  return tickets[0];
-}
-
-export async function getSupportTicketsByUserId(user_id: number) {
-  const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
-  return await db
-    .select()
-    .from(supportTickets)
-    .where(eq(supportTickets.user_id, user_id))
-    .orderBy(supportTickets.created_at);
-}
-
-export async function getAllSupportTickets() {
-  const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
-  return await db
-    .select()
-    .from(supportTickets)
-    .orderBy(supportTickets.created_at);
-}
-
-export async function getSupportTicketById(id: number) {
-  const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
-  const result = await db
-    .select()
-    .from(supportTickets)
-    .where(eq(supportTickets.id, id))
-    .limit(1);
-
-  return result[0] || null;
-}
-
-export async function updateSupportTicketStatus(
-  id: number,
-  status: "open" | "in_progress" | "resolved" | "closed"
-) {
-  const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
-  await db
-    .update(supportTickets)
-    .set({ status, updated_at: new Date() })
-    .where(eq(supportTickets.id, id));
-}
-
 // ============================================
-// Support Messages Functions
+// Old Support System Functions (REMOVED)
 // ============================================
-
-export async function createSupportMessage(data: {
-  ticket_id: number;
-  user_id: number;
-  message: string;
-  is_staff: boolean;
-}) {
-  const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
-  const result = await db.insert(supportMessages).values({
-    ticket_id: data.ticket_id,
-    user_id: data.user_id,
-    message: data.message,
-    is_staff: data.is_staff ? 1 : 0,
-    created_at: new Date(),
-  });
-
-  // Update ticket's updatedAt timestamp
-  await db
-    .update(supportTickets)
-    .set({ updated_at: new Date() })
-    .where(eq(supportTickets.id, data.ticket_id));
-
-  return result;
-}
-
-export async function getSupportMessagesByTicketId(ticket_id: number) {
-  const db = await getDb();
-  if (!db) {
-    throw new Error("Database not available");
-  }
-
-  return await db
-    .select()
-    .from(supportMessages)
-    .where(eq(supportMessages.ticket_id, ticket_id))
-    .orderBy(supportMessages.created_at);
-}
+// The old support ticket system has been replaced with a new
+// real-time chat system. See server/routers_support.ts for
+// the new implementation.
 
 // ============================================
 // Admin Functions
