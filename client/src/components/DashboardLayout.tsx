@@ -17,7 +17,7 @@ import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { MobileHeader } from '@/components/MobileHeader';
 import { MobileHeaderSpacer } from '@/components/MobileHeaderSpacer';
-import { SupportChat } from '@/components/SupportChat';
+
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   console.log('[DashboardLayout] Component mounted');
@@ -248,8 +248,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <MobileBottomNav />
       </main>
       
-      {/* Support Chat - Available globally */}
-      <SupportChat />
+
     </div>
   );
 }
