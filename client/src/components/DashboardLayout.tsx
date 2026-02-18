@@ -79,7 +79,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Settings at the bottom (separate)
   const settingsItems = [
     { name: 'Configuración', href: '/settings', icon: Settings },
-    { name: 'Reportar Bug', href: '/bug-report', icon: Bug },
   ];
 
   // Admin section - only for super_admin

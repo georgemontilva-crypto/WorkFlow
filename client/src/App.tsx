@@ -32,7 +32,7 @@ import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import Markets from "./pages/Markets";
 import PricingPage from "./pages/PricingPage";
-import BugReportPage from "./pages/BugReportPage";
+
 
 import CompanyProfile from "./pages/CompanyProfile";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -86,11 +86,7 @@ function Router() {
           <Settings />
         </ProtectedRoute>
       </Route>
-      <Route path="/bug-report">
-        <ProtectedRoute>
-          <BugReportPage />
-        </ProtectedRoute>
-      </Route>
+
       <Route path="/company-profile">
         <ProtectedRoute>
           <CompanyProfile />
