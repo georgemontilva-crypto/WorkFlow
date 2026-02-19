@@ -506,8 +506,4 @@ export const cryptoWalletAddresses = mysqlTable("crypto_wallet_addresses", {
 export type CryptoWalletAddress = typeof cryptoWalletAddresses.$inferSelect;
 export type InsertCryptoWalletAddress = typeof cryptoWalletAddresses.$inferInsert;
 
-/**
- * Support Chat System
- * Real-time support with bot and human agents
- */
-export * from './schema_support';
+
